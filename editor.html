@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>LAIR ARCHITECT &mdash; CLICK &amp; DAGGER</title>
+<link rel="stylesheet" href="editor.css?v=6">
+</head>
+<body>
+<div id="wrap">
+  <header>
+    <h1>LAIR ARCHITECT</h1>
+    <span class="sub">CLICK &amp; DAGGER &mdash; MISSION CONSTRUCTION BUREAU</span>
+    <a class="back" href="index.html">&larr; BACK TO THE FIELD</a>
+  </header>
+
+  <div id="cols">
+    <aside id="palette">
+      <div class="gridtool">
+        <h2>WALLS &amp; DOORS</h2>
+        <div id="tiles" class="tools"></div>
+      </div>
+      <h2>PERSONNEL &amp; PROPS</h2>
+      <div id="entsPal" class="tools"></div>
+      <p class="hint"><b>[</b> <b>]</b> or scroll here to cycle which one you're placing.</p>
+      <h2>SPECIAL</h2>
+      <div id="specials" class="tools"></div>
+      <div class="row">
+        <label>AGENT FACES</label>
+        <select id="spawnang">
+          <option value="-1.5707963">NORTH</option>
+          <option value="0">EAST</option>
+          <option value="1.5707963">SOUTH</option>
+          <option value="3.1415927">WEST</option>
+        </select>
+      </div>
+
+      <div class="gridtool">
+        <h2>SECTOR HEIGHT</h2>
+        <div id="htools" class="tools"></div>
+        <div class="row">
+          <label><input id="hfOn" type="checkbox" checked> FLOOR</label>
+          <input id="hf" type="number" step="0.1" value="0.0">
+        </div>
+        <div class="row">
+          <label><input id="hcOn" type="checkbox"> CEIL</label>
+          <input id="hc" type="number" step="0.1" value="1.0">
+        </div>
+        <div class="row"><button id="hpick">&#9683; EYEDROP CELL</button></div>
+        <p class="hint">Dial a FLOOR and/or CEILING height, then RAISE/LOWER to brush
+        cells or FILL to flood a whole room. Eye sits 0.5 above the floor; walls block
+        steps taller than 0.5. RIGHT-CLICK with a height tool reverts a cell to its
+        material default.</p>
+      </div>
+
+      <div class="gridtool">
+        <h2>TEXTURES</h2>
+        <div class="row">
+          <label>TARGET</label>
+          <select id="textarget">
+            <option value="surf">FLOOR / WALL</option>
+            <option value="ceil">CEILING</option>
+          </select>
+        </div>
+        <div id="texpal" class="tools"></div>
+        <p class="hint">Pick a TARGET, click a texture, then paint cells to retexture
+        their floor/wall or ceiling — independent of height and material. RIGHT-CLICK
+        reverts a cell's texture. A cyan-bordered corner marks a custom ceiling.</p>
+      </div>
+
+      <div id="drawpanel">
+        <h2>SECTORS</h2>
+        <p class="hint">This is a vector map. <b>Click</b> (or <b>SPACE</b>) drops wall
+        vertices; close the loop on the first point to make a sector. <b>I</b> inserts a
+        vertex on a wall. <b>DEL</b> removes; <b>Ctrl-Z</b> undo. Pick a person/prop below
+        then click to place it. Set floor/ceiling/textures/sky/win/doors in <b>3D PREVIEW</b>.</p>
+      </div>
+    </aside>
+
+    <main id="center">
+      <div id="viewbar">
+        <button id="viewtoggle">&#9633; 3D PREVIEW</button>
+        <button id="rectbtn" hidden>&#9646;&#9646; RECT FILL</button>
+        <button id="drawbtn" hidden>&#9998; DRAW SECTORS</button>
+        <span id="viewhint">Draw sectors &middot; place agents &middot; preview in 3D</span>
+      </div>
+      <div id="preview3d" hidden>
+        <canvas id="pcanvas" width="640" height="360"></canvas>
+        <div id="ptarget"></div>
+        <div id="pcontrols"><b>WASD</b> move &nbsp;·&nbsp; <b>ARROWS</b>/<b>DRAG</b> look &nbsp;·&nbsp;
+        sector: <b>PgUp</b>/<b>PgDn</b> raise/lower floor (<b>Shift</b> = ceiling) &nbsp;·&nbsp; <b>,</b> <b>.</b> slope &nbsp;·&nbsp; <b>[</b> <b>]</b>/<b>scroll</b> texture &nbsp;·&nbsp; <b>ESC</b> map
+        &nbsp;·&nbsp; cyan glow = the surface you're about to edit</div>
+      </div>
+      <div id="drawhelp"><b>SPACE</b>/click vertex &nbsp;·&nbsp; <b>drag</b> a vertex to move it &nbsp;·&nbsp; close on the first to make a sector &nbsp;·&nbsp; <b>I</b> insert on a wall &nbsp;·&nbsp; <b>DEL</b> remove vertex/sector &nbsp;·&nbsp; <b>Ctrl-Z</b> undo &nbsp;·&nbsp; <b>scroll</b> = zoom &nbsp;·&nbsp; white = solid, red = sector wall</div>
+      <div id="gridscroll"><canvas id="grid"></canvas></div>
+      <div id="statusbar">
+        <span id="coords">&nbsp;</span>
+        <span id="status">&nbsp;</span>
+      </div>
+    </main>
+
+    <aside id="side">
+      <h2>MISSION CHECK</h2>
+      <ul id="checks"></ul>
+      <h2>MAP SIZE</h2>
+      <div class="row">
+        <input id="mw" type="number" min="8" max="48" value="24"> &times;
+        <input id="mh" type="number" min="8" max="48" value="24">
+        <button id="resize">APPLY</button>
+      </div>
+      <h2>FILE</h2>
+      <div id="filebtns">
+        <button id="save">SAVE TO BROWSER</button>
+        <button id="play" class="gold">SAVE &amp; PLAY &#9654;</button>
+        <button id="export">EXPORT .JSON</button>
+        <button id="import">IMPORT .JSON</button>
+        <button id="loaddefault">LOAD PLAZA VIEJA</button>
+        <button id="newmap">NEW BLANK MAP</button>
+      </div>
+      <p class="hint">LEFT-DRAG paints. RIGHT-CLICK erases (entity first, then wall).
+      Placing an entity or the spawn clears the wall under it.
+      The blast door needs the full chain: 004's picks &rarr; desk &rarr; punch card,
+      tube &rarr; mainframe &rarr; power.</p>
+    </aside>
+  </div>
+</div>
+<input type="file" id="filein" accept=".json,application/json" hidden>
+<script src="js/world.js?v=31"></script>
+<script src="js/engine.js?v=36"></script>
+<script src="js/editor.js?v=34"></script>
+</body>
+</html>

@@ -1,0 +1,1401 @@
+'use strict';
+
+// LAIR ARCHITECT — level editor. Produces the same level JSON that
+// World.load() consumes; SAVE & PLAY hands it to the game via localStorage.
+const Editor = (() => {
+  const LS_KEY = 'cloakclick.custom';
+  const T = World.T;
+
+  const TILES = [
+    { ch: '.', name: 'FLOOR' },
+    { ch: '#', name: 'TEAK WALL', tex: T.TEAK },
+    { ch: '%', name: 'LAIR WALL', tex: T.LAIR },
+    { ch: 'C', name: 'RADIO DOOR', tex: T.RADIO },
+    { ch: 'E', name: 'BLAST DOOR', tex: T.EXIT },
+    { ch: 'F', name: 'MAINFRAME', tex: T.MAINFRAME },
+    { ch: 'P', name: 'POSTER', tex: T.POSTER },
+    { ch: 'r', name: 'RAISED', floor: 'metal', tag: '▲' },
+    { ch: 'p', name: 'SUNKEN', floor: 'lounge', tag: '▼' },
+    { ch: 'l', name: 'LOW CEIL', floor: 'carpet', tag: '▁' },
+    { ch: 'o', name: 'OUTDOOR', floor: 'ground', tag: '☼' },
+    { ch: 'w', name: 'HELIPAD', floor: 'helipad', tag: 'H' },
+  ];
+  // map chars that are floor sectors → the floor texture drawn top-down
+  const FLOORNAME = { r: 'metal', p: 'lounge', l: 'carpet', o: 'ground', w: 'helipad' };
+  const ENTS = [
+    { kind: 'goon', name: 'HENCHMAN', spr: 'goon' },
+    { kind: 'agent', name: 'AGENT 004', spr: 'agentCase' },
+    { kind: 'desk', name: 'DESK', spr: 'desk' },
+    { kind: 'tube', name: 'TUBE', spr: 'tube' },
+    { kind: 'plant', name: 'PALM', spr: 'plant' },
+    { kind: 'bar', name: 'BAR CART', spr: 'bar' },
+    { kind: 'medkit', name: 'FIRST-AID', spr: 'medkit' },
+    { kind: 'ammo', name: 'AMMO', spr: 'ammo' },
+    { kind: 'camera', name: 'CAMERA', spr: 'camera' },
+    { kind: 'safe', name: 'SAFE', spr: 'safe' },
+    { kind: 'filecab', name: 'FILE CABINET', spr: 'filecab' },
+    { kind: 'globe', name: 'GLOBE', spr: 'globe' },
+    { kind: 'briefcase', name: 'BRIEFCASE', spr: 'briefcase' },
+    { kind: 'radio', name: 'SHORTWAVE', spr: 'radio' },
+    { kind: 'typewriter', name: 'TYPEWRITER', spr: 'typewriter' },
+    { kind: 'cigarcrate', name: 'CIGAR CRATE', spr: 'cigarcrate' },
+    { kind: 'deskfan', name: 'DESK FAN', spr: 'deskfan' },
+    { kind: 'streetlamp', name: 'STREET LAMP', spr: 'streetlamp' },
+    { kind: 'umbrella', name: 'UMBRELLA', spr: 'umbrella' },
+    { kind: 'wallclock', name: 'WALL CLOCK', spr: 'wallclock' },
+    { kind: 'brute', name: 'BRUTE', spr: 'brute' },
+    { kind: 'sniper', name: 'SNIPER', spr: 'sniper' },
+    { kind: 'civilianM', name: 'CIVILIAN (M)', spr: 'civilianM' },
+    { kind: 'civilianF', name: 'CIVILIAN (F)', spr: 'civilianF' },
+    { kind: 'sedan', name: 'SEDAN', spr: 'sedan' },
+    { kind: 'motorcycle', name: 'MOTORCYCLE', spr: 'motorcycle' },
+    { kind: 'phonebooth', name: 'PHONE BOOTH', spr: 'phonebooth' },
+    { kind: 'parkbench', name: 'PARK BENCH', spr: 'parkbench' },
+    { kind: 'newsstand', name: 'NEWSSTAND', spr: 'newsstand' },
+    { kind: 'oildrum', name: 'OIL DRUM', spr: 'oildrum' },
+    { kind: 'cratestack', name: 'CRATE STACK', spr: 'cratestack' },
+    { kind: 'guardpost', name: 'GUARD POST', spr: 'guardpost' },
+    { kind: 'firehydrant', name: 'FIRE HYDRANT', spr: 'firehydrant' },
+    { kind: 'satdish', name: 'SAT. DISH', spr: 'satdish' },
+  ];
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF']);      // neutral — placed with a default wander behavior
+  const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
+
+  // ---- state ----
+  // fh/ch: per-cell floor/ceil height overrides (null = material default)
+  // stex/ctex: per-cell surface(floor/wall) and ceiling texture overrides (null = default)
+  const lv = { w: 24, h: 24, cells: [], fh: [], ch: [], stex: [], ctex: [], fsx: [], fsy: [], spawn: { x: 2.5, y: 2.5, a: 0 }, ents: [] };
+  let tool = { t: 'tile', v: '#' };
+  let entBtns = [];                                              // ENTS-index → palette button, for keyboard/wheel cycling
+  const hset = { f: 0.0, c: 1.0, applyF: true, applyC: false };  // height-tool settings
+  const texset = { name: 'lair', target: 'surf' };              // texture-tool settings
+  let eyedrop = false;
+  let rectMode = false, rectStart = null;                       // rectangle bulk-fill
+  // ---- vector sector geometry (Build-style DRAW mode) ----
+  // verts: {x,y} in world units (float). sectors: { loop:[vertIndices], floor, ceil, parent }.
+  const geo = { verts: [], sectors: [] };
+  let drawMode = false;
+  let draft = [];                                               // vertex indices of the sector being drawn
+  const gcur = { x: 0, y: 0, vi: -1 };                          // snapped world cursor + snapped-vertex index
+  let hoverEdge = null;                                         // {s, i} hovered wall for I-insert
+  let draggingVert = -1;                                        // vertex index being dragged, or -1
+  let painting = false;
+  let hover = null;
+  let cellPx = 28;
+  let zoom = 1;                               // map zoom factor (scroll wheel)
+
+  // effective floor/ceil for a cell: override if set, else the material default
+  function effH(x, y) {
+    const chr = lv.cells[y][x];
+    const base = World.SURF[chr];
+    if (World.CH[chr] > 0 || !base) return null;   // solid
+    const fo = lv.fh[y] ? lv.fh[y][x] : null, co = lv.ch[y] ? lv.ch[y][x] : null;
+    return { f: fo != null ? fo : base.f, c: co != null ? co : base.c, custom: fo != null || co != null };
+  }
+
+  const cvs = document.getElementById('grid');
+  const g = cvs.getContext('2d');
+  const statusEl = document.getElementById('status');
+  const coordsEl = document.getElementById('coords');
+  let statusT = null;
+
+  function status(t) {
+    statusEl.textContent = t;
+    clearTimeout(statusT);
+    statusT = setTimeout(() => { statusEl.textContent = ' '; }, 3500);
+  }
+
+  // ---- level <-> editor state ----
+  function fromLevel(json) {
+    lv.w = json.w; lv.h = json.h;
+    lv.cells = []; lv.fh = []; lv.ch = []; lv.stex = []; lv.ctex = []; lv.fsx = []; lv.fsy = [];
+    for (let y = 0; y < lv.h; y++) {
+      const row = json.map[y] || '';
+      const frow = json.floor && json.floor[y], crow = json.ceil && json.ceil[y];
+      const strow = json.stex && json.stex[y], ctrow = json.ctex && json.ctex[y];
+      const fsxrow = json.fsx && json.fsx[y], fsyrow = json.fsy && json.fsy[y];
+      lv.cells[y] = []; lv.fh[y] = []; lv.ch[y] = []; lv.stex[y] = []; lv.ctex[y] = []; lv.fsx[y] = []; lv.fsy[y] = [];
+      for (let x = 0; x < lv.w; x++) {
+        lv.cells[y][x] = World.CH[row[x]] !== undefined ? row[x] : '.';
+        lv.fh[y][x] = frow && frow[x] != null ? frow[x] : null;
+        lv.ch[y][x] = crow && crow[x] != null ? crow[x] : null;
+        lv.stex[y][x] = strow && strow[x] ? strow[x] : null;
+        lv.ctex[y][x] = ctrow && ctrow[x] ? ctrow[x] : null;
+        lv.fsx[y][x] = fsxrow && fsxrow[x] ? fsxrow[x] : 0;
+        lv.fsy[y][x] = fsyrow && fsyrow[x] ? fsyrow[x] : 0;
+      }
+    }
+    lv.spawn = { x: json.spawn.x, y: json.spawn.y, a: json.spawn.a };
+    lv.ents = json.ents.map(e => ({ ...e }));                     // keep extra fields (e.g. civilian `behavior`)
+    geo.verts = (json.geo && json.geo.verts) ? json.geo.verts.map(v => ({ x: v.x, y: v.y })) : [];
+    geo.sectors = (json.geo && json.geo.sectors) ? json.geo.sectors.map(s => ({
+      loop: s.loop.slice(), floor: s.floor || 0, ceil: s.ceil == null ? 1 : s.ceil,
+      floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, win: !!s.win,
+      texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : null,
+      wallTex: s.wallTex ? s.wallTex.slice() : null,
+      wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : null, parent: s.parent == null ? -1 : s.parent,
+      solid: !!s.solid,
+    })) : [];
+    draft = [];
+    document.getElementById('mw').value = lv.w;
+    document.getElementById('mh').value = lv.h;
+    syncAngleSelect();
+    fitCanvas();
+    render();
+  }
+
+  function toLevel() {
+    let anyH = false, anyT = false, anyS = false;
+    for (let y = 0; y < lv.h; y++) for (let x = 0; x < lv.w; x++) {
+      if ((lv.fh[y] && lv.fh[y][x] != null) || (lv.ch[y] && lv.ch[y][x] != null)) anyH = true;
+      if ((lv.stex[y] && lv.stex[y][x]) || (lv.ctex[y] && lv.ctex[y][x])) anyT = true;
+      if ((lv.fsx[y] && lv.fsx[y][x]) || (lv.fsy[y] && lv.fsy[y][x])) anyS = true;
+    }
+    const out = {
+      v: anyS ? 4 : anyT ? 3 : anyH ? 2 : 1, w: lv.w, h: lv.h,
+      map: lv.cells.map(r => r.join('')),
+      spawn: { x: lv.spawn.x, y: lv.spawn.y, a: lv.spawn.a },
+      ents: lv.ents.map(e => ({ ...e })),
+    };
+    if (anyH) {
+      out.floor = lv.fh.map(r => r.map(v => v == null ? null : v));
+      out.ceil = lv.ch.map(r => r.map(v => v == null ? null : v));
+    }
+    if (anyT) {
+      out.stex = lv.stex.map(r => r.map(v => v || null));
+      out.ctex = lv.ctex.map(r => r.map(v => v || null));
+    }
+    if (anyS) {
+      out.fsx = lv.fsx.map(r => r.map(v => v || 0));
+      out.fsy = lv.fsy.map(r => r.map(v => v || 0));
+    }
+    if (geo.sectors.length) {
+      out.geo = {
+        verts: geo.verts.map(v => ({ x: v.x, y: v.y })),
+        sectors: geo.sectors.map(s => ({ loop: s.loop.slice(), floor: s.floor, ceil: s.ceil, floorTex: s.floorTex, ceilTex: s.ceilTex, sky: !!s.sky, win: !!s.win, texScale: s.texScale || 1,
+          wallDoor: (s.wallDoor && s.wallDoor.some(Boolean)) ? s.wallDoor.slice() : undefined,
+          wallTex: (s.wallTex && s.wallTex.some(Boolean)) ? s.wallTex.slice() : undefined,
+          wallTexScale: (s.wallTexScale && s.wallTexScale.some(v => v && v !== 1)) ? s.wallTexScale.slice() : undefined,
+          parent: s.parent, solid: s.solid || undefined })),
+      };
+      out.v = Math.max(out.v, 5);
+    }
+    return out;
+  }
+
+  function blankLevel(w, h) {
+    const map = [];
+    for (let y = 0; y < h; y++) {
+      map.push((y === 0 || y === h - 1) ? '%'.repeat(w) : '%' + '.'.repeat(w - 2) + '%');
+    }
+    return { v: 1, w, h, map, spawn: { x: (w >> 1) + 0.5, y: (h >> 1) + 0.5, a: 0 }, ents: [] };
+  }
+
+  // ---- palette ----
+  function thumb(draw) {
+    const c = document.createElement('canvas');
+    c.width = 30; c.height = 30;
+    draw(c.getContext('2d'));
+    return c;
+  }
+  function toolBtn(parent, label, tc, sel) {
+    const b = document.createElement('button');
+    b.className = 'tool';
+    b.appendChild(tc);
+    b.appendChild(document.createTextNode(label));
+    b.onclick = () => {
+      document.querySelectorAll('.tool').forEach(n => n.classList.remove('sel'));
+      b.classList.add('sel');
+      sel();
+    };
+    parent.appendChild(b);
+    return b;
+  }
+
+  function buildPalette() {
+    const tilesEl = document.getElementById('tiles');
+    for (const t of TILES) {
+      const tc = thumb(gg => {
+        gg.imageSmoothingEnabled = false;
+        gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
+        if (t.tex !== undefined) gg.drawImage(World.TEX[t.tex], 0, 0, 64, 64, 0, 0, 30, 30);
+        else if (t.floor) gg.drawImage(World.FLOOR[t.floor], 0, 0, 64, 64, 0, 0, 30, 30);
+        if (t.tag) {
+          gg.fillStyle = '#0b0b0e'; gg.fillRect(0, 0, 12, 12);
+          gg.fillStyle = '#ffd75e'; gg.font = 'bold 10px monospace';
+          gg.textAlign = 'center'; gg.textBaseline = 'middle';
+          gg.fillText(t.tag, 6, 7);
+        }
+      });
+      const b = toolBtn(tilesEl, t.name, tc, () => { tool = { t: 'tile', v: t.ch }; });
+      if (t.ch === tool.v) b.classList.add('sel');
+    }
+    const entsEl = document.getElementById('entsPal');
+    entBtns = ENTS.map(e => {
+      const tc = thumb(gg => {
+        gg.imageSmoothingEnabled = false;
+        gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
+        gg.drawImage(World.SPR[e.spr], 0, 0, 64, 64, 1, 1, 28, 28);
+      });
+      const b = toolBtn(entsEl, e.name, tc, () => { tool = { t: 'ent', v: e.kind }; });
+      if (e.kind === tool.v) b.classList.add('sel');
+      return b;
+    });
+    entsEl.addEventListener('wheel', e => {                       // scroll the props panel = cycle the placement sprite
+      e.preventDefault();
+      cycleEntKind(e.deltaY < 0 ? -1 : 1);
+    }, { passive: false });
+    const spEl = document.getElementById('specials');
+    toolBtn(spEl, 'SPAWN', thumb(gg => {
+      gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
+      drawSpawnArrow(gg, 15, 15, 11, 0);
+    }), () => { tool = { t: 'spawn' }; });
+    toolBtn(spEl, 'ERASER', thumb(gg => {
+      gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
+      gg.strokeStyle = '#ff8a3a'; gg.lineWidth = 3;
+      gg.beginPath(); gg.moveTo(8, 8); gg.lineTo(22, 22); gg.moveTo(22, 8); gg.lineTo(8, 22); gg.stroke();
+    }), () => { tool = { t: 'erase' }; });
+
+    const htEl = document.getElementById('htools');
+    toolBtn(htEl, 'RAISE/LWR', thumb(gg => {
+      gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
+      gg.fillStyle = '#7fd0ff';
+      gg.beginPath(); gg.moveTo(15, 3); gg.lineTo(9, 11); gg.lineTo(21, 11); gg.fill();
+      gg.fillStyle = '#ffb060';
+      gg.beginPath(); gg.moveTo(15, 27); gg.lineTo(9, 19); gg.lineTo(21, 19); gg.fill();
+    }), () => { tool = { t: 'height' }; });
+    toolBtn(htEl, 'FILL ROOM', thumb(gg => {
+      gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
+      gg.strokeStyle = '#7fe0d8'; gg.lineWidth = 2;
+      gg.strokeRect(7, 12, 16, 12);
+      gg.fillStyle = '#7fe0d8'; gg.fillRect(7, 18, 16, 6);
+      gg.beginPath(); gg.moveTo(15, 4); gg.lineTo(15, 12); gg.stroke();
+    }), () => { tool = { t: 'hfill' }; });
+
+    // wire the height inputs
+    const hf = document.getElementById('hf'), hc = document.getElementById('hc');
+    const hfOn = document.getElementById('hfOn'), hcOn = document.getElementById('hcOn');
+    const clampH = v => Math.max(-4, Math.min(8, v));
+    hf.oninput = () => { hset.f = clampH(parseFloat(hf.value) || 0); };
+    hc.oninput = () => { hset.c = clampH(parseFloat(hc.value) || 1); };
+    hfOn.onchange = () => { hset.applyF = hfOn.checked; };
+    hcOn.onchange = () => { hset.applyC = hcOn.checked; };
+    document.getElementById('hpick').onclick = () => {
+      eyedrop = true; status('EYEDROP: CLICK A CELL TO READ ITS HEIGHTS.');
+    };
+
+    // texture palette — every registry texture, assignable to any surface
+    const texEl = document.getElementById('texpal');
+    for (const name of World.TXNAMES) {
+      const tc = thumb(gg => {
+        gg.imageSmoothingEnabled = false;
+        gg.drawImage(World.TX[name], 0, 0, 64, 64, 0, 0, 30, 30);
+      });
+      const b = toolBtn(texEl, name.toUpperCase(), tc, () => { tool = { t: 'tex' }; texset.name = name; });
+      if (name === texset.name) b.dataset.tex = name;
+    }
+    document.getElementById('textarget').onchange = e => { texset.target = e.target.value; };
+  }
+
+  // ---- rendering ----
+  function drawPad(gg, px, py, s) {
+    gg.strokeStyle = '#ffd75e'; gg.lineWidth = Math.max(1, s / 14);
+    gg.beginPath(); gg.arc(px + s / 2, py + s / 2, s * 0.33, 0, 7); gg.stroke();
+    gg.fillStyle = '#ffd75e';
+    gg.font = 'bold ' + Math.max(7, s * 0.4) + 'px monospace';
+    gg.textAlign = 'center'; gg.textBaseline = 'middle';
+    gg.fillText('H', px + s / 2, py + s / 2 + 1);
+  }
+
+  function tagCell(gg, px, py, s, ch, col) {
+    gg.fillStyle = col; gg.font = 'bold ' + Math.max(8, s * 0.6) + 'px monospace';
+    gg.textAlign = 'center'; gg.textBaseline = 'middle';
+    gg.fillText(ch, px + s / 2, py + s / 2 + 1);
+  }
+
+  function drawSpawnArrow(gg, cx, cy, r, a) {
+    gg.fillStyle = '#4dff6a';
+    gg.save(); gg.translate(cx, cy); gg.rotate(a);
+    gg.beginPath();
+    gg.moveTo(r, 0); gg.lineTo(-r * 0.6, -r * 0.6); gg.lineTo(-r * 0.25, 0); gg.lineTo(-r * 0.6, r * 0.6);
+    gg.closePath(); gg.fill();
+    gg.restore();
+  }
+
+  function fitCanvas() {
+    const base = Math.max(12, Math.min(30, Math.floor(740 / Math.max(lv.w, lv.h))));
+    cellPx = Math.max(6, Math.min(160, Math.round(base * zoom)));
+    cvs.width = lv.w * cellPx;
+    cvs.height = lv.h * cellPx;
+    g.imageSmoothingEnabled = false;
+  }
+
+  function render() {
+    const c = cellPx;
+    // vector map: dark background + reference grid
+    g.fillStyle = '#161210'; g.fillRect(0, 0, lv.w * c, lv.h * c);
+    g.strokeStyle = 'rgba(255,255,255,0.06)'; g.lineWidth = 1;
+    for (let x = 0; x <= lv.w; x++) { g.beginPath(); g.moveTo(x * c + 0.5, 0); g.lineTo(x * c + 0.5, lv.h * c); g.stroke(); }
+    for (let y = 0; y <= lv.h; y++) { g.beginPath(); g.moveTo(0, y * c + 0.5); g.lineTo(lv.w * c, y * c + 0.5); g.stroke(); }
+    // vector sectors (filled by floor tint) + walls
+    renderGeo();
+    // entities (free-positioned)
+    for (const e of lv.ents) {
+      const def = ENTS.find(d => d.kind === e.kind);
+      if (def) g.drawImage(World.SPR[def.spr], 0, 0, 64, 64, (e.x - 0.5) * c + 1, (e.y - 0.5) * c + 1, c - 2, c - 2);
+    }
+    // spawn
+    drawSpawnArrow(g, lv.spawn.x * c, lv.spawn.y * c, c * 0.38, lv.spawn.a);
+    renderChecks();
+  }
+
+  // ---- mission checklist ----
+  function has(ch) { return lv.cells.some(r => r.includes(ch)); }
+  function entCount(kind) { return lv.ents.filter(e => e.kind === kind).length; }
+  function spawnInSector() {
+    return Engine.sectorAt(lv.spawn.x, lv.spawn.y, geo) >= 0;
+  }
+  function doorCount() {
+    let n = 0; for (const s of geo.sectors) if (s.wallDoor) n += s.wallDoor.filter(Boolean).length;
+    return n;
+  }
+  function renderChecks() {
+    const winSectors = geo.sectors.filter(s => s.win).length;
+    const items = [
+      [geo.sectors.length > 0, 'SECTORS DRAWN (' + geo.sectors.length + ')'],
+      [spawnInSector(), 'AGENT SPAWN INSIDE A SECTOR'],
+      [winSectors > 0, 'WIN ZONE TAGGED (' + winSectors + ')'],
+      [entCount('agent') > 0, 'AGENT 004 (LOCKPICKS) PLACED'],
+    ];
+    const ul = document.getElementById('checks');
+    ul.innerHTML = '';
+    for (const [ok, label] of items) {
+      const li = document.createElement('li');
+      li.className = ok ? 'ok' : 'bad';
+      li.textContent = (ok ? '✓ ' : '⚠ ') + label;
+      ul.appendChild(li);
+    }
+    const li = document.createElement('li');
+    li.className = 'info';
+    li.textContent = '● DOORS: ' + doorCount() + ' · HENCHMEN: ' + entCount('goon') +
+      ' · MEDKITS: ' + entCount('medkit') + ' · AMMO: ' + entCount('ammo');
+    ul.appendChild(li);
+  }
+
+  // ---- editing ----
+  // "enter" prop-placement (defaults to the first kind) or step to the next/prev kind;
+  // [ ] and scrolling the PERSONNEL & PROPS panel both drive this — mirrors the 3D
+  // preview's [ ]/scroll texture cycling, but for WHICH sprite the ENT tool stamps.
+  function cycleEntKind(dir) {
+    const i = tool.t === 'ent' ? ENTS.findIndex(e => e.kind === tool.v) : -1;
+    const next = ((i < 0 ? -dir : i) + dir + ENTS.length) % ENTS.length;
+    tool = { t: 'ent', v: ENTS[next].kind };
+    entBtns.forEach(b => b.classList.remove('sel'));
+    entBtns[next].classList.add('sel');
+    status('PLACING: ' + ENTS[next].name);
+  }
+  // leave prop-placement mode: back to the default click = draw-a-vertex tool
+  function deselectEntTool(silent) {
+    if (tool.t !== 'ent') return;
+    tool = { t: 'tile', v: '#' };
+    document.querySelectorAll('.tool.sel').forEach(b => b.classList.remove('sel'));
+    if (!silent) status('PROP PLACEMENT OFF.');
+  }
+  function entsAt(x, y) { return lv.ents.filter(e => Math.floor(e.x) === x && Math.floor(e.y) === y); }
+  function removeEntsAt(x, y) { lv.ents = lv.ents.filter(e => !(Math.floor(e.x) === x && Math.floor(e.y) === y)); }
+  function entAtWorld(wx, wy) {            // nearest entity within ~0.5 of a free-space point
+    let best = null, bd = 0.5 * 0.5;
+    for (const e of lv.ents) { const dx = e.x - wx, dy = e.y - wy, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = e; } }
+    return best;
+  }
+
+  function stampHeight(x, y) {                               // brush one cell
+    if (World.CH[lv.cells[y][x]] > 0) return;               // never on solids
+    if (hset.applyF) lv.fh[y][x] = hset.f;
+    if (hset.applyC) lv.ch[y][x] = hset.c;
+  }
+  function clearHeight(x, y) { lv.fh[y][x] = null; lv.ch[y][x] = null; }
+
+  function fillHeight(sx, sy) {                              // flood a room of one floor height
+    if (World.CH[lv.cells[sy][sx]] > 0) return;
+    const start = effH(sx, sy); if (!start) return;
+    const target = start.f, seen = new Set(), stack = [[sx, sy]];
+    while (stack.length) {
+      const [x, y] = stack.pop(), k = x + ',' + y;
+      if (seen.has(k) || x < 0 || y < 0 || x >= lv.w || y >= lv.h) continue;
+      seen.add(k);
+      if (World.CH[lv.cells[y][x]] > 0) continue;            // walls bound the room
+      const e = effH(x, y);
+      if (!e || Math.abs(e.f - target) > 1e-3) continue;     // stop at a height change
+      stampHeight(x, y);
+      stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+    }
+  }
+
+  function applyCell(x, y) {                          // one cell, no render (used by rect fill)
+    if (tool.t === 'tile') {
+      lv.cells[y][x] = tool.v;
+      if (World.CH[tool.v] > 0) removeEntsAt(x, y);     // walls evict entities
+    } else if (tool.t === 'ent') {
+      lv.cells[y][x] = World.CH[lv.cells[y][x]] > 0 ? '.' : lv.cells[y][x];
+      removeEntsAt(x, y);
+      lv.ents.push(Object.assign({ kind: tool.v, x: x + 0.5, y: y + 0.5 }, CIVILIAN_KINDS.has(tool.v) ? { behavior: 'wander' } : null));
+    } else if (tool.t === 'spawn') {
+      lv.cells[y][x] = World.CH[lv.cells[y][x]] > 0 ? '.' : lv.cells[y][x];
+      lv.spawn.x = x + 0.5; lv.spawn.y = y + 0.5;
+    } else if (tool.t === 'erase') {
+      eraseCell(x, y);
+    } else if (tool.t === 'height') {
+      stampHeight(x, y);
+    } else if (tool.t === 'hfill') {
+      fillHeight(x, y);
+    } else if (tool.t === 'tex') {
+      stampTex(x, y);
+    }
+  }
+  function apply(x, y) { applyCell(x, y); render(); }
+
+  function stampTex(x, y) {
+    if (texset.target === 'ceil') { if (World.CH[lv.cells[y][x]] === 0) lv.ctex[y][x] = texset.name; }
+    else lv.stex[y][x] = texset.name;              // floor cells → floor tex, wall cells → wall tex
+  }
+  function clearTex(x, y) {
+    if (texset.target === 'ceil') lv.ctex[y][x] = null; else lv.stex[y][x] = null;
+  }
+
+  function eraseCell(x, y) {
+    if (entsAt(x, y).length) removeEntsAt(x, y);
+    else { lv.cells[y][x] = '.'; clearHeight(x, y); lv.stex[y][x] = null; lv.ctex[y][x] = null; }
+  }
+  function erase(x, y) { eraseCell(x, y); render(); }
+
+  const rectEligible = () => ['tile', 'tex', 'height', 'erase'].includes(tool.t);
+  function applyRect(ax, ay, bx, by) {                // fill a rectangular region with the active tool
+    const x0 = Math.min(ax, bx), x1 = Math.max(ax, bx), y0 = Math.min(ay, by), y1 = Math.max(ay, by);
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) applyCell(x, y);
+    render();
+    status('FILLED ' + (x1 - x0 + 1) + '×' + (y1 - y0 + 1) + ' REGION.');
+  }
+
+  function cellFromEvent(e) {
+    const r = cvs.getBoundingClientRect();
+    const x = Math.floor((e.clientX - r.left) * (cvs.width / r.width) / cellPx);
+    const y = Math.floor((e.clientY - r.top) * (cvs.height / r.height) / cellPx);
+    if (x < 0 || y < 0 || x >= lv.w || y >= lv.h) return null;
+    return { x, y };
+  }
+
+  cvs.addEventListener('mousedown', e => {
+    if (drawMode) {                                  // vector map: place vertex / entity / spawn
+      const w = worldFromEvent(e);
+      if (e.button === 2) {                          // right-click: delete an entity, else cancel a draft
+        const hit = entAtWorld(w.x, w.y);
+        if (hit) { pushUndo(); lv.ents.splice(lv.ents.indexOf(hit), 1); render(); }
+        else cancelDraft();
+        return;
+      }
+      if (tool.t === 'ent') {
+        pushUndo();
+        const placedName = (ENTS.find(e => e.kind === tool.v) || {}).name || tool.v;
+        lv.ents.push(Object.assign({ kind: tool.v, x: +w.x.toFixed(2), y: +w.y.toFixed(2) }, CIVILIAN_KINDS.has(tool.v) ? { behavior: 'wander' } : null));
+        deselectEntTool(true);                          // one prop per pick — no accidental continuous stamping
+        status('PLACED ' + placedName + '.');
+        render();
+        return;
+      }
+      if (tool.t === 'spawn') { pushUndo(); lv.spawn.x = +w.x.toFixed(2); lv.spawn.y = +w.y.toFixed(2); lv.spawn.a = +document.getElementById('spawnang').value; render(); return; }
+      if (tool.t === 'erase') { const hit = entAtWorld(w.x, w.y); if (hit) { pushUndo(); lv.ents.splice(lv.ents.indexOf(hit), 1); render(); } return; }
+      if (draft.length === 0 && gcur.vi >= 0) {       // clicked an existing vertex (not mid-draft) → drag it
+        pushUndo(); draggingVert = gcur.vi; return;
+      }
+      pushUndo(); placeVertex();                      // default tool draws sector geometry
+      return;
+    }
+    const c = cellFromEvent(e);
+    if (!c) return;
+    if (eyedrop) {
+      const eh = effH(c.x, c.y);
+      if (eh) {
+        hset.f = eh.f; hset.c = eh.c;
+        document.getElementById('hf').value = eh.f;
+        document.getElementById('hc').value = eh.c;
+        status('PICKED  F:' + eh.f.toFixed(1) + '  C:' + eh.c.toFixed(1) + '.');
+      }
+      eyedrop = false; return;
+    }
+    if (e.button === 2) {
+      pushUndo();
+      if (tool.t === 'height' || tool.t === 'hfill') { clearHeight(c.x, c.y); render(); }
+      else if (tool.t === 'tex') { clearTex(c.x, c.y); render(); }
+      else erase(c.x, c.y);
+      return;
+    }
+    pushUndo();
+    if (rectMode && rectEligible()) { rectStart = { x: c.x, y: c.y }; hover = c; render(); return; }
+    painting = true;
+    apply(c.x, c.y);
+  });
+  cvs.addEventListener('mousemove', e => {
+    if (drawMode) { updateDrawHover(e); return; }   // vector DRAW mode
+    const c = cellFromEvent(e);
+    hover = c;
+    if (c) {
+      const eh = effH(c.x, c.y);
+      coordsEl.textContent = 'CELL ' + c.x + ',' + c.y +
+        (eh ? ' · F ' + eh.f.toFixed(1) + ' C ' + eh.c.toFixed(1) + (eh.custom ? '*' : '') : ' · WALL') +
+        (entsAt(c.x, c.y)[0] ? ' · ' + ENTS.find(d => d.kind === entsAt(c.x, c.y)[0].kind).name : '');
+      if (painting && (tool.t === 'tile' || tool.t === 'erase' || tool.t === 'height' || tool.t === 'tex')) { apply(c.x, c.y); return; }
+    } else {
+      coordsEl.textContent = ' ';
+    }
+    render();
+  });
+  window.addEventListener('mouseup', () => {
+    painting = false;
+    if (draggingVert >= 0) { draggingVert = -1; rebuildParents(); render(); status('VERTEX MOVED.'); }
+    if (rectStart) {
+      const end = hover || rectStart;
+      applyRect(rectStart.x, rectStart.y, end.x, end.y);
+      rectStart = null;
+    }
+  });
+  cvs.addEventListener('mouseleave', () => { hover = null; painting = false; render(); });
+  cvs.addEventListener('contextmenu', e => e.preventDefault());
+
+  // ---- controls ----
+  document.getElementById('spawnang').addEventListener('change', e => {
+    lv.spawn.a = parseFloat(e.target.value);
+    render();
+  });
+  function syncAngleSelect() {
+    const sel = document.getElementById('spawnang');
+    let best = 0, bd = 1e9;
+    [...sel.options].forEach((o, i) => {
+      const d = Math.abs(Math.atan2(Math.sin(lv.spawn.a - parseFloat(o.value)), Math.cos(lv.spawn.a - parseFloat(o.value))));
+      if (d < bd) { bd = d; best = i; }
+    });
+    sel.selectedIndex = best;
+    lv.spawn.a = parseFloat(sel.value);
+  }
+
+  document.getElementById('resize').addEventListener('click', () => {
+    const w = Math.max(8, Math.min(48, parseInt(document.getElementById('mw').value) || 24));
+    const h = Math.max(8, Math.min(48, parseInt(document.getElementById('mh').value) || 24));
+    const cells = [], fh = [], ch = [], stex = [], ctex = [], fsx = [], fsy = [];
+    for (let y = 0; y < h; y++) {
+      cells[y] = []; fh[y] = []; ch[y] = []; stex[y] = []; ctex[y] = []; fsx[y] = []; fsy[y] = [];
+      for (let x = 0; x < w; x++) {
+        cells[y][x] = (lv.cells[y] && lv.cells[y][x] !== undefined) ? lv.cells[y][x]
+          : (y === 0 || x === 0 || y === h - 1 || x === w - 1) ? '%' : '.';
+        fh[y][x] = (lv.fh[y] && lv.fh[y][x] !== undefined) ? lv.fh[y][x] : null;
+        ch[y][x] = (lv.ch[y] && lv.ch[y][x] !== undefined) ? lv.ch[y][x] : null;
+        stex[y][x] = (lv.stex[y] && lv.stex[y][x] !== undefined) ? lv.stex[y][x] : null;
+        ctex[y][x] = (lv.ctex[y] && lv.ctex[y][x] !== undefined) ? lv.ctex[y][x] : null;
+        fsx[y][x] = (lv.fsx[y] && lv.fsx[y][x] !== undefined) ? lv.fsx[y][x] : 0;
+        fsy[y][x] = (lv.fsy[y] && lv.fsy[y][x] !== undefined) ? lv.fsy[y][x] : 0;
+      }
+    }
+    // keep the border sealed
+    for (let x = 0; x < w; x++) { if (cells[0][x] === '.') cells[0][x] = '%'; if (cells[h - 1][x] === '.') cells[h - 1][x] = '%'; }
+    for (let y = 0; y < h; y++) { if (cells[y][0] === '.') cells[y][0] = '%'; if (cells[y][w - 1] === '.') cells[y][w - 1] = '%'; }
+    lv.w = w; lv.h = h; lv.cells = cells; lv.fh = fh; lv.ch = ch; lv.stex = stex; lv.ctex = ctex; lv.fsx = fsx; lv.fsy = fsy;
+    lv.ents = lv.ents.filter(e => e.x < w - 0.25 && e.y < h - 0.25);
+    lv.spawn.x = Math.min(lv.spawn.x, w - 1.5);
+    lv.spawn.y = Math.min(lv.spawn.y, h - 1.5);
+    fitCanvas(); render();
+    status('RESIZED TO ' + w + '×' + h + '.');
+  });
+
+  // ---- scroll-wheel zoom (centred on the cursor) ----
+  const gridscroll = document.getElementById('gridscroll');
+  gridscroll.addEventListener('wheel', e => {
+    e.preventDefault();
+    const before = cvs.getBoundingClientRect();
+    const wx = (e.clientX - before.left) / cellPx;      // world point under the cursor (old scale)
+    const wy = (e.clientY - before.top) / cellPx;
+    const prev = zoom;
+    zoom = Math.max(0.4, Math.min(6, zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15)));
+    if (zoom === prev) return;
+    fitCanvas(); render();
+    const sr = gridscroll.getBoundingClientRect();      // re-anchor so the same point stays under the cursor
+    gridscroll.scrollLeft = sr.left + gridscroll.clientLeft + wx * cellPx - e.clientX;
+    gridscroll.scrollTop = sr.top + gridscroll.clientTop + wy * cellPx - e.clientY;
+    status('ZOOM ×' + zoom.toFixed(2));
+  }, { passive: false });
+
+  function save() {
+    localStorage.setItem(LS_KEY, JSON.stringify(toLevel()));
+    status('SAVED TO BROWSER.');
+  }
+  document.getElementById('save').addEventListener('click', save);
+  document.getElementById('play').addEventListener('click', () => {
+    save();
+    window.open('index.html?level=custom', '_blank');
+  });
+
+  document.getElementById('export').addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(toLevel(), null, 1)], { type: 'application/json' }));
+    a.download = 'click-and-dagger-mission.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    status('EXPORTED.');
+  });
+
+  document.getElementById('import').addEventListener('click', () => document.getElementById('filein').click());
+  document.getElementById('filein').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const j = JSON.parse(rd.result);
+        if (!Number.isInteger(j.w) || !Number.isInteger(j.h) || !Array.isArray(j.map) ||
+            !Array.isArray(j.ents) || !j.spawn) throw new Error('not a mission file');
+        fromLevel(j);
+        status('IMPORTED ' + f.name.toUpperCase() + '.');
+      } catch (err) {
+        status('IMPORT FAILED: ' + err.message.toUpperCase());
+      }
+      e.target.value = '';
+    };
+    rd.readAsText(f);
+  });
+
+  document.getElementById('loaddefault').addEventListener('click', () => {
+    const d = World.defaultLevel();
+    fromLevel(d);
+    if (d.geo && d.geo.sectors && d.geo.sectors.length) {         // authored vector mission → load its geo verbatim
+      status('LOADED PLAZA VIEJA — ' + geo.sectors.length + ' SECTORS.');
+      return;
+    }
+    // legacy grid mission → import as vector sectors so it shows in the vector map
+    try {
+      World.load(toLevel());
+      const cg = World.compileGeo();
+      geo.verts = cg.verts; geo.sectors = cg.sectors; draft = [];
+      render();
+      status('IMPORTED PLAZA VIEJA — ' + geo.sectors.length + ' SECTORS.');
+    } catch (err) { status('IMPORT FAILED: ' + String(err.message || err).toUpperCase()); }
+  });
+  document.getElementById('newmap').addEventListener('click', () => {
+    const w = Math.max(8, Math.min(48, parseInt(document.getElementById('mw').value) || 24));
+    const h = Math.max(8, Math.min(48, parseInt(document.getElementById('mh').value) || 24));
+    fromLevel(blankLevel(w, h));
+    status('NEW ' + w + '×' + h + ' MAP.');
+  });
+
+  // ---- 3D first-person preview (toggle with the map editor) ----
+  const pcanvas = document.getElementById('pcanvas');
+  const cam = { x: 2.5, y: 2.5, a: 0, pitch: 0, eyeZ: 0.5, hurtT: 0 };
+  const pG = { player: cam, combat: false, over: false, preview: true, pick: true, bobT: 0, bobAmt: 0, fireT: 0 };
+  const pcur = { cx: -1, cy: -1 };            // cursor position in the render buffer (for surface picking)
+  const pkeys = {};
+  let previewOn = false, pengineReady = false, praf = null, plast = 0, pdrag = false, plx = 0, ply = 0;
+  let usePortal = false, portalGraph = null;  // portal render path when the level has vector sectors
+  let previewCompiled = false;                // preview is a grid level compiled to geo (walk-only; sculpt drawn sectors)
+
+  // A "sector" = the connected region of cells sharing the pointed surface:
+  // same floor height (kind 0), same ceiling height (kind 1), or same wall
+  // texture (kind 2). Editing acts on the whole sector, not one cell.
+  function floodSector(sx, sy, kind) {
+    const inB = (x, y) => x >= 0 && y >= 0 && x < lv.w && y < lv.h;
+    let match;
+    if (kind === 2) {
+      if (!World.isSolid(sx, sy)) return [];
+      const t0 = World.wallTexName(sx, sy);
+      match = (x, y) => World.isSolid(x, y) && World.wallTexName(x, y) === t0;
+    } else if (kind === 1) {
+      const s0 = World.surfAt(sx, sy); if (!s0) return [];
+      const h0 = s0.c;
+      match = (x, y) => { const s = World.surfAt(x, y); return !!s && Math.abs(s.c - h0) < 1e-3; };
+    } else {
+      // floor: a sector is the connected COPLANAR region (same gradient, on the
+      // same plane) so a whole ramp counts as one sector, not per-cell.
+      const s0 = World.surfAt(sx, sy); if (!s0) return [];
+      const A = s0.fsx, B = s0.fsy, f0 = s0.f;
+      match = (x, y) => {
+        const s = World.surfAt(x, y);
+        if (!s || Math.abs(s.fsx - A) > 1e-6 || Math.abs(s.fsy - B) > 1e-6) return false;
+        return Math.abs(s.f - (f0 + A * (x - sx) + B * (y - sy))) < 1e-3;
+      };
+    }
+    const out = [], seen = new Set(), stack = [[sx, sy]];
+    while (stack.length) {
+      const [x, y] = stack.pop(), k = x + ',' + y;
+      if (seen.has(k) || !inB(x, y)) continue;
+      seen.add(k);
+      if (!match(x, y)) continue;
+      out.push({ x, y });
+      stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+    }
+    return out;
+  }
+
+  // 3D editing: point at a floor/ceiling, PgUp/PgDn raises/lowers the whole sector
+  function adjustSurface(dir) {
+    const t = Engine.pickAt(pcur.cx, pcur.cy);
+    if (!t || t.kind === 2) { status('POINT AT A FLOOR OR CEILING.'); return; }
+    const cells = floodSector(t.mx, t.my, t.kind);
+    if (!cells.length) return;
+    const step = 0.1 * dir;
+    for (const c of cells) {                          // additive → preserves any slope
+      const s = World.surfAt(c.x, c.y);
+      if (t.kind === 0) {
+        const z = Math.max(-4, Math.min(s.c - 0.2, s.f + step));
+        World.setFloorZ(c.x, c.y, z); lv.fh[c.y][c.x] = +z.toFixed(3);
+      } else {
+        const z = Math.max(s.f + 0.2, Math.min(8, s.c + step));
+        World.setCeilZ(c.x, c.y, z); lv.ch[c.y][c.x] = +z.toFixed(3);
+      }
+    }
+    status((t.kind === 0 ? 'FLOOR' : 'CEILING') + ' sector ' + (dir > 0 ? 'raised' : 'lowered') + ' (' + cells.length + ' cells)');
+  }
+
+  // 3D editing: point at a floor, tilt the whole sector into a ramp along your
+  // view direction (mean height stays fixed as the pivot).
+  function slopeSector(delta) {
+    const t = Engine.pickAt(pcur.cx, pcur.cy);
+    if (!t || t.kind !== 0) { status('POINT AT A FLOOR TO SLOPE IT.'); return; }
+    const cells = floodSector(t.mx, t.my, 0);
+    if (cells.length < 2) { status('SECTOR TOO SMALL TO SLOPE.'); return; }
+    let sX = 0, sY = 0, sH = 0;
+    for (const c of cells) { sX += c.x + 0.5; sY += c.y + 0.5; sH += World.surfAt(c.x, c.y).f; }
+    const n = cells.length, cX = sX / n, cY = sY / n, h0 = sH / n;
+    const s0 = World.surfAt(t.mx, t.my);
+    let A = s0.fsx + delta * Math.cos(cam.a), B = s0.fsy + delta * Math.sin(cam.a);
+    const mag = Math.hypot(A, B), MAXG = 0.7;
+    if (mag > MAXG) { A *= MAXG / mag; B *= MAXG / mag; }
+    for (const c of cells) {
+      const f = h0 + A * (c.x + 0.5 - cX) + B * (c.y + 0.5 - cY);
+      World.setFloorZ(c.x, c.y, f); World.setFloorSlope(c.x, c.y, A, B);
+      lv.fh[c.y][c.x] = +f.toFixed(3); lv.fsx[c.y][c.x] = +A.toFixed(4); lv.fsy[c.y][c.x] = +B.toFixed(4);
+    }
+    status('SLOPE gradient ' + Math.hypot(A, B).toFixed(2) + ' (' + n + ' cells)');
+  }
+
+  // 3D editing: point at any surface, [ / ] cycles its whole sector's texture
+  function swapTexture(delta) {
+    const t = Engine.pickAt(pcur.cx, pcur.cy);
+    if (!t) { status('POINT AT A SURFACE.'); return; }
+    const cells = floodSector(t.mx, t.my, t.kind);
+    if (!cells.length) return;
+    let cur;
+    if (t.kind === 2) cur = World.wallTexName(t.mx, t.my);
+    else { const s = World.surfAt(t.mx, t.my); cur = t.kind === 0 ? s.ft : s.ct; }
+    const names = World.TXNAMES;
+    let i = names.indexOf(cur); if (i < 0) i = 0;
+    const next = names[(i + delta + names.length) % names.length];
+    for (const c of cells) {
+      if (t.kind === 1) { World.setCeilTex(c.x, c.y, next); lv.ctex[c.y][c.x] = next; }
+      else { World.setSurfTex(c.x, c.y, next); lv.stex[c.y][c.x] = next; }
+    }
+    const label = t.kind === 2 ? 'WALL' : t.kind === 1 ? 'CEILING' : 'FLOOR';
+    status(label + ' sector → ' + next.toUpperCase() + ' · ' + cells.length + ' cells');
+  }
+
+  // ---- vector-sector editing (portal preview): sculpt the sector you look at ----
+  function pickGeoSector() {                                   // march the crosshair ray to the last sector before a wall
+    // A NESTED sub-sector (fountain, stage, any parent>=0 sector) is always the
+    // more specific target the instant the ray crosses into it — stop right there
+    // instead of continuing to march past it back into its (larger) parent. Without
+    // this, a small feature surrounded by more of the same outer sector could never
+    // register: the march would touch it for a couple of steps, then get overwritten
+    // again by the parent sector as the ray continued toward the wall behind it.
+    const dx = Math.cos(cam.a), dy = Math.sin(cam.a);
+    let last = Engine.sectorAt(cam.x, cam.y, geo);
+    for (let t = 0.2; t <= 6; t += 0.2) {
+      const s = Engine.sectorAt(cam.x + dx * t, cam.y + dy * t, geo);
+      if (s < 0) break;
+      if (geo.sectors[s].parent >= 0) return s;
+      last = s;
+    }
+    return last;
+  }
+  function geoRaise(dir, ceiling) {
+    const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
+    const sec = geo.sectors[s], step = 0.1 * dir;
+    if (ceiling) sec.ceil = Math.max(sec.floor + 0.2, Math.min(12, +(sec.ceil + step).toFixed(3)));
+    else sec.floor = Math.max(-6, Math.min(sec.ceil - 0.2, +(sec.floor + step).toFixed(3)));
+    status('SECTOR ' + (s + 1) + (ceiling ? ' CEIL ' + sec.ceil.toFixed(1) : ' FLOOR ' + sec.floor.toFixed(1)));
+  }
+  function geoTex(dir, ceiling) {
+    const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
+    const sec = geo.sectors[s], names = World.TXNAMES;
+    let i = names.indexOf(ceiling ? sec.ceilTex : sec.floorTex); if (i < 0) i = 0;
+    const next = names[(i + dir + names.length) % names.length];
+    if (ceiling) sec.ceilTex = next; else sec.floorTex = next;
+    status('SECTOR ' + (s + 1) + ' ' + (ceiling ? 'CEIL' : 'FLOOR') + ' → ' + next.toUpperCase());
+  }
+  function geoSky() {
+    const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
+    const sec = geo.sectors[s]; sec.sky = !sec.sky;
+    status('SECTOR ' + (s + 1) + ' SKY ' + (sec.sky ? 'ON' : 'OFF'));
+  }
+  function geoWin() {                                          // tag the looked-at sector a WIN zone (goal)
+    const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
+    const sec = geo.sectors[s]; sec.win = !sec.win;
+    status('SECTOR ' + (s + 1) + ' WIN ZONE ' + (sec.win ? 'ON' : 'OFF'));
+  }
+  // toggle a nested shape between a solid mass (column/pillar — no floor/ceiling,
+  // blocks movement and sight, textured on its outward face) and a proper walkable
+  // sector — the classic Build-engine "hole becomes a sector" conversion.
+  function geoToggleSolid() {
+    const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
+    const sec = geo.sectors[s];
+    if (sec.parent < 0) { status('ONLY A NESTED SHAPE CAN BE A SOLID COLUMN.'); return; }
+    sec.solid = !sec.solid;
+    portalGraph = Engine.buildGraph(geo);                      // wall linkage changes: portal ↔ solid
+    status('SECTOR ' + (s + 1) + (sec.solid ? ' → SOLID (COLUMN)' : ' → WALKABLE SECTOR'));
+  }
+  const TEXSCALES = [1, 2, 4, 0.5];                            // floor/ceiling tile size cycle
+  function geoTexScale() {
+    const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
+    const sec = geo.sectors[s];
+    let i = TEXSCALES.indexOf(sec.texScale || 1); if (i < 0) i = 0;
+    sec.texScale = TEXSCALES[(i + 1) % TEXSCALES.length];
+    status('SECTOR ' + (s + 1) + ' TILE ×' + sec.texScale + (sec.texScale > 1 ? ' (bigger)' : sec.texScale < 1 ? ' (smaller)' : ''));
+  }
+  // ray (from camera) vs segment → distance along the ray, or null if it doesn't hit
+  function raySeg(ox, oy, dx, dy, ax, ay, bx, by) {
+    const ex = bx - ax, ey = by - ay, den = dx * ey - dy * ex;
+    if (Math.abs(den) < 1e-9) return null;
+    const t = ((ax - ox) * ey - (ay - oy) * ex) / den;        // along ray
+    const u = ((ax - ox) * dy - (ay - oy) * dx) / den;        // along segment
+    return (t >= 0 && u >= 0 && u <= 1) ? t : null;
+  }
+  function pickGeoWall() {                                     // the loop edge of the current sector the crosshair hits
+    const s = pickGeoSector(); if (s < 0 || !portalGraph[s]) return null;
+    const dx = Math.cos(cam.a), dy = Math.sin(cam.a);
+    const walls = portalGraph[s], loopLen = geo.sectors[s].loop.length;
+    let best = null, bt = Infinity;
+    for (let i = 0; i < walls.length && i < loopLen; i++) {   // own loop edges only (skip appended hole walls)
+      const w = walls[i], A = geo.verts[w.v1], B = geo.verts[w.v2];
+      const t = raySeg(cam.x, cam.y, dx, dy, A.x, A.y, B.x, B.y);
+      if (t != null && t < bt) { bt = t; best = { s, i, portal: w.next >= 0, dist: t }; }
+    }
+    return best;
+  }
+  const WALL_PICK_DIST = 6;                                    // T/[/] act on the WALL (not the floor) when it's this close
+  // Inside a small NESTED sector (fountain, stage…) that 6-unit reach is bigger
+  // than the whole feature, so a wall is always "close" and its floor/ceiling
+  // could never be targeted without holding Shift. Tighten the reach there so its
+  // own surface stays directly selectable — you can still hit its walls, just by
+  // aiming closer to them, same as approaching any real wall.
+  const wallPickDist = hit => (hit && geo.sectors[hit.s].parent >= 0) ? 1.2 : WALL_PICK_DIST;
+  function geoWallTex(dir) {                                   // cycle the looked-at WALL's texture
+    const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
+    const sec = geo.sectors[hit.s], names = World.TXNAMES;
+    if (!sec.wallTex) sec.wallTex = new Array(sec.loop.length).fill(null);
+    let i = names.indexOf(sec.wallTex[hit.i] || 'lair'); if (i < 0) i = 0;
+    const next = names[(i + dir + names.length) % names.length];
+    sec.wallTex[hit.i] = next;
+    portalGraph = Engine.buildGraph(geo);                      // re-derive wall.tex
+    status('WALL ' + (hit.i + 1) + ' → ' + next.toUpperCase());
+  }
+  function cycleTex(dir, shift) {                              // [ ] / wheel: wall if aiming close at one, else floor/ceil
+    const wallHit = !shift && pickGeoWall();
+    if (wallHit && wallHit.dist < wallPickDist(wallHit)) geoWallTex(dir); else geoTex(dir, shift);
+  }
+  function geoWallTexScale() {                                 // cycle the looked-at WALL's tile size
+    const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
+    const sec = geo.sectors[hit.s];
+    if (!sec.wallTexScale) sec.wallTexScale = new Array(sec.loop.length).fill(1);
+    let i = TEXSCALES.indexOf(sec.wallTexScale[hit.i] || 1); if (i < 0) i = 0;
+    const next = TEXSCALES[(i + 1) % TEXSCALES.length];
+    sec.wallTexScale[hit.i] = next;
+    portalGraph = Engine.buildGraph(geo);                      // re-derive wall.texScale
+    status('WALL ' + (hit.i + 1) + ' TILE ×' + next + (next > 1 ? ' (bigger)' : next < 1 ? ' (smaller)' : ''));
+  }
+  const DOORKINDS = [null, 'radio', 'blast', 'mainframe', 'poster'];
+  function geoDoor() {                                         // cycle the looked-at wall's door/interaction tag
+    const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
+    const sec = geo.sectors[hit.s];
+    if (!sec.wallDoor) sec.wallDoor = new Array(sec.loop.length).fill(null);
+    const next = DOORKINDS[(DOORKINDS.indexOf(sec.wallDoor[hit.i] || null) + 1) % DOORKINDS.length];
+    sec.wallDoor[hit.i] = next;
+    portalGraph = Engine.buildGraph(geo);                     // re-derive wall.door + siblings
+    status('WALL ' + (hit.i + 1) + (hit.portal ? ' (portal)' : ' (solid)') + ' → ' + (next ? next.toUpperCase() : 'PLAIN'));
+  }
+
+  function pSolid(x, y) {
+    const r = 0.2;
+    return World.isSolid(x - r, y - r) || World.isSolid(x + r, y - r) ||
+           World.isSolid(x - r, y + r) || World.isSolid(x + r, y + r);
+  }
+  function pUpdate(dt) {
+    const turn = 2.4 * dt;
+    if (pkeys.ArrowLeft) cam.a -= turn;
+    if (pkeys.ArrowRight) cam.a += turn;
+    if (pkeys.ArrowUp) cam.pitch = Math.min(70, cam.pitch + 90 * dt);
+    if (pkeys.ArrowDown) cam.pitch = Math.max(-70, cam.pitch - 90 * dt);
+    const dx = Math.cos(cam.a), dy = Math.sin(cam.a);
+    let mx = 0, my = 0;
+    if (pkeys.KeyW) { mx += dx; my += dy; }
+    if (pkeys.KeyS) { mx -= dx; my -= dy; }
+    if (pkeys.KeyD) { mx += -dy; my += dx; }
+    if (pkeys.KeyA) { mx -= -dy; my -= dx; }
+    const len = Math.hypot(mx, my);
+    if (len > 0) {
+      const sp = 3.0 * dt / len, nx = cam.x + mx * sp, ny = cam.y + my * sp;
+      Engine.moveGeo(geo, portalGraph, cam, nx, ny, 0.2, 0.5);      // real wall/step collision on the Build engine
+    }
+    const s = Engine.sectorAt(cam.x, cam.y, geo);
+    const target = (s >= 0 ? geo.sectors[s].floor : 0) + 0.5;
+    cam.eyeZ += (target - cam.eyeZ) * Math.min(1, dt * 10);
+  }
+  function pStep(dt) {                                             // one preview frame — also used as a debug hook
+    pUpdate(dt || 1 / 60);
+    Engine.renderPortal(pG, geo, portalGraph);                     // always the Build/portal renderer
+    updateTarget();
+  }
+  function pLoop(t) {
+    if (!previewOn) return;
+    const dt = Math.min(0.05, (t - plast) / 1000 || 0.016); plast = t;
+    pStep(dt);
+    praf = requestAnimationFrame(pLoop);
+  }
+  function updateTarget() {
+    const el = document.getElementById('ptarget');
+    if (usePortal) {
+      const wallHit = pickGeoWall();
+      if (wallHit && wallHit.dist < wallPickDist(wallHit)) {    // close-range wall: show ITS texture/scale/door
+        const sec = geo.sectors[wallHit.s];
+        const wtex = (sec.wallTex && sec.wallTex[wallHit.i]) || 'lair';
+        const wscale = (sec.wallTexScale && sec.wallTexScale[wallHit.i]) || 1;
+        const wdoor = sec.wallDoor && sec.wallDoor[wallHit.i];
+        el.textContent = '■ WALL ' + (wallHit.i + 1) + (wallHit.portal ? ' (portal)' : ' (solid)') +
+          '   ' + String(wtex).toUpperCase() + (wscale !== 1 ? ' ×' + wscale : '') + (wdoor ? ' · ' + wdoor.toUpperCase() : '') +
+          (previewCompiled ? '' : '   T tile · F door');
+        el.style.display = 'block';
+        Engine.setHighlight({ sec: wallHit.s, edge: wallHit.i });
+        return;
+      }
+      const s = pickGeoSector();
+      if (s < 0) { el.style.display = 'none'; Engine.setHighlight(null); return; }
+      const sec = geo.sectors[s];
+      if (sec.solid) {                                          // a column/pillar — no floor/ceiling to report
+        el.textContent = '■ SECTOR ' + (s + 1) + ' — SOLID COLUMN' + (previewCompiled ? '' : '   H to make walkable');
+        el.style.display = 'block';
+        Engine.setHighlight(null);
+        return;
+      }
+      const doors = (sec.wallDoor && sec.wallDoor.filter(Boolean).length) || 0;
+      el.textContent = (previewCompiled ? '◇ GRID SECTOR ' : '◆ SECTOR ') + (s + 1) + '   floor ' + sec.floor.toFixed(1) + ' · ceil ' + sec.ceil.toFixed(1) +
+        '   ' + String(sec.floorTex).toUpperCase() + ' / ' + String(sec.ceilTex).toUpperCase() +
+        ((sec.texScale || 1) !== 1 ? ' ×' + sec.texScale : '') + (sec.sky ? ' · SKY' : '') + (sec.win ? ' · WIN' : '') + (doors ? ' · ' + doors + ' DOOR' : '') +
+        (sec.parent >= 0 && !previewCompiled ? '   H solid' : '');
+      el.style.display = 'block';
+      // Shift picks the ceiling everywhere else (PgUp/[/T all read it the same way) —
+      // the highlight tracks the SAME modifier live so it always shows what a keypress
+      // would actually hit right now, without waiting for one.
+      const shiftHeld = !!(pkeys.ShiftLeft || pkeys.ShiftRight);
+      Engine.setHighlight({ sec: s, kind: shiftHeld ? 'ceil' : 'floor' });
+      return;
+    }
+    Engine.setHighlight(null);
+    const tt = Engine.pickAt(pcur.cx, pcur.cy);
+    if (!tt) { el.style.display = 'none'; return; }
+    if (tt.kind === 2) {
+      el.textContent = '■ WALL  ' + World.wallTexName(tt.mx, tt.my).toUpperCase() + '   [ ] swap texture';
+    } else if (tt.kind === 1) {
+      const s = World.surfAt(tt.mx, tt.my);
+      el.textContent = '▼ CEILING  z ' + s.c.toFixed(1) + '  ' + String(s.ct || '—').toUpperCase() + '   PgUp/PgDn · [ ]';
+    } else {
+      const s = World.surfAt(tt.mx, tt.my);
+      const grad = Math.hypot(s.fsx, s.fsy);
+      el.textContent = '▲ FLOOR  z ' + s.f.toFixed(1) + '  ' + String(s.ft).toUpperCase() +
+        (grad > 0.001 ? '  slope ' + grad.toFixed(2) : '') + '   PgUp/PgDn · [ ] · , . slope';
+    }
+    el.style.display = 'block';
+  }
+  function enterPreview() {
+    // Always preview on the Build/portal engine (matches the game — no raycaster).
+    // A grid level is compiled to vector sectors in-place for the walkthrough;
+    // levels with drawn sectors use their own geometry (and stay sculptable).
+    try { World.load(toLevel()); }                               // entities + textures for either path
+    catch (err) { status('PREVIEW FAILED: ' + String(err.message || err).toUpperCase()); return; }
+    previewCompiled = geo.sectors.length === 0;
+    if (previewCompiled) { const g = World.compileGeo(); geo.verts = g.verts; geo.sectors = g.sectors; }
+    usePortal = true;
+    portalGraph = Engine.buildGraph(geo);
+    cam.pitch = 0; cam.sector = undefined;
+    if (previewCompiled) {                                       // start at the mission spawn
+      cam.x = lv.spawn.x; cam.y = lv.spawn.y; cam.a = lv.spawn.a;
+    } else {                                                     // start in a corner of the first drawn sector
+      const L = geo.sectors[0].loop, v0 = geo.verts[L[0]], cn = centroid(L);
+      cam.x = v0.x + (cn.x - v0.x) * 0.3; cam.y = v0.y + (cn.y - v0.y) * 0.3;
+      cam.a = Math.atan2(cn.y - cam.y, cn.x - cam.x);
+    }
+    const s = Engine.sectorAt(cam.x, cam.y, geo);
+    cam.eyeZ = (s >= 0 ? geo.sectors[s].floor : 0) + 0.5;
+    if (!pengineReady) { Engine.init(pcanvas); pengineReady = true; }
+    document.getElementById('grid').hidden = true;
+    document.getElementById('preview3d').hidden = false;
+    const b = document.getElementById('viewtoggle');
+    b.classList.add('active'); b.innerHTML = '&#9638; MAP EDITOR';
+    document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
+    document.getElementById('pcontrols').innerHTML = previewCompiled
+      ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>ESC</b> map'
+      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> tex — wall if aiming close, else floor (Shift ceil) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>ESC</b> map';
+    previewOn = true; plast = performance.now();
+    praf = requestAnimationFrame(pLoop);
+  }
+  function exitPreview() {
+    previewOn = false; if (praf) cancelAnimationFrame(praf);
+    if (previewCompiled) { geo.verts = []; geo.sectors = []; previewCompiled = false; }  // discard the throwaway grid compile
+    document.getElementById('grid').hidden = false;
+    document.getElementById('preview3d').hidden = true;
+    const b = document.getElementById('viewtoggle');
+    b.classList.remove('active'); b.innerHTML = '&#9633; 3D PREVIEW';
+    document.getElementById('viewhint').textContent = 'Walk your level in first person';
+    render();
+  }
+  document.getElementById('viewtoggle').onclick = () => previewOn ? exitPreview() : enterPreview();
+  document.getElementById('rectbtn').onclick = () => {
+    rectMode = !rectMode;
+    document.getElementById('rectbtn').classList.toggle('active', rectMode);
+    status(rectMode ? 'RECT FILL ON — drag a region with any paint tool.' : 'RECT FILL OFF.');
+  };
+
+  window.addEventListener('keydown', e => {
+    if (!previewOn) return;
+    const el = document.activeElement;
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'SELECT')) return;
+    if (e.code === 'Escape') { exitPreview(); return; }
+    // Portal preview sculpts the VECTOR sector under the crosshair (Shift = ceiling).
+    // A grid level compiled just for the walkthrough (previewCompiled) isn't sculpted
+    // in 3D — draw sectors, or edit heights/textures in the 2D map.
+    if (!previewCompiled) {
+      const sh = e.shiftKey;
+      if (e.code === 'PageUp') { if (!e.repeat) pushUndo(); geoRaise(+1, sh); e.preventDefault(); return; }
+      if (e.code === 'PageDown') { if (!e.repeat) pushUndo(); geoRaise(-1, sh); e.preventDefault(); return; }
+      if (e.code === 'BracketRight') { if (!e.repeat) pushUndo(); cycleTex(+1, sh); e.preventDefault(); return; }
+      if (e.code === 'BracketLeft') { if (!e.repeat) pushUndo(); cycleTex(-1, sh); e.preventDefault(); return; }
+      if (e.code === 'KeyT') {
+        if (!e.repeat) pushUndo();
+        const wallHit = !sh && pickGeoWall();                 // close-range wall in view → scale IT, not the floor
+        if (wallHit && wallHit.dist < wallPickDist(wallHit)) geoWallTexScale(); else geoTexScale();
+        e.preventDefault(); return;
+      }
+      if (e.code === 'KeyK') { if (!e.repeat) pushUndo(); geoSky(); e.preventDefault(); return; }
+      if (e.code === 'KeyG') { if (!e.repeat) pushUndo(); geoWin(); e.preventDefault(); return; }
+      if (e.code === 'KeyF') { if (!e.repeat) pushUndo(); geoDoor(); e.preventDefault(); return; }
+      if (e.code === 'KeyH') { if (!e.repeat) pushUndo(); geoToggleSolid(); e.preventDefault(); return; }
+    }
+    if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+      pkeys[e.code] = true; e.preventDefault();
+    }
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') pkeys[e.code] = true;   // tracked for the live floor/ceiling highlight
+  });
+  window.addEventListener('keyup', e => { pkeys[e.code] = false; });
+  function updatePcur(e) {
+    const r = pcanvas.getBoundingClientRect();
+    pcur.cx = Math.floor((e.clientX - r.left) / r.width * Engine.W);
+    pcur.cy = Math.floor((e.clientY - r.top) / r.height * Engine.H);
+  }
+  pcanvas.addEventListener('mousemove', updatePcur);
+  pcanvas.addEventListener('mousedown', e => { pdrag = true; plx = e.clientX; ply = e.clientY; updatePcur(e); });
+  window.addEventListener('mouseup', () => { pdrag = false; });
+  window.addEventListener('mousemove', e => {
+    if (!pdrag || !previewOn) return;
+    cam.a += (e.clientX - plx) * 0.005;
+    cam.pitch = Math.max(-70, Math.min(70, cam.pitch - (e.clientY - ply) * 0.4));
+    plx = e.clientX; ply = e.clientY;
+  });
+  pcanvas.addEventListener('wheel', e => {                    // scroll = cycle texture on whatever you're aiming at
+    if (!previewOn || previewCompiled) return;
+    e.preventDefault();
+    pushUndo(); cycleTex(e.deltaY < 0 ? +1 : -1, e.shiftKey);
+  }, { passive: false });
+
+  // ---- vector sector geometry (Build-style DRAW mode) ----
+  function worldFromEvent(e) {
+    const r = cvs.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * (cvs.width / r.width) / cellPx,
+             y: (e.clientY - r.top) * (cvs.height / r.height) / cellPx };
+  }
+  function snapWorld(wx, wy) {                                  // snap to a nearby vertex, else 0.5 grid
+    let best = -1, bd = 0.45 * 0.45;
+    for (let i = 0; i < geo.verts.length; i++) {
+      const dx = geo.verts[i].x - wx, dy = geo.verts[i].y - wy, d = dx * dx + dy * dy;
+      if (d < bd) { bd = d; best = i; }
+    }
+    if (best >= 0) return { x: geo.verts[best].x, y: geo.verts[best].y, vi: best };
+    return { x: Math.round(wx * 2) / 2, y: Math.round(wy * 2) / 2, vi: -1 };
+  }
+  function vertIndexFor(sp) {
+    if (sp.vi >= 0) return sp.vi;
+    geo.verts.push({ x: sp.x, y: sp.y });
+    return geo.verts.length - 1;
+  }
+  function polyArea(loop) {
+    let a = 0;
+    for (let i = 0; i < loop.length; i++) {
+      const p = geo.verts[loop[i]], q = geo.verts[loop[(i + 1) % loop.length]];
+      a += p.x * q.y - q.x * p.y;
+    }
+    return a / 2;
+  }
+  function centroid(loop) {
+    let x = 0, y = 0;
+    for (const vi of loop) { x += geo.verts[vi].x; y += geo.verts[vi].y; }
+    return { x: x / loop.length, y: y / loop.length };
+  }
+  function pointInLoop(px, py, loop) {
+    let inside = false;
+    for (let i = 0, j = loop.length - 1; i < loop.length; j = i++) {
+      const a = geo.verts[loop[i]], b = geo.verts[loop[j]];
+      if (((a.y > py) !== (b.y > py)) && (px < (b.x - a.x) * (py - a.y) / (b.y - a.y) + a.x)) inside = !inside;
+    }
+    return inside;
+  }
+  function edgeIsPortal(s, a, b) {
+    if (geo.sectors[s].parent >= 0) return !geo.sectors[s].solid;  // walkable sub-sector outline → red; solid column → white
+    for (let s2 = 0; s2 < geo.sectors.length; s2++) {
+      if (s2 === s) continue;
+      const L = geo.sectors[s2].loop;
+      for (let j = 0; j < L.length; j++) {
+        const x = L[j], y = L[(j + 1) % L.length];
+        if ((x === a && y === b) || (x === b && y === a)) return true;  // shared wall → red
+      }
+    }
+    return false;
+  }
+  function distToSeg(px, py, ax, ay, bx, by) {
+    const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+    let t = l2 ? ((px - ax) * dx + (py - ay) * dy) / l2 : 0;
+    t = Math.max(0, Math.min(1, t));
+    const cx = ax + t * dx, cy = ay + t * dy;
+    return { d: Math.hypot(px - cx, py - cy), x: cx, y: cy };
+  }
+
+  function placeVertex() {
+    const sp = snapWorld(gcur.x, gcur.y);
+    if (draft.length === 0) { draft.push(vertIndexFor(sp)); render(); return; }
+    if (sp.vi === draft[0] && draft.length >= 3) { closeSector(); return; }
+    const vi = vertIndexFor(sp);
+    if (draft.includes(vi)) { status('THAT VERTEX IS ALREADY IN THE LOOP.'); return; }
+    draft.push(vi); render();
+  }
+  function closeSector() {
+    const loop = draft.slice();
+    if (polyArea(loop) < 0) loop.reverse();                    // normalise to CCW
+    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, win: false, texScale: 1, wallDoor: null, wallTex: null, wallTexScale: null, parent: -1, solid: false };
+    const c = centroid(loop);
+    for (let s = 0; s < geo.sectors.length; s++)
+      if (pointInLoop(c.x, c.y, geo.sectors[s].loop)) { sec.parent = s; break; }  // nested → sub-sector
+    // Build-engine convention: a shape drawn INSIDE another sector starts as a
+    // solid mass (a column/pillar) — not a walkable room. Press H on it in the
+    // 3D preview to convert it into a proper sector with its own floor/ceiling.
+    sec.solid = sec.parent >= 0;
+    geo.sectors.push(sec);
+    draft = [];
+    status('SECTOR ' + geo.sectors.length + ' CREATED · ' + loop.length + ' walls' +
+      (sec.parent >= 0 ? ' · SOLID (H in 3D preview to make it walkable)' : ''));
+    render();
+  }
+  function insertVertexOnWall() {
+    if (!hoverEdge) { status('HOVER A WALL, THEN PRESS I.'); return; }
+    const { s, i } = hoverEdge, loop = geo.sectors[s].loop;
+    const a = loop[i], b = loop[(i + 1) % loop.length];
+    const cp = distToSeg(gcur.x, gcur.y, geo.verts[a].x, geo.verts[a].y, geo.verts[b].x, geo.verts[b].y);
+    geo.verts.push({ x: +cp.x.toFixed(3), y: +cp.y.toFixed(3) });
+    const nv = geo.verts.length - 1;
+    for (const sec of geo.sectors) {                           // split in every sector sharing the wall
+      const L = sec.loop;
+      for (let j = 0; j < L.length; j++) {
+        const x = L[j], y = L[(j + 1) % L.length];
+        if ((x === a && y === b) || (x === b && y === a)) { L.splice(j + 1, 0, nv); break; }
+      }
+    }
+    status('VERTEX INSERTED ON WALL.'); render();
+  }
+  function cancelDraft() { if (draft.length) { draft = []; status('DRAFT CANCELLED.'); render(); } }
+
+  function updateDrawHover(e) {
+    const w = worldFromEvent(e);
+    if (draggingVert >= 0) {                          // move the dragged vertex, snapped to the half-grid
+      geo.verts[draggingVert].x = Math.round(w.x * 2) / 2;
+      geo.verts[draggingVert].y = Math.round(w.y * 2) / 2;
+      gcur.x = geo.verts[draggingVert].x; gcur.y = geo.verts[draggingVert].y; gcur.vi = draggingVert;
+      render(); return;
+    }
+    const sp = snapWorld(w.x, w.y);
+    gcur.x = sp.x; gcur.y = sp.y; gcur.vi = sp.vi;
+    hoverEdge = null; let bd = 0.5;
+    for (let s = 0; s < geo.sectors.length; s++) {
+      const L = geo.sectors[s].loop;
+      for (let i = 0; i < L.length; i++) {
+        const A = geo.verts[L[i]], B = geo.verts[L[(i + 1) % L.length]];
+        const cp = distToSeg(w.x, w.y, A.x, A.y, B.x, B.y);
+        if (cp.d < bd) { bd = cp.d; hoverEdge = { s, i }; }
+      }
+    }
+    coordsEl.textContent = 'DRAW  x ' + gcur.x.toFixed(1) + '  y ' + gcur.y.toFixed(1) +
+      (draft.length ? '  · ' + draft.length + ' verts' : '') + (hoverEdge ? '  · [I] split wall' : '');
+    render();
+  }
+
+  function renderGeo() {
+    const c = cellPx;
+    for (let s = 0; s < geo.sectors.length; s++) {             // faint sector fills
+      const L = geo.sectors[s].loop;
+      g.beginPath();
+      for (let i = 0; i < L.length; i++) { const v = geo.verts[L[i]]; i ? g.lineTo(v.x * c, v.y * c) : g.moveTo(v.x * c, v.y * c); }
+      g.closePath();
+      g.fillStyle = geo.sectors[s].solid ? 'rgba(40,40,46,0.85)'          // solid column — filled in, opaque
+        : geo.sectors[s].parent >= 0 ? 'rgba(200,80,80,0.10)' : 'rgba(120,180,255,0.08)';
+      g.fill();
+    }
+    g.lineWidth = 2.5; g.lineCap = 'round';                    // walls: white solid, red portal
+    for (let s = 0; s < geo.sectors.length; s++) {
+      const L = geo.sectors[s].loop;
+      for (let i = 0; i < L.length; i++) {
+        const A = geo.verts[L[i]], B = geo.verts[L[(i + 1) % L.length]];
+        g.strokeStyle = edgeIsPortal(s, L[i], L[(i + 1) % L.length]) ? '#ff5555' : '#eef2f6';
+        g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
+      }
+    }
+    if (hoverEdge) {
+      const L = geo.sectors[hoverEdge.s].loop, A = geo.verts[L[hoverEdge.i]], B = geo.verts[L[(hoverEdge.i + 1) % L.length]];
+      g.strokeStyle = '#7fe0d8'; g.lineWidth = 4;
+      g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
+    }
+    g.fillStyle = '#ffd75e';                                   // vertices
+    for (const v of geo.verts) { g.beginPath(); g.arc(v.x * c, v.y * c, 2.5, 0, 7); g.fill(); }
+    if (draft.length) {                                        // draft polyline + rubber band
+      g.strokeStyle = '#b8ffb8'; g.lineWidth = 2;
+      g.beginPath();
+      for (let i = 0; i < draft.length; i++) { const v = geo.verts[draft[i]]; i ? g.lineTo(v.x * c, v.y * c) : g.moveTo(v.x * c, v.y * c); }
+      g.lineTo(gcur.x * c, gcur.y * c); g.stroke();
+      const first = geo.verts[draft[0]];
+      g.strokeStyle = 'rgba(184,255,184,0.5)'; g.lineWidth = 2;
+      g.beginPath(); g.arc(first.x * c, first.y * c, 6, 0, 7); g.stroke();
+    }
+    if (draggingVert >= 0) {                                   // actively dragging: solid highlight, bigger
+      g.fillStyle = 'rgba(255,215,94,0.5)';
+      g.beginPath(); g.arc(gcur.x * c, gcur.y * c, 7, 0, 7); g.fill();
+    }
+    g.strokeStyle = gcur.vi >= 0 ? '#ffd75e' : '#8fd6ff'; g.lineWidth = 2;
+    g.beginPath(); g.arc(gcur.x * c, gcur.y * c, 4, 0, 7); g.stroke();
+  }
+
+  // ---- undo stack (snapshots the whole edited level; grouped per action) ----
+  const undoStack = [];
+  function snapshot() {
+    return JSON.stringify({
+      w: lv.w, h: lv.h, cells: lv.cells, fh: lv.fh, ch: lv.ch, stex: lv.stex, ctex: lv.ctex,
+      fsx: lv.fsx, fsy: lv.fsy, spawn: lv.spawn, ents: lv.ents, geo, draft,
+    });
+  }
+  function pushUndo() { undoStack.push(snapshot()); if (undoStack.length > 60) undoStack.shift(); }
+  function undo() {
+    if (!undoStack.length) { status('NOTHING TO UNDO.'); return; }
+    const s = JSON.parse(undoStack.pop());
+    lv.w = s.w; lv.h = s.h; lv.cells = s.cells; lv.fh = s.fh; lv.ch = s.ch;
+    lv.stex = s.stex; lv.ctex = s.ctex; lv.fsx = s.fsx; lv.fsy = s.fsy;
+    lv.spawn = s.spawn; lv.ents = s.ents;
+    geo.verts = s.geo.verts; geo.sectors = s.geo.sectors; draft = s.draft;
+    fitCanvas();
+    if (previewOn) { if (usePortal) portalGraph = Engine.buildGraph(geo); else World.load(toLevel()); }
+    render(); status('UNDO.');
+  }
+
+  // ---- vector deletion (Build-style: remove verts / sectors) ----
+  function rebuildParents() {
+    geo.sectors.forEach((sec, s) => {
+      sec.parent = -1;
+      const c = centroid(sec.loop);
+      for (let p = 0; p < geo.sectors.length; p++) {
+        if (p === s || !pointInLoop(c.x, c.y, geo.sectors[p].loop)) continue;
+        if (sec.parent < 0 || Math.abs(polyArea(geo.sectors[p].loop)) < Math.abs(polyArea(geo.sectors[sec.parent].loop))) sec.parent = p;
+      }
+    });
+  }
+  function reindexAfterRemoved(vi) {
+    geo.verts.splice(vi, 1);
+    const dec = i => (i > vi ? i - 1 : i);
+    geo.sectors.forEach(sec => { sec.loop = sec.loop.map(dec); });
+    draft = draft.map(dec);
+  }
+  function pruneVerts() {
+    const used = new Set();
+    geo.sectors.forEach(sec => sec.loop.forEach(i => used.add(i)));
+    draft.forEach(i => used.add(i));
+    for (let i = geo.verts.length - 1; i >= 0; i--) if (!used.has(i)) reindexAfterRemoved(i);
+  }
+  function deleteVertex(vi) {
+    geo.sectors.forEach(sec => { const k = sec.loop.indexOf(vi); if (k >= 0) sec.loop.splice(k, 1); });
+    const dk = draft.indexOf(vi); if (dk >= 0) draft.splice(dk, 1);
+    geo.sectors = geo.sectors.filter(sec => sec.loop.length >= 3);
+    reindexAfterRemoved(vi);
+    pruneVerts(); rebuildParents();
+  }
+  function deleteSectorAt(x, y) {
+    let best = -1, ba = Infinity;
+    for (let s = 0; s < geo.sectors.length; s++)
+      if (pointInLoop(x, y, geo.sectors[s].loop)) { const a = Math.abs(polyArea(geo.sectors[s].loop)); if (a < ba) { ba = a; best = s; } }
+    if (best < 0) return false;
+    geo.sectors.splice(best, 1); pruneVerts(); rebuildParents();
+    return true;
+  }
+  function handleDelete() {
+    if (drawMode) {
+      if (draft.length) { pushUndo(); draft.pop(); status('REMOVED LAST VERTEX.'); render(); }
+      else if (gcur.vi >= 0) { pushUndo(); deleteVertex(gcur.vi); gcur.vi = -1; hoverEdge = null; status('VERTEX DELETED.'); render(); }
+      else { pushUndo(); if (deleteSectorAt(gcur.x, gcur.y)) { status('SECTOR DELETED.'); render(); } else { undoStack.pop(); status('NOTHING TO DELETE HERE.'); } }
+    } else if (hover) {
+      pushUndo(); eraseCell(hover.x, hover.y); render();
+    }
+  }
+
+  document.getElementById('drawbtn').onclick = () => {
+    drawMode = !drawMode;
+    document.getElementById('drawbtn').classList.toggle('active', drawMode);
+    document.getElementById('drawhelp').hidden = !drawMode;
+    if (drawMode && previewOn) exitPreview();
+    if (drawMode) { rectMode = false; document.getElementById('rectbtn').classList.remove('active'); }
+    draft = [];
+    status(drawMode ? 'DRAW MODE — SPACE/click vertices · DEL removes · Ctrl-Z undo.' : 'DRAW MODE OFF.');
+    render();
+  };
+  window.addEventListener('keydown', e => {
+    const el = document.activeElement;
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'SELECT')) return;
+    if ((e.ctrlKey || e.metaKey) && e.code === 'KeyZ') { undo(); e.preventDefault(); return; }
+    if ((e.code === 'Delete' || e.code === 'Backspace') && !previewOn) { handleDelete(); e.preventDefault(); return; }
+    if (!previewOn && (e.code === 'BracketRight' || e.code === 'BracketLeft')) {   // 2D map: cycle the ENT stamp
+      cycleEntKind(e.code === 'BracketRight' ? 1 : -1); e.preventDefault(); return;
+    }
+    if (!drawMode) return;
+    if (e.code === 'Space') { pushUndo(); placeVertex(); e.preventDefault(); }
+    else if (e.code === 'KeyI') { pushUndo(); insertVertexOnWall(); e.preventDefault(); }
+    else if (e.code === 'Escape') {
+      if (draft.length) cancelDraft();
+      else deselectEntTool();
+      e.preventDefault();
+    }
+  });
+
+  // clicking anywhere in the palette that isn't a prop/tool button drops out of prop-placement mode
+  document.getElementById('palette').addEventListener('click', e => {
+    if (!e.target.closest('.tool')) deselectEntTool();
+  });
+
+  // ---- boot: vector-native editor (the grid painter is retired) ----
+  buildPalette();
+  drawMode = true;                                            // vector authoring is the only mode
+  document.querySelectorAll('.gridtool').forEach(el => el.hidden = true);
+  document.getElementById('drawhelp').hidden = false;
+  let start = null;
+  try { start = JSON.parse(localStorage.getItem(LS_KEY)); } catch (e) {}
+  fromLevel(start && start.geo && start.geo.sectors && start.geo.sectors.length ? start : blankLevel(24, 24));
+  status('READY, ARCHITECT — DRAW A SECTOR.');
+
+  return { lv, toLevel, fromLevel, apply, erase, save, get tool() { return tool; }, set tool(t) { tool = t; }, render,
+    get geo() { return geo; }, get draft() { return draft; }, get drawMode() { return drawMode; }, get cam() { return cam; },
+    pStep, get portalGraph() { return portalGraph; }, rebuildPortalGraph: () => { portalGraph = Engine.buildGraph(geo); } };
+})();
+
+window.EDITOR = Editor;
