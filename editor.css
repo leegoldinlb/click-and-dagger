@@ -20,6 +20,7 @@
   --green-bright: #8fe88f;
 }
 
+html, body { height: 100%; }
 body {
   background:
     radial-gradient(ellipse at 50% 0%, #2a2013 0%, #140e08 55%, #0a0704 100%);
@@ -27,9 +28,18 @@ body {
   font-family: "Courier New", Consolas, "Lucida Console", monospace;
   user-select: none;
   -webkit-user-select: none;
+  overflow: hidden;                 /* the page itself never scrolls — each column below scrolls on its own */
 }
 
-#wrap { max-width: 1240px; margin: 0 auto; padding: 14px; }
+/* brass-toned scrollbars for every locally-scrolling panel */
+aside::-webkit-scrollbar, #center::-webkit-scrollbar, #gridscroll::-webkit-scrollbar { width: 11px; height: 11px; }
+aside::-webkit-scrollbar-track, #center::-webkit-scrollbar-track, #gridscroll::-webkit-scrollbar-track { background: var(--panel-deep); }
+aside::-webkit-scrollbar-thumb, #center::-webkit-scrollbar-thumb, #gridscroll::-webkit-scrollbar-thumb {
+  background: var(--brass-dim); border: 2px solid var(--panel-deep);
+}
+aside::-webkit-scrollbar-thumb:hover, #center::-webkit-scrollbar-thumb:hover, #gridscroll::-webkit-scrollbar-thumb:hover { background: var(--brass); }
+
+#wrap { max-width: 1240px; height: 100%; margin: 0 auto; padding: 14px; display: flex; flex-direction: column; }
 
 header {
   position: relative;
@@ -38,6 +48,7 @@ header {
   gap: 16px;
   padding: 10px 14px;
   margin-bottom: 14px;
+  flex: none;                       /* fixed height — #cols below claims the rest */
   background: linear-gradient(160deg, var(--panel-hi), var(--panel) 55%, var(--panel-lo));
   border: 3px solid var(--brass-dim);
   box-shadow: inset 2px 2px 0 var(--bevel-hi), inset -2px -2px 0 var(--bevel-lo);
@@ -60,12 +71,20 @@ header .back {
 }
 header .back:hover { color: var(--gold-bright); border-color: var(--gold-bright); }
 
-#cols { display: flex; gap: 14px; align-items: flex-start; }
+/* The three columns share the rest of the viewport height. Each one owns its
+   OWN scrollbar — the page underneath never scrolls, so wheeling over a tall
+   palette or a long mission-check list never fights with (or gets mistaken
+   for) the 2D map's scroll-to-zoom or the 3D preview's scroll-to-cycle. */
+#cols { display: flex; gap: 14px; align-items: stretch; flex: 1; min-height: 0; }
 
 aside {
   position: relative;
   width: 216px;
   flex: none;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
   background: linear-gradient(160deg, var(--panel-hi), var(--panel) 55%, var(--panel-lo));
   border: 3px solid var(--brass-dim);
   box-shadow: inset 2px 2px 0 var(--bevel-hi), inset -2px -2px 0 var(--bevel-lo);
@@ -119,7 +138,10 @@ select, input[type="number"] {
 }
 input[type="number"] { width: 52px; }
 
-#center { flex: 1; min-width: 0; text-align: center; }
+#center {
+  flex: 1; min-width: 0; height: 100%; overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain; text-align: center;
+}
 #viewbar { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
 #viewtoggle {
   font-family: inherit; font-size: 13px; letter-spacing: 1px;

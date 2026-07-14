@@ -95,7 +95,7 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'civilianM', 'civilianF'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
@@ -111,6 +111,24 @@ const Adventure = (() => {
       case 'civilianM': case 'civilianF': return e.dead
         ? 'A local, caught in the crossfire of somebody else’s war. This is on you.'
         : 'A Havana local, minding their own business — which, currently, is more than you can say for yourself.';
+      case 'vendor': return e.dead
+        ? 'The tray hit the ground before he did. This is on you.'
+        : 'A street vendor, tray balanced on one arm. Whatever he’s selling, it isn’t your business today.';
+      case 'waiter': return e.dead
+        ? 'The tray, the drink, the bow tie — all down together. This is on you.'
+        : 'A café waiter, white jacket pressed, drink held aloft with a professional’s indifference to gunfire two tables over.';
+      case 'tourist': return e.dead
+        ? 'Camera still around his neck. He never got the shot. This is on you.'
+        : 'A tourist in a loud shirt, photographing everything except the one thing that matters. Sunglasses hide poor judgment.';
+      case 'officer': return e.dead
+        ? 'A police officer, down. This complicates your exit considerably, and it’s on you.'
+        : 'A Cuban police officer on his beat. Best he never clocks what you’re actually doing here.';
+      case 'fisherman': return e.dead
+        ? 'His net never made it back to the water. This is on you.'
+        : 'A dockworker with a coil of net over one shoulder, weathered by salt and long shifts.';
+      case 'flowergirl': return e.dead
+        ? 'The basket spilled red across the stones. This is on you.'
+        : 'A flower girl with a basket of the day’s cuttings, working the crowd near the cart.';
       case 'agent': return e.has
         ? 'Agent 004. He didn’t make it. His lockpick kit is still in his hand — he’d want you to have it.'
         : '004 rests easier without the hardware. You’ll drink one for him in Geneva.';
@@ -144,6 +162,30 @@ const Adventure = (() => {
       case 'guardpost': return 'A sentry post behind sandbags. Fortunately, nobody is home.';
       case 'firehydrant': return 'A fire hydrant, chipped enamel, entirely uninvolved in your mission.';
       case 'satdish': return 'A listening dish, aimed at a satellite that does not officially exist.';
+      case 'mailbox': return 'A blue collection box. Somewhere, a postal worker has no idea what they’re about to find in it.';
+      case 'trashcan': return 'A dented street can. Havana’s best-kept secrets end up in here, eventually.';
+      case 'bicycle': return 'Somebody’s ride home. They’ll be walking tonight.';
+      case 'trafficlight': return 'Stuck on green. Traffic in Havana takes this as a suggestion regardless.';
+      case 'watertower': return 'A water tower, up where the rooflines meet. Good sightlines, if you were the sort to use them.';
+      case 'barrier': return 'A striped sawhorse. ROAD CLOSED, or so the story goes.';
+      case 'vendingmachine': return 'Cigarettes, by the pack. Volkov’s men are chain smokers, to a man.';
+      case 'flowercart': return 'A flower cart, unattended. The vendor stepped away at a very convenient moment.';
+      case 'bed': return 'Made up tight enough to bounce a coin off. Someone here was in the service.';
+      case 'sofa': return 'A sofa that has absorbed a great many uncomfortable silences.';
+      case 'armchair': return 'The good chair. The one nobody visiting is allowed to sit in.';
+      case 'diningtable': return 'Set for one. Whoever lives here doesn’t entertain much these days.';
+      case 'bookshelf': return 'Novels, mostly. A few of the spines have never been cracked — for show, not for reading.';
+      case 'icebox': return 'Hums louder than it should. Probably just the compressor. Probably.';
+      case 'recordplayer': return 'A hi-fi console, lid up, needle resting mid-groove. Someone left in a hurry.';
+      case 'wardrobe': return 'A tall wardrobe. Just clothes in here — you checked.';
+      case 'officechair': return 'A swivel chair, still warm. Whoever sat here left in a hurry.';
+      case 'watercooler': return 'A water cooler, half full. The gossip that happens near it has gotten men killed.';
+      case 'coatrack': return 'A coat and hat, hung and forgotten. Nobody leaves without their hat in this weather.';
+      case 'corkboard': return 'Pinned notices and a length of red string. Somebody here is building the same picture you are.';
+      case 'cashregister': return 'A brass till, drawer shut. The till tape would tell a story, if you had time to read it.';
+      case 'wallmap': return 'A map on an easel, a route inked in red. It ends at the harbour.';
+      case 'conftable': return 'A long table, chairs pushed in neat. Whatever was decided here, it was decided quietly.';
+      case 'punchclock': return 'A time clock, a card half-fed into the slot. Someone clocked out and never came back.';
     }
     return 'It defies description. The dossier said nothing about this.';
   }
@@ -168,7 +210,8 @@ const Adventure = (() => {
         : 'Absolutely not. He bites.';
       case 'brute': return e.dead ? 'Nothing on him but a busted knuckle brace. He fought with what he had.' : 'You would need a crane.';
       case 'sniper': return e.dead ? 'A rifle, a canteen, a half-written letter home. You leave the letter.' : 'He is not putting that rifle down for you.';
-      case 'civilianM': case 'civilianF': return 'They are a person, not a prop. Leave them be.';
+      case 'civilianM': case 'civilianF': case 'vendor': case 'waiter': case 'tourist': case 'officer': case 'fisherman': case 'flowergirl':
+        return 'They are a person, not a prop. Leave them be.';
       case 'desk': return 'It’s a desk. Even you couldn’t expense that.';
       case 'medkit': case 'ammo': return 'Just walk over it. This is still a shooter.';
       case 'plant': return 'Your cover is “orchid dealer”, not “palm smuggler”.';
@@ -195,7 +238,8 @@ const Adventure = (() => {
     if ((e.kind === 'brute' || e.kind === 'sniper') && !e.dead) return 'He is not open to conversation. Try the Walther.';
     if (e.kind === 'agent') return 'He’s beyond extraction. Take the picks — he’d insist.';
     if (e.kind === 'tube') return 'Take it first. Then find it a socket.';
-    if (e.kind === 'civilianM' || e.kind === 'civilianF') return e.dead ? 'There is nothing left to do here.' : 'They have nothing to do with your mission. Move along.';
+    if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl'].includes(e.kind))
+      return e.dead ? 'There is nothing left to do here.' : 'They have nothing to do with your mission. Move along.';
     return 'That doesn’t work. And the clock is running.';
   }
 

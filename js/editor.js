@@ -47,6 +47,12 @@ const Editor = (() => {
     { kind: 'sniper', name: 'SNIPER', spr: 'sniper' },
     { kind: 'civilianM', name: 'CIVILIAN (M)', spr: 'civilianM' },
     { kind: 'civilianF', name: 'CIVILIAN (F)', spr: 'civilianF' },
+    { kind: 'vendor', name: 'VENDOR', spr: 'vendor' },
+    { kind: 'waiter', name: 'WAITER', spr: 'waiter' },
+    { kind: 'tourist', name: 'TOURIST', spr: 'tourist' },
+    { kind: 'officer', name: 'POLICE OFFICER', spr: 'officer' },
+    { kind: 'fisherman', name: 'FISHERMAN', spr: 'fisherman' },
+    { kind: 'flowergirl', name: 'FLOWER GIRL', spr: 'flowergirl' },
     { kind: 'sedan', name: 'SEDAN', spr: 'sedan' },
     { kind: 'motorcycle', name: 'MOTORCYCLE', spr: 'motorcycle' },
     { kind: 'phonebooth', name: 'PHONE BOOTH', spr: 'phonebooth' },
@@ -57,8 +63,32 @@ const Editor = (() => {
     { kind: 'guardpost', name: 'GUARD POST', spr: 'guardpost' },
     { kind: 'firehydrant', name: 'FIRE HYDRANT', spr: 'firehydrant' },
     { kind: 'satdish', name: 'SAT. DISH', spr: 'satdish' },
+    { kind: 'mailbox', name: 'MAILBOX', spr: 'mailbox' },
+    { kind: 'trashcan', name: 'TRASH CAN', spr: 'trashcan' },
+    { kind: 'bicycle', name: 'BICYCLE', spr: 'bicycle' },
+    { kind: 'trafficlight', name: 'TRAFFIC LIGHT', spr: 'trafficlight' },
+    { kind: 'watertower', name: 'WATER TOWER', spr: 'watertower' },
+    { kind: 'barrier', name: 'BARRIER', spr: 'barrier' },
+    { kind: 'vendingmachine', name: 'VENDING MACHINE', spr: 'vendingmachine' },
+    { kind: 'flowercart', name: 'FLOWER CART', spr: 'flowercart' },
+    { kind: 'bed', name: 'BED', spr: 'bed' },
+    { kind: 'sofa', name: 'SOFA', spr: 'sofa' },
+    { kind: 'armchair', name: 'ARMCHAIR', spr: 'armchair' },
+    { kind: 'diningtable', name: 'DINING TABLE', spr: 'diningtable' },
+    { kind: 'bookshelf', name: 'BOOKSHELF', spr: 'bookshelf' },
+    { kind: 'icebox', name: 'ICEBOX', spr: 'icebox' },
+    { kind: 'recordplayer', name: 'RECORD PLAYER', spr: 'recordplayer' },
+    { kind: 'wardrobe', name: 'WARDROBE', spr: 'wardrobe' },
+    { kind: 'officechair', name: 'OFFICE CHAIR', spr: 'officechair' },
+    { kind: 'watercooler', name: 'WATER COOLER', spr: 'watercooler' },
+    { kind: 'coatrack', name: 'COAT RACK', spr: 'coatrack' },
+    { kind: 'corkboard', name: 'CORKBOARD', spr: 'corkboard' },
+    { kind: 'cashregister', name: 'CASH REGISTER', spr: 'cashregister' },
+    { kind: 'wallmap', name: 'WALL MAP', spr: 'wallmap' },
+    { kind: 'conftable', name: 'CONFERENCE TABLE', spr: 'conftable' },
+    { kind: 'punchclock', name: 'PUNCH CLOCK', spr: 'punchclock' },
   ];
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF']);      // neutral — placed with a default wander behavior
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl']);      // neutral — placed with a default wander behavior
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 
   // ---- state ----
@@ -241,10 +271,6 @@ const Editor = (() => {
       if (e.kind === tool.v) b.classList.add('sel');
       return b;
     });
-    entsEl.addEventListener('wheel', e => {                       // scroll the props panel = cycle the placement sprite
-      e.preventDefault();
-      cycleEntKind(e.deltaY < 0 ? -1 : 1);
-    }, { passive: false });
     const spEl = document.getElementById('specials');
     toolBtn(spEl, 'SPAWN', thumb(gg => {
       gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);

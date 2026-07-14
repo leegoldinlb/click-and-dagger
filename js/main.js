@@ -23,7 +23,7 @@ const Game = (() => {
     sniper: { speed: 1.4, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 10, atkCd: 1.3,
               ranged: true, rangedRange: 7, rangedDmg: [10, 16] },
   };
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF']);
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl']);
   const totalHostiles = World.ents.filter(e => HOSTILE[e.kind]).length;
   // Quest-critical kinds never take damage — destroying 004's body, the vacuum
   // tube, or Volkov's desk could strand the puzzle chain with no way to recover.
@@ -118,18 +118,22 @@ const Game = (() => {
       else Sfx.impHit();
       return;
     }
-    best.dead = true;
-    best.solid = false;
     if (CIVILIAN_KINDS.has(best.kind)) {
+      best.dead = true;
+      best.solid = false;
       G.civKills++;
       Sfx.hurt();
       if (G.civKills >= 3) { dieCivilians(); return; }
       Adventure.msg('A local goes down. Word will spread — two more and this mission is over.', 3.5);
     } else if (HOSTILE[best.kind]) {
+      best.dead = true;
+      best.solid = false;
       G.kills++;
       Sfx.impDie();
     } else {
-      Sfx.impDie();                                        // a plain prop, wrecked — no kill/casualty counter
+      World.spawnFx(best.x, best.y);                       // a plain prop, wrecked — burst + vanish, no lingering corpse
+      World.removeEnt(best);
+      Sfx.impDie();
     }
   }
 
@@ -243,6 +247,13 @@ const Game = (() => {
       }
       const wd = Math.hypot(e.wx - e.x, e.wy - e.y);
       if (wd > 0.15) tryMove(e, e.x + (e.wx - e.x) * Math.min(1, 0.6 * dt / wd), e.y + (e.wy - e.y) * Math.min(1, 0.6 * dt / wd), 0.25);
+    }
+
+    // transient fx (explosion bursts from destroyed props): age out and remove
+    for (const e of [...World.ents]) {
+      if (e.kind !== 'fx') continue;
+      e.t += dt;
+      if (e.t > World.FX_LIFE) World.removeEnt(e);
     }
 
     // walk-over pickups
