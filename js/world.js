@@ -904,6 +904,71 @@ const World = (() => {
     bevel(g, 0, 0, 64, 64, 'rgba(255,232,180,0.15)', 'rgba(0,0,0,0.25)');
   });
 
+  // ---- street-facing building facades with windows ----
+  FLOOR.windowrow = cnv(g => {                        // pastel stucco with a shuttered colonial window, arched top
+    vgrad(g, 0, 0, 64, 64, '#e3c988', '#c7a860');
+    stains(g, 8, ['#a98a52', '#8a7048']);
+    speck(g, 60, 'rgba(0,0,0,0.05)'); speck(g, 30, 'rgba(255,255,255,0.06)');
+    g.fillStyle = 'rgba(0,0,0,0.16)'; g.beginPath();                            // recessed window reveal, arched top
+    g.moveTo(14, 40); g.lineTo(14, 18); g.quadraticCurveTo(14, 8, 32, 8); g.quadraticCurveTo(50, 8, 50, 18); g.lineTo(50, 40); g.closePath(); g.fill();
+    const gl = g.createLinearGradient(16, 10, 48, 38);                          // glass, dim interior
+    gl.addColorStop(0, '#3a4a52'); gl.addColorStop(1, '#161e22');
+    g.fillStyle = gl; g.beginPath();
+    g.moveTo(17, 38); g.lineTo(17, 19); g.quadraticCurveTo(17, 11, 32, 11); g.quadraticCurveTo(47, 11, 47, 19); g.lineTo(47, 38); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1.4;                       // mullions
+    g.beginPath(); g.moveTo(32, 11); g.lineTo(32, 38); g.moveTo(17, 24); g.lineTo(47, 24); g.stroke();
+    const shu = '#3f6b48';                                                      // green louvered shutters, folded open
+    g.fillStyle = shu; g.fillRect(9, 12, 5, 28); g.fillRect(50, 12, 5, 28);
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 0.8;
+    for (let y = 14; y < 38; y += 3) { g.beginPath(); g.moveTo(9, y); g.lineTo(14, y); g.moveTo(50, y); g.lineTo(55, y); g.stroke(); }
+    bevel(g, 9, 12, 5, 28, 'rgba(255,255,255,0.12)', 'rgba(0,0,0,0.3)');
+    bevel(g, 50, 12, 5, 28, 'rgba(255,255,255,0.12)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = '#8a7042'; g.fillRect(12, 40, 40, 4);                         // stone sill
+    bevel(g, 12, 40, 40, 4, 'rgba(255,240,200,0.25)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 59, 64, 5);                 // grimy base
+  });
+
+  FLOOR.balconywin = cnv(g => {                       // upper-floor window with a wrought-iron Juliet balcony
+    vgrad(g, 0, 0, 64, 64, '#c98f7a', '#a86a5a');
+    stains(g, 8, ['#8a5648', '#6a4438']);
+    speck(g, 60, 'rgba(0,0,0,0.05)'); speck(g, 30, 'rgba(255,255,255,0.05)');
+    g.fillStyle = 'rgba(0,0,0,0.16)'; g.fillRect(15, 8, 34, 30);                // recessed reveal
+    const gl = g.createLinearGradient(17, 10, 47, 36);
+    gl.addColorStop(0, '#4a5a62'); gl.addColorStop(1, '#1c262a');
+    g.fillStyle = gl; g.fillRect(17, 10, 30, 26);
+    g.strokeStyle = 'rgba(255,255,255,0.10)'; g.lineWidth = 1;                  // pane reflection streak
+    g.beginPath(); g.moveTo(20, 12); g.lineTo(24, 34); g.stroke();
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1.4;                       // mullions, french-door style
+    g.beginPath(); g.moveTo(32, 10); g.lineTo(32, 36); g.moveTo(17, 22); g.lineTo(47, 22); g.stroke();
+    g.strokeStyle = '#e8dcc8'; g.lineWidth = 1.2; g.strokeRect(15, 8, 34, 30);  // painted trim
+    g.strokeStyle = '#2a2018'; g.lineWidth = 3; g.lineCap = 'round';            // wrought-iron balcony rail
+    g.beginPath(); g.moveTo(11, 41); g.lineTo(53, 41); g.stroke();
+    for (let x = 13; x <= 51; x += 6) { g.lineWidth = 1.6; g.beginPath(); g.moveTo(x, 36); g.lineTo(x, 41); g.stroke(); }
+    g.lineWidth = 1.2;
+    g.beginPath(); g.moveTo(11, 36); g.quadraticCurveTo(20, 32, 32, 36); g.quadraticCurveTo(44, 32, 53, 36); g.stroke();  // scrollwork arc
+    g.fillStyle = 'rgba(60,45,30,0.5)'; g.fillRect(11, 41, 42, 2);              // shadow under the rail
+    bevel(g, 15, 8, 34, 30, 'rgba(255,240,220,0.18)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 59, 64, 5);
+  });
+
+  FLOOR.shopfront = cnv(g => {                        // ground-floor storefront: broad glass pane, wood frame
+    vgrad(g, 0, 0, 64, 64, '#8a6a48', '#6a4e32');
+    speck(g, 70, 'rgba(0,0,0,0.08)');
+    g.fillStyle = '#4a3624'; g.fillRect(4, 6, 56, 48);                          // dark wood frame surround
+    bevel(g, 4, 6, 56, 48, 'rgba(255,220,170,0.15)', 'rgba(0,0,0,0.4)');
+    const gl = g.createLinearGradient(8, 10, 56, 50);                          // big display glass, cool reflection
+    gl.addColorStop(0, '#7a97a0'); gl.addColorStop(0.45, '#3a4e56'); gl.addColorStop(0.55, '#2a3a40'); gl.addColorStop(1, '#182226');
+    g.fillStyle = gl; g.fillRect(8, 10, 48, 40);
+    g.fillStyle = 'rgba(255,255,255,0.16)'; g.beginPath();                     // diagonal glare streak
+    g.moveTo(12, 46); g.lineTo(24, 12); g.lineTo(30, 12); g.lineTo(18, 46); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(20,14,8,0.5)'; g.lineWidth = 2;                       // muntin cross dividing the display
+    g.beginPath(); g.moveTo(32, 10); g.lineTo(32, 50); g.stroke();
+    g.fillStyle = 'rgba(10,8,6,0.35)'; g.beginPath(); g.ellipse(44, 40, 7, 9, 0, 0, 7); g.fill();  // a shadowed goods silhouette
+    g.fillStyle = '#3a2c1c'; g.fillRect(4, 50, 56, 6);                          // kick panel / base
+    bevel(g, 4, 50, 56, 6, 'rgba(255,220,170,0.2)', 'rgba(0,0,0,0.35)');
+    g.fillStyle = 'rgba(0,0,0,0.14)'; g.fillRect(0, 59, 64, 5);
+  });
+
   // ---- parallax sky (wide; sampled by view angle): warm Havana afternoon ----
   const SKY = cnv(g => {
     const grd = g.createLinearGradient(0, 0, 0, 96);
@@ -941,14 +1006,14 @@ const World = (() => {
   const TXNAMES = ['lair', 'teak', 'brick', 'stucco', 'stuccob', 'stuccop', 'panel', 'tile',
     'cobble', 'wood', 'marble', 'concrete', 'water', 'metal', 'vent', 'carpet', 'lounge',
     'ceiltile', 'ground', 'helipad', 'rattan', 'azulejo', 'cork', 'corrugated', 'awning', 'limestone',
-    'terrazzo', 'rooftile', 'mural', 'sandbag', 'rope',
+    'terrazzo', 'rooftile', 'mural', 'sandbag', 'rope', 'windowrow', 'balconywin', 'shopfront',
     'radio', 'blast', 'mainframe', 'poster'];
   const WALLTX = { 1: 'teak', 2: 'lair', 3: 'blast', 4: 'radio', 5: 'mainframe', 6: 'poster' };
   const wallTexName = (x, y) => {
     const i = Math.floor(y) * MW + Math.floor(x);
-    return (stexg && stexg[i]) || WALLTX[get(x, y)] || 'lair';
+    return (stexg && stexg[i]) || WALLTX[get(x, y)] || 'brick';
   };
-  const wallTex = (x, y) => TX[wallTexName(x, y)] || TX.lair;
+  const wallTex = (x, y) => TX[wallTexName(x, y)] || TX.brick;
 
   // ---- sprites ----
   function whiteOf(src) {

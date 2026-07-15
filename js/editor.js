@@ -98,7 +98,7 @@ const Editor = (() => {
   let tool = { t: 'tile', v: '#' };
   let entBtns = [];                                              // ENTS-index → palette button, for keyboard/wheel cycling
   const hset = { f: 0.0, c: 1.0, applyF: true, applyC: false };  // height-tool settings
-  const texset = { name: 'lair', target: 'surf' };              // texture-tool settings
+  const texset = { name: 'brick', target: 'surf' };              // texture-tool settings
   let eyedrop = false;
   let rectMode = false, rectStart = null;                       // rectangle bulk-fill
   // ---- vector sector geometry (Build-style DRAW mode) ----
@@ -924,7 +924,7 @@ const Editor = (() => {
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
     const sec = geo.sectors[hit.s], names = World.TXNAMES;
     if (!sec.wallTex) sec.wallTex = new Array(sec.loop.length).fill(null);
-    let i = names.indexOf(sec.wallTex[hit.i] || 'lair'); if (i < 0) i = 0;
+    let i = names.indexOf(sec.wallTex[hit.i] || 'brick'); if (i < 0) i = 0;
     const next = names[(i + dir + names.length) % names.length];
     sec.wallTex[hit.i] = next;
     portalGraph = Engine.buildGraph(geo);                      // re-derive wall.tex
@@ -998,7 +998,7 @@ const Editor = (() => {
       const wallHit = pickGeoWall();
       if (wallHit && wallHit.dist < wallPickDist(wallHit)) {    // close-range wall: show ITS texture/scale/door
         const sec = geo.sectors[wallHit.s];
-        const wtex = (sec.wallTex && sec.wallTex[wallHit.i]) || 'lair';
+        const wtex = (sec.wallTex && sec.wallTex[wallHit.i]) || 'brick';
         const wscale = (sec.wallTexScale && sec.wallTexScale[wallHit.i]) || 1;
         const wdoor = sec.wallDoor && sec.wallDoor[wallHit.i];
         el.textContent = '■ WALL ' + (wallHit.i + 1) + (wallHit.portal ? ' (portal)' : ' (solid)') +

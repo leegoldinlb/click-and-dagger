@@ -92,7 +92,7 @@ const Engine = (() => {
     const sky = cacheOf(World.SKY);
     const stepTex = cacheOf(World.TX.metal);
     const ventTex = cacheOf(World.TX.vent);
-    const facadeTex = cacheOf(World.TX.stucco || World.TX.lair);   // building wall drawn above sky-adjacent openings
+    const facadeTex = cacheOf(World.TX.stucco || World.TX.brick);   // building wall drawn above sky-adjacent openings
     const DEF = World.SURF['.'];
 
     buf.fill(FOG);      // clear to fog so any uncovered pixel reads as distance haze, never a stale frame
@@ -407,9 +407,9 @@ const Engine = (() => {
     const eyeZ = p.eyeZ != null ? p.eyeZ : 0.5;
     const horizon = H * 0.5 + (p.pitch || 0);
     const FX = (W / 2) / 0.66, NEAR = 0.04;
-    const wt = cacheOf(World.TX.lair);
+    const wt = cacheOf(World.TX.brick);
     const skyTex = cacheOf(World.SKY);
-    const facadeTex = cacheOf(World.TX.stucco || World.TX.lair);   // building wall up to the sky roofline
+    const facadeTex = cacheOf(World.TX.stucco || World.TX.brick);   // building wall up to the sky roofline
     const stepDn = cacheOf(World.TX.metal);                         // riser of a step UP (neighbour floor higher)
     const stepUp = cacheOf(World.TX.vent);                          // soffit of a step DOWN (indoor lower ceiling)
     const TAU = Math.PI * 2;
@@ -479,8 +479,8 @@ const Engine = (() => {
       for (const w of vis) {
         const wall = w.wall, ad = w.ad, bd = w.bd, x1 = w.x1, x2 = w.x2, span = x2 - x1;
         const wallHL = !!(hl && hl.edge != null && hl.sec === sn && hl.edge === w.wi);   // this exact wall targeted
-        const wallTx = wall.tex ? cacheOf(World.TX[wall.tex] || World.TX.lair) : wt;
-        const drawTx = wall.door ? cacheOf(World.TX[wall.door] || World.TX.lair) : wallTx;  // door/interactive wall texture
+        const wallTx = wall.tex ? cacheOf(World.TX[wall.tex] || World.TX.brick) : wt;
+        const drawTx = wall.door ? cacheOf(World.TX[wall.door] || World.TX.brick) : wallTx;  // door/interactive wall texture
         const wisc = 1 / (wall.texScale || 1);                        // wall tile size (>1 bigger, <1 smaller)
         const yc1 = horizon - (cz - eyeZ) * H / ad, yc2 = horizon - (cz - eyeZ) * H / bd;
         const yf1 = horizon - (fz - eyeZ) * H / ad, yf2 = horizon - (fz - eyeZ) * H / bd;
