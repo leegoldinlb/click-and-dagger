@@ -916,7 +916,15 @@ const Editor = (() => {
     return (t >= 0 && u >= 0 && u <= 1) ? t : null;
   }
   function pickGeoWall() {                                     // the loop edge of the current sector the crosshair hits
-    const s = pickGeoSector(); if (s < 0 || !portalGraph[s]) return null;
+    // Deliberately NOT pickGeoSector() — that one marches the flat ray THROUGH open
+    // portals to find the farthest visible room (correct for floor/ceiling: aiming
+    // through a doorway should edit the room beyond it). A wall you're looking at,
+    // at any pitch, always belongs to the sector you're physically standing in —
+    // using the march here meant aiming down at a nearby step/riser from the plaza
+    // side would walk straight past it into the raised sector beyond, so the riser's
+    // OWN wall (an edge of the plaza sector) was never even in the candidate list.
+    const s = Engine.sectorAt(cam.x, cam.y, geo);
+    if (s < 0 || !portalGraph[s]) return null;
     const dx = Math.cos(cam.a), dy = Math.sin(cam.a);
     const walls = portalGraph[s], loopLen = geo.sectors[s].loop.length;
     let best = null, bt = Infinity;
