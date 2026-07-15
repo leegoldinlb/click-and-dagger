@@ -42,7 +42,7 @@ body {
     inset -2px -2px 0 var(--bevel-lo);
 }
 
-#game { width: 960px; max-width: 98vw; }
+#game { width: min(92vw, 1400px, 150vh); }
 
 #viewwrap {
   position: relative;

@@ -5,8 +5,22 @@ const Game = (() => {
   const canvas = document.getElementById('view');
   Engine.init(canvas);
 
+  // The arsenal: one hardcoded Walther becomes a real weapon table. Each entry is
+  // per-weapon ammo (Lee's call — different guns for different jobs, not one shared
+  // pool), a fire-rate cooldown, a damage range, and the HUD viewmodel sprite name.
+  // `auto: true` (Sterling) fires continuously while LMB is held, gated by the same
+  // cooldown as every other weapon — see the mousedown-hold loop in update().
+  const WEAPONS = {
+    walther:  { name: 'WALTHER PPK',   spr: 'gun',         dmg: [16, 26], cd: 0.28, maxAmmo: 99, auto: false },
+    sterling: { name: 'STERLING SMG',  spr: 'gunSterling', dmg: [8, 14],  cd: 0.11, maxAmmo: 90, auto: true },
+    ar7:      { name: 'AR-7',          spr: 'gunAR7',      dmg: [32, 46], cd: 0.55, maxAmmo: 30, auto: false },
+    laser:    { name: 'LASER',         spr: 'gunLaser',    dmg: [55, 75], cd: 0.9,  maxAmmo: 12, auto: false },
+    golden:   { name: 'GOLDEN GUN',    spr: 'gunGolden',   dmg: [999, 999], cd: 0.6, maxAmmo: 1, auto: false },
+  };
+  const WEAPON_ORDER = ['walther', 'sterling', 'ar7', 'laser', 'golden'];
+
   const G = {
-    player: { x: World.spawn.x, y: World.spawn.y, a: World.spawn.a, hp: 100, ammo: 24, hurtT: 0,
+    player: { x: World.spawn.x, y: World.spawn.y, a: World.spawn.a, hp: 100, hurtT: 0,
               eyeZ: World.floorZAt(World.spawn.x, World.spawn.y) + 0.5, pitch: 0, vz: 0 },
     combat: false,
     started: false,
@@ -14,6 +28,10 @@ const Game = (() => {
     bobT: 0, bobAmt: 0, fireT: 0,
     kills: 0, civKills: 0, t0: 0,
     blown: World.startBlown,          // Cover status: false = Undercover (hostiles ignore you), true = Blown (one-way door for the level)
+    weapon: 'walther',                 // currently equipped weapon kind
+    owned: { walther: true, sterling: false, ar7: false, laser: false, golden: false },
+    ammo: { walther: 24, sterling: 0, ar7: 0, laser: 0, golden: 0 },
+    gunSprite: 'gun',                  // read by Engine.paintOverlays for the HUD viewmodel — kept in sync by switchWeapon
   };
   // Per-kind combat stats for hostile entities. `ranged` kinds hold position and fire
   // once in rangedRange (with LOS), only closing distance to get there; everyone else
@@ -28,19 +46,33 @@ const Game = (() => {
   const totalHostiles = World.ents.filter(e => HOSTILE[e.kind]).length;
   // Quest-critical kinds never take damage — destroying 004's body, the vacuum
   // tube, or Volkov's desk could strand the puzzle chain with no way to recover.
+  // Weapon pickups are similarly protected: a stray shot near a case (especially
+  // the one-per-mission Golden Gun) shouldn't be able to destroy it before it's found.
   // Every other entity with an `hp` field (every plain prop, via World.js's
   // `prop()` factory) is fair game — "make all sprites destructible."
-  const NO_DAMAGE = new Set(['agent', 'tube', 'desk']);
+  const NO_DAMAGE = new Set(['agent', 'tube', 'desk', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden']);
 
   const keys = {};
   const mouse = { x: -1, y: -1 };            // internal canvas coords
+  let mouseDown = false;                     // held for full-auto weapons
 
   const hpEl = document.getElementById('hp');
   const ammoEl = document.getElementById('ammo');
   const coverEl = document.getElementById('cover');
+  const weaponEl = document.getElementById('weapon');
+  const drawgunEl = document.getElementById('drawgun');
   const modeEl = document.getElementById('modeline');
   const hoverEl = document.getElementById('hoverlabel');
   const overlay = document.getElementById('overlay');
+
+  function switchWeapon(kind) {
+    if (!G.owned[kind]) { Adventure.msg('You don’t have that yet.', 1.5); return; }
+    if (G.weapon === kind) return;
+    G.weapon = kind;
+    G.gunSprite = WEAPONS[kind].spr;
+    G.fireT = 0;
+    Adventure.msg(WEAPONS[kind].name + ' READY.', 1.5);
+  }
 
   // ---------------------------------------------------------------- modes --
   function requestCombat() {
@@ -78,9 +110,14 @@ const Game = (() => {
   document.getElementById('drawgun').addEventListener('click', requestCombat);
 
   // ---------------------------------------------------------------- input --
+  const WEAPON_KEYS = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5'];
   document.addEventListener('keydown', e => {
     keys[e.code] = true;
     if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault();
+    if (G.started && !G.over) {
+      const wi = WEAPON_KEYS.indexOf(e.code);
+      if (wi >= 0) switchWeapon(WEAPON_ORDER[wi]);
+    }
   });
   document.addEventListener('keyup', e => { keys[e.code] = false; });
 
@@ -99,16 +136,18 @@ const Game = (() => {
 
   canvas.addEventListener('mousedown', e => {
     if (!G.started || G.over || e.button !== 0) return;
-    if (G.combat) shoot();
+    if (G.combat) { mouseDown = true; shoot(); }
     else if (mouse.x >= 0) Adventure.clickAt(mouse.x, mouse.y);
   });
+  window.addEventListener('mouseup', () => { mouseDown = false; });
 
   // --------------------------------------------------------------- combat --
   function shoot() {
+    const wpn = WEAPONS[G.weapon];
     if (G.fireT > 0) return;
-    if (G.player.ammo <= 0) { Sfx.dry(); Adventure.msg('Click. The magazine is empty.'); return; }
-    G.player.ammo--;
-    G.fireT = 0.28;
+    if (G.ammo[G.weapon] <= 0) { Sfx.dry(); Adventure.msg('Click. The magazine is empty.'); return; }
+    G.ammo[G.weapon]--;
+    G.fireT = wpn.cd;
     Sfx.shoot();
     if (blowCover()) Adventure.msg('The shot cracks across the square. Cover’s blown.', 4);
 
@@ -126,7 +165,7 @@ const Game = (() => {
       if (depth < bestDepth) { bestDepth = depth; best = e; }
     }
     if (!best) return;
-    best.hp -= 16 + Math.random() * 10;
+    best.hp -= wpn.dmg[0] + Math.random() * (wpn.dmg[1] - wpn.dmg[0]);
     best.flash = 0.12;
     if (best.hp > 0) {
       if (HOSTILE[best.kind]) { best.aggro = true; Sfx.impHit(); }
@@ -212,6 +251,7 @@ const Game = (() => {
 
     G.fireT = Math.max(0, G.fireT - dt);
     p.hurtT = Math.max(0, p.hurtT - dt);
+    if (mouseDown && G.combat && WEAPONS[G.weapon].auto) shoot();   // full-auto: hold LMB, gated by the same cooldown as any other shot
 
     // enemies move at a crawl while you're pointing and clicking
     const edt = G.combat ? dt : dt * 0.25;
@@ -281,8 +321,18 @@ const Game = (() => {
         if (p.hp >= 100) continue;
         p.hp = Math.min(100, p.hp + 25);
         Adventure.msg('+25 HP. Field dressing, agent grade.');
+      } else if (e.pickup === 'weapon') {
+        const wk = e.weaponKind, wpn = WEAPONS[wk], wasOwned = G.owned[wk];
+        G.owned[wk] = true;
+        G.ammo[wk] = Math.min(wpn.maxAmmo, G.ammo[wk] + e.grantAmmo);
+        if (wasOwned) {
+          Adventure.msg('+' + e.grantAmmo + ' rounds for the ' + wpn.name + '.');
+        } else {
+          switchWeapon(wk);
+          Adventure.msg('Acquired: ' + wpn.name + '. Press ' + (WEAPON_ORDER.indexOf(wk) + 1) + ' to switch to it.', 4);
+        }
       } else {
-        p.ammo = Math.min(99, p.ammo + 10);
+        G.ammo.walther = Math.min(WEAPONS.walther.maxAmmo, G.ammo.walther + 10);
         Adventure.msg('+10 rounds for the Walther. A love language.');
       }
       World.removeEnt(e);
@@ -298,7 +348,9 @@ const Game = (() => {
   function updateHud() {
     hpEl.textContent = Math.ceil(G.player.hp);
     hpEl.classList.toggle('low', G.player.hp < 30);
-    ammoEl.textContent = G.player.ammo;
+    ammoEl.textContent = G.ammo[G.weapon];
+    weaponEl.textContent = WEAPONS[G.weapon].name;
+    drawgunEl.textContent = '✦ DRAW ' + WEAPONS[G.weapon].name;
     coverEl.textContent = G.blown ? 'BLOWN' : 'UNDERCOVER';
     coverEl.classList.toggle('low', G.blown);
 

@@ -309,7 +309,7 @@ const Engine = (() => {
         octx.fillStyle = 'rgba(200,200,210,0.5)';
         octx.beginPath(); octx.arc(W / 2 + bobX, gy + 6, 6, 0, 7); octx.fill();
       }
-      octx.drawImage(World.SPR.gun, gx, gy, gw, gw);
+      octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, gx, gy, gw, gw);
     }
     if (!g.combat && !g.preview) {
       octx.fillStyle = 'rgba(40,60,120,0.06)'; octx.fillRect(0, 0, W, H);
@@ -361,6 +361,11 @@ const Engine = (() => {
         cell: sec.wallCell ? sec.wallCell[i] : null,
         door: sec.wallDoor ? (sec.wallDoor[i] || null) : null,   // door kind (string) or null
         texScale: sec.wallTexScale ? (sec.wallTexScale[i] || 1) : 1,  // wall tile size (>1 bigger, <1 smaller)
+        // per-wall override for the step surfaces at a height-mismatched portal —
+        // the soffit above the opening (neighbour ceiling lower) and the riser below
+        // it (neighbour floor higher). null = fall back to the old hardcoded vent/metal.
+        stepTex: sec.wallStepTex ? (sec.wallStepTex[i] || null) : null,
+        stepFloorTex: sec.wallStepFloorTex ? (sec.wallStepFloorTex[i] || null) : null,
         open: false,
       });
     });
@@ -489,7 +494,12 @@ const Engine = (() => {
         // step-down soffit: facade outdoors when EITHER side is sky (matches the grid
         // renderer's historic "wall of sky" fix) — checking only the current sector let
         // a farther sky sector's parallax backdrop bleed down over a nearer opening.
-        const upTx = (sky || (ns && ns.sky)) ? facadeTex : stepUp;
+        // An explicit per-wall override (set via the editor) always wins over the
+        // sky/indoor default — otherwise there was no way to retexture the surfaces
+        // above/below a non-sky opening at all.
+        const upTx = wall.stepTex ? cacheOf(World.TX[wall.stepTex] || World.TX.vent)
+          : (sky || (ns && ns.sky)) ? facadeTex : stepUp;
+        const wallStepDn = wall.stepFloorTex ? cacheOf(World.TX[wall.stepFloorTex] || World.TX.metal) : stepDn;
         const nyc1 = ns ? horizon - (ns.ceil - eyeZ) * H / ad : 0, nyc2 = ns ? horizon - (ns.ceil - eyeZ) * H / bd : 0;
         const nyf1 = ns ? horizon - (ns.floor - eyeZ) * H / ad : 0, nyf2 = ns ? horizon - (ns.floor - eyeZ) * H / bd : 0;
         const xs = Math.max(xL, Math.ceil(x1)), xe = Math.min(xR, Math.floor(x2));
@@ -577,7 +587,7 @@ const Engine = (() => {
               const v = yfTrue > nyfTrue ? (y - nyfTrue) / (yfTrue - nyfTrue) : 0;
               const tv = (((((ns.floor - fz) * v * wisc) % 1) + 1) % 1 * 64 | 0) & 63;
               const idx = y * W + x;
-              let dpx = shade(stepDn.u32[tv * 64 + texU], wsh);
+              let dpx = shade(wallStepDn.u32[tv * 64 + texU], wsh);
               if (wallHL) dpx = hlMix(dpx);
               buf[idx] = dpx; depth[idx] = zdist;
             }

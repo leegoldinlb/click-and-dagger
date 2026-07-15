@@ -204,6 +204,20 @@ input[type="number"] { width: 52px; }
   border: 2px solid var(--brass); color: var(--gold-bright);
   font-size: 12px; letter-spacing: 1px; padding: 4px 9px; pointer-events: none;
 }
+#favbar {
+  position: absolute; top: 10px; right: 10px; display: flex; gap: 3px; pointer-events: none;
+}
+.favslot {
+  position: relative; width: 26px; height: 26px;
+  border: 2px solid var(--brass-dim); background: var(--panel-deep);
+  box-shadow: inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo);
+}
+.favslot.empty { opacity: 0.4; border-style: dashed; }
+.favslot canvas { position: absolute; top: 0; left: 0; image-rendering: pixelated; }
+.favslot .favnum {
+  position: absolute; bottom: 0; right: 1px; font-size: 8px; color: var(--gold-bright);
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000; z-index: 1;
+}
 #statusbar {
   display: flex;
   justify-content: space-between;

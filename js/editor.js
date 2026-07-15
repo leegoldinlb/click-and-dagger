@@ -28,9 +28,19 @@ const Editor = (() => {
     { kind: 'desk', name: 'DESK', spr: 'desk' },
     { kind: 'tube', name: 'TUBE', spr: 'tube' },
     { kind: 'plant', name: 'PALM', spr: 'plant' },
+    { kind: 'royalpalm', name: 'ROYAL PALM', spr: 'royalpalm' },
+    { kind: 'bananaplant', name: 'BANANA TREE', spr: 'bananaplant' },
+    { kind: 'bougainvillea', name: 'BOUGAINVILLEA', spr: 'bougainvillea' },
+    { kind: 'fern', name: 'POTTED FERN', spr: 'fern' },
+    { kind: 'cactus', name: 'POTTED CACTUS', spr: 'cactus' },
+    { kind: 'hedge', name: 'HEDGE', spr: 'hedge' },
     { kind: 'bar', name: 'BAR CART', spr: 'bar' },
     { kind: 'medkit', name: 'FIRST-AID', spr: 'medkit' },
     { kind: 'ammo', name: 'AMMO', spr: 'ammo' },
+    { kind: 'wpn_sterling', name: 'STERLING CASE', spr: 'wpn_sterling' },
+    { kind: 'wpn_ar7', name: 'AR-7 CASE', spr: 'wpn_ar7' },
+    { kind: 'wpn_laser', name: 'LASER GADGET', spr: 'wpn_laser' },
+    { kind: 'wpn_golden', name: 'GOLDEN GUN', spr: 'wpn_golden' },
     { kind: 'camera', name: 'CAMERA', spr: 'camera' },
     { kind: 'safe', name: 'SAFE', spr: 'safe' },
     { kind: 'filecab', name: 'FILE CABINET', spr: 'filecab' },
@@ -166,6 +176,8 @@ const Editor = (() => {
       texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : null,
       wallTex: s.wallTex ? s.wallTex.slice() : null,
       wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : null, parent: s.parent == null ? -1 : s.parent,
+      wallStepTex: s.wallStepTex ? s.wallStepTex.slice() : null,
+      wallStepFloorTex: s.wallStepFloorTex ? s.wallStepFloorTex.slice() : null,
       solid: !!s.solid,
     })) : [];
     draft = [];
@@ -209,6 +221,8 @@ const Editor = (() => {
           wallDoor: (s.wallDoor && s.wallDoor.some(Boolean)) ? s.wallDoor.slice() : undefined,
           wallTex: (s.wallTex && s.wallTex.some(Boolean)) ? s.wallTex.slice() : undefined,
           wallTexScale: (s.wallTexScale && s.wallTexScale.some(v => v && v !== 1)) ? s.wallTexScale.slice() : undefined,
+          wallStepTex: (s.wallStepTex && s.wallStepTex.some(Boolean)) ? s.wallStepTex.slice() : undefined,
+          wallStepFloorTex: (s.wallStepFloorTex && s.wallStepFloorTex.some(Boolean)) ? s.wallStepFloorTex.slice() : undefined,
           parent: s.parent, solid: s.solid || undefined })),
       };
       out.v = Math.max(out.v, 5);
@@ -930,9 +944,45 @@ const Editor = (() => {
     portalGraph = Engine.buildGraph(geo);                      // re-derive wall.tex
     status('WALL ' + (hit.i + 1) + ' → ' + next.toUpperCase());
   }
+  // does this portal wall's opening have a soffit (neighbour ceiling lower) and/or
+  // a riser (neighbour floor higher) — the surfaces above/below a non-flush opening
+  // that render at all, and so are the only ones worth retexturing.
+  function wallStepInfo(hit) {
+    if (!hit || !hit.portal) return { up: false, down: false };
+    const w = portalGraph[hit.s] && portalGraph[hit.s][hit.i];
+    const nsec = w && w.next >= 0 ? geo.sectors[w.next] : null;
+    if (!nsec) return { up: false, down: false };
+    const sec = geo.sectors[hit.s];
+    return { up: nsec.ceil < sec.ceil - 0.001, down: nsec.floor > sec.floor + 0.001 };
+  }
+  function geoWallStepTex(dir) {                               // cycle the SOFFIT above a stepped-down opening
+    const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
+    const sec = geo.sectors[hit.s], names = World.TXNAMES;
+    if (!sec.wallStepTex) sec.wallStepTex = new Array(sec.loop.length).fill(null);
+    let i = names.indexOf(sec.wallStepTex[hit.i] || 'vent'); if (i < 0) i = 0;
+    const next = names[(i + dir + names.length) % names.length];
+    sec.wallStepTex[hit.i] = next;
+    portalGraph = Engine.buildGraph(geo);
+    status('WALL ' + (hit.i + 1) + ' SOFFIT → ' + next.toUpperCase());
+  }
+  function geoWallStepFloorTex(dir) {                          // cycle the RISER below a stepped-up opening
+    const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
+    const sec = geo.sectors[hit.s], names = World.TXNAMES;
+    if (!sec.wallStepFloorTex) sec.wallStepFloorTex = new Array(sec.loop.length).fill(null);
+    let i = names.indexOf(sec.wallStepFloorTex[hit.i] || 'metal'); if (i < 0) i = 0;
+    const next = names[(i + dir + names.length) % names.length];
+    sec.wallStepFloorTex[hit.i] = next;
+    portalGraph = Engine.buildGraph(geo);
+    status('WALL ' + (hit.i + 1) + ' RISER → ' + next.toUpperCase());
+  }
   function cycleTex(dir, shift) {                              // [ ] / wheel: wall if aiming close at one, else floor/ceil
     const wallHit = !shift && pickGeoWall();
-    if (wallHit && wallHit.dist < wallPickDist(wallHit)) geoWallTex(dir); else geoTex(dir, shift);
+    if (wallHit && wallHit.dist < wallPickDist(wallHit)) {
+      const step = wallStepInfo(wallHit);                      // a portal's plain wall.tex renders nowhere — retexture
+      if (step.up) geoWallStepTex(dir);                        // whichever step surface is actually visible instead
+      else if (step.down) geoWallStepFloorTex(dir);
+      else geoWallTex(dir);
+    } else geoTex(dir, shift);
   }
   function geoWallTexScale() {                                 // cycle the looked-at WALL's tile size
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
@@ -953,6 +1003,93 @@ const Editor = (() => {
     sec.wallDoor[hit.i] = next;
     portalGraph = Engine.buildGraph(geo);                     // re-derive wall.door + siblings
     status('WALL ' + (hit.i + 1) + (hit.portal ? ' (portal)' : ' (solid)') + ' → ' + (next ? next.toUpperCase() : 'PLAIN'));
+  }
+
+  // ---- texture favorites: hover a surface in the 3D preview, 1-9/0 applies a saved
+  // texture, Shift+1-9/0 saves the surface under the crosshair into that slot. One
+  // shared bank of 10 (not separate per floor/ceiling/wall) — persisted across sessions.
+  const FAV_KEYS = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0'];
+  const FAV_LABELS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+  function loadFavorites() {
+    try {
+      const raw = localStorage.getItem('cloakclick.favorites');
+      if (raw) { const a = JSON.parse(raw); if (Array.isArray(a) && a.length === 10) return a; }
+    } catch (e) { /* ignore corrupt storage */ }
+    return new Array(10).fill(null);
+  }
+  let favorites = loadFavorites();
+  function persistFavorites() { try { localStorage.setItem('cloakclick.favorites', JSON.stringify(favorites)); } catch (e) { /* storage may be unavailable */ } }
+  // the surface currently under the crosshair: a close wall, else the sector's floor —
+  // same wall-priority test [ ] already uses (without Shift, which is the save/apply toggle here).
+  function favTarget() {
+    const wallHit = pickGeoWall();
+    if (wallHit && wallHit.dist < wallPickDist(wallHit)) return wallHit;
+    const s = pickGeoSector();
+    return s < 0 ? null : { s, i: -1 };
+  }
+  function renderFavbar() {
+    const el = document.getElementById('favbar'); if (!el) return;
+    el.innerHTML = '';
+    FAV_LABELS.forEach((lbl, i) => {
+      const name = favorites[i];
+      const cell = document.createElement('div');
+      cell.className = 'favslot' + (name ? '' : ' empty');
+      if (name) {
+        const tex = World.TX[name];
+        if (tex) {
+          const c = document.createElement('canvas'); c.width = 26; c.height = 26;
+          c.getContext('2d').drawImage(tex, 0, 0, 64, 64, 0, 0, 26, 26);
+          cell.appendChild(c);
+        }
+        cell.title = name.toUpperCase();
+      }
+      const num = document.createElement('span'); num.className = 'favnum'; num.textContent = lbl;
+      cell.appendChild(num);
+      el.appendChild(cell);
+    });
+  }
+  function favSave(slot) {
+    const t = favTarget(); if (!t) { status('LOOK AT A SURFACE.'); return; }
+    const sec = geo.sectors[t.s];
+    let name;
+    if (t.i >= 0) {
+      const step = wallStepInfo(t);
+      name = step.up ? ((sec.wallStepTex && sec.wallStepTex[t.i]) || 'vent')
+        : step.down ? ((sec.wallStepFloorTex && sec.wallStepFloorTex[t.i]) || 'metal')
+        : ((sec.wallTex && sec.wallTex[t.i]) || 'brick');
+    } else {
+      name = sec.floorTex;
+    }
+    favorites[slot] = name;
+    persistFavorites(); renderFavbar();
+    status('SLOT ' + FAV_LABELS[slot] + ' SAVED — ' + name.toUpperCase());
+  }
+  function favApply(slot) {
+    const name = favorites[slot];
+    if (!name) { status('SLOT ' + FAV_LABELS[slot] + ' IS EMPTY — SHIFT+' + FAV_LABELS[slot] + ' TO SAVE ONE.'); return; }
+    const t = favTarget(); if (!t) { status('LOOK AT A SURFACE.'); return; }
+    pushUndo();
+    const sec = geo.sectors[t.s];
+    if (t.i >= 0) {
+      const step = wallStepInfo(t);
+      if (step.up) {
+        if (!sec.wallStepTex) sec.wallStepTex = new Array(sec.loop.length).fill(null);
+        sec.wallStepTex[t.i] = name;
+        status('WALL ' + (t.i + 1) + ' SOFFIT → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
+      } else if (step.down) {
+        if (!sec.wallStepFloorTex) sec.wallStepFloorTex = new Array(sec.loop.length).fill(null);
+        sec.wallStepFloorTex[t.i] = name;
+        status('WALL ' + (t.i + 1) + ' RISER → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
+      } else {
+        if (!sec.wallTex) sec.wallTex = new Array(sec.loop.length).fill(null);
+        sec.wallTex[t.i] = name;
+        status('WALL ' + (t.i + 1) + ' → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
+      }
+      portalGraph = Engine.buildGraph(geo);
+    } else {
+      sec.floorTex = name;
+      status('SECTOR ' + (t.s + 1) + ' FLOOR → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
+    }
   }
 
   function pSolid(x, y) {
@@ -998,12 +1135,16 @@ const Editor = (() => {
       const wallHit = pickGeoWall();
       if (wallHit && wallHit.dist < wallPickDist(wallHit)) {    // close-range wall: show ITS texture/scale/door
         const sec = geo.sectors[wallHit.s];
-        const wtex = (sec.wallTex && sec.wallTex[wallHit.i]) || 'brick';
         const wscale = (sec.wallTexScale && sec.wallTexScale[wallHit.i]) || 1;
         const wdoor = sec.wallDoor && sec.wallDoor[wallHit.i];
+        const step = wallStepInfo(wallHit);
+        let label, hint;
+        if (step.up) { label = 'SOFFIT ' + String((sec.wallStepTex && sec.wallStepTex[wallHit.i]) || 'vent').toUpperCase(); hint = '[ ] soffit tex' + (step.down ? ' · R riser tex' : ''); }
+        else if (step.down) { label = 'RISER ' + String((sec.wallStepFloorTex && sec.wallStepFloorTex[wallHit.i]) || 'metal').toUpperCase(); hint = '[ ] riser tex'; }
+        else { label = String((sec.wallTex && sec.wallTex[wallHit.i]) || 'brick').toUpperCase(); hint = 'T tile · F door'; }
         el.textContent = '■ WALL ' + (wallHit.i + 1) + (wallHit.portal ? ' (portal)' : ' (solid)') +
-          '   ' + String(wtex).toUpperCase() + (wscale !== 1 ? ' ×' + wscale : '') + (wdoor ? ' · ' + wdoor.toUpperCase() : '') +
-          (previewCompiled ? '' : '   T tile · F door');
+          '   ' + label + (wscale !== 1 ? ' ×' + wscale : '') + (wdoor ? ' · ' + wdoor.toUpperCase() : '') +
+          (previewCompiled ? '' : '   ' + hint);
         el.style.display = 'block';
         Engine.setHighlight({ sec: wallHit.s, edge: wallHit.i });
         return;
@@ -1074,7 +1215,9 @@ const Editor = (() => {
     document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
     document.getElementById('pcontrols').innerHTML = previewCompiled
       ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>ESC</b> map'
-      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> tex — wall if aiming close, else floor (Shift ceil) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>ESC</b> map';
+      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> tex — wall (or its soffit/riser step) if aiming close, else floor (Shift ceil) &nbsp;·&nbsp; <b>R</b> riser tex (when a wall has both a soffit and a riser) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply · <b>Shift</b>+ save favorite &nbsp;·&nbsp; <b>ESC</b> map';
+    document.getElementById('favbar').style.display = previewCompiled ? 'none' : 'flex';
+    renderFavbar();
     previewOn = true; plast = performance.now();
     praf = requestAnimationFrame(pLoop);
   }
@@ -1120,6 +1263,14 @@ const Editor = (() => {
       if (e.code === 'KeyN') { if (!e.repeat) pushUndo(); geoHostile(); e.preventDefault(); return; }
       if (e.code === 'KeyF') { if (!e.repeat) pushUndo(); geoDoor(); e.preventDefault(); return; }
       if (e.code === 'KeyH') { if (!e.repeat) pushUndo(); geoToggleSolid(); e.preventDefault(); return; }
+      if (e.code === 'KeyR') {                                 // riser (down-step): [ ] prefers the soffit when a wall
+        if (!e.repeat) pushUndo();                              // has both, so this is the only way to reach the riser then
+        const wallHit = pickGeoWall();
+        if (wallHit && wallStepInfo(wallHit).down) geoWallStepFloorTex(1); else status('NO RISER ON THIS WALL.');
+        e.preventDefault(); return;
+      }
+      const favIdx = FAV_KEYS.indexOf(e.code);
+      if (favIdx >= 0) { if (!e.repeat) { if (sh) favSave(favIdx); else favApply(favIdx); } e.preventDefault(); return; }
     }
     if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
       pkeys[e.code] = true; e.preventDefault();
@@ -1219,7 +1370,7 @@ const Editor = (() => {
   function closeSector() {
     const loop = draft.slice();
     if (polyArea(loop) < 0) loop.reverse();                    // normalise to CCW
-    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, win: false, hostile: false, texScale: 1, wallDoor: null, wallTex: null, wallTexScale: null, parent: -1, solid: false };
+    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, win: false, hostile: false, texScale: 1, wallDoor: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, parent: -1, solid: false };
     const c = centroid(loop);
     for (let s = 0; s < geo.sectors.length; s++)
       if (pointInLoop(c.x, c.y, geo.sectors[s].loop)) { sec.parent = s; break; }  // nested → sub-sector

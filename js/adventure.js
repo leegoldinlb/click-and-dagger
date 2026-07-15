@@ -137,9 +137,19 @@ const Adventure = (() => {
         : 'Volkov’s desk: walnut, a red telephone, and a locked drawer that practically screams CLASSIFIED.';
       case 'tube': return 'A vacuum tube, military grade. Warm, like a tiny glass furnace.';
       case 'plant': return 'A potted palm. Even secret lairs need a touch of Riviera.';
+      case 'royalpalm': return 'A royal palm, smooth and tall. Cuba puts one on the coat of arms; Volkov puts one in the courtyard.';
+      case 'bananaplant': return 'A banana tree, green fruit hanging low. Entirely decorative, as far as the mission is concerned.';
+      case 'bougainvillea': return 'Bougainvillea, magenta and thorned. Havana grows beautiful things over ugly walls.';
+      case 'fern': return 'A fern in a shaded corner, unbothered by any of this.';
+      case 'cactus': return 'A potted cactus. One flower, a great many spines — a fair summary of the week.';
+      case 'hedge': return 'A trimmed hedge, clipped with more care than anything else in this compound.';
       case 'bar': return 'The bar cart: gin, scotch, a shaker. Volkov entertains between atrocities.';
       case 'medkit': return 'A first-aid tin. Walk over it to use it — this is still a shooter.';
       case 'ammo': return 'Nine-millimetre rounds. Walk over them. They know the drill.';
+      case 'wpn_sterling': return 'A hard case, stencilled STEN. Q Branch does not believe in subtlety.';
+      case 'wpn_ar7': return 'A field rifle, broken down to fit the case. Assembles in under a minute, if your hands are steady.';
+      case 'wpn_laser': return 'A gadget that hums when you get close. Whatever it does, it is not standard issue.';
+      case 'wpn_golden': return 'A pistol, gold from grip to barrel, resting on velvet. One shot. Make it count.';
       case 'camera': return 'A subminiature spy camera. Volkov photographs his enemies before he disposes of them. Sentimental.';
       case 'safe': return 'A wall safe, dial locked. Whatever is in there is above your pay grade, and also welded shut.';
       case 'filecab': return 'Three drawers of surveillance files, alphabetized by paranoia.';
@@ -213,8 +223,10 @@ const Adventure = (() => {
       case 'civilianM': case 'civilianF': case 'vendor': case 'waiter': case 'tourist': case 'officer': case 'fisherman': case 'flowergirl':
         return 'They are a person, not a prop. Leave them be.';
       case 'desk': return 'It’s a desk. Even you couldn’t expense that.';
-      case 'medkit': case 'ammo': return 'Just walk over it. This is still a shooter.';
-      case 'plant': return 'Your cover is “orchid dealer”, not “palm smuggler”.';
+      case 'medkit': case 'ammo': case 'wpn_sterling': case 'wpn_ar7': case 'wpn_laser': case 'wpn_golden':
+        return 'Just walk over it. This is still a shooter.';
+      case 'plant': case 'royalpalm': case 'bananaplant': case 'bougainvillea': case 'fern': case 'cactus': case 'hedge':
+        return 'Your cover is “orchid dealer”, not “palm smuggler”.';
       case 'bar': return 'Tempting. After the mission.';
     }
     return 'You can’t take that.';

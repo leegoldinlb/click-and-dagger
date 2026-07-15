@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>LAIR ARCHITECT &mdash; CLICK &amp; DAGGER</title>
-<link rel="stylesheet" href="editor.css?v=7">
+<link rel="stylesheet" href="editor.css?v=8">
 </head>
 <body>
 <div id="wrap">
@@ -86,8 +86,9 @@
       <div id="preview3d" hidden>
         <canvas id="pcanvas" width="640" height="360"></canvas>
         <div id="ptarget"></div>
+        <div id="favbar"></div>
         <div id="pcontrols"><b>WASD</b> move &nbsp;·&nbsp; <b>ARROWS</b>/<b>DRAG</b> look &nbsp;·&nbsp;
-        sector: <b>PgUp</b>/<b>PgDn</b> raise/lower floor (<b>Shift</b> = ceiling) &nbsp;·&nbsp; <b>,</b> <b>.</b> slope &nbsp;·&nbsp; <b>[</b> <b>]</b>/<b>scroll</b> texture &nbsp;·&nbsp; <b>ESC</b> map
+        sector: <b>PgUp</b>/<b>PgDn</b> raise/lower floor (<b>Shift</b> = ceiling) &nbsp;·&nbsp; <b>,</b> <b>.</b> slope &nbsp;·&nbsp; <b>[</b> <b>]</b>/<b>scroll</b> texture &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply favorite &nbsp;·&nbsp; <b>Shift</b>+<b>1</b>-<b>9</b>/<b>0</b> save favorite &nbsp;·&nbsp; <b>ESC</b> map
         &nbsp;·&nbsp; cyan glow = the surface you're about to edit</div>
       </div>
       <div id="drawhelp"><b>SPACE</b>/click vertex &nbsp;·&nbsp; <b>drag</b> a vertex to move it &nbsp;·&nbsp; close on the first to make a sector &nbsp;·&nbsp; <b>I</b> insert on a wall &nbsp;·&nbsp; <b>DEL</b> remove vertex/sector &nbsp;·&nbsp; <b>Ctrl-Z</b> undo &nbsp;·&nbsp; <b>scroll</b> = zoom &nbsp;·&nbsp; white = solid, red = sector wall</div>
@@ -130,8 +131,8 @@
   </div>
 </div>
 <input type="file" id="filein" accept=".json,application/json" hidden>
-<script src="js/world.js?v=38"></script>
-<script src="js/engine.js?v=37"></script>
-<script src="js/editor.js?v=41"></script>
+<script src="js/world.js?v=42"></script>
+<script src="js/engine.js?v=39"></script>
+<script src="js/editor.js?v=45"></script>
 </body>
 </html>

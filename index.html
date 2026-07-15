@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>CLICK &amp; DAGGER</title>
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <div id="game">
@@ -21,10 +21,10 @@
       a radio-shack mainframe that 004 sabotaged before Volkov's men got him. Henchmen are easy.
       Crossing the square is the puzzle.</p>
       <div class="controls">
-        <div><b>WASD</b> move &nbsp;·&nbsp; <b>SPACE</b> jump &nbsp;·&nbsp; <b>MOUSE</b> look + aim up/down &nbsp;·&nbsp; <b>LMB</b> shoot</div>
+        <div><b>WASD</b> move &nbsp;·&nbsp; <b>SPACE</b> jump &nbsp;·&nbsp; <b>MOUSE</b> look + aim up/down &nbsp;·&nbsp; <b>LMB</b> shoot &nbsp;·&nbsp; <b>1</b>-<b>5</b> switch weapon</div>
         <div><b>RIGHT-CLICK</b> holsters your gun &rarr; <span class="adv">ADVENTURE MODE</span>:
         pick a verb (LOOK / TAKE / USE), click things in the world, collect items.</div>
-        <div><b>RIGHT-CLICK</b> again (or ESC) toggles back. Time crawls while your Walther is holstered.</div>
+        <div><b>RIGHT-CLICK</b> again (or ESC) toggles back. Time crawls while your gun is holstered.</div>
       </div>
       <button id="startbtn">[ BEGIN MISSION ]</button>
       <a id="editorlink" href="editor.html">LAIR ARCHITECT &mdash; BUILD YOUR OWN MISSION</a>
@@ -33,7 +33,7 @@
   <div id="hud">
     <div id="stats">
       <span class="stat">HP <b id="hp">100</b></span>
-      <span class="stat">AMMO <b id="ammo">24</b></span>
+      <span class="stat"><b id="weapon">WALTHER PPK</b> AMMO <b id="ammo">24</b></span>
       <span class="stat">COVER <b id="cover">UNDERCOVER</b></span>
     </div>
     <div id="verbs">
@@ -47,9 +47,9 @@
   <div id="modeline">COMBAT MODE — right-click to holster &amp; point-and-click</div>
 </div>
 <script src="js/audio.js?v=6"></script>
-<script src="js/world.js?v=38"></script>
-<script src="js/engine.js?v=37"></script>
-<script src="js/adventure.js?v=15"></script>
-<script src="js/main.js?v=14"></script>
+<script src="js/world.js?v=42"></script>
+<script src="js/engine.js?v=39"></script>
+<script src="js/adventure.js?v=17"></script>
+<script src="js/main.js?v=15"></script>
 </body>
 </html>

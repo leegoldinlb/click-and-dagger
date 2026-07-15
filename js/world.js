@@ -56,6 +56,7 @@ const World = (() => {
       sectors.push(Object.assign({
         loop, floor: 0, ceil: 3.6, floorTex: 'tile', ceilTex: 'ceiltile', sky: false, win: false, hostile: false, texScale: 1,
         wallTex: new Array(n).fill(null), wallDoor: new Array(n).fill(null), wallTexScale: new Array(n).fill(1), parent: -1,
+        wallStepTex: new Array(n).fill(null), wallStepFloorTex: new Array(n).fill(null),
       }, p));
       return sectors.length - 1;
     };
@@ -68,6 +69,8 @@ const World = (() => {
           if (o.tex !== undefined) sec.wallTex[i] = o.tex;
           if (o.door !== undefined) sec.wallDoor[i] = o.door;
           if (o.scale !== undefined) sec.wallTexScale[i] = o.scale;
+          if (o.stepTex !== undefined) sec.wallStepTex[i] = o.stepTex;
+          if (o.stepFloorTex !== undefined) sec.wallStepFloorTex[i] = o.stepFloorTex;
           return;
         }
       }
@@ -388,7 +391,7 @@ const World = (() => {
       sectors.push({
         loop, floor: s.f, ceil: s.c, floorTex: s.ft, ceilTex: s.ct,
         sky: s.sky, win: s.win, hostile: false, fsx: s.fsx, fsy: s.fsy,
-        wallTex, wallCell, parent: -1,
+        wallTex, wallCell, wallStepTex: wallTex.map(() => null), wallStepFloorTex: wallTex.map(() => null), parent: -1,
       });
       for (let yy = r.y0; yy <= r.y1; yy++) for (let xx = r.x0; xx <= r.x1; xx++) cellSector[yy * MW + xx] = si;
     }
@@ -969,6 +972,102 @@ const World = (() => {
     g.fillStyle = 'rgba(0,0,0,0.14)'; g.fillRect(0, 59, 64, 5);
   });
 
+  FLOOR.doorwood = cnv(g => {                          // paneled colonial front door, brass fittings
+    vgrad(g, 0, 0, 64, 64, '#c9a06a', '#a87e4a');
+    stains(g, 6, ['#8a6a44', '#6a5236']);
+    g.fillStyle = 'rgba(0,0,0,0.16)'; g.fillRect(8, 4, 48, 56);                   // recessed door reveal
+    let dr = g.createLinearGradient(0, 6, 0, 58);
+    dr.addColorStop(0, '#8a5c34'); dr.addColorStop(0.5, '#6e4526'); dr.addColorStop(1, '#4a2e18');
+    g.fillStyle = dr; g.fillRect(11, 6, 42, 52);
+    bevel(g, 11, 6, 42, 52, 'rgba(255,220,170,0.2)', 'rgba(0,0,0,0.5)');
+    g.strokeStyle = '#3a2414'; g.lineWidth = 1.4;                                // two raised panels, top + bottom
+    g.strokeRect(16, 11, 32, 20); g.strokeRect(16, 35, 32, 18);
+    g.fillStyle = 'rgba(255,220,170,0.08)'; g.fillRect(16, 11, 32, 2); g.fillRect(16, 35, 32, 2);
+    g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(16, 29, 32, 2); g.fillRect(16, 51, 32, 2);
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 1; g.beginPath(); g.moveTo(32, 6); g.lineTo(32, 58); g.stroke();  // centre seam
+    let br = g.createRadialGradient(41, 32, 0.5, 41, 32, 3);                     // brass handle
+    br.addColorStop(0, '#f0d888'); br.addColorStop(1, '#8a6a1a');
+    g.fillStyle = br; g.beginPath(); g.arc(41, 32, 2.6, 0, 7); g.fill();
+    g.fillStyle = '#5e3a24'; g.fillRect(11, 58, 42, 2);                          // threshold
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 59, 64, 5);
+  });
+
+  FLOOR.doorarch = cnv(g => {                          // deep-set arched doorway, shadowed alcove
+    vgrad(g, 0, 0, 64, 64, '#d0c4a0', '#b0a37c');
+    stains(g, 6, ['#8a7a58', '#6a5c40']);
+    g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath();                             // deep arched recess
+    g.moveTo(10, 60); g.lineTo(10, 24); g.quadraticCurveTo(10, 8, 32, 8); g.quadraticCurveTo(54, 8, 54, 24); g.lineTo(54, 60); g.closePath(); g.fill();
+    let dr = g.createLinearGradient(16, 14, 48, 56);
+    dr.addColorStop(0, '#241a10'); dr.addColorStop(1, '#0e0a06');
+    g.fillStyle = dr; g.beginPath();
+    g.moveTo(16, 60); g.lineTo(16, 26); g.quadraticCurveTo(16, 14, 32, 14); g.quadraticCurveTo(48, 14, 48, 26); g.lineTo(48, 60); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.5)'; g.lineWidth = 2;                          // stone archivolt trim
+    g.beginPath(); g.moveTo(10, 24); g.quadraticCurveTo(10, 8, 32, 8); g.quadraticCurveTo(54, 8, 54, 24); g.stroke();
+    g.strokeStyle = 'rgba(255,250,235,0.3)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(11, 23); g.quadraticCurveTo(11, 10, 32, 10); g.quadraticCurveTo(53, 10, 53, 23); g.stroke();
+    g.fillStyle = 'rgba(20,14,8,0.5)'; g.beginPath(); g.ellipse(32, 58, 15, 3, 0, 0, 7); g.fill();  // interior floor shadow
+    speck(g, 40, 'rgba(0,0,0,0.06)', 64, 64);
+  });
+
+  FLOOR.doubledoor = cnv(g => {                        // grand glass-paned double door, hotel/shop entrance
+    vgrad(g, 0, 0, 64, 64, '#7a6048', '#5a462e');
+    g.fillStyle = '#241a10'; g.fillRect(4, 4, 56, 56);                           // dark wood frame surround
+    bevel(g, 4, 4, 56, 56, 'rgba(255,220,170,0.18)', 'rgba(0,0,0,0.45)');
+    for (const dx of [7, 33]) {
+      const gl = g.createLinearGradient(dx, 8, dx + 24, 56);
+      gl.addColorStop(0, '#6a8894'); gl.addColorStop(0.5, '#33454e'); gl.addColorStop(1, '#20292e');
+      g.fillStyle = gl; g.fillRect(dx, 8, 24, 48);
+      g.strokeStyle = 'rgba(20,14,8,0.6)'; g.lineWidth = 1.5; g.strokeRect(dx, 8, 24, 48);
+      g.strokeStyle = 'rgba(20,14,8,0.4)'; g.lineWidth = 1;                      // muntins, three panes tall
+      g.beginPath(); g.moveTo(dx, 24); g.lineTo(dx + 24, 24); g.moveTo(dx, 40); g.lineTo(dx + 24, 40); g.stroke();
+      g.fillStyle = 'rgba(255,255,255,0.14)'; g.beginPath();
+      g.moveTo(dx + 3, 50); g.lineTo(dx + 10, 10); g.lineTo(dx + 14, 10); g.lineTo(dx + 7, 50); g.closePath(); g.fill();
+      let br = g.createRadialGradient(dx + (dx === 7 ? 21 : 3), 32, 0.5, dx + (dx === 7 ? 21 : 3), 32, 2.6);
+      br.addColorStop(0, '#f0d888'); br.addColorStop(1, '#8a6a1a');
+      g.fillStyle = br; g.beginPath(); g.arc(dx + (dx === 7 ? 21 : 3), 32, 2.2, 0, 7); g.fill();
+    }
+    g.fillStyle = 'rgba(0,0,0,0.14)'; g.fillRect(0, 59, 64, 5);
+  });
+
+  FLOOR.windowbars = cnv(g => {                         // ground-floor barred window (reja), no glass
+    vgrad(g, 0, 0, 64, 64, '#c9b888', '#a99862');
+    stains(g, 8, ['#8a7a50', '#6a5c3c']);
+    speck(g, 60, 'rgba(0,0,0,0.05)');
+    g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(14, 12, 36, 34);                 // recessed opening
+    let interior = g.createLinearGradient(16, 14, 46, 44);
+    interior.addColorStop(0, '#241c14'); interior.addColorStop(1, '#0e0a06');
+    g.fillStyle = interior; g.fillRect(16, 14, 32, 30);
+    g.fillStyle = '#7a8028'; g.fillRect(20, 30, 8, 10); g.fillRect(34, 20, 6, 8);  // hint of interior greenery
+    g.strokeStyle = '#1c1e22'; g.lineWidth = 2.4; g.lineCap = 'round';            // iron reja bars, vertical
+    for (let x = 19; x <= 43; x += 4.5) { g.beginPath(); g.moveTo(x, 12); g.lineTo(x, 46); g.stroke(); }
+    g.strokeStyle = '#26282e'; g.lineWidth = 2;                                  // horizontal crossbars
+    g.beginPath(); g.moveTo(14, 20); g.lineTo(50, 20); g.moveTo(14, 38); g.lineTo(50, 38); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,0.1)'; for (let x = 19; x <= 43; x += 4.5) g.fillRect(x - 0.4, 12, 0.8, 34);  // highlight edge
+    g.fillStyle = '#8a7042'; g.fillRect(12, 46, 40, 3);                          // sill
+    bevel(g, 12, 46, 40, 3, 'rgba(255,240,200,0.25)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 59, 64, 5);
+  });
+
+  FLOOR.windowshut = cnv(g => {                         // fully shuttered window, closed tight
+    vgrad(g, 0, 0, 64, 64, '#c78868', '#a76648');
+    stains(g, 7, ['#8a5638', '#6a4230']);
+    speck(g, 60, 'rgba(0,0,0,0.05)');
+    g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(13, 10, 38, 36);                 // recess
+    let sh = g.createLinearGradient(0, 12, 0, 44);
+    sh.addColorStop(0, '#3a5c40'); sh.addColorStop(1, '#22381f');
+    g.fillStyle = sh; g.fillRect(15, 12, 34, 32);
+    bevel(g, 15, 12, 34, 32, 'rgba(200,230,180,0.18)', 'rgba(0,0,0,0.4)');
+    g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 1;                          // louvre slats, closed
+    for (let y = 15; y < 42; y += 3.2) { g.beginPath(); g.moveTo(16, y); g.lineTo(48, y); g.stroke(); }
+    g.strokeStyle = 'rgba(255,255,255,0.08)'; g.lineWidth = 1;
+    for (let y = 16.4; y < 42; y += 3.2) { g.beginPath(); g.moveTo(16, y); g.lineTo(48, y); g.stroke(); }
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(32, 12); g.lineTo(32, 44); g.stroke();  // centre seam, two doors
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.arc(30, 28, 1.2, 0, 7); g.fill(); g.beginPath(); g.arc(34, 28, 1.2, 0, 7); g.fill();  // latch pins
+    g.fillStyle = '#8a5638'; g.fillRect(11, 44, 40, 3);                          // sill
+    bevel(g, 11, 44, 40, 3, 'rgba(255,220,180,0.22)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 59, 64, 5);
+  });
+
   // ---- parallax sky (wide; sampled by view angle): warm Havana afternoon ----
   const SKY = cnv(g => {
     const grd = g.createLinearGradient(0, 0, 0, 96);
@@ -1007,6 +1106,7 @@ const World = (() => {
     'cobble', 'wood', 'marble', 'concrete', 'water', 'metal', 'vent', 'carpet', 'lounge',
     'ceiltile', 'ground', 'helipad', 'rattan', 'azulejo', 'cork', 'corrugated', 'awning', 'limestone',
     'terrazzo', 'rooftile', 'mural', 'sandbag', 'rope', 'windowrow', 'balconywin', 'shopfront',
+    'doorwood', 'doorarch', 'doubledoor', 'windowbars', 'windowshut',
     'radio', 'blast', 'mainframe', 'poster'];
   const WALLTX = { 1: 'teak', 2: 'lair', 3: 'blast', 4: 'radio', 5: 'mainframe', 6: 'poster' };
   const wallTexName = (x, y) => {
@@ -2369,6 +2469,54 @@ const World = (() => {
     g.fillStyle = 'rgba(255,255,255,0.12)'; g.fillRect(20, 35, 9, 0.8);
   });
 
+  // ---- weapon pickups: a hard case per gun, stenciled, in the medkit/ammo style ----
+  function gunCase(label, top, bot, stencil) {
+    return outlined(g => {
+      g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 58.5, 22, 2.6, 0, 0, 7); g.fill();
+      let cs = g.createLinearGradient(0, 30, 0, 58);
+      cs.addColorStop(0, top); cs.addColorStop(1, bot);
+      g.fillStyle = cs; g.fillRect(11, 30, 42, 28);
+      bevel(g, 11, 30, 42, 28, 'rgba(255,255,255,0.3)', 'rgba(0,0,0,0.5)');
+      g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(11, 41, 42, 1.6);              // lid seam
+      g.fillStyle = '#20222a'; g.fillRect(17, 41.4, 4, 4); g.fillRect(43, 41.4, 4, 4);  // latches
+      g.fillStyle = 'rgba(255,255,255,0.4)'; g.fillRect(17, 41.4, 4, 1); g.fillRect(43, 41.4, 4, 1);
+      g.fillStyle = stencil; g.font = 'bold 8px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(label, 32, 51.5);
+      g.fillStyle = 'rgba(0,0,0,0.15)'; g.fillRect(13, 32, 38, 1);
+      speck(g, 30, 'rgba(0,0,0,0.08)', 64, 64);
+    });
+  }
+  SPR.wpn_sterling = gunCase('STEN', '#4a4f45', '#26281f', 'rgba(220,224,200,0.8)');
+  SPR.wpn_ar7 = gunCase('AR-7', '#3a3c30', '#1c1e16', 'rgba(200,210,180,0.8)');
+  SPR.wpn_laser = outlined(g => {                                  // glowing gadget case
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 58.5, 22, 2.6, 0, 0, 7); g.fill();
+    let cs = g.createLinearGradient(0, 30, 0, 58);
+    cs.addColorStop(0, '#3a4a56'); cs.addColorStop(1, '#1a232a');
+    g.fillStyle = cs; g.fillRect(11, 30, 42, 28);
+    bevel(g, 11, 30, 42, 28, 'rgba(150,220,255,0.3)', 'rgba(0,0,0,0.5)');
+    const gl = g.createRadialGradient(32, 44, 1, 32, 44, 12);
+    gl.addColorStop(0, 'rgba(200,245,255,0.95)'); gl.addColorStop(0.6, 'rgba(60,200,255,0.6)'); gl.addColorStop(1, 'rgba(20,120,180,0)');
+    g.fillStyle = gl; g.beginPath(); g.arc(32, 44, 12, 0, 7); g.fill();
+    g.fillStyle = '#0c1216'; g.fillRect(17, 41.4, 4, 4); g.fillRect(43, 41.4, 4, 4);
+    speck(g, 24, 'rgba(150,220,255,0.08)', 64, 64);
+  });
+  SPR.wpn_golden = outlined(g => {                                 // ornate display case, velvet-lined
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 58.5, 22, 2.6, 0, 0, 7); g.fill();
+    let cs = g.createLinearGradient(0, 30, 0, 58);
+    cs.addColorStop(0, '#5a4020'); cs.addColorStop(1, '#2c2010');
+    g.fillStyle = cs; g.fillRect(11, 30, 42, 28);
+    bevel(g, 11, 30, 42, 28, 'rgba(255,220,140,0.35)', 'rgba(0,0,0,0.5)');
+    g.fillStyle = '#4a1620'; g.fillRect(15, 34, 34, 20);                          // velvet interior
+    g.fillStyle = 'rgba(0,0,0,0.2)'; g.fillRect(15, 34, 34, 3);
+    let gd = g.createLinearGradient(20, 38, 44, 48);                             // the gun itself, resting inside
+    gd.addColorStop(0, '#f0d878'); gd.addColorStop(1, '#8a6a1a');
+    g.fillStyle = gd; g.beginPath(); g.moveTo(20, 44); g.lineTo(42, 40); g.lineTo(44, 44); g.lineTo(22, 48); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1; g.stroke();
+    g.fillStyle = '#20222a'; g.fillRect(17, 41.4, 4, 4); g.fillRect(43, 41.4, 4, 4);
+    g.fillStyle = 'rgba(255,255,255,0.4)'; g.fillRect(17, 41.4, 4, 1); g.fillRect(43, 41.4, 4, 1);
+    speck(g, 20, 'rgba(255,220,140,0.1)', 64, 64);
+  });
+
   SPR.plant = outlined(g => {                                     // potted Havana palm
     g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62.4, 13, 2.2, 0, 0, 7); g.fill();
     // terracotta pot, side-lit, with rim and sheen
@@ -2416,6 +2564,137 @@ const World = (() => {
     frond(0, 29, 5, '#46a052', '#2c6b34');
     g.fillStyle = '#5e4322'; g.beginPath(); g.arc(30, 29.4, 2, 0, 7); g.arc(34, 29.8, 1.8, 0, 7); g.fill();   // coconuts
     g.fillStyle = 'rgba(255,230,180,0.35)'; g.beginPath(); g.arc(29.4, 28.8, 0.7, 0, 7); g.fill();
+  });
+
+  // ---------------------------------------------------------------------------
+  // MORE GREENERY — a wider palette of Havana plants and trees, street and indoor.
+  // ---------------------------------------------------------------------------
+  SPR.royalpalm = outlined(g => {                                  // tall royal palm — Cuba's national tree, ground-planted
+    g.fillStyle = 'rgba(0,0,0,0.26)'; g.beginPath(); g.ellipse(32, 62, 9, 1.8, 0, 0, 7); g.fill();
+    let tk = g.createLinearGradient(28, 0, 36, 0);                              // smooth pale grey trunk, slightly swollen
+    tk.addColorStop(0, '#c9c4b0'); tk.addColorStop(0.5, '#a8a08c'); tk.addColorStop(1, '#726c5a');
+    g.fillStyle = tk;
+    g.beginPath(); g.moveTo(29.4, 61); g.quadraticCurveTo(28, 34, 30.4, 14); g.lineTo(33.6, 14); g.quadraticCurveTo(35.6, 34, 34.6, 61); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(60,54,40,0.3)'; g.lineWidth = 0.7;                     // faint ringed bark
+    for (let i = 0; i < 9; i++) { const y = 58 - i * 5; g.beginPath(); g.moveTo(29.6, y); g.lineTo(34.4, y - 0.6); g.stroke(); }
+    g.fillStyle = '#5a6b3c'; g.beginPath(); g.ellipse(32, 14, 3.6, 6, 0, 0, 7); g.fill();          // smooth green crownshaft
+    const frond = (rot, len, c1, c2) => {
+      g.save(); g.translate(32, 12); g.rotate(rot);
+      const fg = g.createLinearGradient(0, 0, 0, -len);
+      fg.addColorStop(0, c2); fg.addColorStop(1, c1);
+      g.fillStyle = fg;
+      g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(-3.4, -len * 0.5, -1, -len); g.quadraticCurveTo(0, -len * 0.9, 1, -len); g.quadraticCurveTo(3.4, -len * 0.5, 0, 0);
+      g.closePath(); g.fill();
+      g.restore();
+    };
+    frond(-1.5, 15, '#2c5a30', '#1c3f20'); frond(-1.0, 17, '#356a38', '#234a26');
+    frond(-0.4, 19, '#3f7a42', '#2a5530'); frond(0.4, 19, '#3f7a42', '#2a5530');
+    frond(1.0, 17, '#356a38', '#234a26'); frond(1.5, 15, '#2c5a30', '#1c3f20');
+    frond(0, 20, '#4a8a4e', '#316038');
+  });
+
+  SPR.bananaplant = outlined(g => {                                 // banana tree, broad tropical leaves
+    g.fillStyle = 'rgba(0,0,0,0.26)'; g.beginPath(); g.ellipse(32, 61, 14, 2.4, 0, 0, 7); g.fill();
+    let tk = g.createLinearGradient(28, 0, 36, 0);
+    tk.addColorStop(0, '#8ea25a'); tk.addColorStop(0.5, '#6a7f3e'); tk.addColorStop(1, '#455326');
+    g.fillStyle = tk; g.beginPath(); g.moveTo(29, 60); g.quadraticCurveTo(28.6, 40, 30.4, 26); g.lineTo(33.6, 26); g.quadraticCurveTo(35.4, 40, 35, 60); g.closePath(); g.fill();
+    const leaf = (rot, len, w, tilt, c1, c2) => {
+      g.save(); g.translate(32, 27); g.rotate(rot);
+      const fg = g.createLinearGradient(0, 0, -len * 0.3, -len);
+      fg.addColorStop(0, c2); fg.addColorStop(1, c1);
+      g.fillStyle = fg;
+      g.beginPath(); g.moveTo(0, 0);
+      g.quadraticCurveTo(-w, -len * 0.4 + tilt, -w * 0.5, -len + tilt);
+      g.quadraticCurveTo(0, -len * 0.85 + tilt, w * 0.5, -len - tilt);
+      g.quadraticCurveTo(w, -len * 0.4 - tilt, 0, 0);
+      g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(20,40,10,0.4)'; g.lineWidth = 0.9;
+      g.beginPath(); g.moveTo(0, 0); g.lineTo(tilt * 0.4, -len + tilt * 0.4); g.stroke();
+      g.restore();
+    };
+    leaf(-1.1, 22, 11, -4, '#2a5a2c', '#1c3e1e'); leaf(-0.5, 26, 13, -2, '#3a7a3c', '#265428');
+    leaf(0.1, 27, 13, 3, '#4a9048', '#2f6432'); leaf(0.7, 24, 12, 5, '#3a7a3c', '#265428');
+    leaf(1.2, 20, 10, 6, '#2a5a2c', '#1c3e1e');
+    g.fillStyle = '#5a3018'; g.beginPath(); g.moveTo(32, 28); g.quadraticCurveTo(38, 34, 36, 42); g.lineTo(33, 41); g.quadraticCurveTo(35, 34, 30, 29); g.closePath(); g.fill();  // hanging flower stalk
+    g.fillStyle = '#d8c840'; for (const [fx, fy] of [[34, 38], [35, 41]]) { g.beginPath(); g.ellipse(fx, fy, 2.4, 1.4, 0.3, 0, 7); g.fill(); }  // a few green bananas
+  });
+
+  SPR.bougainvillea = outlined(g => {                               // flowering shrub in a pot, vivid magenta bracts
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62.4, 12, 2.2, 0, 0, 7); g.fill();
+    let pt = g.createLinearGradient(24, 0, 40, 0);
+    pt.addColorStop(0, '#c9784a'); pt.addColorStop(0.45, '#a9552c'); pt.addColorStop(1, '#6e3417');
+    g.fillStyle = pt; g.beginPath(); g.moveTo(23, 48); g.lineTo(41, 48); g.lineTo(38, 63); g.lineTo(26, 63); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,235,210,0.3)'; g.fillRect(22.6, 45.4, 18.8, 0.9);
+    let rm = g.createLinearGradient(0, 45.4, 0, 49);
+    rm.addColorStop(0, '#d98d5c'); rm.addColorStop(1, '#8f4520');
+    g.fillStyle = rm; g.fillRect(22, 45.4, 20, 3.6);
+    g.strokeStyle = '#4a3018'; g.lineWidth = 1.6;                                // wiry woody stems
+    g.beginPath(); g.moveTo(32, 46); g.quadraticCurveTo(24, 32, 27, 16); g.stroke();
+    g.beginPath(); g.moveTo(32, 46); g.quadraticCurveTo(40, 30, 36, 14); g.stroke();
+    g.beginPath(); g.moveTo(32, 46); g.quadraticCurveTo(32, 26, 32, 12); g.stroke();
+    g.fillStyle = '#2c5a30';                                                     // small green foliage clusters
+    for (const [lx, ly] of [[26, 22], [37, 20], [32, 16], [22, 30], [41, 28]]) { g.beginPath(); g.ellipse(lx, ly, 4, 3, 0, 0, 7); g.fill(); }
+    g.fillStyle = '#d8347a';                                                     // magenta bract clusters — the showy part
+    for (const [bx, by, r] of [[24, 15, 5], [37, 12, 5.4], [30, 9, 4.4], [43, 22, 4], [20, 26, 3.6]]) {
+      for (let i = 0; i < 5; i++) { const a2 = i / 5 * 6.283; g.beginPath(); g.ellipse(bx + Math.cos(a2) * r * 0.5, by + Math.sin(a2) * r * 0.5, r * 0.5, r * 0.32, a2, 0, 7); g.fill(); }
+    }
+    g.fillStyle = 'rgba(255,255,255,0.3)'; for (const [bx, by] of [[24, 15], [37, 12], [30, 9]]) { g.beginPath(); g.arc(bx, by, 1, 0, 7); g.fill(); }
+  });
+
+  SPR.fern = outlined(g => {                                        // lush potted fern, shaded-courtyard plant
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 60.4, 11, 2, 0, 0, 7); g.fill();
+    let pt = g.createLinearGradient(23, 0, 41, 0);
+    pt.addColorStop(0, '#8a8070'); pt.addColorStop(0.45, '#6a6152'); pt.addColorStop(1, '#443e32');
+    g.fillStyle = pt; g.beginPath(); g.moveTo(24, 46); g.lineTo(40, 46); g.lineTo(37.6, 61); g.lineTo(26.4, 61); g.closePath(); g.fill();
+    bevel(g, 24, 44, 16, 3, 'rgba(255,255,255,0.2)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = '#3a3428'; g.beginPath(); g.ellipse(32, 45, 7, 1.4, 0, 0, 7); g.fill();
+    const spray = (rot, len, c1, c2) => {
+      g.save(); g.translate(32, 44); g.rotate(rot);
+      g.strokeStyle = c1; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(-2, -len * 0.5, 0, -len); g.stroke();
+      for (let i = 2; i < len; i += 3) {
+        const t = i / len, w = 4 * (1 - t * 0.6);
+        g.fillStyle = c2;
+        g.beginPath(); g.ellipse(-2 - w * 0.4, -i, w * 0.5, 1.6, -0.5, 0, 7); g.fill();
+        g.beginPath(); g.ellipse(2 + w * 0.4, -i, w * 0.5, 1.6, 0.5, 0, 7); g.fill();
+      }
+      g.restore();
+    };
+    for (const rot of [-0.9, -0.5, -0.15, 0.15, 0.5, 0.9]) spray(rot, 26 + Math.random() * 4, 'rgba(20,50,16,0.5)', ['#2c6030', '#3a7a3c', '#245026'][((rot + 1) * 3) | 0]);
+  });
+
+  SPR.cactus = outlined(g => {                                      // potted cactus/succulent, desk or patio accent
+    g.fillStyle = 'rgba(0,0,0,0.26)'; g.beginPath(); g.ellipse(32, 60, 9, 1.8, 0, 0, 7); g.fill();
+    let pt = g.createLinearGradient(25, 0, 39, 0);
+    pt.addColorStop(0, '#d89058'); pt.addColorStop(0.45, '#b06e38'); pt.addColorStop(1, '#7a4620');
+    g.fillStyle = pt; g.beginPath(); g.moveTo(25, 48); g.lineTo(39, 48); g.lineTo(37, 60); g.lineTo(27, 60); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,235,210,0.3)'; g.fillRect(24.6, 46, 14.8, 0.9);
+    g.fillStyle = '#c9924a'; g.fillRect(24, 46, 16, 3);
+    let cb = g.createLinearGradient(24, 20, 40, 48);                             // barrel cactus body
+    cb.addColorStop(0, '#4a8a52'); cb.addColorStop(1, '#2c5a32');
+    g.fillStyle = cb; g.beginPath(); g.ellipse(32, 36, 9, 13, 0, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(20,50,20,0.4)'; g.lineWidth = 1;                       // vertical ribs
+    for (const dx of [-6, -3, 0, 3, 6]) { g.beginPath(); g.moveTo(32 + dx, 24); g.quadraticCurveTo(32 + dx * 1.1, 36, 32 + dx, 48); g.stroke(); }
+    g.fillStyle = '#e8dca0'; for (const dx of [-6, -3, 0, 3, 6]) for (let y = 26; y < 46; y += 5) { g.beginPath(); g.arc(32 + dx, y, 0.5, 0, 7); g.fill(); }  // spines
+    g.fillStyle = '#d8347a'; g.beginPath(); g.arc(32, 23, 2.4, 0, 7); g.fill();   // a single flower on top
+    g.fillStyle = '#e858a0'; g.beginPath(); g.arc(31, 22, 1, 0, 7); g.fill();
+  });
+
+  SPR.hedge = outlined(g => {                                       // trimmed boxwood hedge / planter box
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 58, 22, 3, 0, 0, 7); g.fill();
+    let bx = g.createLinearGradient(0, 40, 0, 56);
+    bx.addColorStop(0, '#8a6a48'); bx.addColorStop(1, '#5a4228');
+    g.fillStyle = bx; g.fillRect(10, 40, 44, 16);
+    bevel(g, 10, 40, 44, 16, 'rgba(255,220,170,0.2)', 'rgba(0,0,0,0.4)');
+    g.fillStyle = 'rgba(0,0,0,0.15)'; g.fillRect(10, 40, 44, 2);
+    let fo = g.createLinearGradient(0, 18, 0, 42);                               // rounded clipped foliage mass
+    fo.addColorStop(0, '#4a8a4e'); fo.addColorStop(1, '#2c5a32');
+    g.fillStyle = fo;
+    g.beginPath(); g.moveTo(10, 42); g.quadraticCurveTo(8, 18, 22, 16); g.quadraticCurveTo(32, 10, 42, 16); g.quadraticCurveTo(56, 18, 54, 42); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.08)'; g.beginPath(); g.ellipse(24, 22, 10, 6, -0.2, 0, 7); g.fill();
+    speck(g, 60, 'rgba(0,50,10,0.15)'); speck(g, 30, 'rgba(200,255,180,0.08)');
+    g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(10, 42); g.quadraticCurveTo(8, 18, 22, 16); g.quadraticCurveTo(32, 10, 42, 16); g.quadraticCurveTo(56, 18, 54, 42); g.stroke();
   });
 
   SPR.bar = outlined(g => {
@@ -2777,6 +3056,174 @@ const World = (() => {
     speck(g, 14, 'rgba(0,0,0,0.06)', 96, 96);
   }, 96, 96);
 
+  // ---- shared first-person grip: bare fist + frame stub, reused by every new
+  // weapon viewmodel so the whole arsenal reads as one consistent HUD "slot"
+  // (same pose/size as the Walther above; only the mechanism above the fist differs) ----
+  function gunFist(g) {
+    g.save();
+    g.beginPath(); g.moveTo(20, 42); g.lineTo(76, 42); g.lineTo(80, 58); g.lineTo(74, 96); g.lineTo(22, 96); g.lineTo(16, 58); g.closePath(); g.clip();
+    vgrad(g, 12, 40, 72, 56, '#a06a3e', '#6b4327');
+    g.restore();
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(48, 46); g.lineTo(48, 94); g.stroke();
+    g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 2.4;
+    for (const y of [54, 64, 75, 86]) { g.beginPath(); g.moveTo(22, y); g.quadraticCurveTo(48, y + 5, 74, y); g.stroke(); }
+    g.strokeStyle = 'rgba(255,255,255,0.10)'; g.lineWidth = 1.4;
+    for (const y of [51, 61, 72, 83]) { g.beginPath(); g.moveTo(24, y); g.quadraticCurveTo(48, y + 4, 72, y); g.stroke(); }
+    g.fillStyle = 'rgba(0,0,0,0.15)'; g.beginPath(); g.ellipse(48, 94, 30, 5, 0, 0, 7); g.fill();
+  }
+
+  SPR.gunSterling = cnv(g => {                                    // Sterling: tubular perforated barrel jacket + side mag
+    gunFist(g);
+    vgrad(g, 30, 38, 36, 12, '#3a3d44', '#24262c');
+    bevel(g, 30, 38, 36, 12, 'rgba(255,255,255,0.12)', 'rgba(0,0,0,0.4)');
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.ellipse(48, 40, 22, 4, 0, 0, 7); g.fill();  // grounding shadow under the jacket
+    const jacketPath = () => { g.beginPath(); g.moveTo(29, 39); g.lineTo(27, 15); g.quadraticCurveTo(27, 7, 48, 7); g.quadraticCurveTo(69, 7, 69, 15); g.lineTo(67, 39); g.closePath(); };
+    let bj = g.createLinearGradient(27, 0, 69, 0);                  // barrel jacket: dark-light-dark cylindrical roll-off
+    bj.addColorStop(0, '#1a1b1e'); bj.addColorStop(0.22, '#4c4f57'); bj.addColorStop(0.42, '#63666f');
+    bj.addColorStop(0.58, '#3a3d44'); bj.addColorStop(0.8, '#24262c'); bj.addColorStop(1, '#0e0f11');
+    g.fillStyle = bj; jacketPath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.6)'; g.lineWidth = 1.5; jacketPath(); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 1;      // specular rim on the near-light edge
+    g.beginPath(); g.moveTo(33, 13); g.quadraticCurveTo(33, 9, 42, 8); g.stroke();
+    g.fillStyle = '#050506'; g.beginPath(); g.ellipse(48, 8, 15, 3, 0, 0, 7); g.fill();  // muzzle-end dark bore, seen face-on
+    g.strokeStyle = 'rgba(120,124,132,0.6)'; g.lineWidth = 1; g.beginPath(); g.ellipse(48, 8, 15, 3, 0, 0, 7); g.stroke();
+    for (let row = 0; row < 3; row++) for (let col = 0; col < 4; col++) {   // ventilation holes, each with rim + AO
+      const hx = 34 + col * 9.4, hy = 15 + row * 7.4;
+      g.fillStyle = '#050506'; g.beginPath(); g.arc(hx, hy, 2.1, 0, 7); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.6)'; g.lineWidth = 0.8; g.beginPath(); g.arc(hx, hy, 2.6, 0, 7); g.stroke();
+      g.strokeStyle = 'rgba(255,255,255,0.22)'; g.lineWidth = 0.7; g.beginPath(); g.arc(hx - 0.6, hy - 0.6, 1, Math.PI, Math.PI * 1.6); g.stroke();
+    }
+    let sb = g.createLinearGradient(42, 0, 56, 0);                  // rear tangent sight, dimensional block
+    sb.addColorStop(0, '#0c0d0f'); sb.addColorStop(0.5, '#2c2e33'); sb.addColorStop(1, '#0c0d0f');
+    g.fillStyle = sb; g.fillRect(42, 2, 12, 7);
+    g.strokeStyle = 'rgba(255,255,255,0.18)'; g.lineWidth = 0.8; g.strokeRect(42, 2, 12, 1.4);
+    g.fillStyle = '#020203'; g.fillRect(46.5, 0, 3, 4.4);           // notch aperture
+    let bh = g.createRadialGradient(69, 20, 0.4, 69, 20, 3);        // cocking-handle knob, side profile
+    bh.addColorStop(0, '#8a8e98'); bh.addColorStop(1, '#3a3d44');
+    g.fillStyle = bh; g.beginPath(); g.arc(69, 20, 3, 0, 7); g.fill();
+    let mg = g.createLinearGradient(2, 0, 28, 0);                   // side-mounted magazine, the Sterling's signature, tapered
+    mg.addColorStop(0, '#0e0f11'); mg.addColorStop(0.3, '#40434b'); mg.addColorStop(0.55, '#54575f'); mg.addColorStop(1, '#16171a');
+    g.fillStyle = mg; g.beginPath(); g.moveTo(2, 19); g.lineTo(27, 17.4); g.lineTo(27, 29.6); g.lineTo(2, 32); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 1; g.beginPath(); g.moveTo(2, 19); g.lineTo(27, 17.4); g.lineTo(27, 29.6); g.lineTo(2, 32); g.closePath(); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.3)'; g.lineWidth = 0.9; g.beginPath(); g.moveTo(4, 20); g.lineTo(25, 18.6); g.stroke();
+    g.fillStyle = '#0a0b0c'; g.fillRect(2, 30, 8, 3);                // magazine baseplate
+    speck(g, 30, 'rgba(255,255,255,0.06)', 96, 96); speck(g, 18, 'rgba(0,0,0,0.1)', 96, 96);
+  }, 96, 96);
+
+  SPR.gunAR7 = cnv(g => {                                          // AR-7: takedown survival rifle, stepped receiver, tall silhouette
+    gunFist(g);
+    vgrad(g, 30, 38, 36, 12, '#3a3d44', '#24262c');
+    bevel(g, 30, 38, 36, 12, 'rgba(255,255,255,0.12)', 'rgba(0,0,0,0.4)');
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.ellipse(48, 40, 17, 4, 0, 0, 7); g.fill();
+    const stockPath = () => { g.beginPath(); g.moveTo(32, 40); g.lineTo(30, 26); g.quadraticCurveTo(30, 22, 36, 21); g.lineTo(60, 21); g.quadraticCurveTo(66, 22, 66, 26); g.lineTo(64, 40); g.closePath(); };
+    let sk = g.createLinearGradient(30, 0, 66, 0);                  // stowed-stock receiver body, moulded polymer sheen
+    sk.addColorStop(0, '#0e0f0a'); sk.addColorStop(0.25, '#2e3324'); sk.addColorStop(0.5, '#3c4330'); sk.addColorStop(0.75, '#242820'); sk.addColorStop(1, '#0a0b08');
+    g.fillStyle = sk; stockPath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.6)'; g.lineWidth = 1.4; stockPath(); g.stroke();
+    g.strokeStyle = 'rgba(230,240,210,0.18)'; g.lineWidth = 1; g.beginPath(); g.moveTo(33, 25); g.quadraticCurveTo(35, 22, 40, 21.6); g.stroke();
+    const recPath = () => { g.beginPath(); g.moveTo(34, 21); g.lineTo(33, 5); g.quadraticCurveTo(33, 1, 40, 1); g.lineTo(56, 1); g.quadraticCurveTo(63, 1, 63, 5); g.lineTo(62, 21); g.closePath(); };
+    let rc = g.createLinearGradient(33, 0, 63, 0);                  // upper action, one step narrower + lighter
+    rc.addColorStop(0, '#181a13'); rc.addColorStop(0.3, '#3a4230'); rc.addColorStop(0.5, '#4a5338'); rc.addColorStop(0.7, '#2e3524'); rc.addColorStop(1, '#12130e');
+    g.fillStyle = rc; recPath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.6)'; g.lineWidth = 1.2; recPath(); g.stroke();
+    g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(48, 1); g.lineTo(48, 21); g.stroke();
+    let peep = g.createRadialGradient(48, 8, 0.5, 48, 8, 5.4);      // rear peep sight, real depth via radial shading
+    peep.addColorStop(0, '#4a4d54'); peep.addColorStop(0.55, '#1c1d20'); peep.addColorStop(1, '#050506');
+    g.fillStyle = peep; g.beginPath(); g.arc(48, 8, 5.4, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.28)'; g.lineWidth = 0.8; g.beginPath(); g.arc(48, 8, 5.4, Math.PI * 1.1, Math.PI * 1.6); g.stroke();
+    g.fillStyle = '#000'; g.beginPath(); g.arc(48, 8, 2, 0, 7); g.fill();
+    let bl = g.createLinearGradient(44, 0, 52, 0);                  // barrel poking above, subtle taper + muzzle highlight
+    bl.addColorStop(0, '#0e0f0a'); bl.addColorStop(0.5, '#3a4230'); bl.addColorStop(1, '#0e0f0a');
+    g.fillStyle = bl; g.beginPath(); g.moveTo(45.4, 1); g.lineTo(46, -4); g.lineTo(50, -4); g.lineTo(50.6, 1); g.closePath(); g.fill();
+    g.fillStyle = '#050506'; g.beginPath(); g.ellipse(48, -4, 2.3, 1, 0, 0, 7); g.fill();
+    g.fillStyle = '#6a7358'; g.beginPath(); g.arc(38, 12, 1.7, 0, 7); g.fill(); g.beginPath(); g.arc(58, 12, 1.7, 0, 7); g.fill();  // takedown screws
+    g.fillStyle = 'rgba(0,0,0,0.5)'; g.beginPath(); g.arc(38, 12, 1.7, 0, 7); g.stroke(); g.beginPath(); g.arc(58, 12, 1.7, 0, 7); g.stroke();
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 0.8;            // slot detail on the screw heads
+    g.beginPath(); g.moveTo(36.5, 12); g.lineTo(39.5, 12); g.moveTo(56.5, 12); g.lineTo(59.5, 12); g.stroke();
+    let sl = g.createLinearGradient(0, 30, 0, 34);                  // sling loop at the buttstock end
+    sl.addColorStop(0, '#4a4d54'); sl.addColorStop(1, '#1c1d20');
+    g.strokeStyle = sl; g.lineWidth = 2; g.beginPath(); g.arc(33, 33, 2.6, 0.6, 3.6); g.stroke();
+    speck(g, 26, 'rgba(255,255,255,0.03)', 96, 96); speck(g, 20, 'rgba(0,0,0,0.1)', 96, 96);
+  }, 96, 96);
+
+  SPR.gunLaser = cnv(g => {                                        // Q-branch laser: sleek gadget frame, layered glowing emitter
+    gunFist(g);
+    vgrad(g, 30, 38, 36, 12, '#2c3a44', '#182228');
+    bevel(g, 30, 38, 36, 12, 'rgba(150,220,255,0.18)', 'rgba(0,0,0,0.4)');
+    g.fillStyle = 'rgba(30,120,180,0.28)'; g.beginPath(); g.ellipse(48, 40, 22, 5, 0, 0, 7); g.fill();  // cool ambient glow pooling under it
+    const framePath = () => { g.beginPath(); g.moveTo(25, 40); g.lineTo(29, 15); g.quadraticCurveTo(48, 6, 67, 15); g.lineTo(71, 40); g.closePath(); };
+    let fr = g.createLinearGradient(25, 0, 71, 0);                  // brushed gunmetal, cool highlight sweeping across
+    fr.addColorStop(0, '#141b20'); fr.addColorStop(0.28, '#6e8894'); fr.addColorStop(0.42, '#9ec2d2'); fr.addColorStop(0.55, '#4a6270');
+    fr.addColorStop(0.78, '#243038'); fr.addColorStop(1, '#0e1316');
+    g.fillStyle = fr; framePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 1.5; framePath(); g.stroke();
+    g.strokeStyle = 'rgba(200,240,255,0.5)'; g.lineWidth = 1;       // crisp top rim catching the light
+    g.beginPath(); g.moveTo(31, 17); g.quadraticCurveTo(48, 9, 65, 17); g.stroke();
+    let innerFr = g.createLinearGradient(0, 18, 0, 38);              // inset panel, a shade darker — reads as a separate plate
+    innerFr.addColorStop(0, '#1c2830'); innerFr.addColorStop(1, '#0c1216');
+    g.fillStyle = innerFr; g.beginPath(); g.moveTo(32, 38); g.lineTo(34, 20); g.quadraticCurveTo(48, 14, 62, 20); g.lineTo(64, 38); g.closePath(); g.fill();
+    let coil = g.createLinearGradient(38, 24, 58, 24);               // glowing power-cell strip
+    coil.addColorStop(0, 'rgba(30,80,120,0.2)'); coil.addColorStop(0.5, 'rgba(140,230,255,0.9)'); coil.addColorStop(1, 'rgba(30,80,120,0.2)');
+    g.fillStyle = coil; g.fillRect(38, 25, 20, 3);
+    g.fillStyle = 'rgba(255,255,255,0.7)'; g.fillRect(38, 25.6, 20, 0.8);
+    let halo = g.createRadialGradient(48, 15, 0, 48, 15, 13);        // emitter: soft outer halo
+    halo.addColorStop(0, 'rgba(200,245,255,0.55)'); halo.addColorStop(0.5, 'rgba(70,200,255,0.28)'); halo.addColorStop(1, 'rgba(20,120,180,0)');
+    g.fillStyle = halo; g.beginPath(); g.arc(48, 15, 13, 0, 7); g.fill();
+    let em = g.createRadialGradient(48, 15, 0.5, 48, 15, 7.5);       // bright inner crystal core
+    em.addColorStop(0, '#ffffff'); em.addColorStop(0.4, 'rgba(190,245,255,0.98)'); em.addColorStop(0.75, 'rgba(60,200,255,0.85)'); em.addColorStop(1, 'rgba(20,120,180,0.15)');
+    g.fillStyle = em; g.beginPath(); g.moveTo(48, 8); g.lineTo(53, 15); g.lineTo(48, 22); g.lineTo(43, 15); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.6)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(48, 8); g.lineTo(53, 15); g.lineTo(48, 22); g.lineTo(43, 15); g.closePath(); g.stroke();
+    g.fillStyle = '#ffffff'; g.beginPath(); g.arc(48, 15, 1.6, 0, 7); g.fill();
+    for (const [ix, iy, on] of [[35, 32, 1], [61, 32, 0]]) {         // small status LEDs
+      const led = g.createRadialGradient(ix, iy, 0, ix, iy, 2);
+      led.addColorStop(0, on ? '#baffc8' : '#3a2020'); led.addColorStop(1, on ? '#1a8a3a' : '#1a0a0a');
+      g.fillStyle = led; g.beginPath(); g.arc(ix, iy, 1.6, 0, 7); g.fill();
+    }
+    g.strokeStyle = 'rgba(140,220,255,0.55)'; g.lineWidth = 1.1;     // side cooling fins, each with its own tiny highlight
+    for (const y of [21, 26, 31, 36]) {
+      g.beginPath(); g.moveTo(30, y); g.lineTo(37, y - 1); g.stroke();
+      g.beginPath(); g.moveTo(59, y - 1); g.lineTo(66, y); g.stroke();
+    }
+    g.strokeStyle = 'rgba(255,255,255,0.2)'; g.lineWidth = 0.6;
+    for (const y of [20.4, 25.4, 30.4, 35.4]) { g.beginPath(); g.moveTo(30, y); g.lineTo(37, y - 1); g.stroke(); }
+    speck(g, 20, 'rgba(150,220,255,0.08)', 96, 96);
+  }, 96, 96);
+
+  SPR.gunGolden = cnv(g => {                                       // Golden Gun: same silhouette as the Walther, gilded + gem, ornate
+    gunFist(g);
+    vgrad(g, 30, 38, 36, 12, '#8a6a2a', '#5a4416');
+    bevel(g, 30, 38, 36, 12, 'rgba(255,240,180,0.25)', 'rgba(0,0,0,0.4)');
+    g.fillStyle = 'rgba(140,100,10,0.3)'; g.beginPath(); g.ellipse(48, 40, 20, 4, 0, 0, 7); g.fill();
+    const slidePath = () => { g.beginPath(); g.moveTo(24, 40); g.lineTo(30, 16); g.lineTo(66, 16); g.lineTo(72, 40); g.closePath(); };
+    let sg = g.createLinearGradient(20, 0, 76, 0);                  // polished-gold roll-off: dark, bright streak, dark, bright, dark
+    sg.addColorStop(0, '#5a4416'); sg.addColorStop(0.18, '#c9a227'); sg.addColorStop(0.32, '#fff3c0');
+    sg.addColorStop(0.46, '#c9a227'); sg.addColorStop(0.62, '#7a5c1e'); sg.addColorStop(0.78, '#e8c860'); sg.addColorStop(1, '#4a3a12');
+    g.fillStyle = sg; slidePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 1.5; slidePath(); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.55)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(30, 16); g.lineTo(24, 40); g.stroke();
+    g.beginPath(); g.moveTo(66, 16); g.lineTo(72, 40); g.stroke();
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(48, 17); g.lineTo(48, 39); g.stroke();  // centre facet seam
+    g.strokeStyle = 'rgba(140,90,10,0.6)'; g.lineWidth = 1;          // ornate engraving flourish, layered curls
+    g.beginPath(); g.moveTo(35, 21); g.quadraticCurveTo(48, 16, 61, 21); g.stroke();
+    g.beginPath(); g.moveTo(35, 34); g.quadraticCurveTo(48, 39, 61, 34); g.stroke();
+    g.strokeStyle = 'rgba(255,240,190,0.35)'; g.lineWidth = 0.7;
+    g.beginPath(); g.moveTo(36, 23); g.quadraticCurveTo(48, 19, 60, 23); g.stroke();
+    g.beginPath(); g.moveTo(38, 25); g.quadraticCurveTo(48, 22, 58, 25); g.moveTo(38, 30); g.quadraticCurveTo(48, 33, 58, 30); g.stroke();
+    let gem = g.createRadialGradient(46, 11, 0.4, 49, 13, 5);        // red gem inset, faceted — the classic Golden Gun tell
+    gem.addColorStop(0, '#ffd8d0'); gem.addColorStop(0.35, '#ff5a44'); gem.addColorStop(0.75, '#a01a10'); gem.addColorStop(1, '#4a0a06');
+    g.fillStyle = gem; g.beginPath(); g.arc(48, 12, 4.4, 0, 7); g.fill();
+    g.strokeStyle = '#3a2c08'; g.lineWidth = 1; g.beginPath(); g.arc(48, 12, 4.4, 0, 7); g.stroke();
+    g.strokeStyle = 'rgba(120,20,10,0.5)'; g.lineWidth = 0.6;        // facet cuts across the gem
+    for (const a2 of [0, 1.05, 2.1, 3.14, 4.2, 5.24]) { g.beginPath(); g.moveTo(48, 12); g.lineTo(48 + Math.cos(a2) * 4.4, 12 + Math.sin(a2) * 4.4); g.stroke(); }
+    g.fillStyle = 'rgba(255,255,255,0.85)'; g.beginPath(); g.arc(46.4, 10.4, 1, 0, 7); g.fill();  // sparkle
+    let bezel = g.createLinearGradient(0, 6, 0, 18);
+    bezel.addColorStop(0, '#f0d878'); bezel.addColorStop(1, '#8a6a1a');
+    g.strokeStyle = bezel; g.lineWidth = 1.4; g.beginPath(); g.arc(48, 12, 5.4, 0, 7); g.stroke();
+    speck(g, 20, 'rgba(255,240,180,0.1)', 96, 96); speck(g, 8, 'rgba(0,0,0,0.08)', 96, 96);
+  }, 96, 96);
+
   // -------------------------------------------------------------------------
   // CUSTOM ART — swap any procedural texture/sprite for an uploaded image.
   // Overrides persist as data URLs in localStorage (shared by the game and
@@ -2871,9 +3318,19 @@ const World = (() => {
       { open: false, getTex() { return this.open ? SPR.deskOpen : SPR.desk; } }),
     tube: (x, y) => prop('tube', 'VACUUM TUBE', x, y, 0.32, false),
     plant: (x, y) => prop('plant', 'POTTED PALM', x, y, 0.7, false),
+    royalpalm: (x, y) => prop('royalpalm', 'ROYAL PALM', x, y, 1.3, true),
+    bananaplant: (x, y) => prop('bananaplant', 'BANANA TREE', x, y, 0.85, true),
+    bougainvillea: (x, y) => prop('bougainvillea', 'BOUGAINVILLEA', x, y, 0.75, false),
+    fern: (x, y) => prop('fern', 'POTTED FERN', x, y, 0.65, false),
+    cactus: (x, y) => prop('cactus', 'POTTED CACTUS', x, y, 0.55, false),
+    hedge: (x, y) => prop('hedge', 'HEDGE', x, y, 0.9, true),
     bar: (x, y) => prop('bar', 'BAR CART', x, y, 0.85, true),
     medkit: (x, y) => prop('medkit', 'FIRST-AID TIN', x, y, 0.34, false, { pickup: 'med' }),
     ammo: (x, y) => prop('ammo', 'AMMO BOX', x, y, 0.34, false, { pickup: 'ammo' }),
+    wpn_sterling: (x, y) => prop('wpn_sterling', 'STERLING CASE', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'sterling', grantAmmo: 60 }),
+    wpn_ar7: (x, y) => prop('wpn_ar7', 'AR-7 CASE', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'ar7', grantAmmo: 20 }),
+    wpn_laser: (x, y) => prop('wpn_laser', 'LASER GADGET', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'laser', grantAmmo: 8 }),
+    wpn_golden: (x, y) => prop('wpn_golden', 'GOLDEN GUN', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'golden', grantAmmo: 1 }),
     camera: (x, y) => prop('camera', 'SPY CAMERA', x, y, 0.4, false),
     safe: (x, y) => prop('safe', 'WALL SAFE', x, y, 0.8, true),
     filecab: (x, y) => prop('filecab', 'FILING CABINET', x, y, 0.82, true),
@@ -3031,6 +3488,8 @@ const World = (() => {
         texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : undefined,
         wallTex: s.wallTex ? s.wallTex.slice() : undefined,
         wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : undefined,
+        wallStepTex: s.wallStepTex ? s.wallStepTex.slice() : undefined,
+        wallStepFloorTex: s.wallStepFloorTex ? s.wallStepFloorTex.slice() : undefined,
         parent: s.parent == null ? -1 : s.parent, solid: !!s.solid,
       })),
     } : null;
