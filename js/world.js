@@ -54,7 +54,7 @@ const World = (() => {
       if (area < 0) loop = loop.slice().reverse();
       const n = loop.length;
       sectors.push(Object.assign({
-        loop, floor: 0, ceil: 3.6, floorTex: 'tile', ceilTex: 'ceiltile', sky: false, win: false, texScale: 1,
+        loop, floor: 0, ceil: 3.6, floorTex: 'tile', ceilTex: 'ceiltile', sky: false, win: false, hostile: false, texScale: 1,
         wallTex: new Array(n).fill(null), wallDoor: new Array(n).fill(null), wallTexScale: new Array(n).fill(1), parent: -1,
       }, p));
       return sectors.length - 1;
@@ -217,6 +217,10 @@ const World = (() => {
       spawn: { x: 5.2, y: 12.6, a: 0 },
       ents,
       geo: { verts, sectors },
+      // the intro narrates that your cover is ALREADY blown when the mission starts
+      // (dead colleague, henchmen already hunting) — this mission predates the Cover
+      // system and keeps its always-hostile feel; new levels default Undercover.
+      blown: true,
     };
   })();
 
@@ -231,6 +235,7 @@ const World = (() => {
   const spawn = { x: 2.5, y: 2.5, a: 0 };
   let isCustom = false;
   let authoredGeo = null;                          // vector geo authored in the editor (source of truth when present)
+  let startBlown = false;                          // does this level start with Cover already blown? (main.js reads at boot)
 
   const charAt = (x, y) => (x < 0 || y < 0 || x >= MW || y >= MH) ? '%' : grid[y][x];
   const get = (x, y) => CH[charAt(x, y)] || 0;    // numeric wall id (0 = walkable floor)
@@ -382,7 +387,7 @@ const World = (() => {
       const si = sectors.length;
       sectors.push({
         loop, floor: s.f, ceil: s.c, floorTex: s.ft, ceilTex: s.ct,
-        sky: s.sky, win: s.win, fsx: s.fsx, fsy: s.fsy,
+        sky: s.sky, win: s.win, hostile: false, fsx: s.fsx, fsy: s.fsy,
         wallTex, wallCell, parent: -1,
       });
       for (let yy = r.y0; yy <= r.y1; yy++) for (let xx = r.x0; xx <= r.x1; xx++) cellSector[yy * MW + xx] = si;
@@ -2957,13 +2962,14 @@ const World = (() => {
       verts: level.geo.verts.map(v => ({ x: v.x, y: v.y })),
       sectors: level.geo.sectors.map(s => ({
         loop: s.loop.slice(), floor: s.floor || 0, ceil: s.ceil == null ? 1 : s.ceil,
-        floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, win: !!s.win,
+        floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, win: !!s.win, hostile: !!s.hostile,
         texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : undefined,
         wallTex: s.wallTex ? s.wallTex.slice() : undefined,
         wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : undefined,
         parent: s.parent == null ? -1 : s.parent, solid: !!s.solid,
       })),
     } : null;
+    startBlown = !!level.blown;
     geoRev++;                                     // new geometry → callers recompile
   }
 
@@ -2983,5 +2989,6 @@ const World = (() => {
     TEX, SPR, FLOOR, SKY, TX, TXNAMES, wallTex, wallTexName, WALLTX,
     ents, removeEnt, setPowered, spawnFx, FX_LIFE,
     spawn, load, defaultLevel, get isCustom() { return isCustom; }, get geoRev() { return geoRev; },
+    get startBlown() { return startBlown; },
   };
 })();

@@ -94,7 +94,7 @@ const Editor = (() => {
   // ---- state ----
   // fh/ch: per-cell floor/ceil height overrides (null = material default)
   // stex/ctex: per-cell surface(floor/wall) and ceiling texture overrides (null = default)
-  const lv = { w: 24, h: 24, cells: [], fh: [], ch: [], stex: [], ctex: [], fsx: [], fsy: [], spawn: { x: 2.5, y: 2.5, a: 0 }, ents: [] };
+  const lv = { w: 24, h: 24, cells: [], fh: [], ch: [], stex: [], ctex: [], fsx: [], fsy: [], spawn: { x: 2.5, y: 2.5, a: 0 }, ents: [], blown: false };
   let tool = { t: 'tile', v: '#' };
   let entBtns = [];                                              // ENTS-index → palette button, for keyboard/wheel cycling
   const hset = { f: 0.0, c: 1.0, applyF: true, applyC: false };  // height-tool settings
@@ -157,10 +157,12 @@ const Editor = (() => {
     }
     lv.spawn = { x: json.spawn.x, y: json.spawn.y, a: json.spawn.a };
     lv.ents = json.ents.map(e => ({ ...e }));                     // keep extra fields (e.g. civilian `behavior`)
+    lv.blown = !!json.blown;
+    document.getElementById('startblown').checked = lv.blown;
     geo.verts = (json.geo && json.geo.verts) ? json.geo.verts.map(v => ({ x: v.x, y: v.y })) : [];
     geo.sectors = (json.geo && json.geo.sectors) ? json.geo.sectors.map(s => ({
       loop: s.loop.slice(), floor: s.floor || 0, ceil: s.ceil == null ? 1 : s.ceil,
-      floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, win: !!s.win,
+      floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, win: !!s.win, hostile: !!s.hostile,
       texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : null,
       wallTex: s.wallTex ? s.wallTex.slice() : null,
       wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : null, parent: s.parent == null ? -1 : s.parent,
@@ -186,6 +188,7 @@ const Editor = (() => {
       map: lv.cells.map(r => r.join('')),
       spawn: { x: lv.spawn.x, y: lv.spawn.y, a: lv.spawn.a },
       ents: lv.ents.map(e => ({ ...e })),
+      blown: !!lv.blown,
     };
     if (anyH) {
       out.floor = lv.fh.map(r => r.map(v => v == null ? null : v));
@@ -202,7 +205,7 @@ const Editor = (() => {
     if (geo.sectors.length) {
       out.geo = {
         verts: geo.verts.map(v => ({ x: v.x, y: v.y })),
-        sectors: geo.sectors.map(s => ({ loop: s.loop.slice(), floor: s.floor, ceil: s.ceil, floorTex: s.floorTex, ceilTex: s.ceilTex, sky: !!s.sky, win: !!s.win, texScale: s.texScale || 1,
+        sectors: geo.sectors.map(s => ({ loop: s.loop.slice(), floor: s.floor, ceil: s.ceil, floorTex: s.floorTex, ceilTex: s.ceilTex, sky: !!s.sky, win: !!s.win, hostile: !!s.hostile, texScale: s.texScale || 1,
           wallDoor: (s.wallDoor && s.wallDoor.some(Boolean)) ? s.wallDoor.slice() : undefined,
           wallTex: (s.wallTex && s.wallTex.some(Boolean)) ? s.wallTex.slice() : undefined,
           wallTexScale: (s.wallTexScale && s.wallTexScale.some(v => v && v !== 1)) ? s.wallTexScale.slice() : undefined,
@@ -704,6 +707,7 @@ const Editor = (() => {
       status('IMPORTED PLAZA VIEJA — ' + geo.sectors.length + ' SECTORS.');
     } catch (err) { status('IMPORT FAILED: ' + String(err.message || err).toUpperCase()); }
   });
+  document.getElementById('startblown').addEventListener('change', e => { lv.blown = e.target.checked; });
   document.getElementById('newmap').addEventListener('click', () => {
     const w = Math.max(8, Math.min(48, parseInt(document.getElementById('mw').value) || 24));
     const h = Math.max(8, Math.min(48, parseInt(document.getElementById('mh').value) || 24));
@@ -863,6 +867,13 @@ const Editor = (() => {
     const sec = geo.sectors[s]; sec.win = !sec.win;
     status('SECTOR ' + (s + 1) + ' WIN ZONE ' + (sec.win ? 'ON' : 'OFF'));
   }
+  // tag the looked-at sector HOSTILE territory — crossing into one blows the
+  // player's Cover status (main.js), waking every hostile to normal AI rules.
+  function geoHostile() {
+    const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
+    const sec = geo.sectors[s]; sec.hostile = !sec.hostile;
+    status('SECTOR ' + (s + 1) + ' HOSTILE AREA ' + (sec.hostile ? 'ON' : 'OFF'));
+  }
   // toggle a nested shape between a solid mass (column/pillar — no floor/ceiling,
   // blocks movement and sight, textured on its outward face) and a proper walkable
   // sector — the classic Build-engine "hole becomes a sector" conversion.
@@ -1009,7 +1020,7 @@ const Editor = (() => {
       const doors = (sec.wallDoor && sec.wallDoor.filter(Boolean).length) || 0;
       el.textContent = (previewCompiled ? '◇ GRID SECTOR ' : '◆ SECTOR ') + (s + 1) + '   floor ' + sec.floor.toFixed(1) + ' · ceil ' + sec.ceil.toFixed(1) +
         '   ' + String(sec.floorTex).toUpperCase() + ' / ' + String(sec.ceilTex).toUpperCase() +
-        ((sec.texScale || 1) !== 1 ? ' ×' + sec.texScale : '') + (sec.sky ? ' · SKY' : '') + (sec.win ? ' · WIN' : '') + (doors ? ' · ' + doors + ' DOOR' : '') +
+        ((sec.texScale || 1) !== 1 ? ' ×' + sec.texScale : '') + (sec.sky ? ' · SKY' : '') + (sec.win ? ' · WIN' : '') + (sec.hostile ? ' · HOSTILE' : '') + (doors ? ' · ' + doors + ' DOOR' : '') +
         (sec.parent >= 0 && !previewCompiled ? '   H solid' : '');
       el.style.display = 'block';
       // Shift picks the ceiling everywhere else (PgUp/[/T all read it the same way) —
@@ -1063,7 +1074,7 @@ const Editor = (() => {
     document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
     document.getElementById('pcontrols').innerHTML = previewCompiled
       ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>ESC</b> map'
-      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> tex — wall if aiming close, else floor (Shift ceil) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>ESC</b> map';
+      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> tex — wall if aiming close, else floor (Shift ceil) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>ESC</b> map';
     previewOn = true; plast = performance.now();
     praf = requestAnimationFrame(pLoop);
   }
@@ -1106,6 +1117,7 @@ const Editor = (() => {
       }
       if (e.code === 'KeyK') { if (!e.repeat) pushUndo(); geoSky(); e.preventDefault(); return; }
       if (e.code === 'KeyG') { if (!e.repeat) pushUndo(); geoWin(); e.preventDefault(); return; }
+      if (e.code === 'KeyN') { if (!e.repeat) pushUndo(); geoHostile(); e.preventDefault(); return; }
       if (e.code === 'KeyF') { if (!e.repeat) pushUndo(); geoDoor(); e.preventDefault(); return; }
       if (e.code === 'KeyH') { if (!e.repeat) pushUndo(); geoToggleSolid(); e.preventDefault(); return; }
     }
@@ -1207,7 +1219,7 @@ const Editor = (() => {
   function closeSector() {
     const loop = draft.slice();
     if (polyArea(loop) < 0) loop.reverse();                    // normalise to CCW
-    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, win: false, texScale: 1, wallDoor: null, wallTex: null, wallTexScale: null, parent: -1, solid: false };
+    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, win: false, hostile: false, texScale: 1, wallDoor: null, wallTex: null, wallTexScale: null, parent: -1, solid: false };
     const c = centroid(loop);
     for (let s = 0; s < geo.sectors.length; s++)
       if (pointInLoop(c.x, c.y, geo.sectors[s].loop)) { sec.parent = s; break; }  // nested → sub-sector
@@ -1273,6 +1285,7 @@ const Editor = (() => {
       g.fillStyle = geo.sectors[s].solid ? 'rgba(40,40,46,0.85)'          // solid column — filled in, opaque
         : geo.sectors[s].parent >= 0 ? 'rgba(200,80,80,0.10)' : 'rgba(120,180,255,0.08)';
       g.fill();
+      if (geo.sectors[s].hostile) { g.fillStyle = 'rgba(220,40,30,0.16)'; g.fill(); }  // hostile-area tint, on top
     }
     g.lineWidth = 2.5; g.lineCap = 'round';                    // walls: white solid, red portal
     for (let s = 0; s < geo.sectors.length; s++) {

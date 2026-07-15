@@ -54,5 +54,6 @@ const Sfx = (() => {
     power()  { tone(55, 120, 0.6, 'sawtooth', 0.18); tone(400, 800, 0.3, 'sine', 0.11, 0.3); },
     win()    { [330, 392, 494, 659, 587].forEach((f, i) => tone(f, f, 0.24, 'square', 0.15, i * 0.13)); },  // minor spy sting
     land()   { noise(0.06, 0.16, 220, 60); tone(90, 55, 0.07, 'sine', 0.14); },            // jump touchdown thump
+    alarm()  { tone(500, 900, 0.16, 'square', 0.18); tone(500, 900, 0.16, 'square', 0.18, 0.22); },  // cover blown — rising two-whoop klaxon
   };
 })();

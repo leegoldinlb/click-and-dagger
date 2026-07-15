@@ -13,6 +13,7 @@ const Game = (() => {
     over: false,
     bobT: 0, bobAmt: 0, fireT: 0,
     kills: 0, civKills: 0, t0: 0,
+    blown: World.startBlown,          // Cover status: false = Undercover (hostiles ignore you), true = Blown (one-way door for the level)
   };
   // Per-kind combat stats for hostile entities. `ranged` kinds hold position and fire
   // once in rangedRange (with LOS), only closing distance to get there; everyone else
@@ -36,6 +37,7 @@ const Game = (() => {
 
   const hpEl = document.getElementById('hp');
   const ammoEl = document.getElementById('ammo');
+  const coverEl = document.getElementById('cover');
   const modeEl = document.getElementById('modeline');
   const hoverEl = document.getElementById('hoverlabel');
   const overlay = document.getElementById('overlay');
@@ -54,6 +56,18 @@ const Game = (() => {
   }
   document.addEventListener('pointerlockchange', syncMode);
   document.addEventListener('pointerlockerror', syncMode);
+
+  // ------------------------------------------------------------- cover status --
+  // Undercover → Blown is a one-way door for the level: hostiles ignore the
+  // player entirely while undercover (see the aggro gate in update()), no matter
+  // the sightline. Returns true only on the actual Undercover→Blown transition,
+  // so callers can show a one-time message instead of spamming on every shot.
+  function blowCover() {
+    if (G.blown) return false;
+    G.blown = true;
+    Sfx.alarm();
+    return true;
+  }
 
   document.addEventListener('contextmenu', e => {
     e.preventDefault();
@@ -96,6 +110,7 @@ const Game = (() => {
     G.player.ammo--;
     G.fireT = 0.28;
     Sfx.shoot();
+    if (blowCover()) Adventure.msg('The shot cracks across the square. Cover’s blown.', 4);
 
     const p = G.player;
     const dx = Math.cos(p.a), dy = Math.sin(p.a);
@@ -206,7 +221,9 @@ const Game = (() => {
       e.flash = Math.max(0, e.flash - dt);
       e.atkT = Math.max(0, e.atkT - edt);
       const d = Math.hypot(p.x - e.x, p.y - e.y);
-      if (!e.aggro && d < st.aggroR && los(e.x, e.y, p.x, p.y)) {
+      // Undercover: hostiles never notice the player, however close or in view —
+      // this is the whole stealth layer. Once Cover is Blown, normal aggro rules.
+      if (G.blown && !e.aggro && d < st.aggroR && los(e.x, e.y, p.x, p.y)) {
         e.aggro = true;
         Sfx.growl();
       }
@@ -273,6 +290,7 @@ const Game = (() => {
     }
 
     const cs = Engine.localSector(geo, graph, p.x, p.y, p.sector);
+    if (cs >= 0 && geo.sectors[cs].hostile && blowCover()) Adventure.msg('You’ve wandered into hostile territory. Cover’s blown.', 4);
     if (cs >= 0 && geo.sectors[cs].win) win();
   }
 
@@ -281,6 +299,8 @@ const Game = (() => {
     hpEl.textContent = Math.ceil(G.player.hp);
     hpEl.classList.toggle('low', G.player.hp < 30);
     ammoEl.textContent = G.player.ammo;
+    coverEl.textContent = G.blown ? 'BLOWN' : 'UNDERCOVER';
+    coverEl.classList.toggle('low', G.blown);
 
     if (!G.combat && G.started && !G.over && mouse.x >= 0) {
       const name = Adventure.nameAt(mouse.x, mouse.y);

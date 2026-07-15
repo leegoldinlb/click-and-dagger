@@ -107,6 +107,12 @@
         <input id="mh" type="number" min="8" max="48" value="24">
         <button id="resize">APPLY</button>
       </div>
+      <h2>COVER</h2>
+      <div class="row">
+        <label><input id="startblown" type="checkbox"> Start mission with cover already BLOWN</label>
+      </div>
+      <p class="hint">Off = start Undercover (henchmen ignore you until you fire, shoot a civilian,
+      or cross into a room tagged Hostile — <b>N</b> in the 3D preview). On = combat from the first frame.</p>
       <h2>FILE</h2>
       <div id="filebtns">
         <button id="save">SAVE TO BROWSER</button>
@@ -124,8 +130,8 @@
   </div>
 </div>
 <input type="file" id="filein" accept=".json,application/json" hidden>
-<script src="js/world.js?v=36"></script>
+<script src="js/world.js?v=37"></script>
 <script src="js/engine.js?v=36"></script>
-<script src="js/editor.js?v=39"></script>
+<script src="js/editor.js?v=40"></script>
 </body>
 </html>
