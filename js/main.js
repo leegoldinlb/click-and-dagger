@@ -41,16 +41,24 @@ const Game = (() => {
     brute:  { speed: 1.3, meleeRange: 1.0,  meleeDmg: [12, 20], aggroR: 7, atkCd: 1.1 },
     sniper: { speed: 1.4, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 10, atkCd: 1.3,
               ranged: true, rangedRange: 7, rangedDmg: [10, 16] },
+    // 005 isn't hostile until "The Truth" is used on him — at that instant shoot()
+    // rewrites his kind from 'agent005' to 'boss005', which is what actually pulls
+    // him into this table (and out of NO_DAMAGE) — no separate aggro/AI code needed.
+    boss005: { speed: 1.3, meleeRange: 1.0, meleeDmg: [10, 18], aggroR: 14, atkCd: 0.45,
+               ranged: true, rangedRange: 8, rangedDmg: [9, 16] },
   };
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta']);
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector']);
   const totalHostiles = World.ents.filter(e => HOSTILE[e.kind]).length;
   // Quest-critical kinds never take damage — destroying 004's body, the vacuum
   // tube, or Volkov's desk could strand the puzzle chain with no way to recover.
   // Weapon pickups are similarly protected: a stray shot near a case (especially
   // the one-per-mission Golden Gun) shouldn't be able to destroy it before it's found.
+  // Same logic for the new puzzle devices (defusing/deciphering must go through
+  // their own tool-based interactions, not a stray bullet) and Agent 005 pre-reveal.
   // Every other entity with an `hp` field (every plain prop, via World.js's
   // `prop()` factory) is fair game — "make all sprites destructible."
-  const NO_DAMAGE = new Set(['agent', 'tube', 'desk', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden']);
+  const NO_DAMAGE = new Set(['agent', 'tube', 'desk', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden',
+    'agent005', 'ciphermachine', 'bomb', 'microfichemachine']);
 
   const keys = {};
   const mouse = { x: -1, y: -1 };            // internal canvas coords
@@ -191,6 +199,10 @@ const Game = (() => {
       best.solid = false;
       G.kills++;
       Sfx.impDie();
+      if (best.kind === 'boss005') {
+        Adventure.addItem('keys', 'KEYS');
+        Adventure.msg('005 falls. A set of keys spills from his jacket.', 4);
+      }
     } else {
       World.spawnFx(best.x, best.y);                       // a plain prop, wrecked — burst + vanish, no lingering corpse
       World.removeEnt(best);
@@ -215,7 +227,23 @@ const Game = (() => {
   const STEP = 0.5;                     // highest ledge you can climb in one move
   const JUMP_V = 5.2, GRAVITY = 15.5, HEAD_CLR = 0.12;   // jump takeoff speed, gravity, headroom before a ceiling bonk
   function los(x0, y0, x1, y1) { return Engine.losGeo(geo, graph, x0, y0, x1, y1); }
-  function tryMove(o, nx, ny, r) { Engine.moveGeo(geo, graph, o, nx, ny, r, STEP); }
+  // Engine.moveGeo only ever collided against WALL geometry — `solid` on an
+  // entity (every FACT prop sets one, e.g. desk/hedge/sedan default true) was
+  // never actually consulted anywhere, so solid props have silently let every
+  // mover (player, hostiles, civilians) walk straight through them since the
+  // portal engine went in. Push the mover back out of any solid entity's
+  // rough footprint AFTER the wall-collided position is resolved — simple
+  // radial correction, not a full sweep/slide (props are static, so this is
+  // enough to stop you walking into one; it doesn't need wall-quality sliding).
+  function tryMove(o, nx, ny, r) {
+    Engine.moveGeo(geo, graph, o, nx, ny, r, STEP);
+    for (const e of World.ents) {
+      if (e === o || !e.solid || e.dead) continue;
+      const er = (e.scale || 0.5) * 0.4, min = r + er;
+      const dx = o.x - e.x, dy = o.y - e.y, d = Math.hypot(dx, dy);
+      if (d < min && d > 1e-4) { o.x = e.x + (dx / d) * min; o.y = e.y + (dy / d) * min; }
+    }
+  }
 
   // --------------------------------------------------------------- update --
   function update(dt) {
@@ -313,6 +341,21 @@ const Game = (() => {
       if (wd > 0.15) tryMove(e, e.x + (e.wx - e.x) * Math.min(1, 0.6 * dt / wd), e.y + (e.wy - e.y) * Math.min(1, 0.6 * dt / wd), 0.25);
     }
 
+    // the defector escort: once flagged following (watch handed over), he tags
+    // along at a short distance. Dying along the way ends the mission — he only
+    // dies from the player's own fire (hostiles never target anyone but the
+    // player in this engine), but that's still a real, felt risk of friendly fire.
+    if (Adventure.flags.defectorFollowing && !Adventure.flags.defectorLost) {
+      const def = World.ents.find(e => e.kind === 'defector');
+      if (!def || def.dead) {
+        Adventure.flags.defectorLost = true;
+        dieDefector();
+      } else {
+        const dd = Math.hypot(p.x - def.x, p.y - def.y);
+        if (dd > 1.4) tryMove(def, def.x + (p.x - def.x) * Math.min(1, 2.2 * dt / dd), def.y + (p.y - def.y) * Math.min(1, 2.2 * dt / dd), 0.3);
+      }
+    }
+
     // transient fx (explosion bursts from destroyed props): age out and remove
     for (const e of [...World.ents]) {
       if (e.kind !== 'fx') continue;
@@ -341,6 +384,14 @@ const Game = (() => {
       } else if (e.pickup === 'disguise') {
         if (G.blown) {
           G.blown = false;
+          // Regaining cover has to actually make hostiles forget you — merely
+          // flipping G.blown left every already-aggroed enemy's `aggro` flag
+          // stuck true forever (aggro is sticky per-entity, not re-checked once
+          // set), so they kept attacking right through the "Cover regained"
+          // message. Reset the lot so the stealth gate is meaningful again.
+          for (const h of World.ents) {
+            if (HOSTILE[h.kind] && !h.dead) { h.aggro = false; h.atkT = 0; }
+          }
           Adventure.msg('Glasses, nose, moustache, a tilted fedora — you become nobody in particular. Cover regained.', 4);
         } else {
           Adventure.msg('A disguise kit. You already look like nobody in particular.');
@@ -411,6 +462,24 @@ const Game = (() => {
       '[ INSERT NEXT AGENT ]');
   }
 
+  function dieDefector() {
+    if (G.over) return;
+    G.over = true;
+    document.exitPointerLock();
+    endOverlay('MISSION FAILED', '',
+      'The defector never made it out. Whatever he knew, it dies with him — and so does London’s trust in you.',
+      '[ INSERT NEXT AGENT ]');
+  }
+
+  function dieBomb() {
+    if (G.over) return;
+    G.over = true;
+    document.exitPointerLock();
+    endOverlay('MISSION FAILED', '',
+      'Wrong wire. Dr. Z never got his prize, and neither did you.',
+      '[ INSERT NEXT AGENT ]');
+  }
+
   function win() {
     if (G.over) return;
     G.over = true;
@@ -446,6 +515,8 @@ const Game = (() => {
   });
 
   if (World.isCustom) document.getElementById('customtag').style.display = 'block';
+  Adventure.setWinTrigger(win);   // lets a puzzle payoff (e.g. the sports car + keys) end the mission directly
+  Adventure.setLoseTrigger(dieBomb);   // cutting the wrong wire on the bomb ends it too
 
   syncMode();
   requestAnimationFrame(loop);

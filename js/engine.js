@@ -366,6 +366,10 @@ const Engine = (() => {
         // it (neighbour floor higher). null = fall back to the old hardcoded vent/metal.
         stepTex: sec.wallStepTex ? (sec.wallStepTex[i] || null) : null,
         stepFloorTex: sec.wallStepFloorTex ? (sec.wallStepFloorTex[i] || null) : null,
+        // an optional sprite mounted flat against this wall (poster/sign/map) —
+        // drawn once, un-tiled, over the plain wall texture wherever its pixels
+        // aren't transparent. Any World.SPR key works, not just wall materials.
+        decal: sec.wallDecal ? (sec.wallDecal[i] || null) : null,
         open: false,
       });
     });
@@ -486,6 +490,8 @@ const Engine = (() => {
         const wallHL = !!(hl && hl.edge != null && hl.sec === sn && hl.edge === w.wi);   // this exact wall targeted
         const wallTx = wall.tex ? cacheOf(World.TX[wall.tex] || World.TX.brick) : wt;
         const drawTx = wall.door ? cacheOf(World.TX[wall.door] || World.TX.brick) : wallTx;  // door/interactive wall texture
+        const decalTx = wall.decal ? cacheOf(World.SPR[wall.decal]) : null;                  // flat-mounted sprite, drawn once (no tiling)
+        const wallLen = w.ub - w.ua || 1;                             // normalises the decal to the WHOLE edge, whatever its length
         const wisc = 1 / (wall.texScale || 1);                        // wall tile size (>1 bigger, <1 smaller)
         const yc1 = horizon - (cz - eyeZ) * H / ad, yc2 = horizon - (cz - eyeZ) * H / bd;
         const yf1 = horizon - (fz - eyeZ) * H / ad, yf2 = horizon - (fz - eyeZ) * H / bd;
@@ -554,12 +560,21 @@ const Engine = (() => {
           const u = (uz1 + (uz2 - uz1) * f) * zdist * wisc;
           const texU = ((((u - Math.floor(u)) * 64) | 0) & 63);
           const wsh = Math.min(0.85, fogAt(zdist));
+          // decal U ignores wisc/tiling and is normalised across the WHOLE edge
+          // (ua..ub, which may span many world units on a hand-authored wall,
+          // not just one grid cell) so the image appears exactly once, not tiled
+          const decU = decalTx ? clamp((((((uz1 + (uz2 - uz1) * f) * zdist - w.ua) / wallLen) * 64) | 0), 0, 63) : 0;
           if (!ns) {                                                 // solid wall (incl. closed door)
             for (let y = yTopA[x]; y <= yBotA[x]; y++) {
               const v = yfTrue > ycTrue ? (y - ycTrue) / (yfTrue - ycTrue) : 0;
               const tv = (((((cz - fz) * v * wisc) % 1) + 1) % 1 * 64 | 0) & 63;
               const idx = y * W + x;
               let wpx = shade(drawTx.u32[tv * 64 + texU], wsh);
+              if (decalTx) {                                          // decal V spans the whole wall face once, top→bottom
+                const dv = clamp((v * 64) | 0, 0, 63), du = decU;
+                const dc = decalTx.u32[dv * 64 + du];
+                if ((dc >>> 24) >= 128) wpx = shade(dc, wsh);
+              }
               if (wallHL) wpx = hlMix(wpx);
               buf[idx] = wpx; depth[idx] = zdist;
             }

@@ -6,10 +6,22 @@ const Adventure = (() => {
     lockpick: false, punchcard: false, tube: false,
     tubeIn: false, radioOpen: false, deskOpen: false, exitOpen: false,
     knowsCombo: false, safeOpen: false, gotMoney: false, gotRose: false, roseGiven: false,
+    // Secret Phrase
+    gotLetter: false, decoded: false, phraseUsed: false,
+    // Defuse the B
+    metZ: false, gaveLetterToZ: false, bombDefused: false, bombFailed: false,
+    // The Defector
+    familySmuggled: false, defectorFollowing: false, defectorLost: false,
+    // Learn the Truth
+    met005: false, gotTruth005: false, revealed005: false,
   };
   let verb = 'look';
   let selected = null;            // selected inventory item id
   const inv = [];
+  let winFn = null;                // registered by main.js — lets a puzzle payoff end the mission directly
+  let loseFn = null;                // ditto, for a puzzle failure (cutting the wrong wire)
+  function setWinTrigger(fn) { winFn = fn; }
+  function setLoseTrigger(fn) { loseFn = fn; }
 
   const invEl = document.getElementById('inventory');
   const invEmptyEl = document.getElementById('invempty');
@@ -96,7 +108,7 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
@@ -135,6 +147,20 @@ const Adventure = (() => {
         : (flags.roseGiven
           ? 'Carlotta, hair down, rose behind her ear. She smiles like she means it.'
           : 'Carlotta, hair pinned up, watching the square like she owns it. “You should let your hair down,” you try. She is not impressed.');
+      case 'drz': return e.dead
+        ? 'A genius, unrecognized to the last. This is on you.'
+        : 'Dr. Z, wild-haired and muttering equations under his breath. Whatever he is building, it is not good news.';
+      case 'defector': return e.dead
+        ? 'Whatever he knew, it is gone now. This is on you.'
+        : (flags.defectorFollowing
+          ? 'The defector, close behind you, watch clutched tight, eyes on the exit.'
+          : 'A nervous man in a good suit, glancing over his shoulder every few seconds.');
+      case 'agent005': return e.dead
+        ? 'A colleague, once. This is on you.'
+        : 'Agent 005, easy smile, watching the square like he has nothing to hide. Maybe he does not.';
+      case 'boss005': return e.dead
+        ? 'The traitor, permanently retired. Justice, of a sort.'
+        : '005, Sterling drawn, the easy smile finally gone.';
       case 'agent': return e.has
         ? 'Agent 004. He didn’t make it. His lockpick kit is still in his hand — he’d want you to have it.'
         : '004 rests easier without the hardware. You’ll drink one for him in Geneva.';
@@ -170,6 +196,24 @@ const Adventure = (() => {
           ? 'Tucked between the pages, a slip of paper: “11.22.63.” You commit it to memory.'
           : 'The book, and the slip of paper you already memorized: 11.22.63.';
       }
+      case 'letter': return flags.gotLetter ? 'You already have it.' : 'A scrap of paper, coded. Meaningless, at a glance.';
+      case 'telegram': return 'A telegram, stamped RUSH. Addressed, oddly, to Doctor Z.';
+      case 'businesscard': return 'A card for Exports Universal. Rather ordinary, if you did not know better.';
+      case 'watch': return 'A gold pocket watch, chain coiled beside it. Someone’s father’s, once.';
+      case 'personnelfile': return 'A manila folder, stamped CONFIDENTIAL. Someone’s whole career, reduced to a paragraph.';
+      case 'microfiche': return 'A single frame of film, far too small to read by eye.';
+      case 'screwdriver': return 'A flathead screwdriver. Four screws between you and whatever this is.';
+      case 'pliers': return 'A pair of pliers. For wires, presumably, and not the friendly kind.';
+      case 'ciphermachine': return 'A cipher machine, three rotors and a keyboard. It wants paper, not conversation.';
+      case 'bomb': return flags.bombDefused
+        ? 'Dead and harmless now, wires cut, the countdown stopped for good.'
+        : (e.casingOpen
+          ? 'The casing is off. A tangle of red and blue wire, and a countdown that does not care about your feelings.'
+          : 'A bomb, casing sealed, counting down. You will need tools before you need nerve.');
+      case 'microfichemachine': return e.showingArticle
+        ? 'The screen shows a newspaper clipping — the assassination of the Ambassador to Hong Kong, a few years back.'
+        : 'A microfiche viewer, screen dark, waiting for film.';
+      case 'sportscar': return 'A sports car, parked and gleaming. Someone’s exit strategy, if you can get the keys.';
       case 'filecab': return 'Three drawers of surveillance files, alphabetized by paranoia.';
       case 'globe': return 'A desk globe. Someone has circled Havana in red grease pencil.';
       case 'briefcase': return 'A leather attaché case. Standard issue for men who deny working for anyone.';
@@ -244,6 +288,7 @@ const Adventure = (() => {
       case 'brute': return e.dead ? 'Nothing on him but a busted knuckle brace. He fought with what he had.' : 'You would need a crane.';
       case 'sniper': return e.dead ? 'A rifle, a canteen, a half-written letter home. You leave the letter.' : 'He is not putting that rifle down for you.';
       case 'civilianM': case 'civilianF': case 'vendor': case 'waiter': case 'tourist': case 'officer': case 'fisherman': case 'flowergirl': case 'carlotta':
+      case 'drz': case 'defector': case 'agent005': case 'boss005':
         return 'They are a person, not a prop. Leave them be.';
       case 'desk': return 'It’s a desk. Even you couldn’t expense that.';
       case 'safe': return 'Bolted to the wall. You are a spy, not a mover.';
@@ -253,6 +298,49 @@ const Adventure = (() => {
       case 'plant': case 'royalpalm': case 'bananaplant': case 'bougainvillea': case 'fern': case 'cactus': case 'hedge':
         return 'Your cover is “orchid dealer”, not “palm smuggler”.';
       case 'bar': return 'Tempting. After the mission.';
+      case 'letter':
+        if (flags.gotLetter) return 'You already have it.';
+        flags.gotLetter = true;
+        World.removeEnt(e);
+        addItem('letter', 'CODED LETTER');
+        return 'You pocket the coded letter. Meaningless — until something can read it.';
+      case 'telegram':
+        if (inv.some(i => i.id === 'telegram')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('telegram', 'TELEGRAM');
+        return 'A telegram: “RUSH — to Doctor Z.” Someone was in a hurry to reach him.';
+      case 'businesscard':
+        if (inv.some(i => i.id === 'businesscard')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('businesscard', 'BUSINESS CARD');
+        return 'There’s a phone number on it.';
+      case 'watch':
+        if (inv.some(i => i.id === 'watch')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('watch', 'POCKET WATCH');
+        return 'You take the watch. It is warm, somehow, like it was just checked.';
+      case 'personnelfile':
+        if (inv.some(i => i.id === 'file')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('file', 'PERSONNEL FILE');
+        return 'It says 005 was stationed in Hong Kong for five years.';
+      case 'microfiche':
+        if (inv.some(i => i.id === 'microfiche')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('microfiche', 'MICROFICHE');
+        return 'You take the microfiche. It needs a machine, not eyes.';
+      case 'screwdriver':
+        if (inv.some(i => i.id === 'screwdriver')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('screwdriver', 'SCREWDRIVER');
+        return 'A screwdriver. Simple, and exactly what this looks like it needs.';
+      case 'pliers':
+        if (inv.some(i => i.id === 'pliers')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('pliers', 'PLIERS');
+        return 'A pair of pliers, well used.';
+      case 'ciphermachine': case 'bomb': case 'microfichemachine': case 'sportscar':
+        return 'That is bolted down, and staying that way.';
     }
     return 'You can’t take that.';
   }
@@ -280,15 +368,18 @@ const Adventure = (() => {
     }
     if (e.kind === 'bar') return 'You mix a quick martini. Shaken, given the circumstances. Morale restored; aim unaffected, officially.';
     if (['goon', 'brute', 'sniper'].includes(e.kind) && !e.dead) {
-      if (selected === 'lettersoftransit') {
+      if (selected === 'lettersoftransit' || selected === 'phrase') {
         const geo = World.getGeo();
         let count = 0;
         for (const s of geo.sectors) { if (s.hostile) { s.hostile = false; count++; } }
-        removeItem('lettersoftransit');
+        const usingPhrase = selected === 'phrase';
+        removeItem(usingPhrase ? 'phrase' : 'lettersoftransit');
+        if (usingPhrase) flags.phraseUsed = true;
         Sfx.pick();
-        return count
-          ? 'You slide the envelope across. He studies the seal, nods once, and waves you through — every checkpoint in the compound, forever.'
-          : 'He studies the letters, unimpressed. There is nothing here for them to open.';
+        if (!count) return usingPhrase ? 'He studies you, unimpressed. There is nothing here for the phrase to open.' : 'He studies the letters, unimpressed. There is nothing here for them to open.';
+        return usingPhrase
+          ? '“Greenwich Mean?” you ask. He blinks, then answers on reflex: “Never in summer.” Whatever that phrase means to Volkov’s men, it means you belong here now.'
+          : 'You slide the envelope across. He studies the seal, nods once, and waves you through — every checkpoint in the compound, forever.';
       }
       return 'He is not open to conversation. Try the Walther.';
     }
@@ -317,6 +408,119 @@ const Adventure = (() => {
         return 'She lets her hair down — somehow even more dangerous than up. “Thank you,” she says, “for opening my heart.” She presses her hairpin into your hand, so you will never forget her.';
       }
       return 'She is clearly waiting for something more romantic than that.';
+    }
+    if (e.kind === 'ciphermachine') {
+      if (selected === 'letter') {
+        if (flags.decoded) return 'The machine sits idle. You already have what it gave you.';
+        flags.decoded = true;
+        removeItem('letter');
+        addItem('phrase', 'THE PHRASE');
+        Sfx.pick();
+        return '“Greenwich Mean?” the machine clatters out. Then, a beat later: “Never in summer.” A challenge, and its answer.';
+      }
+      return 'A cipher machine, rotors set to nothing in particular. It wants paper, not fingers.';
+    }
+    if (e.kind === 'drz') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'telegram' && !flags.gaveLetterToZ) {
+        flags.gaveLetterToZ = true;
+        removeItem('telegram');
+        Sfx.pickup();
+        return '“I’m being awarded the Nobel Prize? The world must be saved! Find the B and cut the blue wire!”';
+      }
+      if (!flags.metZ) {
+        flags.metZ = true;
+        return '“The world refuses to recognize my genius. Mankind must be punished!”';
+      }
+      if (flags.gaveLetterToZ) return '“Hurry! Find the B — cut the blue wire!”';
+      return '“Genius, wasted on the small-minded,” he mutters, checking a pocket watch of his own.';
+    }
+    if (e.kind === 'bomb') {
+      if (flags.bombDefused) return 'Dead and harmless now.';
+      if (selected === 'screwdriver') {
+        if (e.casingOpen) return 'Already open. No need to repeat yourself.';
+        e.casingOpen = true;
+        Sfx.pick();
+        return 'Four screws, patience over speed. The casing comes away, revealing a tangle of red and blue wire.';
+      }
+      if (selected === 'pliers') {
+        if (!e.casingOpen) { Sfx.denied(); return 'Sealed shut. Get the casing off first — you will need a screwdriver.'; }
+        if (flags.gaveLetterToZ) {
+          flags.bombDefused = true;
+          Sfx.power();
+          if (winFn) winFn();
+          return 'You cut the blue wire. The world is saved!';
+        }
+        flags.bombFailed = true;
+        Sfx.denied();
+        if (loseFn) loseFn();
+        return 'You cut the red wire.';
+      }
+      return e.casingOpen ? 'Wires, red and blue. You will want the pliers, and a steady hand.' : 'Sealed shut. You would need a screwdriver.';
+    }
+    if (e.kind === 'defector') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (flags.defectorFollowing) return 'He stays close, watch in hand, waiting for you to move.';
+      if (selected === 'watch' && flags.familySmuggled) {
+        flags.defectorFollowing = true;
+        removeItem('watch');
+        Sfx.pickup();
+        return 'He clutches the watch, eyes wet. “Now — we must leave at once!” He falls in behind you.';
+      }
+      if (!flags.familySmuggled) return '“I’m not leaving without my family.”';
+      return '“Thank heavens, we must leave at once! But I can’t leave without my father’s watch.”';
+    }
+    if (e.kind === 'phonebooth') {
+      if (selected === 'businesscard' && !flags.familySmuggled) {
+        flags.familySmuggled = true;
+        removeItem('businesscard');
+        Sfx.pick();
+        return 'You dial the number. A clipped voice on the other end: “Tell the defector his family has been smuggled out.”';
+      }
+      return flags.familySmuggled ? 'The line is dead now. The call already did its work.' : 'A red phone booth. The receiver is heavier than it looks.';
+    }
+    if (e.kind === 'microfichemachine') {
+      if (selected === 'microfiche') {
+        if (e.showingArticle) return 'Already loaded. The article is right there on the screen.';
+        e.showingArticle = true;
+        removeItem('microfiche');
+        Sfx.pick();
+        return 'The reel clicks into place. An old newspaper clipping resolves into focus: the assassination of the Ambassador to Hong Kong, a few years back.';
+      }
+      if (selected === 'file') {
+        if (!e.showingArticle) { Sfx.denied(); return 'Nothing to compare it to. Load the microfiche first.'; }
+        if (flags.gotTruth005) return 'You already put it together.';
+        flags.gotTruth005 = true;
+        addItem('truth', 'THE TRUTH');
+        Sfx.power();
+        return '005 was stationed in Hong Kong when the assassination occurred. He’s the traitor!';
+      }
+      return e.showingArticle ? 'The article sits on the screen, waiting for something to compare it to.' : 'A microfiche viewer. Whirring, patient, waiting for film.';
+    }
+    if (e.kind === 'agent005') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'truth') {
+        flags.revealed005 = true;
+        removeItem('truth');
+        e.kind = 'boss005';
+        e.aggro = true;
+        Sfx.growl();
+        return 'You lay the evidence on the table. 005’s easy smile finally slips. “Clever,” he says, reaching for a Sterling of his own.';
+      }
+      if (!flags.met005) {
+        flags.met005 = true;
+        return '“There’s a traitor in our midst. You must find him.”';
+      }
+      return 'He watches the square, saying nothing further.';
+    }
+    if (e.kind === 'boss005' && !e.dead) return 'He is well past conversation. Try the Walther.';
+    if (e.kind === 'sportscar') {
+      if (selected === 'keys') {
+        removeItem('keys');
+        if (winFn) winFn();
+        return 'The engine roars to life. You are three blocks away before anyone even reaches the square.';
+      }
+      return 'Locked. You would need keys.';
     }
     if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman'].includes(e.kind))
       return e.dead ? 'There is nothing left to do here.' : 'They have nothing to do with your mission. Move along.';
@@ -394,5 +598,5 @@ const Adventure = (() => {
   }
 
   renderInv();
-  return { flags, msg, setVerb, clickAt, nameAt, resolveAt, addItem, get selected() { return selected; } };
+  return { flags, msg, setVerb, clickAt, nameAt, resolveAt, addItem, setWinTrigger, setLoseTrigger, get selected() { return selected; } };
 })();

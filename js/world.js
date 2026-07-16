@@ -26,206 +26,1921 @@ const World = (() => {
     'w': { f: 0.18, c: 3.2,  ft: 'helipad',  ct: null,       sky: true,  win: true  },
   };
 
-  // -------------------------------------------------------------------------
-  // Default level: PLAZA VIEJA — a little square in Havana, 1962. Showcases the
-  // outdoor sky, sloped ramp, raised bandstand, sunken fountain, low-ceiling
-  // arcade, and mixed textures. The re-themed puzzle (picks → radio store → tube
-  // → mainframe → gate → getaway dock) is placed around the plaza.
-  // -------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
-  // PLAZA VIEJA — the default mission, hand-authored as VECTOR sectors (no grid
-  // compile). Built to exercise everything the Build engine does: non-rectangular
-  // portal-linked rooms, nested sub-sectors (fountain, stage), Build-style pillar
-  // "teeth" (solid mass carved between two sectors so both faces render their own
-  // wall texture), varied sky rooflines, per-wall textures & tile scales, tagged
-  // door walls (radio/blast/mainframe/poster) driving the whole puzzle chain, an
-  // open cantina storefront under a lintel, and a harbour you can fall into.
+  // PLAZA VIEJA — the default mission, hand-authored in the editor (LAIR
+  // ARCHITECT) as a large vector level (48×48, ~24 sectors) and imported here
+  // verbatim (2026-07). Carries every puzzle system built so far: the radio
+  // door/tube/mainframe/blast-gate chain, the disguise-kit stealth reset, the
+  // Letters of Transit safe+book combo, the Carlotta/hairpin alt-lockpick,
+  // Secret Phrase (cipher machine), Defuse the B (Dr. Z + bomb), The Defector
+  // (business card + phone booth + watch escort), and Learn the Truth (agent
+  // 005's boss reveal → keys → sportscar). Replaces the earlier hand-coded
+  // procedural IIFE — this is now the single source of truth for Plaza Vieja.
   // ---------------------------------------------------------------------------
-  const DEFAULT = (() => {
-    const verts = [], vmap = new Map();
-    const V = (x, y) => { const k = x + ',' + y; if (!vmap.has(k)) { vmap.set(k, verts.length); verts.push({ x, y }); } return vmap.get(k); };
-    const sectors = [];
-    // add a sector from a coordinate list; winding normalised to positive shoelace
-    // (same convention as the editor's closeSector) so front faces render.
-    const S = (coords, p) => {
-      let loop = coords.map(([x, y]) => V(x, y));
-      let area = 0;
-      for (let i = 0; i < loop.length; i++) { const a = verts[loop[i]], b = verts[loop[(i + 1) % loop.length]]; area += a.x * b.y - b.x * a.y; }
-      if (area < 0) loop = loop.slice().reverse();
-      const n = loop.length;
-      sectors.push(Object.assign({
-        loop, floor: 0, ceil: 3.6, floorTex: 'tile', ceilTex: 'ceiltile', sky: false, win: false, hostile: false, texScale: 1,
-        wallTex: new Array(n).fill(null), wallDoor: new Array(n).fill(null), wallTexScale: new Array(n).fill(1), parent: -1,
-        wallStepTex: new Array(n).fill(null), wallStepFloorTex: new Array(n).fill(null),
-      }, p));
-      return sectors.length - 1;
-    };
-    // paint/tag a wall by its ENDPOINTS (immune to winding direction/index shifts)
-    const wall = (si, ax, ay, bx, by, o) => {
-      const sec = sectors[si], a = V(ax, ay), b = V(bx, by), L = sec.loop;
-      for (let i = 0; i < L.length; i++) {
-        const p = L[i], q = L[(i + 1) % L.length];
-        if ((p === a && q === b) || (p === b && q === a)) {
-          if (o.tex !== undefined) sec.wallTex[i] = o.tex;
-          if (o.door !== undefined) sec.wallDoor[i] = o.door;
-          if (o.scale !== undefined) sec.wallTexScale[i] = o.scale;
-          if (o.stepTex !== undefined) sec.wallStepTex[i] = o.stepTex;
-          if (o.stepFloorTex !== undefined) sec.wallStepFloorTex[i] = o.stepFloorTex;
-          return;
-        }
-      }
-      throw new Error('DEFAULT map: no wall (' + ax + ',' + ay + ')-(' + bx + ',' + by + ') in sector ' + si);
-    };
-    const fillTex = (si, tex) => sectors[si].wallTex.fill(tex);
-
-    // ---- 0: THE PLAZA — big open sky square; ceramic tile, pastel facades ----
-    const PLAZA = S([
-      [4, 4], [10, 4], [12, 4], [17.5, 4], [18.4, 4], [19, 4],                       // north facade (blast gate, alley mouth)
-      [19, 9.5], [19, 10.5], [19, 12], [19, 13.5], [19, 14],                          // east facade (radio-shop front)
-      [16.5, 14], [16, 14], [14, 14], [13.5, 14], [11.5, 14], [11, 14], [9, 14], [8.5, 14], [6.5, 14], [6, 14], [4, 14],  // arcade colonnade line
-      [4, 11], [4, 5],                                                               // west (café terrace opening)
-    ], { sky: true, ceil: 3.6, floorTex: 'tile', texScale: 2 });
-    fillTex(PLAZA, 'stucco');
-    wall(PLAZA, 4, 4, 10, 4, { tex: 'stuccop' });                                     // pastel row along the north
-    wall(PLAZA, 12, 4, 17.5, 4, { tex: 'stuccob' });
-    wall(PLAZA, 18.4, 4, 19, 4, { tex: 'mural' });                                    // revolution mural by the alley
-    wall(PLAZA, 19, 4, 19, 9.5, { tex: 'brick' });
-    wall(PLAZA, 19, 9.5, 19, 10.5, { tex: 'radio' });                                 // shopfront flanks
-    wall(PLAZA, 19, 12, 19, 13.5, { tex: 'radio' });
-    for (const [a, b] of [[16.5, 16], [14, 13.5], [11.5, 11], [9, 8.5], [6.5, 6]])    // colonnade pillars, plaza face
-      wall(PLAZA, a, 14, b, 14, { tex: 'limestone' });
-
-    // ---- 1: FOUNTAIN — sunken octagonal basin, nested in the plaza ----
-    S([[10, 7], [13, 7], [14, 8], [14, 9], [13, 10], [10, 10], [9, 9], [9, 8]],
-      { parent: PLAZA, sky: true, ceil: 3.6, floor: -0.4, floorTex: 'water' });
-
-    // ---- 2: STAGE — low tobacco-crate bandstand, nested in the plaza ----
-    const STAGE = S([[15.5, 5.5], [17.5, 5.5], [17.5, 7], [15.5, 7]],
-      { parent: PLAZA, sky: true, ceil: 3.6, floor: 0.5, floorTex: 'wood' });
-    fillTex(STAGE, 'wood');
-
-    // ---- 3: CAFÉ TERRACE — raised deck under a striped awning ----
-    const TERR = S([[1.2, 5], [4, 5], [4, 11], [1.2, 11]],
-      { sky: true, ceil: 3.6, floor: 0.35, floorTex: 'wood' });
-    fillTex(TERR, 'stuccop');
-    wall(TERR, 1.2, 5, 4, 5, { tex: 'awning' });                                      // café canopy on the short face
-
-    // ---- 4: CANTINA — roofed corner bar, open storefronts to terrace & plaza ----
-    const CANT = S([[1.2, 11], [4, 11], [4, 14], [1.2, 14]],
-      { floor: 0.35, ceil: 1.9, floorTex: 'azulejo', ceilTex: 'wood' });
-    fillTex(CANT, 'teak');
-
-    // ---- 5: ARCADE — covered colonnade; its side of the pillars dips south ----
-    const ARC = S([
-      [4, 14], [6, 14], [6, 14.3], [6.5, 14.3], [6.5, 14],
-      [8.5, 14], [8.5, 14.3], [9, 14.3], [9, 14],
-      [11, 14], [11, 14.3], [11.5, 14.3], [11.5, 14],
-      [13.5, 14], [13.5, 14.3], [14, 14.3], [14, 14],
-      [16, 14], [16, 14.3], [16.5, 14.3], [16.5, 14],
-      [19, 14], [19, 16.6],
-      [12, 16.6], [11, 16.6], [9.6, 16.6], [8.4, 16.6], [4, 16.6],
-    ], { floor: 0, ceil: 1.5, floorTex: 'limestone', ceilTex: 'wood' });
-    fillTex(ARC, 'brick');
-    for (const [a, b] of [[6, 6.5], [8.5, 9], [11, 11.5], [13.5, 14], [16, 16.5]]) {  // pillar flanks, arcade side
-      wall(ARC, a, 14, a, 14.3, { tex: 'limestone' });
-      wall(ARC, a, 14.3, b, 14.3, { tex: 'limestone' });
-      wall(ARC, b, 14.3, b, 14, { tex: 'limestone' });
+  const DEFAULT = {
+  "v": 5,
+  "w": 48,
+  "h": 48,
+  "map": [
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%..........%...................................%",
+    "%..........%...................................%",
+    "%..........%...................................%",
+    "%..........%...................................%",
+    "%..........%...................................%",
+    "%..........%...................................%",
+    "%..........%...................................%",
+    "%..........%...................................%",
+    "%..........%...................................%",
+    "%..........%...................................%",
+    "%%%%%%%%%%%%...................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%..............................................%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+  ],
+  "spawn": {
+    "x": 20.33,
+    "y": 6.61,
+    "a": 0
+  },
+  "ents": [
+    {
+      "kind": "streetlamp",
+      "x": 11.82,
+      "y": 14.78
+    },
+    {
+      "kind": "streetlamp",
+      "x": 18.88,
+      "y": 20.84
+    },
+    {
+      "kind": "streetlamp",
+      "x": 12,
+      "y": 20.37
+    },
+    {
+      "kind": "streetlamp",
+      "x": 26.82,
+      "y": 21.13
+    },
+    {
+      "kind": "streetlamp",
+      "x": 31.06,
+      "y": 20.95
+    },
+    {
+      "kind": "streetlamp",
+      "x": 31.06,
+      "y": 3.37
+    },
+    {
+      "kind": "streetlamp",
+      "x": 26.53,
+      "y": 3.54
+    },
+    {
+      "kind": "streetlamp",
+      "x": 30.71,
+      "y": 9.78
+    },
+    {
+      "kind": "streetlamp",
+      "x": 18.59,
+      "y": 6.42
+    },
+    {
+      "kind": "parkbench",
+      "x": 11.88,
+      "y": 17.6
+    },
+    {
+      "kind": "phonebooth",
+      "x": 15.24,
+      "y": 20.25
+    },
+    {
+      "kind": "newsstand",
+      "x": 28.82,
+      "y": 20.78
+    },
+    {
+      "kind": "firehydrant",
+      "x": 17.88,
+      "y": 14.25
+    },
+    {
+      "kind": "oildrum",
+      "x": 18.41,
+      "y": 7.95
+    },
+    {
+      "kind": "fisherman",
+      "x": 18.47,
+      "y": 9.54,
+      "behavior": "wander"
+    },
+    {
+      "kind": "waiter",
+      "x": 28.71,
+      "y": 18.42,
+      "behavior": "wander"
+    },
+    {
+      "kind": "tourist",
+      "x": 14.06,
+      "y": 16.25,
+      "behavior": "wander"
+    },
+    {
+      "kind": "civilianF",
+      "x": 14.41,
+      "y": 17.6,
+      "behavior": "wander"
+    },
+    {
+      "kind": "civilianM",
+      "x": 17.88,
+      "y": 11.84,
+      "behavior": "wander"
+    },
+    {
+      "kind": "brute",
+      "x": 26.35,
+      "y": 15.78
+    },
+    {
+      "kind": "royalpalm",
+      "x": 27.57,
+      "y": 7.81
+    },
+    {
+      "kind": "bananaplant",
+      "x": 19.7,
+      "y": 8.57
+    },
+    {
+      "kind": "bananaplant",
+      "x": 22.23,
+      "y": 8.74
+    },
+    {
+      "kind": "fern",
+      "x": 23.93,
+      "y": 8.97
+    },
+    {
+      "kind": "hedge",
+      "x": 24.33,
+      "y": 10.54
+    },
+    {
+      "kind": "hedge",
+      "x": 24.73,
+      "y": 11.84
+    },
+    {
+      "kind": "goon",
+      "x": 29,
+      "y": 22.91
+    },
+    {
+      "kind": "goon",
+      "x": 22.6,
+      "y": 18.11
+    },
+    {
+      "kind": "royalpalm",
+      "x": 20.77,
+      "y": 16.51
+    },
+    {
+      "kind": "royalpalm",
+      "x": 25.1,
+      "y": 16.34
+    },
+    {
+      "kind": "newsstand",
+      "x": 17.65,
+      "y": 9.6
+    },
+    {
+      "kind": "bar",
+      "x": 21.65,
+      "y": 7.16
+    },
+    {
+      "kind": "plant",
+      "x": 24.76,
+      "y": 5.76
+    },
+    {
+      "kind": "armchair",
+      "x": 24.88,
+      "y": 6.21
+    },
+    {
+      "kind": "bookshelf",
+      "x": 24.41,
+      "y": 7.09
+    },
+    {
+      "kind": "bougainvillea",
+      "x": 20.04,
+      "y": 7.21
+    },
+    {
+      "kind": "phonebooth",
+      "x": 22.78,
+      "y": 8.4
+    },
+    {
+      "kind": "goon",
+      "x": 5.65,
+      "y": 3.31
+    },
+    {
+      "kind": "goon",
+      "x": 7.06,
+      "y": 3.37
+    },
+    {
+      "kind": "goon",
+      "x": 8.71,
+      "y": 3.6
+    },
+    {
+      "kind": "goon",
+      "x": 10.29,
+      "y": 3.72
+    },
+    {
+      "kind": "goon",
+      "x": 11.53,
+      "y": 3.78
+    },
+    {
+      "kind": "goon",
+      "x": 5.35,
+      "y": 4.9
+    },
+    {
+      "kind": "goon",
+      "x": 7.29,
+      "y": 5.13
+    },
+    {
+      "kind": "goon",
+      "x": 9.06,
+      "y": 5.25
+    },
+    {
+      "kind": "goon",
+      "x": 6.06,
+      "y": 4.9
+    },
+    {
+      "kind": "goon",
+      "x": 10.82,
+      "y": 5.07
+    },
+    {
+      "kind": "goon",
+      "x": 8.29,
+      "y": 5.48
+    },
+    {
+      "kind": "goon",
+      "x": 5.91,
+      "y": 6.18
+    },
+    {
+      "kind": "royalpalm",
+      "x": 5.36,
+      "y": 2.37
+    },
+    {
+      "kind": "royalpalm",
+      "x": 6.64,
+      "y": 2.39
+    },
+    {
+      "kind": "bananaplant",
+      "x": 7.54,
+      "y": 2.43
+    },
+    {
+      "kind": "royalpalm",
+      "x": 8.63,
+      "y": 2.66
+    },
+    {
+      "kind": "bananaplant",
+      "x": 9.43,
+      "y": 2.69
+    },
+    {
+      "kind": "bananaplant",
+      "x": 10.39,
+      "y": 2.67
+    },
+    {
+      "kind": "royalpalm",
+      "x": 11,
+      "y": 2.77
+    },
+    {
+      "kind": "royalpalm",
+      "x": 12.07,
+      "y": 2.76
+    },
+    {
+      "kind": "guardpost",
+      "x": 4.73,
+      "y": 3.72
+    },
+    {
+      "kind": "guardpost",
+      "x": 12,
+      "y": 4.1
+    },
+    {
+      "kind": "goon",
+      "x": 27.39,
+      "y": 13.58
+    },
+    {
+      "kind": "agent",
+      "x": 29.09,
+      "y": 32.12
+    },
+    {
+      "kind": "desk",
+      "x": 28.43,
+      "y": 11.5
+    },
+    {
+      "kind": "bougainvillea",
+      "x": 27.85,
+      "y": 0.96
+    },
+    {
+      "kind": "bougainvillea",
+      "x": 29.45,
+      "y": 1.06
+    },
+    {
+      "kind": "cactus",
+      "x": 28.63,
+      "y": 0.83
+    },
+    {
+      "kind": "fern",
+      "x": 27.13,
+      "y": 2.96
+    },
+    {
+      "kind": "flowergirl",
+      "x": 28.5,
+      "y": 1.96,
+      "behavior": "wander"
+    },
+    {
+      "kind": "disguise",
+      "x": 18.23,
+      "y": 3.17
+    },
+    {
+      "kind": "vendingmachine",
+      "x": 31.67,
+      "y": 17.92
+    },
+    {
+      "kind": "flowercart",
+      "x": 27.88,
+      "y": 2.93
+    },
+    {
+      "kind": "flowercart",
+      "x": 30.04,
+      "y": 3.12
+    },
+    {
+      "kind": "carlotta",
+      "x": 15.8,
+      "y": 18.55,
+      "behavior": "wander"
+    },
+    {
+      "kind": "safe",
+      "x": 23.8,
+      "y": 6.21
+    },
+    {
+      "kind": "bookshelf",
+      "x": 33.77,
+      "y": 6.81
+    },
+    {
+      "kind": "bookshelf",
+      "x": 35.05,
+      "y": 6.88
+    },
+    {
+      "kind": "bookshelf",
+      "x": 36.02,
+      "y": 7.01
+    },
+    {
+      "kind": "bookshelf",
+      "x": 35.8,
+      "y": 11.73
+    },
+    {
+      "kind": "bookshelf",
+      "x": 34.98,
+      "y": 10.03
+    },
+    {
+      "kind": "bookshelf",
+      "x": 36.98,
+      "y": 8.63
+    },
+    {
+      "kind": "bookshelf",
+      "x": 37,
+      "y": 10.38
+    },
+    {
+      "kind": "armchair",
+      "x": 36.75,
+      "y": 9.58
+    },
+    {
+      "kind": "book",
+      "x": 35.83,
+      "y": 10.86
+    },
+    {
+      "kind": "sportscar",
+      "x": 30.92,
+      "y": 4.74
+    },
+    {
+      "kind": "bomb",
+      "x": 36.83,
+      "y": 13.57
+    },
+    {
+      "kind": "microfichemachine",
+      "x": 29.67,
+      "y": 11.64
+    },
+    {
+      "kind": "microfiche",
+      "x": 23.67,
+      "y": 6.94
+    },
+    {
+      "kind": "personnelfile",
+      "x": 30.57,
+      "y": 11.64
+    },
+    {
+      "kind": "brute",
+      "x": 18,
+      "y": 15.97
+    },
+    {
+      "kind": "agent005",
+      "x": 23.2,
+      "y": 6.31
+    },
+    {
+      "kind": "screwdriver",
+      "x": 11.96,
+      "y": 24.72
+    },
+    {
+      "kind": "pliers",
+      "x": 29.63,
+      "y": 2.15
+    },
+    {
+      "kind": "wpn_ar7",
+      "x": 30.35,
+      "y": 12.55
+    },
+    {
+      "kind": "wpn_sterling",
+      "x": 12.58,
+      "y": 13.82
+    },
+    {
+      "kind": "wpn_laser",
+      "x": 30.81,
+      "y": 15.59
+    },
+    {
+      "kind": "wpn_golden",
+      "x": 34,
+      "y": 13.47
     }
-    wall(ARC, 12, 16.6, 11, 16.6, { door: 'poster' });                                // 004's hint hangs mid-arcade
-
-    // ---- 6: STUDY — Volkov's back office, tucked behind the arcade ----
-    const STUDY = S([[7.6, 16.6], [8.4, 16.6], [9.6, 16.6], [10.4, 16.6], [10.4, 19], [7.6, 19]],
-      { floor: 0, ceil: 1.4, floorTex: 'carpet', ceilTex: 'ceiltile' });
-    fillTex(STUDY, 'teak');
-    wall(STUDY, 10.4, 16.6, 10.4, 19, { tex: 'cork' });                               // the conspiracy wall
-
-    // ---- 7: RADIO SHOP — locked; the mainframe hums against the back wall ----
-    const SHOP = S([
-      [19, 10.5], [19, 12], [19.2, 12], [19.2, 13.5], [23.5, 13.5],
-      [23.5, 12.2], [23.5, 10.8], [23.5, 9.5], [19.2, 9.5], [19.2, 10.5],
-    ], { floor: 0, ceil: 1.6, floorTex: 'wood', ceilTex: 'ceiltile' });
-    fillTex(SHOP, 'panel');
-    wall(SHOP, 19, 10.5, 19, 12, { door: 'radio' });                                  // the locked shopfront
-    wall(SHOP, 23.5, 10.8, 23.5, 12.2, { door: 'mainframe' });                        // sabotaged mainframe
-    wall(SHOP, 19.2, 9.5, 23.5, 9.5, { tex: 'cork' });
-
-    // ---- 8: DOCK — behind the harbour gate; corrugated sheds, morning sea air ----
-    const DOCK = S([
-      [3, 1.2], [17.5, 1.2], [17.5, 4], [14.7, 4], [12, 4], [10, 4], [3, 4],
-      [3, 2.8], [3, 1.4],
-    ], { sky: true, ceil: 3.0, floor: 0.05, floorTex: 'wood' });
-    fillTex(DOCK, 'corrugated');
-    wall(DOCK, 3, 4, 10, 4, { tex: 'rope', scale: 2 });                               // coiled lines on the shed wall
-
-    // ---- 9: HARBOUR — open water off the dock edge; you can fall in ----
-    const WATER = S([[3, 0.2], [17.5, 0.2], [17.5, 1.2], [3, 1.2]],
-      { sky: true, ceil: 3.0, floor: -0.45, floorTex: 'water' });
-    fillTex(WATER, 'limestone');
-
-    // ---- 10: ALLEY — crooked service cut between plaza and dock ----
-    const ALLEY = S([[17.5, 1.2], [19, 1.2], [19, 2.6], [18.4, 2.6], [18.4, 4], [17.5, 4]],
-      { sky: true, ceil: 2.7, floor: 0.15, floorTex: 'cobble' });
-    fillTex(ALLEY, 'corrugated');
-    wall(ALLEY, 19, 1.2, 19, 2.6, { tex: 'mural' });
-    wall(ALLEY, 18.4, 2.6, 18.4, 4, { tex: 'sandbag' });
-
-    // ---- 11: THE BOAT — moored at the dock's west end; the way home ----
-    const BOAT = S([[1.4, 1.4], [3, 1.4], [3, 2.8], [1.4, 2.8]],
-      { sky: true, ceil: 3.0, floor: 0.1, floorTex: 'wood', win: true });
-    fillTex(BOAT, 'wood');
-
-    // door tags live on one side; buildGraph mirrors them onto the twin wall
-    wall(PLAZA, 10, 4, 12, 4, { door: 'blast' });                                     // the harbour gate
-
-    const ents = [
-      // the fallen contact, the tools, the goal
-      { kind: 'agent', x: 5.2, y: 15.5 },          // 004, under the colonnade
-      { kind: 'desk', x: 9, y: 18.2 },             // Volkov's desk (punch card)
-      { kind: 'tube', x: 22.6, y: 10.2 },          // the missing tube, locked in the shop
-      // the opposition
-      { kind: 'goon', x: 14.8, y: 11.2 }, { kind: 'goon', x: 16.4, y: 8.2 },
-      { kind: 'goon', x: 15, y: 15.4 }, { kind: 'goon', x: 2.4, y: 12.6 },
-      { kind: 'goon', x: 8, y: 2.6 },
-      { kind: 'goon', x: 14.5, y: 2.4 }, { kind: 'goon', x: 21, y: 12.6 },
-      { kind: 'brute', x: 11, y: 6 },              // posted at the harbour gate
-      { kind: 'sniper', x: 18.7, y: 2.3 },         // covers the gate from the alley
-      // the living square: locals who want no part of this
-      { kind: 'civilianF', x: 12.5, y: 9, behavior: 'wander' },
-      { kind: 'civilianM', x: 3, y: 7.5, behavior: 'wander' },
-      { kind: 'civilianM', x: 2.5, y: 13, behavior: 'stationary' },
-      // supplies
-      { kind: 'medkit', x: 1.9, y: 13.4 }, { kind: 'medkit', x: 8, y: 17.2 },
-      { kind: 'medkit', x: 16.5, y: 3.3 }, { kind: 'medkit', x: 4.8, y: 4.8 },
-      { kind: 'ammo', x: 11.8, y: 15.6 }, { kind: 'ammo', x: 16.5, y: 6.2 },
-      { kind: 'ammo', x: 4, y: 3.4 }, { kind: 'ammo', x: 20, y: 10 },
-      // the living square
-      { kind: 'plant', x: 4.7, y: 5.6 }, { kind: 'plant', x: 18.2, y: 13.2 },
-      { kind: 'plant', x: 1.8, y: 5.8 }, { kind: 'plant', x: 18.5, y: 15.8 },
-      { kind: 'streetlamp', x: 8.5, y: 5 }, { kind: 'streetlamp', x: 14.5, y: 12.5 },
-      { kind: 'streetlamp', x: 6.5, y: 2 },
-      { kind: 'bar', x: 2, y: 6.8 }, { kind: 'umbrella', x: 3.2, y: 11.9 },
-      { kind: 'wallclock', x: 2.2, y: 11.5 }, { kind: 'cigarcrate', x: 2.2, y: 9.8 },
-      { kind: 'cigarcrate', x: 5, y: 1.9 }, { kind: 'cigarcrate', x: 15.8, y: 1.8 },
-      // the shop's working clutter
-      { kind: 'deskfan', x: 20, y: 13 }, { kind: 'typewriter', x: 21.5, y: 9.9 },
-      { kind: 'filecab', x: 19.8, y: 10 }, { kind: 'safe', x: 23, y: 13 },
-      // the study's secrets
-      { kind: 'camera', x: 10, y: 18.4 }, { kind: 'globe', x: 8, y: 18.3 },
-      { kind: 'briefcase', x: 10.1, y: 17.1 },
-    ];
-
-    return {
-      v: 5, w: 26, h: 20,
-      map: Array.from({ length: 20 }, () => '.'.repeat(26)),
-      spawn: { x: 5.2, y: 12.6, a: 0 },
-      ents,
-      geo: { verts, sectors },
-      // the intro narrates that your cover is ALREADY blown when the mission starts
-      // (dead colleague, henchmen already hunting) — this mission predates the Cover
-      // system and keeps its always-hostile feel; new levels default Undercover.
-      blown: true,
-    };
-  })();
+  ],
+  "blown": false,
+  "geo": {
+    "verts": [
+      {
+        "x": 17,
+        "y": 2.5
+      },
+      {
+        "x": 17,
+        "y": 14
+      },
+      {
+        "x": 11,
+        "y": 14
+      },
+      {
+        "x": 11,
+        "y": 21.5
+      },
+      {
+        "x": 20,
+        "y": 21.5
+      },
+      {
+        "x": 20,
+        "y": 17
+      },
+      {
+        "x": 26,
+        "y": 17
+      },
+      {
+        "x": 26,
+        "y": 22
+      },
+      {
+        "x": 31.5,
+        "y": 22
+      },
+      {
+        "x": 31.5,
+        "y": 15
+      },
+      {
+        "x": 27,
+        "y": 15
+      },
+      {
+        "x": 27,
+        "y": 10.5
+      },
+      {
+        "x": 32,
+        "y": 10.5
+      },
+      {
+        "x": 32,
+        "y": 2.5
+      },
+      {
+        "x": 25.5,
+        "y": 2.5
+      },
+      {
+        "x": 25.5,
+        "y": 8
+      },
+      {
+        "x": 19.5,
+        "y": 8
+      },
+      {
+        "x": 19.5,
+        "y": 2.5
+      },
+      {
+        "x": 22,
+        "y": 10
+      },
+      {
+        "x": 22.5,
+        "y": 10
+      },
+      {
+        "x": 22.5,
+        "y": 10.5
+      },
+      {
+        "x": 23,
+        "y": 11
+      },
+      {
+        "x": 23,
+        "y": 12.5
+      },
+      {
+        "x": 21.5,
+        "y": 12.5
+      },
+      {
+        "x": 21.5,
+        "y": 11
+      },
+      {
+        "x": 22,
+        "y": 10.5
+      },
+      {
+        "x": 21.5,
+        "y": 17
+      },
+      {
+        "x": 24,
+        "y": 17
+      },
+      {
+        "x": 24,
+        "y": 25.5
+      },
+      {
+        "x": 21.5,
+        "y": 25.5
+      },
+      {
+        "x": 22,
+        "y": 13
+      },
+      {
+        "x": 22,
+        "y": 13.5
+      },
+      {
+        "x": 22.5,
+        "y": 13
+      },
+      {
+        "x": 22.5,
+        "y": 13
+      },
+      {
+        "x": 22.5,
+        "y": 13.5
+      },
+      {
+        "x": 21.5,
+        "y": 23.5
+      },
+      {
+        "x": 11,
+        "y": 23.5
+      },
+      {
+        "x": 11,
+        "y": 33
+      },
+      {
+        "x": 13,
+        "y": 25.5
+      },
+      {
+        "x": 27.5,
+        "y": 33
+      },
+      {
+        "x": 13,
+        "y": 31.5
+      },
+      {
+        "x": 27.5,
+        "y": 31.5
+      },
+      {
+        "x": 28,
+        "y": 22
+      },
+      {
+        "x": 30,
+        "y": 22
+      },
+      {
+        "x": 28,
+        "y": 30
+      },
+      {
+        "x": 30,
+        "y": 30
+      },
+      {
+        "x": 30,
+        "y": 34
+      },
+      {
+        "x": 31,
+        "y": 31.5
+      },
+      {
+        "x": 28.5,
+        "y": 34
+      },
+      {
+        "x": 31,
+        "y": 33
+      },
+      {
+        "x": 32,
+        "y": 5
+      },
+      {
+        "x": 32,
+        "y": 6
+      },
+      {
+        "x": 32.5,
+        "y": 5
+      },
+      {
+        "x": 32.5,
+        "y": 6
+      },
+      {
+        "x": 17,
+        "y": 9.5
+      },
+      {
+        "x": 17,
+        "y": 10
+      },
+      {
+        "x": 11,
+        "y": 24.5
+      },
+      {
+        "x": 11,
+        "y": 25
+      },
+      {
+        "x": 7,
+        "y": 7
+      },
+      {
+        "x": 7,
+        "y": 25
+      },
+      {
+        "x": 7.5,
+        "y": 24.5
+      },
+      {
+        "x": 7.5,
+        "y": 7
+      },
+      {
+        "x": 7.5,
+        "y": 9.5
+      },
+      {
+        "x": 7.5,
+        "y": 10
+      },
+      {
+        "x": 19.5,
+        "y": 4.5
+      },
+      {
+        "x": 19.5,
+        "y": 5
+      },
+      {
+        "x": 25.5,
+        "y": 4.5
+      },
+      {
+        "x": 25.5,
+        "y": 5
+      },
+      {
+        "x": 22,
+        "y": 5
+      },
+      {
+        "x": 23,
+        "y": 5
+      },
+      {
+        "x": 22,
+        "y": 5.5
+      },
+      {
+        "x": 20,
+        "y": 7.5
+      },
+      {
+        "x": 25,
+        "y": 7.5
+      },
+      {
+        "x": 25,
+        "y": 5.5
+      },
+      {
+        "x": 23,
+        "y": 5.5
+      },
+      {
+        "x": 21,
+        "y": 6
+      },
+      {
+        "x": 20,
+        "y": 6
+      },
+      {
+        "x": 22.5,
+        "y": 7.5
+      },
+      {
+        "x": 23,
+        "y": 7.5
+      },
+      {
+        "x": 23,
+        "y": 8
+      },
+      {
+        "x": 22.5,
+        "y": 8
+      },
+      {
+        "x": 27,
+        "y": 11
+      },
+      {
+        "x": 27,
+        "y": 12
+      },
+      {
+        "x": 27.5,
+        "y": 11
+      },
+      {
+        "x": 27.5,
+        "y": 12
+      },
+      {
+        "x": 13,
+        "y": 6.5
+      },
+      {
+        "x": 14.5,
+        "y": 0.5
+      },
+      {
+        "x": 1,
+        "y": 1
+      },
+      {
+        "x": 2,
+        "y": 7
+      },
+      {
+        "x": 27,
+        "y": 13
+      },
+      {
+        "x": 27,
+        "y": 14
+      },
+      {
+        "x": 28,
+        "y": 13
+      },
+      {
+        "x": 28,
+        "y": 14
+      },
+      {
+        "x": 32.5,
+        "y": 31.5
+      },
+      {
+        "x": 32.5,
+        "y": 10.5
+      },
+      {
+        "x": 33.5,
+        "y": 10.5
+      },
+      {
+        "x": 33.5,
+        "y": 33
+      },
+      {
+        "x": 28,
+        "y": 11
+      },
+      {
+        "x": 31.5,
+        "y": 11
+      },
+      {
+        "x": 31.5,
+        "y": 13
+      },
+      {
+        "x": 28,
+        "y": 14.5
+      },
+      {
+        "x": 31.5,
+        "y": 12.5
+      },
+      {
+        "x": 31.5,
+        "y": 12
+      },
+      {
+        "x": 32.5,
+        "y": 12
+      },
+      {
+        "x": 32.5,
+        "y": 12.5
+      },
+      {
+        "x": 29,
+        "y": 14.5
+      },
+      {
+        "x": 29,
+        "y": 13
+      },
+      {
+        "x": 27.5,
+        "y": 2.5
+      },
+      {
+        "x": 30,
+        "y": 2.5
+      },
+      {
+        "x": 27.5,
+        "y": 0.5
+      },
+      {
+        "x": 30,
+        "y": 0.5
+      },
+      {
+        "x": 31.5,
+        "y": 17
+      },
+      {
+        "x": 31.5,
+        "y": 19
+      },
+      {
+        "x": 32,
+        "y": 17.5
+      },
+      {
+        "x": 32,
+        "y": 18.5
+      },
+      {
+        "x": 12.5,
+        "y": 13
+      },
+      {
+        "x": 32,
+        "y": 7
+      },
+      {
+        "x": 32,
+        "y": 8
+      },
+      {
+        "x": 32.5,
+        "y": 8
+      },
+      {
+        "x": 32.5,
+        "y": 7
+      },
+      {
+        "x": 32.5,
+        "y": 6.5
+      },
+      {
+        "x": 37,
+        "y": 6.5
+      },
+      {
+        "x": 37,
+        "y": 12
+      },
+      {
+        "x": 35,
+        "y": 12
+      },
+      {
+        "x": 35,
+        "y": 8.5
+      },
+      {
+        "x": 32.5,
+        "y": 8.5
+      },
+      {
+        "x": 33.5,
+        "y": 13
+      },
+      {
+        "x": 33.5,
+        "y": 14
+      },
+      {
+        "x": 34.5,
+        "y": 13
+      },
+      {
+        "x": 34.5,
+        "y": 14
+      },
+      {
+        "x": 34.5,
+        "y": 12.5
+      },
+      {
+        "x": 38,
+        "y": 12.5
+      },
+      {
+        "x": 38,
+        "y": 15.5
+      },
+      {
+        "x": 34.5,
+        "y": 15.5
+      }
+    ],
+    "sectors": [
+      {
+        "loop": [
+          17,
+          64,
+          65,
+          16,
+          80,
+          79,
+          15,
+          67,
+          66,
+          14,
+          107,
+          108,
+          13,
+          50,
+          51,
+          116,
+          117,
+          12,
+          11,
+          81,
+          82,
+          89,
+          90,
+          10,
+          9,
+          111,
+          113,
+          114,
+          112,
+          8,
+          43,
+          42,
+          7,
+          6,
+          27,
+          26,
+          5,
+          4,
+          3,
+          2,
+          115,
+          1,
+          55,
+          54,
+          0
+        ],
+        "floor": 0.3,
+        "ceil": 3.3,
+        "floorTex": "tile",
+        "ceilTex": "ceiltile",
+        "sky": true,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          "windowrow",
+          "windowrow",
+          "windowrow",
+          "windowrow",
+          "windowrow",
+          "windowrow",
+          "windowrow",
+          "brick",
+          "windowrow",
+          null,
+          "balconywin",
+          "brick",
+          "windowrow",
+          "windowrow",
+          "windowrow",
+          "azulejo",
+          "azulejo",
+          "stucco",
+          "azulejo",
+          "brick",
+          "azulejo",
+          "brick",
+          "stucco",
+          "stucco",
+          null,
+          "stucco",
+          "stucco"
+        ],
+        "wallTexScale": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0.5,
+          1,
+          1,
+          1,
+          1,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          1
+        ],
+        "wallStepTex": [
+          null,
+          null,
+          null,
+          null,
+          "stucco",
+          "windowrow",
+          null,
+          null,
+          null,
+          "balconywin",
+          "brick",
+          null,
+          "brick",
+          "windowrow",
+          null,
+          "brick",
+          "stucco",
+          "azulejo",
+          null,
+          "azulejo",
+          "brick",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "brick",
+          null,
+          "brick",
+          null,
+          "brick"
+        ],
+        "wallStepFloorTex": [
+          null,
+          null,
+          null,
+          null,
+          "teak",
+          null,
+          null,
+          null,
+          null,
+          null,
+          "brick",
+          null,
+          null,
+          "limestone",
+          null,
+          null,
+          null,
+          "azulejo",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "wallDecal": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "wallmap",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          18,
+          19,
+          20,
+          21,
+          22,
+          32,
+          33,
+          34,
+          31,
+          30,
+          23,
+          24,
+          25
+        ],
+        "floor": 0,
+        "ceil": 3.1,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": 0,
+        "solid": true
+      },
+      {
+        "loop": [
+          27,
+          28,
+          29,
+          35,
+          26
+        ],
+        "floor": 0.2,
+        "ceil": 1.7,
+        "floorTex": "water",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": true,
+        "texScale": 1,
+        "wallTex": [
+          "stucco",
+          "stucco",
+          null,
+          "stucco",
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          29,
+          38,
+          40,
+          41,
+          39,
+          37,
+          57,
+          56,
+          36,
+          35
+        ],
+        "floor": 0.2,
+        "ceil": 1.7,
+        "floorTex": "water",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          "stucco",
+          "stucco",
+          "stucco",
+          "water",
+          "stucco",
+          "stucco",
+          "stucco",
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          43,
+          45,
+          44,
+          42
+        ],
+        "floor": 0.5,
+        "ceil": 1.7,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": true,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          45,
+          47,
+          49,
+          46,
+          48,
+          39,
+          41,
+          44
+        ],
+        "floor": 0.1,
+        "ceil": 2.3,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": true,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          null,
+          null,
+          "brick",
+          "brick",
+          null,
+          null,
+          null,
+          null
+        ],
+        "wallStepTex": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "water",
+          null,
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          50,
+          52,
+          53,
+          51
+        ],
+        "floor": 0.4,
+        "ceil": 1.4,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          "stucco",
+          "doorwood",
+          "stucco",
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          57,
+          59,
+          58,
+          61,
+          62,
+          63,
+          60,
+          56
+        ],
+        "floor": 0.6,
+        "ceil": 1.3,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          62,
+          54,
+          55,
+          63
+        ],
+        "floor": 0.7,
+        "ceil": 1.3,
+        "floorTex": "teak",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          64,
+          66,
+          67,
+          69,
+          68,
+          65
+        ],
+        "floor": 0.3,
+        "ceil": 1.3,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          "stucco",
+          null,
+          "stucco",
+          null,
+          "stucco",
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          69,
+          74,
+          73,
+          72,
+          78,
+          77,
+          71,
+          76,
+          75,
+          70,
+          68
+        ],
+        "floor": 0,
+        "ceil": 1.2,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          "teak",
+          "stucco",
+          "stucco",
+          "stucco",
+          "teak",
+          "stucco",
+          "stucco",
+          "stucco",
+          "stucco",
+          "stucco"
+        ],
+        "wallStepTex": [
+          null,
+          null,
+          null,
+          null,
+          "stucco",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "wallStepFloorTex": [
+          null,
+          null,
+          null,
+          null,
+          "stucco",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          80,
+          77,
+          78,
+          79
+        ],
+        "floor": 0.5,
+        "ceil": 1,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          "stucco",
+          null,
+          "stucco",
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          81,
+          83,
+          84,
+          82
+        ],
+        "floor": 0.7,
+        "ceil": 1.7,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          "azulejo",
+          "mural",
+          "azulejo",
+          "brick"
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          58,
+          88,
+          87,
+          86,
+          85,
+          61
+        ],
+        "floor": 0,
+        "ceil": 3.4,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": true,
+        "win": false,
+        "hostile": true,
+        "texScale": 1,
+        "wallTex": [
+          "wood",
+          "wood",
+          "wood",
+          "wood",
+          "wood",
+          null
+        ],
+        "wallTexScale": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "wallStepTex": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "wood"
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          89,
+          91,
+          92,
+          90
+        ],
+        "floor": 0.4,
+        "ceil": 1.6,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": true,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          47,
+          93,
+          104,
+          103,
+          94,
+          95,
+          126,
+          127,
+          96,
+          49
+        ],
+        "floor": 0.4,
+        "ceil": 1.4,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          null,
+          null,
+          null,
+          "brick",
+          null,
+          null,
+          null,
+          null
+        ],
+        "wallStepTex": [
+          null,
+          null,
+          "brick",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          91,
+          97,
+          98,
+          102,
+          101,
+          99,
+          106,
+          105,
+          100,
+          92
+        ],
+        "floor": 0.4,
+        "ceil": 1.8,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallStepTex": [
+          null,
+          null,
+          null,
+          "brick",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          104,
+          101,
+          102,
+          103
+        ],
+        "floor": 0.7,
+        "ceil": 1.2,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          107,
+          109,
+          110,
+          108
+        ],
+        "floor": 0.4,
+        "ceil": 1.6,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          116,
+          119,
+          118,
+          117
+        ],
+        "floor": 0,
+        "ceil": 1,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          119,
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          118
+        ],
+        "floor": 0,
+        "ceil": 1,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          126,
+          128,
+          129,
+          127
+        ],
+        "floor": 0,
+        "ceil": 1,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          128,
+          130,
+          131,
+          132,
+          133,
+          129
+        ],
+        "floor": 0,
+        "ceil": 1,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      }
+    ]
+  }
+};
 
   // ---- level state ----
   let MW = 0, MH = 0;
@@ -391,7 +2106,8 @@ const World = (() => {
       sectors.push({
         loop, floor: s.f, ceil: s.c, floorTex: s.ft, ceilTex: s.ct,
         sky: s.sky, win: s.win, hostile: false, fsx: s.fsx, fsy: s.fsy,
-        wallTex, wallCell, wallStepTex: wallTex.map(() => null), wallStepFloorTex: wallTex.map(() => null), parent: -1,
+        wallTex, wallCell, wallStepTex: wallTex.map(() => null), wallStepFloorTex: wallTex.map(() => null),
+        wallDecal: wallTex.map(() => null), parent: -1,
       });
       for (let yy = r.y0; yy <= r.y1; yy++) for (let xx = r.x0; xx <= r.x1; xx++) cellSector[yy * MW + xx] = si;
     }
@@ -1068,6 +2784,62 @@ const World = (() => {
     g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 59, 64, 5);
   });
 
+  FLOOR.rockwall = cnv(g => {                           // rough natural stone / cliff face
+    vgrad(g, 0, 0, 64, 64, '#8c887e', '#5e5a52');
+    const cols = ['#7a7668', '#67635a', '#918c7e', '#544f47', '#847e70'];
+    for (let i = 0; i < 22; i++) {                       // jagged overlapping boulder facets
+      const x = Math.random() * 70 - 3, y = Math.random() * 70 - 3, r = 6 + Math.random() * 9;
+      g.fillStyle = cols[(Math.random() * cols.length) | 0];
+      g.beginPath();
+      const pts = 6 + ((Math.random() * 3) | 0);
+      for (let k = 0; k < pts; k++) { const a = (k / pts) * 7, rr = r * (0.7 + Math.random() * 0.4); const px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr; k ? g.lineTo(px, py) : g.moveTo(px, py); }
+      g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.22)'; g.lineWidth = 0.8; g.stroke();
+      g.strokeStyle = 'rgba(255,255,255,0.08)'; g.lineWidth = 0.6; g.beginPath(); g.moveTo(x - r * 0.3, y - r * 0.3); g.lineTo(x + r * 0.2, y - r * 0.1); g.stroke();
+    }
+    speck(g, 90, 'rgba(0,0,0,0.15)'); speck(g, 50, 'rgba(255,255,255,0.06)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,255,255,0.06)', 'rgba(0,0,0,0.3)');
+  });
+
+  FLOOR.mossyrock = cnv(g => {                          // rockwall's damp, overgrown cousin — garden/jungle walls
+    vgrad(g, 0, 0, 64, 64, '#6e7860', '#454c38');
+    const cols = ['#5e6650', '#4c5340', '#727a5c', '#3e4432'];
+    for (let i = 0; i < 20; i++) {
+      const x = Math.random() * 70 - 3, y = Math.random() * 70 - 3, r = 6 + Math.random() * 9;
+      g.fillStyle = cols[(Math.random() * cols.length) | 0];
+      g.beginPath();
+      const pts = 6 + ((Math.random() * 3) | 0);
+      for (let k = 0; k < pts; k++) { const a = (k / pts) * 7, rr = r * (0.7 + Math.random() * 0.4); const px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr; k ? g.lineTo(px, py) : g.moveTo(px, py); }
+      g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.24)'; g.lineWidth = 0.8; g.stroke();
+    }
+    g.fillStyle = 'rgba(90,120,50,0.35)';                // moss patches, thickest low on the wall
+    for (let i = 0; i < 14; i++) { const x = Math.random() * 64, y = 24 + Math.random() * 40, r = 3 + Math.random() * 5; g.beginPath(); g.ellipse(x, y, r, r * 0.6, Math.random(), 0, 7); g.fill(); }
+    speck(g, 70, 'rgba(0,0,0,0.15)'); speck(g, 40, 'rgba(200,230,150,0.08)');
+    bevel(g, 0, 0, 64, 64, 'rgba(200,220,160,0.06)', 'rgba(0,0,0,0.32)');
+  });
+
+  FLOOR.pond = cnv(g => {                               // still garden pond — calmer/greener than the fountain's `water`
+    vgrad(g, 0, 0, 64, 64, '#3a6650', '#1f4234');
+    g.strokeStyle = 'rgba(160,220,190,0.16)'; g.lineWidth = 1;
+    for (let k = 0; k < 6; k++) { const y = 6 + k * 10; g.beginPath(); g.moveTo(0, y); for (let x = 0; x <= 64; x += 8) g.lineTo(x, y + Math.sin(x * 0.3 + k) * 1.6); g.stroke(); }
+    g.fillStyle = 'rgba(60,110,70,0.4)';                 // lily pads
+    for (const [x, y, r] of [[14, 18, 5], [42, 30, 6], [24, 46, 4.5], [50, 12, 4]]) { g.beginPath(); g.ellipse(x, y, r, r * 0.75, 0.3, 0, 7); g.fill(); g.beginPath(); g.moveTo(x, y); g.lineTo(x + r, y - r * 0.2); g.stroke(); }
+    g.fillStyle = 'rgba(255,255,255,0.1)'; for (let i = 0; i < 8; i++) g.fillRect((Math.random() * 64) | 0, (Math.random() * 64) | 0, 2, 1);
+  });
+
+  FLOOR.wetstone = cnv(g => {                           // rain-slicked stone/cobble — dockside, alleys after a storm
+    g.fillStyle = '#3a3834'; g.fillRect(0, 0, 64, 64);   // dark wet grout
+    for (let ty = 0; ty < 5; ty++) for (let tx = 0; tx < 5; tx++) {
+      const off = (ty % 2) * 6, x = tx * 13 + off - 4, y = ty * 13, r = 5 + Math.random() * 2;
+      g.fillStyle = ['#4c4a46', '#403e3a', '#565450', '#38362f'][(tx + ty) % 4];
+      g.beginPath(); g.ellipse(x + 6, y + 6, r, r * 0.85, Math.random(), 0, 7); g.fill();
+      g.fillStyle = 'rgba(180,210,230,0.22)'; g.beginPath(); g.ellipse(x + 4.5, y + 4.5, r * 0.4, r * 0.3, 0, 0, 7); g.fill();  // wet specular highlight
+    }
+    g.fillStyle = 'rgba(140,180,210,0.06)'; g.fillRect(0, 0, 64, 64);
+    speck(g, 40, 'rgba(255,255,255,0.05)');
+  });
+
   // ---- parallax sky (wide; sampled by view angle): warm Havana afternoon ----
   const SKY = cnv(g => {
     const grd = g.createLinearGradient(0, 0, 0, 96);
@@ -1096,7 +2868,7 @@ const World = (() => {
   // realism pass: fine per-texel grain over every texture — flat vector fills
   // read as plastic; a whisper of noise reads as material. Water stays clean.
   for (const n of Object.keys(TX)) {
-    if (n === 'water') continue;
+    if (n === 'water' || n === 'pond') continue;
     const c = TX[n], gt = c.getContext('2d');
     speck(gt, 80, 'rgba(0,0,0,0.05)', c.width, c.height);
     speck(gt, 55, 'rgba(255,246,220,0.04)', c.width, c.height);
@@ -1107,6 +2879,7 @@ const World = (() => {
     'ceiltile', 'ground', 'helipad', 'rattan', 'azulejo', 'cork', 'corrugated', 'awning', 'limestone',
     'terrazzo', 'rooftile', 'mural', 'sandbag', 'rope', 'windowrow', 'balconywin', 'shopfront',
     'doorwood', 'doorarch', 'doubledoor', 'windowbars', 'windowshut',
+    'rockwall', 'mossyrock', 'pond', 'wetstone',
     'radio', 'blast', 'mainframe', 'poster'];
   const WALLTX = { 1: 'teak', 2: 'lair', 3: 'blast', 4: 'radio', 5: 'mainframe', 6: 'poster' };
   const wallTexName = (x, y) => {
@@ -1689,6 +3462,109 @@ const World = (() => {
     g.fillStyle = '#d84040'; g.beginPath(); g.arc(24.4, 13.4, 1.8, 0, 7); g.fill();       // a flower behind the ear
   });
 
+  SPR.drz = outlined(g => {                                          // Dr. Z — balding mad scientist, wild side-hair, lab coat
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
+    g.fillStyle = '#1c1e22'; g.fillRect(27, 55, 4, 7); g.fillRect(33, 55, 4, 7);
+    g.fillStyle = '#0c0d10'; g.fillRect(26, 59.6, 6, 3); g.fillRect(32, 59.6, 6, 3);
+    let coat = g.createLinearGradient(18, 27, 46, 56);                                    // lab coat, off-white
+    coat.addColorStop(0, '#eeeadf'); coat.addColorStop(0.5, '#cfcab9'); coat.addColorStop(1, '#9a9484');
+    g.fillStyle = coat;
+    g.beginPath(); g.moveTo(23, 30); g.quadraticCurveTo(32, 26, 41, 30); g.lineTo(45, 55); g.lineTo(19, 55); g.closePath(); g.fill();
+    // lapels — folded collar catching the light, breaks up the flat coat front
+    g.fillStyle = 'rgba(255,255,255,0.3)'; g.beginPath(); g.moveTo(26, 30); g.lineTo(31, 34); g.lineTo(29, 38); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(0,0,0,0.14)'; g.beginPath(); g.moveTo(38, 30); g.lineTo(33, 34); g.lineTo(35, 38); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(32, 34); g.lineTo(32, 55); g.stroke();
+    g.fillStyle = '#2b2e34'; g.fillRect(29.6, 30.4, 4.8, 4.2);                              // dark shirt/tie sliver under lapels
+    g.strokeStyle = 'rgba(0,0,0,0.12)'; g.lineWidth = 0.6;
+    g.beginPath(); g.moveTo(24, 44); g.lineTo(26.4, 51); g.stroke(); g.beginPath(); g.moveTo(40, 44); g.lineTo(37.6, 51); g.stroke(); // hem creases
+    g.fillStyle = '#8a8478'; g.strokeStyle = '#6f6a5e'; g.lineWidth = 0.5;
+    g.fillRect(23.6, 40, 4.4, 3.4); g.strokeRect(23.6, 40, 4.4, 3.4);                      // breast pocket
+    g.fillStyle = '#b23a2c'; g.fillRect(24.2, 39.4, 0.8, 3);                               // red pen clipped in pocket
+    g.fillStyle = '#3a5fae'; g.fillRect(25.4, 39.4, 0.8, 3);                               // blue pen
+    g.strokeStyle = '#c9c4b4'; g.lineWidth = 4.2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(23, 32); g.lineTo(16, 40); g.stroke();
+    g.beginPath(); g.moveTo(41, 32); g.lineTo(48, 40); g.stroke();
+    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(15.4, 41, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(48.6, 41, 2.4, 0, 7); g.fill();
+    // head — high balding dome, hair swept to the sides only
+    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(32, 18.6, 7.4, 0, 7); g.fill();
+    g.fillStyle = 'rgba(90,50,25,0.22)'; g.beginPath(); g.ellipse(34.4, 20.8, 3.6, 2.6, -0.15, 0, 7); g.fill();  // cheek shade
+    g.fillStyle = 'rgba(255,255,255,0.22)'; g.beginPath(); g.ellipse(29.4, 13.4, 4.4, 3, -0.3, 0, 7); g.fill(); // bald-dome shine
+    // wild white side/back hair — spiky static-shocked tufts, NOT a solid halo: hairline stays low+bald on top
+    let hair = g.createLinearGradient(14, 10, 50, 24);
+    hair.addColorStop(0, '#f4f4f0'); hair.addColorStop(1, '#c9c4b4');
+    g.fillStyle = hair;
+    const tuft = (hx, hy, rot, len, w) => {
+      g.save(); g.translate(hx, hy); g.rotate(rot);
+      g.beginPath(); g.moveTo(-w, 1); g.quadraticCurveTo(-w * 0.3, -len * 0.6, 0, -len); g.quadraticCurveTo(w * 0.3, -len * 0.6, w, 1); g.closePath(); g.fill();
+      g.restore();
+    };
+    // left side burst
+    tuft(21, 17, -1.9, 7, 2.2); tuft(19.5, 15, -2.3, 6, 1.8); tuft(23, 14.5, -1.5, 6.5, 1.9); tuft(20, 20, -2.6, 5, 1.6);
+    // right side burst
+    tuft(43, 17, 1.9, 7, 2.2); tuft(44.5, 15, 2.3, 6, 1.8); tuft(41, 14.5, 1.5, 6.5, 1.9); tuft(44, 20, 2.6, 5, 1.6);
+    // a few wisps combed back over the crown (thin, sparse — reads as balding, not covered)
+    g.strokeStyle = hair; g.lineWidth = 1.1; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(26, 12.5); g.quadraticCurveTo(29, 10.2, 32.5, 11.4); g.stroke();
+    g.beginPath(); g.moveTo(35, 11.6); g.quadraticCurveTo(31.5, 9.6, 27.5, 10.8); g.stroke();
+    g.fillStyle = '#3a3a3a'; g.fillRect(28.6, 22.4, 1.6, 1); g.fillRect(35.8, 22.4, 1.6, 1);    // bushy brows
+    g.strokeStyle = '#1c1e22'; g.lineWidth = 1; g.beginPath(); g.arc(29, 20, 2.6, 0, 7); g.stroke(); g.beginPath(); g.arc(35, 20, 2.6, 0, 7); g.stroke();  // round glasses
+    g.beginPath(); g.moveTo(31.6, 20); g.lineTo(32.4, 20); g.stroke();
+    g.beginPath(); g.moveTo(26.6, 19.4); g.lineTo(24.6, 18.4); g.stroke(); g.beginPath(); g.moveTo(37.4, 19.4); g.lineTo(39.4, 18.4); g.stroke(); // temple arms
+    g.fillStyle = 'rgba(160,215,235,0.4)'; g.beginPath(); g.arc(29, 20, 2.2, 0, 7); g.fill(); g.beginPath(); g.arc(35, 20, 2.2, 0, 7); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.55)'; g.beginPath(); g.arc(28.2, 19.2, 0.7, 0, 7); g.fill(); g.beginPath(); g.arc(34.2, 19.2, 0.7, 0, 7); g.fill(); // lens glint
+    g.strokeStyle = '#8a5a3a'; g.lineWidth = 1.1; g.lineCap = 'round'; g.beginPath(); g.moveTo(28.2, 24.6); g.quadraticCurveTo(32, 25.6, 35.8, 24.6); g.stroke(); // faint smile line, not a bar
+  });
+
+  SPR.defector = outlined(g => {                                     // the defector — nervous, sharp suit, glancing back
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
+    g.fillStyle = '#1c1e22'; g.fillRect(27, 55, 4, 7); g.fillRect(33, 55, 4, 7);
+    g.fillStyle = '#0c0d10'; g.fillRect(26, 59.6, 6, 3); g.fillRect(32, 59.6, 6, 3);
+    let su = g.createLinearGradient(18, 27, 46, 56);                                     // charcoal suit
+    su.addColorStop(0, '#4a4e58'); su.addColorStop(0.5, '#33363e'); su.addColorStop(1, '#1e2026');
+    g.fillStyle = su;
+    g.beginPath(); g.moveTo(23, 30); g.quadraticCurveTo(32, 26, 41, 30); g.lineTo(45, 55); g.lineTo(19, 55); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.08)'; g.beginPath(); g.moveTo(26, 31); g.lineTo(30, 42); g.lineTo(27, 55); g.lineTo(23, 55); g.closePath(); g.fill();
+    let sh = g.createLinearGradient(29, 30, 35, 40);
+    sh.addColorStop(0, '#f0ece0'); sh.addColorStop(1, '#c9c4b4');
+    g.fillStyle = sh; g.beginPath(); g.moveTo(29.4, 30); g.lineTo(32, 40); g.lineTo(34.6, 30); g.closePath(); g.fill();
+    g.fillStyle = '#701818'; g.fillRect(31, 30.6, 2, 9);                                  // tie
+    g.strokeStyle = '#33363e'; g.lineWidth = 4.2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(23, 32); g.lineTo(17, 41); g.lineTo(19, 48); g.stroke();       // one hand clutching a lapel
+    g.beginPath(); g.moveTo(41, 32); g.lineTo(47, 40); g.stroke();
+    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(19, 49, 2.2, 0, 7); g.fill(); g.beginPath(); g.arc(47.6, 40.6, 2.2, 0, 7); g.fill();
+    g.save(); g.translate(32, 19.4); g.rotate(0.32);                                       // head turned, glancing over shoulder
+    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(0, 0, 7.6, 0, 7); g.fill();
+    g.fillStyle = 'rgba(90,50,25,0.3)'; g.beginPath(); g.ellipse(2.6, 2.4, 4, 2.8, -0.15, 0, 7); g.fill();
+    g.fillStyle = '#241a10'; g.fillRect(-2.6, -4.8, 5.4, 1.1);
+    g.fillStyle = '#1c1710'; g.beginPath(); g.ellipse(0, -6, 7.2, 4.2, 0, Math.PI, 0, true); g.fill();  // slicked hair
+    g.restore();
+    g.fillStyle = 'rgba(0,0,0,0.15)'; g.beginPath(); g.ellipse(46, 30, 4, 6, 0.2, 0, 7); g.fill();       // sweat/shadow, on edge
+  });
+
+  SPR.agent005 = outlined(g => {                                     // Agent 005 — sharp navy suit, confident
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
+    g.fillStyle = '#1c1e22'; g.fillRect(27, 55, 4, 7); g.fillRect(33, 55, 4, 7);
+    g.fillStyle = '#0c0d10'; g.fillRect(26, 59.6, 6, 3); g.fillRect(32, 59.6, 6, 3);
+    let su = g.createLinearGradient(18, 27, 46, 56);                                      // navy suit
+    su.addColorStop(0, '#2e3a5c'); su.addColorStop(0.5, '#202a44'); su.addColorStop(1, '#131a2c');
+    g.fillStyle = su;
+    g.beginPath(); g.moveTo(23, 30); g.quadraticCurveTo(32, 26, 41, 30); g.lineTo(45, 55); g.lineTo(19, 55); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.08)'; g.beginPath(); g.moveTo(37, 31); g.lineTo(34, 42); g.lineTo(37, 55); g.lineTo(41, 55); g.closePath(); g.fill();
+    let sh = g.createLinearGradient(29, 30, 35, 40);
+    sh.addColorStop(0, '#f0ece0'); sh.addColorStop(1, '#c9c4b4');
+    g.fillStyle = sh; g.beginPath(); g.moveTo(29.4, 30); g.lineTo(32, 40); g.lineTo(34.6, 30); g.closePath(); g.fill();
+    g.fillStyle = '#8a1414'; g.fillRect(31, 30.6, 2, 9);                                   // tie
+    g.strokeStyle = '#202a44'; g.lineWidth = 4.2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(23, 32); g.lineTo(18, 44); g.stroke();
+    g.beginPath(); g.moveTo(41, 32); g.lineTo(46, 44); g.stroke();
+    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(17.4, 45, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(46.6, 45, 2.4, 0, 7); g.fill();
+    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(32, 19.4, 7.6, 0, 7); g.fill();
+    g.fillStyle = 'rgba(90,50,25,0.3)'; g.beginPath(); g.ellipse(34.6, 21.8, 4, 2.8, -0.15, 0, 7); g.fill();
+    g.fillStyle = '#241a10'; g.beginPath(); g.ellipse(32, 15, 8.6, 6.4, 0, Math.PI, 0, true); g.fill();  // neat dark hair
+    g.fillStyle = '#5e3a24'; g.fillRect(29.4, 24.8, 5.4, 1.1);
+    g.fillStyle = 'rgba(255,255,255,0.7)'; g.beginPath(); g.arc(30, 18.4, 0.7, 0, 7); g.fill();          // a knowing glint in the eye
+  });
+
   // ---------------------------------------------------------------------------
   // OUTDOOR / GENRE PROPS — off the Havana palette, into 1960s spy-thriller
   // territory generally: the parked sedan, the dead-drop phone booth, the
@@ -1716,6 +3592,28 @@ const World = (() => {
     g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(6, 43, 2.4, 3.6); g.fillRect(56, 43, 2.4, 3.6);   // taillight glints
     g.fillStyle = '#8a1414'; g.fillRect(5, 44, 2, 3); g.fillRect(57, 44, 2, 3);
     g.fillStyle = '#c9a227'; g.fillRect(28, 47, 8, 2);                         // rear plate
+  });
+
+  SPR.sportscar = outlined(g => {                                  // sleek red convertible — the getaway, if you earn it
+    g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath(); g.ellipse(32, 56, 30, 5, 0, 0, 7); g.fill();
+    let body = g.createLinearGradient(4, 26, 60, 50);
+    body.addColorStop(0, '#e8382c'); body.addColorStop(0.5, '#b8241a'); body.addColorStop(1, '#6e120c');
+    g.fillStyle = body;
+    g.beginPath();
+    g.moveTo(6, 46); g.quadraticCurveTo(4, 36, 16, 32); g.lineTo(24, 27); g.quadraticCurveTo(32, 25, 40, 27);
+    g.lineTo(48, 32); g.quadraticCurveTo(60, 34, 58, 46); g.quadraticCurveTo(60, 50, 55, 51); g.lineTo(9, 51);
+    g.quadraticCurveTo(4, 50, 6, 46); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.22)'; g.beginPath(); g.moveTo(10, 34); g.quadraticCurveTo(20, 28, 32, 26); g.lineTo(30, 32); g.quadraticCurveTo(18, 34, 12, 42); g.closePath(); g.fill();
+    g.fillStyle = '#3a2018'; g.beginPath(); g.ellipse(32, 33, 11, 4.4, 0, 0, 7); g.fill();     // open cockpit, no roof
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.ellipse(32, 34, 8.6, 3, 0, 0, 7); g.fill();      // seats
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(24, 33); g.lineTo(23, 50); g.moveTo(40, 33); g.lineTo(41, 50); g.stroke();
+    g.fillStyle = '#c9a227'; g.fillRect(29, 40, 6, 2);                                        // door handles
+    g.fillStyle = '#0c0d10'; g.beginPath(); g.ellipse(14, 52, 8, 8, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(50, 52, 8, 8, 0, 0, 7); g.fill();
+    g.fillStyle = '#e8ecf0'; g.beginPath(); g.arc(14, 52, 3.6, 0, 7); g.fill(); g.beginPath(); g.arc(50, 52, 3.6, 0, 7); g.fill();  // chrome hubcaps
+    g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(6, 44, 2.4, 3.6); g.fillRect(56, 44, 2.4, 3.6);
+    g.fillStyle = '#f0d840'; g.fillRect(5, 45, 2, 3); g.fillRect(57, 45, 2, 3);                // amber taillights
+    g.fillStyle = '#e8ecf0'; g.fillRect(28, 48, 8, 2);                                         // chrome rear bumper
   });
 
   SPR.motorcycle = outlined(g => {                                 // chase-scene motorcycle with a sidecar
@@ -2817,6 +4715,98 @@ const World = (() => {
     g.fillStyle = '#c9a227'; g.fillRect(19, 32, 6, 1.4);                    // gold brand plate
   });
 
+  SPR.ciphermachine = outlined(g => {                             // Enigma-esque cipher machine, three rotors + keys
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 60, 20, 3, 0, 0, 7); g.fill();
+    let bd = g.createLinearGradient(0, 30, 0, 58);
+    bd.addColorStop(0, '#5a4a30'); bd.addColorStop(0.5, '#3a3020'); bd.addColorStop(1, '#201810');
+    g.fillStyle = bd; g.fillRect(12, 30, 40, 28);
+    bevel(g, 12, 30, 40, 28, 'rgba(255,240,200,0.2)', 'rgba(0,0,0,0.5)');
+    g.fillStyle = '#0c0d10'; g.fillRect(16, 34, 32, 10);                        // rotor housing recess
+    for (const rx of [22, 32, 42]) {
+      let rot = g.createRadialGradient(rx, 39, 0.5, rx, 39, 4.4);
+      rot.addColorStop(0, '#e8dca0'); rot.addColorStop(0.7, '#a8925a'); rot.addColorStop(1, '#5a4a28');
+      g.fillStyle = rot; g.beginPath(); g.arc(rx, 39, 4.2, 0, 7); g.fill();
+      g.strokeStyle = '#1c1712'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(rx, 39); g.lineTo(rx + 3, 36.6); g.stroke();
+      g.fillStyle = '#1c1712'; g.font = 'bold 5px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('ABC'[(rx / 10) | 0] || 'Q', rx, 40.6);
+    }
+    g.fillStyle = '#1c1e22';                                                    // key rows
+    for (let row = 0; row < 2; row++) for (let col = 0; col < 8; col++) {
+      const kx = 16 + col * 3.6 - row * 1.2, ky = 48 + row * 4;
+      g.beginPath(); g.arc(kx, ky, 1.4, 0, 7); g.fill();
+      g.fillStyle = 'rgba(255,255,255,0.15)'; g.beginPath(); g.arc(kx - 0.4, ky - 0.4, 0.5, 0, 7); g.fill();
+      g.fillStyle = '#1c1e22';
+    }
+    g.fillStyle = '#c9a227'; g.fillRect(14, 31.4, 8, 1.4);                       // brass plate
+  });
+
+  SPR.bomb = outlined(g => {                                      // "the B" — casing on: sealed cylinder + countdown
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 58, 18, 3, 0, 0, 7); g.fill();
+    let cs = g.createLinearGradient(14, 24, 50, 24);
+    cs.addColorStop(0, '#3a3d44'); cs.addColorStop(0.5, '#5a5f68'); cs.addColorStop(1, '#24262c');
+    g.fillStyle = cs; g.fillRect(14, 24, 36, 32);
+    bevel(g, 14, 24, 36, 32, 'rgba(255,255,255,0.2)', 'rgba(0,0,0,0.5)');
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 1; for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(14, 24 + i * 8); g.lineTo(50, 24 + i * 8); g.stroke(); }
+    g.fillStyle = '#0c0d10'; g.fillRect(20, 30, 24, 10);                        // countdown display
+    g.fillStyle = '#e02020'; g.font = 'bold 9px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('00:47', 32, 35.4);
+    g.fillStyle = '#c9302a'; g.beginPath(); g.arc(24, 48, 2.4, 0, 7); g.fill();          // status LEDs
+    g.fillStyle = '#3aa848'; g.beginPath(); g.arc(32, 48, 2.4, 0, 7); g.fill();
+    g.fillStyle = '#3a5ec9'; g.beginPath(); g.arc(40, 48, 2.4, 0, 7); g.fill();
+    g.fillStyle = '#8a8f98'; g.fillRect(18, 20, 4, 6); g.fillRect(42, 20, 4, 6);         // bolt caps top corners
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 0.8; g.strokeRect(18, 20, 4, 6); g.strokeRect(42, 20, 4, 6);
+  });
+  SPR.bombOpen = outlined(g => {                                  // casing removed — red/blue wires exposed
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 58, 18, 3, 0, 0, 7); g.fill();
+    let cs = g.createLinearGradient(14, 24, 50, 24);
+    cs.addColorStop(0, '#3a3d44'); cs.addColorStop(0.5, '#5a5f68'); cs.addColorStop(1, '#24262c');
+    g.fillStyle = cs; g.fillRect(14, 24, 36, 32);
+    bevel(g, 14, 24, 36, 32, 'rgba(255,255,255,0.2)', 'rgba(0,0,0,0.5)');
+    g.fillStyle = '#0c0d10'; g.fillRect(19, 29, 26, 24);                        // open cavity
+    g.fillStyle = '#0c0d10'; g.fillRect(20, 30, 24, 10); g.fillStyle = '#e02020';
+    g.font = 'bold 9px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('00:12', 32, 35.4);
+    g.strokeStyle = '#2050c9'; g.lineWidth = 2.6; g.lineCap = 'round';           // blue wire
+    g.beginPath(); g.moveTo(23, 44); g.quadraticCurveTo(29, 48, 27, 52); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.2)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(23, 44); g.quadraticCurveTo(29, 48, 27, 52); g.stroke();
+    g.strokeStyle = '#c9302a'; g.lineWidth = 2.6; g.lineCap = 'round';          // red wire
+    g.beginPath(); g.moveTo(41, 44); g.quadraticCurveTo(35, 48, 37, 52); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.2)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(41, 44); g.quadraticCurveTo(35, 48, 37, 52); g.stroke();
+    g.fillStyle = '#8a8f98'; g.fillRect(18, 20, 4, 6); g.fillRect(42, 20, 4, 6);
+  });
+
+  SPR.microfichemachine = outlined(g => {                         // viewer, blank screen — idle state
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 60, 20, 3, 0, 0, 7); g.fill();
+    let bd = g.createLinearGradient(0, 20, 0, 58);
+    bd.addColorStop(0, '#5a5f42'); bd.addColorStop(0.5, '#454a30'); bd.addColorStop(1, '#282b1b');
+    g.fillStyle = bd; g.fillRect(12, 42, 40, 16);
+    bevel(g, 12, 42, 40, 16, 'rgba(255,255,255,0.18)', 'rgba(0,0,0,0.5)');
+    g.strokeStyle = '#2a2d33'; g.lineWidth = 3; g.beginPath(); g.moveTo(28, 42); g.lineTo(24, 20); g.stroke();  // gooseneck arm
+    g.beginPath(); g.moveTo(36, 42); g.lineTo(40, 20); g.stroke();
+    let scr = g.createLinearGradient(14, 12, 50, 30);
+    scr.addColorStop(0, '#2a2e26'); scr.addColorStop(1, '#14160f');
+    g.fillStyle = scr; g.fillRect(14, 12, 36, 18);
+    bevel(g, 14, 12, 36, 18, 'rgba(200,220,180,0.15)', 'rgba(0,0,0,0.5)');
+    g.fillStyle = 'rgba(140,200,140,0.4)'; g.font = '6px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('- NO FICHE LOADED -', 32, 21);
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.arc(20, 50, 2.4, 0, 7); g.fill();          // focus knob
+  });
+  SPR.microfichemachineOn = outlined(g => {                        // showing the newspaper article — active state
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 60, 20, 3, 0, 0, 7); g.fill();
+    let bd = g.createLinearGradient(0, 20, 0, 58);
+    bd.addColorStop(0, '#5a5f42'); bd.addColorStop(0.5, '#454a30'); bd.addColorStop(1, '#282b1b');
+    g.fillStyle = bd; g.fillRect(12, 42, 40, 16);
+    bevel(g, 12, 42, 40, 16, 'rgba(255,255,255,0.18)', 'rgba(0,0,0,0.5)');
+    g.strokeStyle = '#2a2d33'; g.lineWidth = 3; g.beginPath(); g.moveTo(28, 42); g.lineTo(24, 20); g.stroke();
+    g.beginPath(); g.moveTo(36, 42); g.lineTo(40, 20); g.stroke();
+    let scr = g.createLinearGradient(14, 12, 50, 30);
+    scr.addColorStop(0, '#e8e4d4'); scr.addColorStop(1, '#c9c4ac');
+    g.fillStyle = scr; g.fillRect(14, 12, 36, 18);
+    bevel(g, 14, 12, 36, 18, 'rgba(255,255,255,0.4)', 'rgba(0,0,0,0.4)');
+    g.fillStyle = '#1c1e22'; g.font = 'bold 6px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('AMBASSADOR', 32, 17); g.fillText('SLAIN IN HK', 32, 23);
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 0.5;
+    for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(17, 26.4 + i * 1.4); g.lineTo(47, 26.4 + i * 1.4); g.stroke(); }
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.arc(20, 50, 2.4, 0, 7); g.fill();
+  });
+
   SPR.disguise = outlined(g => {                                  // novelty glasses/nose/moustache under a tilted fedora
     g.fillStyle = 'rgba(0,0,0,0.26)'; g.beginPath(); g.ellipse(32, 51, 17, 3, 0, 0, 7); g.fill();
     let brim = g.createLinearGradient(10, 30, 54, 40);                       // fedora brim, tilted
@@ -2870,6 +4860,112 @@ const World = (() => {
     g.save(); g.translate(32, 43); g.rotate(0.15); g.strokeRect(-9, -6, 18, 12);
     g.fillStyle = '#8a1414'; g.font = 'bold 7px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillText('11.22.63', 0, 0); g.restore();
+  });
+
+  SPR.letter = outlined(g => {                                    // a coded letter, sealed
+    g.fillStyle = 'rgba(0,0,0,0.24)'; g.beginPath(); g.ellipse(32, 46, 16, 2.6, 0, 0, 7); g.fill();
+    let env = g.createLinearGradient(16, 32, 48, 44);
+    env.addColorStop(0, '#e8ddc0'); env.addColorStop(1, '#c9bc94');
+    g.fillStyle = env; g.fillRect(16, 32, 32, 22);
+    bevel(g, 16, 32, 32, 22, 'rgba(255,255,255,0.3)', 'rgba(0,0,0,0.35)');
+    g.fillStyle = 'rgba(120,105,70,0.4)'; g.beginPath(); g.moveTo(16, 32); g.lineTo(32, 44); g.lineTo(48, 32); g.stroke();
+    g.strokeStyle = 'rgba(120,105,70,0.4)'; g.lineWidth = 1; g.beginPath(); g.moveTo(16, 32); g.lineTo(32, 44); g.lineTo(48, 32); g.stroke();
+    g.strokeStyle = 'rgba(60,50,30,0.5)'; g.lineWidth = 0.6;                     // gibberish coded text hint
+    for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(20, 46 + i * 2.4); g.lineTo(44, 46 + i * 2.4); g.stroke(); }
+    let sealGrad = g.createRadialGradient(32, 34, 0.5, 32, 34, 4);
+    sealGrad.addColorStop(0, '#c94a3a'); sealGrad.addColorStop(1, '#7e241a');
+    g.fillStyle = sealGrad; g.beginPath(); g.arc(32, 34, 3.6, 0, 7); g.fill();
+  });
+
+  SPR.telegram = outlined(g => {                                  // Dr Z's urgent telegram, RUSH stamped
+    g.fillStyle = 'rgba(0,0,0,0.24)'; g.beginPath(); g.ellipse(32, 46, 17, 2.6, 0, 0, 7); g.fill();
+    let paper = g.createLinearGradient(14, 28, 50, 46);
+    paper.addColorStop(0, '#f0d878'); paper.addColorStop(1, '#d0ae4a');
+    g.fillStyle = paper; g.fillRect(14, 28, 36, 20);
+    bevel(g, 14, 28, 36, 20, 'rgba(255,255,255,0.3)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = '#8a1414'; g.save(); g.translate(24, 34); g.rotate(-0.2);
+    g.strokeStyle = '#8a1414'; g.lineWidth = 1.4; g.strokeRect(-8, -3, 16, 6);
+    g.font = 'bold 6px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('RUSH', 0, 0.4);
+    g.restore();
+    g.strokeStyle = 'rgba(60,50,10,0.45)'; g.lineWidth = 0.6;
+    for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(18, 40 + i * 2.4); g.lineTo(46, 40 + i * 2.4); g.stroke(); }
+  });
+
+  SPR.businesscard = outlined(g => {                              // Exports Universal business card
+    g.fillStyle = 'rgba(0,0,0,0.22)'; g.beginPath(); g.ellipse(32, 43, 13, 2.2, 0, 0, 7); g.fill();
+    let cd = g.createLinearGradient(20, 34, 44, 42);
+    cd.addColorStop(0, '#f4f0e2'); cd.addColorStop(1, '#d8d0b8');
+    g.fillStyle = cd; g.save(); g.translate(32, 38); g.rotate(-0.1); g.fillRect(-12, -5, 24, 10);
+    g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 0.8; g.strokeRect(-12, -5, 24, 10);
+    g.fillStyle = '#1c3a5c'; g.font = 'bold 4.6px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('EXPORTS', 0, -1.4); g.fillText('UNIVERSAL', 0, 2);
+    g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 0.5; g.beginPath(); g.moveTo(-9, 4.4); g.lineTo(9, 4.4); g.stroke();
+    g.restore();
+  });
+
+  SPR.watch = outlined(g => {                                     // an heirloom pocket watch, chain coiled beside it
+    g.fillStyle = 'rgba(0,0,0,0.26)'; g.beginPath(); g.ellipse(32, 46, 13, 2.4, 0, 0, 7); g.fill();
+    g.strokeStyle = '#c9a227'; g.lineWidth = 1.2;                                // coiled chain
+    g.beginPath(); g.arc(22, 42, 5, 0.2, 5.5); g.stroke();
+    g.beginPath(); g.arc(20, 40, 3, 0.2, 5.5); g.stroke();
+    let cs = g.createRadialGradient(34, 34, 1, 34, 34, 11);
+    cs.addColorStop(0, '#f0d878'); cs.addColorStop(0.6, '#c9a227'); cs.addColorStop(1, '#7a5c14');
+    g.fillStyle = cs; g.beginPath(); g.arc(34, 34, 10, 0, 7); g.fill();
+    g.strokeStyle = '#5a4210'; g.lineWidth = 1.2; g.beginPath(); g.arc(34, 34, 10, 0, 7); g.stroke();
+    g.fillStyle = '#f4efe0'; g.beginPath(); g.arc(34, 34, 7, 0, 7); g.fill();
+    g.strokeStyle = '#1c1e22'; g.lineWidth = 0.8;
+    for (let i = 0; i < 12; i++) { const a2 = i / 12 * 6.283; g.beginPath(); g.moveTo(34 + Math.cos(a2) * 5.6, 34 + Math.sin(a2) * 5.6); g.lineTo(34 + Math.cos(a2) * 6.6, 34 + Math.sin(a2) * 6.6); g.stroke(); }
+    g.beginPath(); g.moveTo(34, 34); g.lineTo(34, 30); g.moveTo(34, 34); g.lineTo(37, 35); g.stroke();
+    g.fillStyle = '#c9a227'; g.beginPath(); g.arc(34, 24.4, 1.6, 0, 7); g.fill();       // crown/stem
+  });
+
+  SPR.personnelfile = outlined(g => {                             // manila folder, CONFIDENTIAL, a clipped photo
+    g.fillStyle = 'rgba(0,0,0,0.26)'; g.beginPath(); g.ellipse(32, 48, 18, 2.6, 0, 0, 7); g.fill();
+    let fl = g.createLinearGradient(12, 30, 52, 46);
+    fl.addColorStop(0, '#d8b878'); fl.addColorStop(1, '#b8925a');
+    g.fillStyle = fl; g.fillRect(12, 32, 40, 16);
+    g.fillStyle = 'rgba(90,60,20,0.3)'; g.beginPath(); g.moveTo(12, 32); g.lineTo(22, 27); g.lineTo(34, 27); g.lineTo(38, 32); g.closePath(); g.fill();
+    bevel(g, 12, 32, 40, 16, 'rgba(255,240,200,0.3)', 'rgba(0,0,0,0.35)');
+    g.fillStyle = '#f0ece0'; g.fillRect(35, 33.6, 9, 11);                              // clipped photo, corner
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 0.8; g.strokeRect(35, 33.6, 9, 11);
+    g.fillStyle = '#c9a06a'; g.beginPath(); g.arc(39.4, 37.6, 2.4, 0, 7); g.fill();
+    g.fillStyle = '#8a1414'; g.font = 'bold 5px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.save(); g.translate(22, 40); g.rotate(-0.05); g.fillText('CONFIDENTIAL', 0, 0); g.restore();
+  });
+
+  SPR.microfiche = outlined(g => {                                // a small translucent microfiche slide
+    g.fillStyle = 'rgba(0,0,0,0.22)'; g.beginPath(); g.ellipse(32, 42, 11, 2, 0, 0, 7); g.fill();
+    let mf = g.createLinearGradient(22, 34, 42, 42);
+    mf.addColorStop(0, 'rgba(200,210,200,0.7)'); mf.addColorStop(1, 'rgba(140,150,140,0.7)');
+    g.fillStyle = mf; g.fillRect(22, 34, 20, 8);
+    g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 0.8; g.strokeRect(22, 34, 20, 8);
+    g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 0.5;
+    for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(22 + i * 5, 34); g.lineTo(22 + i * 5, 42); g.stroke(); }
+    g.fillStyle = 'rgba(255,255,255,0.3)'; g.fillRect(23, 35, 18, 1.2);
+  });
+
+  SPR.screwdriver = outlined(g => {                               // flathead screwdriver, red handle
+    g.fillStyle = 'rgba(0,0,0,0.24)'; g.beginPath(); g.ellipse(32, 47, 15, 2.2, 0, 0, 7); g.fill();
+    let sh = g.createLinearGradient(14, 40, 32, 44);
+    sh.addColorStop(0, '#e8ecf0'); sh.addColorStop(1, '#9aa0aa');
+    g.strokeStyle = sh; g.lineWidth = 2.6; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(14, 44); g.lineTo(32, 40); g.stroke();
+    g.fillStyle = '#c9ccd4'; g.fillRect(12.6, 42.6, 3, 2.8);                            // tip
+    let hd = g.createLinearGradient(30, 34, 50, 44);
+    hd.addColorStop(0, '#c9302a'); hd.addColorStop(1, '#7a1c18');
+    g.fillStyle = hd; g.beginPath(); g.ellipse(42, 38, 10, 5, -0.35, 0, 7); g.fill();
+    bevel(g, 34, 33, 16, 10, 'rgba(255,255,255,0.2)', 'rgba(0,0,0,0.3)');
+  });
+
+  SPR.pliers = outlined(g => {                                    // red-handled pliers
+    g.fillStyle = 'rgba(0,0,0,0.24)'; g.beginPath(); g.ellipse(32, 48, 15, 2.2, 0, 0, 7); g.fill();
+    g.strokeStyle = '#8a8f98'; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(20, 32); g.lineTo(30, 42); g.stroke();
+    g.beginPath(); g.moveTo(44, 32); g.lineTo(34, 42); g.stroke();
+    g.fillStyle = '#c9302a';
+    g.save(); g.translate(24, 46); g.rotate(0.7); g.fillRect(-3, -8, 6, 12); g.restore();  // red rubber grips
+    g.save(); g.translate(40, 46); g.rotate(-0.7); g.fillRect(-3, -8, 6, 12); g.restore();
+    g.fillStyle = '#5a5e66'; g.beginPath(); g.arc(32, 39, 2.2, 0, 7); g.fill();          // pivot
   });
 
   SPR.filecab = outlined(g => {                                   // olive-steel filing cabinet, three drawers
@@ -3419,6 +5515,20 @@ const World = (() => {
     disguise: (x, y) => prop('disguise', 'DISGUISE KIT', x, y, 0.45, false, { pickup: 'disguise' }),
     book: (x, y) => prop('book', 'OPEN BOOK', x, y, 0.4, false),
     safe: (x, y) => prop('safe', 'WALL SAFE', x, y, 0.8, true),
+    letter: (x, y) => prop('letter', 'CODED LETTER', x, y, 0.32, false),
+    telegram: (x, y) => prop('telegram', 'TELEGRAM', x, y, 0.32, false),
+    businesscard: (x, y) => prop('businesscard', 'BUSINESS CARD', x, y, 0.26, false),
+    watch: (x, y) => prop('watch', 'POCKET WATCH', x, y, 0.3, false),
+    personnelfile: (x, y) => prop('personnelfile', 'PERSONNEL FILE', x, y, 0.35, false),
+    microfiche: (x, y) => prop('microfiche', 'MICROFICHE', x, y, 0.26, false),
+    screwdriver: (x, y) => prop('screwdriver', 'SCREWDRIVER', x, y, 0.3, false),
+    pliers: (x, y) => prop('pliers', 'PLIERS', x, y, 0.3, false),
+    ciphermachine: (x, y) => prop('ciphermachine', 'CIPHER MACHINE', x, y, 0.8, true),
+    bomb: (x, y) => prop('bomb', 'THE BOMB', x, y, 0.85, true, { casingOpen: false,
+      getTex() { return this.casingOpen ? SPR.bombOpen : SPR.bomb; } }),
+    microfichemachine: (x, y) => prop('microfichemachine', 'MICROFICHE VIEWER', x, y, 0.8, true, { showingArticle: false,
+      getTex() { return this.showingArticle ? SPR.microfichemachineOn : SPR.microfichemachine; } }),
+    sportscar: (x, y) => prop('sportscar', 'SPORTS CAR', x, y, 1.3, true),
     filecab: (x, y) => prop('filecab', 'FILING CABINET', x, y, 0.82, true),
     globe: (x, y) => prop('globe', 'DESK GLOBE', x, y, 0.6, false),
     briefcase: (x, y) => prop('briefcase', 'ATTACHÉ CASE', x, y, 0.55, false),
@@ -3485,6 +5595,24 @@ const World = (() => {
       kind: 'carlotta', name: 'CARLOTTA', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
       behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
       getTex() { return this.dead ? SPR.civilianCorpse : SPR.carlotta; },
+    }),
+    drz: (x, y, e) => ({
+      kind: 'drz', name: 'DR. Z', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.drz; },
+    }),
+    defector: (x, y, e) => ({
+      kind: 'defector', name: 'THE DEFECTOR', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.defector; },
+    }),
+    // Agent 005 starts as a protected ally (kind 'agent005', NO_DAMAGE) — main.js's
+    // shoot() literally rewrites his `kind` to 'boss005' once "The Truth" is used on
+    // him, which drops the NO_DAMAGE protection and picks him up in the HOSTILE
+    // table automatically, reusing all existing combat/AI code for the boss fight.
+    agent005: (x, y) => ({
+      kind: 'agent005', name: 'AGENT 005', x, y, solid: true, scale: 0.85, hp: 220, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.corpse : SPR.agent005; },
     }),
     sedan: (x, y) => prop('sedan', 'PARKED SEDAN', x, y, 1.3, true),
     motorcycle: (x, y) => prop('motorcycle', 'MOTORCYCLE', x, y, 1.0, true),
@@ -3566,7 +5694,14 @@ const World = (() => {
       }
     }
     ents.length = 0;
-    for (const e of level.ents) if (FACT[e.kind]) ents.push(FACT[e.kind](e.x, e.y, e));
+    for (const e of level.ents) {
+      if (!FACT[e.kind]) continue;
+      const ent = FACT[e.kind](e.x, e.y, e);
+      // per-instance solid override (editor's WALK-THROUGH toggle) — every FACT
+      // entry sets its own default `solid`, this just lets one placed copy differ
+      if (e.solid != null) ent.solid = e.solid;
+      ents.push(ent);
+    }
     spawn.x = level.spawn.x; spawn.y = level.spawn.y; spawn.a = level.spawn.a;
     TEX[T.EXIT] = blastDoor(false);
     TEX[T.MAINFRAME] = mainframe(false);
@@ -3581,6 +5716,7 @@ const World = (() => {
         wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : undefined,
         wallStepTex: s.wallStepTex ? s.wallStepTex.slice() : undefined,
         wallStepFloorTex: s.wallStepFloorTex ? s.wallStepFloorTex.slice() : undefined,
+        wallDecal: s.wallDecal ? s.wallDecal.slice() : undefined,
         parent: s.parent == null ? -1 : s.parent, solid: !!s.solid,
       })),
     } : null;

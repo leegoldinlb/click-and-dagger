@@ -45,6 +45,18 @@ const Editor = (() => {
     { kind: 'disguise', name: 'DISGUISE KIT', spr: 'disguise' },
     { kind: 'book', name: 'OPEN BOOK', spr: 'book' },
     { kind: 'safe', name: 'SAFE', spr: 'safe' },
+    { kind: 'letter', name: 'CODED LETTER', spr: 'letter' },
+    { kind: 'telegram', name: 'TELEGRAM', spr: 'telegram' },
+    { kind: 'businesscard', name: 'BUSINESS CARD', spr: 'businesscard' },
+    { kind: 'watch', name: 'POCKET WATCH', spr: 'watch' },
+    { kind: 'personnelfile', name: 'PERSONNEL FILE', spr: 'personnelfile' },
+    { kind: 'microfiche', name: 'MICROFICHE', spr: 'microfiche' },
+    { kind: 'screwdriver', name: 'SCREWDRIVER', spr: 'screwdriver' },
+    { kind: 'pliers', name: 'PLIERS', spr: 'pliers' },
+    { kind: 'ciphermachine', name: 'CIPHER MACHINE', spr: 'ciphermachine' },
+    { kind: 'bomb', name: 'THE BOMB', spr: 'bomb' },
+    { kind: 'microfichemachine', name: 'MICROFICHE VIEWER', spr: 'microfichemachine' },
+    { kind: 'sportscar', name: 'SPORTS CAR', spr: 'sportscar' },
     { kind: 'filecab', name: 'FILE CABINET', spr: 'filecab' },
     { kind: 'globe', name: 'GLOBE', spr: 'globe' },
     { kind: 'briefcase', name: 'BRIEFCASE', spr: 'briefcase' },
@@ -66,6 +78,9 @@ const Editor = (() => {
     { kind: 'fisherman', name: 'FISHERMAN', spr: 'fisherman' },
     { kind: 'flowergirl', name: 'FLOWER GIRL', spr: 'flowergirl' },
     { kind: 'carlotta', name: 'CARLOTTA', spr: 'carlotta' },
+    { kind: 'drz', name: 'DR. Z', spr: 'drz' },
+    { kind: 'defector', name: 'THE DEFECTOR', spr: 'defector' },
+    { kind: 'agent005', name: 'AGENT 005', spr: 'agent005' },
     { kind: 'sedan', name: 'SEDAN', spr: 'sedan' },
     { kind: 'motorcycle', name: 'MOTORCYCLE', spr: 'motorcycle' },
     { kind: 'phonebooth', name: 'PHONE BOOTH', spr: 'phonebooth' },
@@ -101,7 +116,7 @@ const Editor = (() => {
     { kind: 'conftable', name: 'CONFERENCE TABLE', spr: 'conftable' },
     { kind: 'punchclock', name: 'PUNCH CLOCK', spr: 'punchclock' },
   ];
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta']);      // neutral — placed with a default wander behavior
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector']);      // neutral — placed with a default wander behavior
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 
   // ---- state ----
@@ -181,6 +196,7 @@ const Editor = (() => {
       wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : null, parent: s.parent == null ? -1 : s.parent,
       wallStepTex: s.wallStepTex ? s.wallStepTex.slice() : null,
       wallStepFloorTex: s.wallStepFloorTex ? s.wallStepFloorTex.slice() : null,
+      wallDecal: s.wallDecal ? s.wallDecal.slice() : null,
       solid: !!s.solid,
     })) : [];
     draft = [];
@@ -226,6 +242,7 @@ const Editor = (() => {
           wallTexScale: (s.wallTexScale && s.wallTexScale.some(v => v && v !== 1)) ? s.wallTexScale.slice() : undefined,
           wallStepTex: (s.wallStepTex && s.wallStepTex.some(Boolean)) ? s.wallStepTex.slice() : undefined,
           wallStepFloorTex: (s.wallStepFloorTex && s.wallStepFloorTex.some(Boolean)) ? s.wallStepFloorTex.slice() : undefined,
+          wallDecal: (s.wallDecal && s.wallDecal.some(Boolean)) ? s.wallDecal.slice() : undefined,
           parent: s.parent, solid: s.solid || undefined })),
       };
       out.v = Math.max(out.v, 5);
@@ -986,6 +1003,43 @@ const Editor = (() => {
     portalGraph = Engine.buildGraph(geo);
     status('WALL ' + (hit.i + 1) + ' RISER → ' + next.toUpperCase());
   }
+  // mount any sprite flat against a wall, like a poster/map/photo pinned to the
+  // brick — drawn once (no tiling) over the plain wall texture. A curated list,
+  // not every SPR kind, since most (henchmen, plants, furniture) don't read as
+  // wall-mountable images; the paper/board props do.
+  const DECAL_KINDS = [null, 'wallmap', 'corkboard', 'wallclock', 'telegram', 'personnelfile', 'businesscard', 'letter'];
+  function geoWallDecal() {
+    const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
+    const sec = geo.sectors[hit.s];
+    if (!sec.wallDecal) sec.wallDecal = new Array(sec.loop.length).fill(null);
+    let i = DECAL_KINDS.indexOf(sec.wallDecal[hit.i] || null); if (i < 0) i = 0;
+    const next = DECAL_KINDS[(i + 1) % DECAL_KINDS.length];
+    sec.wallDecal[hit.i] = next;
+    portalGraph = Engine.buildGraph(geo);                      // re-derive wall.decal
+    status('WALL ' + (hit.i + 1) + ' DECAL → ' + (next ? next.toUpperCase() : 'NONE'));
+  }
+  // find the entity nearest the crosshair (screen-centre pick, same idea as the
+  // game's Adventure.resolveAt but against the editor's own preview render)
+  function pickEntNear() {
+    const rects = Engine.rects(), cx = Engine.W / 2, cy = Engine.H / 2;
+    let best = null;
+    for (const r of rects) {
+      if (cx >= r.x0 && cx <= r.x1 && cy >= r.y0 && cy <= r.y1) {
+        if (!best || r.dist < best.dist) best = r;
+      }
+    }
+    return best;
+  }
+  // toggle WALK-THROUGH ⇄ SOLID on the entity under the crosshair. Overrides that
+  // kind's default (every FACT entry has its own baseline `solid`) per placed copy.
+  function geoToggleEntSolid() {
+    const r = pickEntNear();
+    if (!r) { status('LOOK AT AN OBJECT.'); return; }
+    const ent = r.ent, idx = World.ents.indexOf(ent);
+    ent.solid = !ent.solid;
+    if (idx >= 0 && lv.ents[idx]) lv.ents[idx].solid = ent.solid;
+    status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + (ent.solid ? 'SOLID' : 'WALK-THROUGH'));
+  }
   function cycleTex(dir, shift) {                              // [ ] / wheel: wall if aiming close at one, else floor/ceil
     const wallHit = !shift && pickGeoWall();
     if (wallHit && wallHit.dist < wallPickDist(wallHit)) {
@@ -1124,6 +1178,12 @@ const Editor = (() => {
     if (len > 0) {
       const sp = 3.0 * dt / len, nx = cam.x + mx * sp, ny = cam.y + my * sp;
       Engine.moveGeo(geo, portalGraph, cam, nx, ny, 0.2, 0.5);      // real wall/step collision on the Build engine
+      for (const e of World.ents) {                                 // same solid-entity push-back as the game (main.js tryMove)
+        if (!e.solid || e.dead) continue;
+        const er = (e.scale || 0.5) * 0.4, min = 0.2 + er;
+        const dx = cam.x - e.x, dy = cam.y - e.y, d = Math.hypot(dx, dy);
+        if (d < min && d > 1e-4) { cam.x = e.x + (dx / d) * min; cam.y = e.y + (dy / d) * min; }
+      }
     }
     const s = Engine.sectorAt(cam.x, cam.y, geo);
     const target = (s >= 0 ? geo.sectors[s].floor : 0) + 0.5;
@@ -1142,19 +1202,30 @@ const Editor = (() => {
   }
   function updateTarget() {
     const el = document.getElementById('ptarget');
+    // an entity actually drawn at screen-centre is nearer than any wall/sector
+    // behind it — check it first so J (solid toggle) always targets what you see
+    const entHit = pickEntNear();
+    if (entHit) {
+      el.textContent = '● ' + (entHit.ent.name || entHit.ent.kind).toUpperCase() + '   ' +
+        (entHit.ent.solid ? 'SOLID' : 'WALK-THROUGH') + '   J to toggle';
+      el.style.display = 'block';
+      Engine.setHighlight(null);
+      return;
+    }
     if (usePortal) {
       const wallHit = pickGeoWall();
       if (wallHit && wallHit.dist < wallPickDist(wallHit)) {    // close-range wall: show ITS texture/scale/door
         const sec = geo.sectors[wallHit.s];
         const wscale = (sec.wallTexScale && sec.wallTexScale[wallHit.i]) || 1;
         const wdoor = sec.wallDoor && sec.wallDoor[wallHit.i];
+        const wdecal = sec.wallDecal && sec.wallDecal[wallHit.i];
         const step = wallStepInfo(wallHit);
         let label, hint;
         if (step.up) { label = 'SOFFIT ' + String((sec.wallStepTex && sec.wallStepTex[wallHit.i]) || 'vent').toUpperCase(); hint = '[ ] soffit tex' + (step.down ? ' · R riser tex' : ''); }
         else if (step.down) { label = 'RISER ' + String((sec.wallStepFloorTex && sec.wallStepFloorTex[wallHit.i]) || 'metal').toUpperCase(); hint = '[ ] riser tex'; }
-        else { label = String((sec.wallTex && sec.wallTex[wallHit.i]) || 'brick').toUpperCase(); hint = 'T tile · F door'; }
+        else { label = String((sec.wallTex && sec.wallTex[wallHit.i]) || 'brick').toUpperCase(); hint = 'T tile · F door · P decal'; }
         el.textContent = '■ WALL ' + (wallHit.i + 1) + (wallHit.portal ? ' (portal)' : ' (solid)') +
-          '   ' + label + (wscale !== 1 ? ' ×' + wscale : '') + (wdoor ? ' · ' + wdoor.toUpperCase() : '') +
+          '   ' + label + (wscale !== 1 ? ' ×' + wscale : '') + (wdoor ? ' · ' + wdoor.toUpperCase() : '') + (wdecal ? ' · ' + wdecal.toUpperCase() + ' DECAL' : '') +
           (previewCompiled ? '' : '   ' + hint);
         el.style.display = 'block';
         Engine.setHighlight({ sec: wallHit.s, edge: wallHit.i });
@@ -1225,8 +1296,8 @@ const Editor = (() => {
     b.classList.add('active'); b.innerHTML = '&#9638; MAP EDITOR';
     document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
     document.getElementById('pcontrols').innerHTML = previewCompiled
-      ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>ESC</b> map'
-      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> tex — wall (or its soffit/riser step) if aiming close, else floor (Shift ceil) &nbsp;·&nbsp; <b>R</b> riser tex (when a wall has both a soffit and a riser) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply · <b>Shift</b>+ save favorite &nbsp;·&nbsp; <b>ESC</b> map';
+      ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>ESC</b> map'
+      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> tex — wall (or its soffit/riser step) if aiming close, else floor (Shift ceil) &nbsp;·&nbsp; <b>R</b> riser tex (when a wall has both a soffit and a riser) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>P</b> mount a sprite on a wall (poster) &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply · <b>Shift</b>+ save favorite &nbsp;·&nbsp; <b>ESC</b> map';
     document.getElementById('favbar').style.display = previewCompiled ? 'none' : 'flex';
     renderFavbar();
     previewOn = true; plast = performance.now();
@@ -1280,9 +1351,13 @@ const Editor = (() => {
         if (wallHit && wallStepInfo(wallHit).down) geoWallStepFloorTex(1); else status('NO RISER ON THIS WALL.');
         e.preventDefault(); return;
       }
+      if (e.code === 'KeyP') { if (!e.repeat) pushUndo(); geoWallDecal(); e.preventDefault(); return; }   // mount/cycle a sprite on the wall, poster-style
       const favIdx = FAV_KEYS.indexOf(e.code);
       if (favIdx >= 0) { if (!e.repeat) { if (sh) favSave(favIdx); else favApply(favIdx); } e.preventDefault(); return; }
     }
+    // works on either a grid or vector level — toggles whether a placed entity
+    // blocks movement, independent of any sector/wall sculpting
+    if (e.code === 'KeyJ') { if (!e.repeat) pushUndo(); geoToggleEntSolid(); e.preventDefault(); return; }
     if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
       pkeys[e.code] = true; e.preventDefault();
     }
@@ -1381,7 +1456,7 @@ const Editor = (() => {
   function closeSector() {
     const loop = draft.slice();
     if (polyArea(loop) < 0) loop.reverse();                    // normalise to CCW
-    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, win: false, hostile: false, texScale: 1, wallDoor: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, parent: -1, solid: false };
+    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, win: false, hostile: false, texScale: 1, wallDoor: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false };
     const c = centroid(loop);
     for (let s = 0; s < geo.sectors.length; s++)
       if (pointInLoop(c.x, c.y, geo.sectors[s].loop)) { sec.parent = s; break; }  // nested → sub-sector
