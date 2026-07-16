@@ -99,21 +99,6 @@ const World = (() => {
   "ents": [
     {
       "kind": "streetlamp",
-      "x": 11.82,
-      "y": 14.78
-    },
-    {
-      "kind": "streetlamp",
-      "x": 18.88,
-      "y": 20.84
-    },
-    {
-      "kind": "streetlamp",
-      "x": 12,
-      "y": 20.37
-    },
-    {
-      "kind": "streetlamp",
       "x": 26.82,
       "y": 21.13
     },
@@ -134,23 +119,8 @@ const World = (() => {
     },
     {
       "kind": "streetlamp",
-      "x": 30.71,
-      "y": 9.78
-    },
-    {
-      "kind": "streetlamp",
       "x": 18.59,
       "y": 6.42
-    },
-    {
-      "kind": "parkbench",
-      "x": 11.88,
-      "y": 17.6
-    },
-    {
-      "kind": "phonebooth",
-      "x": 15.24,
-      "y": 20.25
     },
     {
       "kind": "newsstand",
@@ -177,18 +147,6 @@ const World = (() => {
       "kind": "waiter",
       "x": 28.71,
       "y": 18.42,
-      "behavior": "wander"
-    },
-    {
-      "kind": "tourist",
-      "x": 14.06,
-      "y": 16.25,
-      "behavior": "wander"
-    },
-    {
-      "kind": "civilianF",
-      "x": 14.41,
-      "y": 17.6,
       "behavior": "wander"
     },
     {
@@ -251,11 +209,6 @@ const World = (() => {
       "kind": "royalpalm",
       "x": 25.1,
       "y": 16.34
-    },
-    {
-      "kind": "newsstand",
-      "x": 17.65,
-      "y": 9.6
     },
     {
       "kind": "bar",
@@ -439,11 +392,6 @@ const World = (() => {
       "behavior": "wander"
     },
     {
-      "kind": "disguise",
-      "x": 18.23,
-      "y": 3.17
-    },
-    {
       "kind": "vendingmachine",
       "x": 31.67,
       "y": 17.92
@@ -459,60 +407,9 @@ const World = (() => {
       "y": 3.12
     },
     {
-      "kind": "carlotta",
-      "x": 15.8,
-      "y": 18.55,
-      "behavior": "wander"
-    },
-    {
       "kind": "safe",
       "x": 23.8,
       "y": 6.21
-    },
-    {
-      "kind": "bookshelf",
-      "x": 33.77,
-      "y": 6.81
-    },
-    {
-      "kind": "bookshelf",
-      "x": 35.05,
-      "y": 6.88
-    },
-    {
-      "kind": "bookshelf",
-      "x": 36.02,
-      "y": 7.01
-    },
-    {
-      "kind": "bookshelf",
-      "x": 35.8,
-      "y": 11.73
-    },
-    {
-      "kind": "bookshelf",
-      "x": 34.98,
-      "y": 10.03
-    },
-    {
-      "kind": "bookshelf",
-      "x": 36.98,
-      "y": 8.63
-    },
-    {
-      "kind": "bookshelf",
-      "x": 37,
-      "y": 10.38
-    },
-    {
-      "kind": "armchair",
-      "x": 36.75,
-      "y": 9.58
-    },
-    {
-      "kind": "book",
-      "x": 35.83,
-      "y": 10.86
     },
     {
       "kind": "sportscar",
@@ -545,11 +442,6 @@ const World = (() => {
       "y": 15.97
     },
     {
-      "kind": "agent005",
-      "x": 23.2,
-      "y": 6.31
-    },
-    {
       "kind": "screwdriver",
       "x": 11.96,
       "y": 24.72
@@ -560,24 +452,219 @@ const World = (() => {
       "y": 2.15
     },
     {
-      "kind": "wpn_ar7",
-      "x": 30.35,
-      "y": 12.55
+      "kind": "agent005",
+      "x": 16.38,
+      "y": 1.52
+    },
+    {
+      "kind": "plant",
+      "x": 19.93,
+      "y": 0.92
     },
     {
       "kind": "wpn_sterling",
-      "x": 12.58,
-      "y": 13.82
+      "x": 19.91,
+      "y": 2.03
     },
     {
-      "kind": "wpn_laser",
-      "x": 30.81,
-      "y": 15.59
+      "kind": "medkit",
+      "x": 19.89,
+      "y": 1.69
     },
     {
-      "kind": "wpn_golden",
-      "x": 34,
-      "y": 13.47
+      "kind": "ciphermachine",
+      "x": 18.89,
+      "y": 1.16
+    },
+    {
+      "kind": "recordplayer",
+      "x": 16.2,
+      "y": 1.05
+    },
+    {
+      "kind": "officechair",
+      "x": 17.56,
+      "y": 1.23
+    },
+    {
+      "kind": "streetlamp",
+      "x": 31.06,
+      "y": 9.21
+    },
+    {
+      "kind": "bookshelf",
+      "x": 33.4,
+      "y": 8.32
+    },
+    {
+      "kind": "bookshelf",
+      "x": 33.64,
+      "y": 6.97
+    },
+    {
+      "kind": "bookshelf",
+      "x": 34.25,
+      "y": 7.55
+    },
+    {
+      "kind": "book",
+      "x": 33.6,
+      "y": 7.65
+    },
+    {
+      "kind": "diningtable",
+      "x": 28.99,
+      "y": 16.05
+    },
+    {
+      "kind": "diningtable",
+      "x": 30.24,
+      "y": 17.31
+    },
+    {
+      "kind": "diningtable",
+      "x": 30.33,
+      "y": 16.15
+    },
+    {
+      "kind": "plant",
+      "x": 30.87,
+      "y": 15.49
+    },
+    {
+      "kind": "plant",
+      "x": 27.82,
+      "y": 15.52
+    },
+    {
+      "kind": "plant",
+      "x": 31.14,
+      "y": 19.41
+    },
+    {
+      "kind": "bar",
+      "x": 31.02,
+      "y": 16.71
+    },
+    {
+      "kind": "cashregister",
+      "x": 29.42,
+      "y": 15.45
+    },
+    {
+      "kind": "parkbench",
+      "x": 12.06,
+      "y": 12.06
+    },
+    {
+      "kind": "parkbench",
+      "x": 8.86,
+      "y": 17.35
+    },
+    {
+      "kind": "parkbench",
+      "x": 14.49,
+      "y": 21.95
+    },
+    {
+      "kind": "parkbench",
+      "x": 19.57,
+      "y": 20.29
+    },
+    {
+      "kind": "royalpalm",
+      "x": 8.8,
+      "y": 16.29
+    },
+    {
+      "kind": "royalpalm",
+      "x": 10.89,
+      "y": 12.21
+    },
+    {
+      "kind": "royalpalm",
+      "x": 13.83,
+      "y": 12.32
+    },
+    {
+      "kind": "royalpalm",
+      "x": 11.17,
+      "y": 15.06
+    },
+    {
+      "kind": "royalpalm",
+      "x": 14.57,
+      "y": 19.86
+    },
+    {
+      "kind": "hedge",
+      "x": 9.14,
+      "y": 19.15
+    },
+    {
+      "kind": "hedge",
+      "x": 12.11,
+      "y": 21.49
+    },
+    {
+      "kind": "hedge",
+      "x": 17.4,
+      "y": 22.12
+    },
+    {
+      "kind": "bananaplant",
+      "x": 19.37,
+      "y": 18.95
+    },
+    {
+      "kind": "bananaplant",
+      "x": 19.57,
+      "y": 21.98
+    },
+    {
+      "kind": "fern",
+      "x": 10.43,
+      "y": 20.69
+    },
+    {
+      "kind": "fern",
+      "x": 15.69,
+      "y": 22.06
+    },
+    {
+      "kind": "hedge",
+      "x": 9.63,
+      "y": 13.95
+    },
+    {
+      "kind": "carlotta",
+      "x": 12.5,
+      "y": 14.31,
+      "behavior": "wander"
+    },
+    {
+      "kind": "civilianM",
+      "x": 18.5,
+      "y": 18.38,
+      "behavior": "wander"
+    },
+    {
+      "kind": "civilianF",
+      "x": 8.78,
+      "y": 21.48,
+      "behavior": "wander"
+    },
+    {
+      "kind": "fisherman",
+      "x": 10.22,
+      "y": 19.33,
+      "behavior": "wander"
+    },
+    {
+      "kind": "drz",
+      "x": 35.42,
+      "y": 13.16,
+      "behavior": "wander"
     }
   ],
   "blown": false,
@@ -585,23 +672,11 @@ const World = (() => {
     "verts": [
       {
         "x": 17,
-        "y": 2.5
+        "y": 4
       },
       {
         "x": 17,
-        "y": 14
-      },
-      {
-        "x": 11,
-        "y": 14
-      },
-      {
-        "x": 11,
-        "y": 21.5
-      },
-      {
-        "x": 20,
-        "y": 21.5
+        "y": 13
       },
       {
         "x": 20,
@@ -629,11 +704,11 @@ const World = (() => {
       },
       {
         "x": 27,
-        "y": 10.5
+        "y": 10
       },
       {
         "x": 32,
-        "y": 10.5
+        "y": 10
       },
       {
         "x": 32,
@@ -653,7 +728,7 @@ const World = (() => {
       },
       {
         "x": 19.5,
-        "y": 2.5
+        "y": 4
       },
       {
         "x": 22,
@@ -1044,130 +1119,253 @@ const World = (() => {
         "y": 18.5
       },
       {
+        "x": 32,
+        "y": 7
+      },
+      {
+        "x": 32,
+        "y": 8
+      },
+      {
+        "x": 32.5,
+        "y": 8
+      },
+      {
+        "x": 32.5,
+        "y": 7
+      },
+      {
+        "x": 32.5,
+        "y": 6.5
+      },
+      {
+        "x": 34.5,
+        "y": 6.5
+      },
+      {
+        "x": 34.5,
+        "y": 9
+      },
+      {
+        "x": 32.5,
+        "y": 9
+      },
+      {
+        "x": 33.5,
+        "y": 13
+      },
+      {
+        "x": 33.5,
+        "y": 14
+      },
+      {
+        "x": 34.5,
+        "y": 13
+      },
+      {
+        "x": 34.5,
+        "y": 14
+      },
+      {
+        "x": 34.5,
+        "y": 12.5
+      },
+      {
+        "x": 38,
+        "y": 12.5
+      },
+      {
+        "x": 38,
+        "y": 15.5
+      },
+      {
+        "x": 34.5,
+        "y": 15.5
+      },
+      {
+        "x": 17.5,
+        "y": 3.5
+      },
+      {
+        "x": 19,
+        "y": 3.5
+      },
+      {
+        "x": 19,
+        "y": 3
+      },
+      {
+        "x": 17.5,
+        "y": 3
+      },
+      {
+        "x": 15.5,
+        "y": 2
+      },
+      {
+        "x": 15.5,
+        "y": 0.5
+      },
+      {
+        "x": 20.5,
+        "y": 0.5
+      },
+      {
+        "x": 20.5,
+        "y": 2
+      },
+      {
+        "x": 19.16,
+        "y": 15.88
+      },
+      {
+        "x": 18,
+        "y": 17
+      },
+      {
+        "x": 15.5,
+        "y": 14
+      },
+      {
+        "x": 15.5,
+        "y": 11
+      },
+      {
+        "x": 8,
+        "y": 11
+      },
+      {
+        "x": 8,
+        "y": 22.5
+      },
+      {
+        "x": 20.5,
+        "y": 23
+      },
+      {
+        "x": 20.5,
+        "y": 18
+      },
+      {
+        "x": 10.5,
+        "y": 17.5
+      },
+      {
+        "x": 11,
+        "y": 17
+      },
+      {
+        "x": 11,
+        "y": 16.5
+      },
+      {
+        "x": 11.5,
+        "y": 16
+      },
+      {
+        "x": 12,
+        "y": 16
+      },
+      {
         "x": 12.5,
-        "y": 13
-      },
-      {
-        "x": 32,
-        "y": 7
-      },
-      {
-        "x": 32,
-        "y": 8
-      },
-      {
-        "x": 32.5,
-        "y": 8
-      },
-      {
-        "x": 32.5,
-        "y": 7
-      },
-      {
-        "x": 32.5,
-        "y": 6.5
-      },
-      {
-        "x": 37,
-        "y": 6.5
-      },
-      {
-        "x": 37,
-        "y": 12
-      },
-      {
-        "x": 35,
-        "y": 12
-      },
-      {
-        "x": 35,
-        "y": 8.5
-      },
-      {
-        "x": 32.5,
-        "y": 8.5
-      },
-      {
-        "x": 33.5,
-        "y": 13
-      },
-      {
-        "x": 33.5,
-        "y": 14
-      },
-      {
-        "x": 34.5,
-        "y": 13
-      },
-      {
-        "x": 34.5,
-        "y": 14
-      },
-      {
-        "x": 34.5,
-        "y": 12.5
-      },
-      {
-        "x": 38,
-        "y": 12.5
-      },
-      {
-        "x": 38,
         "y": 15.5
       },
       {
-        "x": 34.5,
+        "x": 13,
         "y": 15.5
+      },
+      {
+        "x": 13.5,
+        "y": 16
+      },
+      {
+        "x": 14,
+        "y": 17
+      },
+      {
+        "x": 15,
+        "y": 17.5
+      },
+      {
+        "x": 15.5,
+        "y": 18.5
+      },
+      {
+        "x": 14.5,
+        "y": 19.5
+      },
+      {
+        "x": 13.5,
+        "y": 19.5
+      },
+      {
+        "x": 12,
+        "y": 20
+      },
+      {
+        "x": 11,
+        "y": 19.5
+      },
+      {
+        "x": 10,
+        "y": 18.5
+      },
+      {
+        "x": 9.5,
+        "y": 18
+      },
+      {
+        "x": 9.5,
+        "y": 17.5
       }
     ],
     "sectors": [
       {
         "loop": [
-          17,
-          64,
-          65,
-          16,
-          80,
-          79,
-          15,
-          67,
-          66,
           14,
-          107,
-          108,
+          61,
+          62,
           13,
-          50,
-          51,
-          116,
-          117,
+          77,
+          76,
           12,
+          64,
+          63,
           11,
-          81,
-          82,
-          89,
-          90,
+          104,
+          105,
           10,
-          9,
-          111,
-          113,
-          114,
+          47,
+          48,
           112,
+          113,
+          9,
           8,
-          43,
-          42,
+          78,
+          79,
+          86,
+          87,
           7,
           6,
-          27,
-          26,
+          108,
+          110,
+          111,
+          109,
           5,
+          40,
+          39,
           4,
           3,
+          24,
+          23,
           2,
-          115,
+          136,
           1,
-          55,
-          54,
-          0
+          52,
+          51,
+          0,
+          128,
+          129
         ],
         "floor": 0.3,
         "ceil": 3.3,
@@ -1194,7 +1392,7 @@ const World = (() => {
           "windowrow",
           "windowrow",
           "azulejo",
-          "azulejo",
+          "windowrow",
           "stucco",
           "azulejo",
           "brick",
@@ -1204,7 +1402,18 @@ const World = (() => {
           "stucco",
           null,
           "stucco",
-          "stucco"
+          "stucco",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "marble"
         ],
         "wallTexScale": [
           1,
@@ -1222,12 +1431,33 @@ const World = (() => {
           1,
           1,
           1,
+          1,
+          1,
           0.5,
           0.5,
           0.5,
           0.5,
-          0.5,
-          0.5,
+          1,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
           1
         ],
         "wallStepTex": [
@@ -1246,7 +1476,7 @@ const World = (() => {
           "brick",
           "windowrow",
           null,
-          "brick",
+          "windowrow",
           "stucco",
           "azulejo",
           null,
@@ -1261,6 +1491,17 @@ const World = (() => {
           "brick",
           null,
           "brick",
+          null,
+          "brick",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "brick",
+          null,
           null,
           "brick"
         ],
@@ -1280,7 +1521,7 @@ const World = (() => {
           null,
           "limestone",
           null,
-          null,
+          "rooftile",
           null,
           "azulejo",
           null,
@@ -1302,7 +1543,12 @@ const World = (() => {
           null,
           null,
           null,
-          null
+          null,
+          null,
+          "brick",
+          null,
+          null,
+          "brick"
         ],
         "wallDecal": [
           null,
@@ -1355,19 +1601,19 @@ const World = (() => {
       },
       {
         "loop": [
+          15,
+          16,
+          17,
           18,
           19,
+          29,
+          30,
+          31,
+          28,
+          27,
           20,
           21,
-          22,
-          32,
-          33,
-          34,
-          31,
-          30,
-          23,
-          24,
-          25
+          22
         ],
         "floor": 0,
         "ceil": 3.1,
@@ -1382,11 +1628,11 @@ const World = (() => {
       },
       {
         "loop": [
-          27,
-          28,
-          29,
-          35,
-          26
+          24,
+          25,
+          26,
+          32,
+          23
         ],
         "floor": 0.2,
         "ceil": 1.7,
@@ -1407,16 +1653,16 @@ const World = (() => {
       },
       {
         "loop": [
-          29,
-          38,
-          40,
-          41,
-          39,
+          26,
+          35,
           37,
-          57,
-          56,
+          38,
           36,
-          35
+          34,
+          54,
+          53,
+          33,
+          32
         ],
         "floor": 0.2,
         "ceil": 1.7,
@@ -1440,10 +1686,10 @@ const World = (() => {
       },
       {
         "loop": [
-          43,
-          45,
-          44,
-          42
+          40,
+          42,
+          41,
+          39
         ],
         "floor": 0.5,
         "ceil": 1.7,
@@ -1457,14 +1703,14 @@ const World = (() => {
       },
       {
         "loop": [
-          45,
-          47,
-          49,
+          42,
+          44,
           46,
-          48,
-          39,
-          41,
-          44
+          43,
+          45,
+          36,
+          38,
+          41
         ],
         "floor": 0.1,
         "ceil": 2.3,
@@ -1498,10 +1744,10 @@ const World = (() => {
       },
       {
         "loop": [
+          47,
+          49,
           50,
-          52,
-          53,
-          51
+          48
         ],
         "floor": 0.4,
         "ceil": 1.4,
@@ -1521,14 +1767,14 @@ const World = (() => {
       },
       {
         "loop": [
-          57,
-          59,
+          54,
+          56,
+          55,
           58,
-          61,
-          62,
-          63,
+          59,
           60,
-          56
+          57,
+          53
         ],
         "floor": 0.6,
         "ceil": 1.3,
@@ -1542,10 +1788,10 @@ const World = (() => {
       },
       {
         "loop": [
-          62,
-          54,
-          55,
-          63
+          59,
+          51,
+          52,
+          60
         ],
         "floor": 0.7,
         "ceil": 1.3,
@@ -1559,12 +1805,12 @@ const World = (() => {
       },
       {
         "loop": [
+          61,
+          63,
           64,
           66,
-          67,
-          69,
-          68,
-          65
+          65,
+          62
         ],
         "floor": 0.3,
         "ceil": 1.3,
@@ -1586,17 +1832,17 @@ const World = (() => {
       },
       {
         "loop": [
+          66,
+          71,
+          70,
           69,
+          75,
           74,
+          68,
           73,
           72,
-          78,
-          77,
-          71,
-          76,
-          75,
-          70,
-          68
+          67,
+          65
         ],
         "floor": 0,
         "ceil": 1.2,
@@ -1648,10 +1894,10 @@ const World = (() => {
       },
       {
         "loop": [
-          80,
           77,
-          78,
-          79
+          74,
+          75,
+          76
         ],
         "floor": 0.5,
         "ceil": 1,
@@ -1671,10 +1917,10 @@ const World = (() => {
       },
       {
         "loop": [
+          78,
+          80,
           81,
-          83,
-          84,
-          82
+          79
         ],
         "floor": 0.7,
         "ceil": 1.7,
@@ -1694,12 +1940,12 @@ const World = (() => {
       },
       {
         "loop": [
-          58,
-          88,
-          87,
-          86,
+          55,
           85,
-          61
+          84,
+          83,
+          82,
+          58
         ],
         "floor": 0,
         "ceil": 3.4,
@@ -1737,10 +1983,10 @@ const World = (() => {
       },
       {
         "loop": [
+          86,
+          88,
           89,
-          91,
-          92,
-          90
+          87
         ],
         "floor": 0.4,
         "ceil": 1.6,
@@ -1754,16 +2000,16 @@ const World = (() => {
       },
       {
         "loop": [
-          47,
+          44,
+          90,
+          101,
+          100,
+          91,
+          92,
+          120,
+          121,
           93,
-          104,
-          103,
-          94,
-          95,
-          126,
-          127,
-          96,
-          49
+          46
         ],
         "floor": 0.4,
         "ceil": 1.4,
@@ -1797,16 +2043,16 @@ const World = (() => {
       },
       {
         "loop": [
-          91,
-          97,
-          98,
-          102,
-          101,
+          88,
+          94,
+          95,
           99,
-          106,
-          105,
-          100,
-          92
+          98,
+          96,
+          103,
+          102,
+          97,
+          89
         ],
         "floor": 0.4,
         "ceil": 1.8,
@@ -1832,10 +2078,10 @@ const World = (() => {
       },
       {
         "loop": [
-          104,
           101,
-          102,
-          103
+          98,
+          99,
+          100
         ],
         "floor": 0.7,
         "ceil": 1.2,
@@ -1849,10 +2095,10 @@ const World = (() => {
       },
       {
         "loop": [
+          104,
+          106,
           107,
-          109,
-          110,
-          108
+          105
         ],
         "floor": 0.4,
         "ceil": 1.6,
@@ -1866,13 +2112,13 @@ const World = (() => {
       },
       {
         "loop": [
-          116,
-          119,
-          118,
-          117
+          112,
+          115,
+          114,
+          113
         ],
-        "floor": 0,
-        "ceil": 1,
+        "floor": 0.6,
+        "ceil": 2.2,
         "floorTex": "carpet",
         "ceilTex": "ceiltile",
         "sky": false,
@@ -1883,31 +2129,48 @@ const World = (() => {
       },
       {
         "loop": [
+          115,
+          116,
+          117,
+          118,
           119,
+          114
+        ],
+        "floor": 0.7,
+        "ceil": 2.2,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
           120,
-          121,
           122,
           123,
+          121
+        ],
+        "floor": 0,
+        "ceil": 1,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          122,
           124,
           125,
-          118
-        ],
-        "floor": 0,
-        "ceil": 1,
-        "floorTex": "carpet",
-        "ceilTex": "ceiltile",
-        "sky": false,
-        "win": false,
-        "hostile": false,
-        "texScale": 1,
-        "parent": -1
-      },
-      {
-        "loop": [
           126,
-          128,
-          129,
-          127
+          127,
+          123
         ],
         "floor": 0,
         "ceil": 1,
@@ -1922,14 +2185,31 @@ const World = (() => {
       {
         "loop": [
           128,
+          131,
           130,
+          129
+        ],
+        "floor": 0.4,
+        "ceil": 1.7,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
           131,
           132,
           133,
-          129
+          134,
+          135,
+          130
         ],
-        "floor": 0,
-        "ceil": 1,
+        "floor": 0.5,
+        "ceil": 1.8,
         "floorTex": "carpet",
         "ceilTex": "ceiltile",
         "sky": false,
@@ -1937,6 +2217,92 @@ const World = (() => {
         "hostile": false,
         "texScale": 1,
         "parent": -1
+      },
+      {
+        "loop": [
+          136,
+          137,
+          138,
+          1
+        ],
+        "floor": 0.3,
+        "ceil": 1.3,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          137,
+          143,
+          142,
+          141,
+          140,
+          139,
+          138
+        ],
+        "floor": 0.3,
+        "ceil": 2.3,
+        "floorTex": "wetstone",
+        "ceilTex": "ceiltile",
+        "sky": true,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          "rope",
+          "rockwall",
+          "rockwall",
+          "rockwall",
+          "rockwall",
+          "rope",
+          null
+        ],
+        "wallStepTex": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "rope"
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          144,
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155,
+          156,
+          157,
+          158,
+          159,
+          160,
+          161
+        ],
+        "floor": 0,
+        "ceil": 2.3,
+        "floorTex": "water",
+        "ceilTex": "ceiltile",
+        "sky": true,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": 26
       }
     ]
   }
@@ -2896,14 +3262,32 @@ const World = (() => {
       g.fillStyle = '#fff'; g.fillRect(0, 0, 64, 64);
     });
   }
+  // retro grit: per-pixel grain plus a whisper of vertical light falloff, applied
+  // to every finished sprite. Flat vector fills read as paper-cutout ("South
+  // Park"); the same shapes with sensor-noise texture read as a digitized 90s
+  // Build-engine sprite. Only opaque pixels are touched, so outlines stay crisp.
+  function grit(c, w, h) {
+    const g = c.getContext('2d');
+    const d = g.getImageData(0, 0, w, h), p = d.data;
+    for (let i = 0; i < p.length; i += 4) {
+      if (p[i + 3] < 10) continue;
+      const n = (Math.random() - 0.5) * 13;
+      const v = 1 - (((i >> 2) / w | 0) / h) * 0.05;
+      p[i] = Math.min(255, Math.max(0, p[i] * v + n));
+      p[i + 1] = Math.min(255, Math.max(0, p[i + 1] * v + n));
+      p[i + 2] = Math.min(255, Math.max(0, p[i + 2] * v + n));
+    }
+    g.putImageData(d, 0, 0);
+    return c;
+  }
   // draw with a crisp 1px dark outline so the sprite reads against any texture
   function outlined(drawFn, w = 64, h = 64) {
     const base = cnv(drawFn, w, h);
     const sil = cnv(gg => { gg.drawImage(base, 0, 0); gg.globalCompositeOperation = 'source-in'; gg.fillStyle = '#100c0a'; gg.fillRect(0, 0, w, h); }, w, h);
-    return cnv(g => {
+    return grit(cnv(g => {
       for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, 1], [-1, 1], [1, -1]]) g.drawImage(sil, dx, dy);
       g.drawImage(base, 0, 0);
-    }, w, h);
+    }, w, h), w, h);
   }
 
   const SPR = {};
@@ -3192,58 +3576,147 @@ const World = (() => {
   });
 
   // ---- CIVILIANS: unarmed Havana locals, wander or stand — never fight back ----
-  SPR.civilianM = outlined(g => {
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    let lg = g.createLinearGradient(0, 48, 0, 62);
-    lg.addColorStop(0, '#cbb896'); lg.addColorStop(1, '#9c8968');
-    g.fillStyle = lg; g.fillRect(27, 49, 4, 12); g.fillRect(33, 49, 4, 12);
-    g.fillStyle = '#3a2f22'; g.fillRect(26, 59, 6, 3.6); g.fillRect(32, 59, 6, 3.6);
-    let tg = g.createLinearGradient(20, 26, 44, 50);
-    tg.addColorStop(0, '#f0ead6'); tg.addColorStop(0.45, '#d9d0b4'); tg.addColorStop(1, '#a89c78');
-    g.fillStyle = tg;                                                                 // loose guayabera shirt
-    g.beginPath(); g.moveTo(23, 29); g.quadraticCurveTo(32, 25.5, 41, 29); g.lineTo(40, 48); g.quadraticCurveTo(32, 51, 24, 48); g.closePath(); g.fill();
-    g.strokeStyle = 'rgba(120,105,75,0.4)'; g.lineWidth = 0.8;                        // pleat lines
-    g.beginPath(); g.moveTo(28, 29); g.lineTo(27, 48); g.moveTo(36, 29); g.lineTo(37, 48); g.stroke();
-    g.fillStyle = 'rgba(0,0,0,0.15)'; g.beginPath(); g.ellipse(37, 36, 5, 12, 0, 0, 7); g.fill();
-    g.strokeStyle = '#c9a06a'; g.lineWidth = 4.4; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(23, 31); g.lineTo(18, 44); g.stroke();
-    g.beginPath(); g.moveTo(41, 31); g.lineTo(46, 44); g.stroke();
-    g.fillStyle = '#a8734a'; g.beginPath(); g.arc(17.4, 45, 2.6, 0, 7); g.fill();
-    g.fillStyle = '#8a5c38'; g.beginPath(); g.arc(46.6, 45, 2.6, 0, 7); g.fill();
-    g.fillStyle = '#a8724a'; g.beginPath(); g.arc(32, 19, 8, 0, 7); g.fill();
-    g.fillStyle = 'rgba(90,50,25,0.35)'; g.beginPath(); g.ellipse(35, 21.6, 4.4, 3, -0.15, 0, 7); g.fill();
-    g.fillStyle = '#5e3a24'; g.fillRect(29, 24.4, 6, 1.2);
-    g.fillStyle = '#241a10'; g.fillRect(28, 15.6, 3, 4); g.fillRect(33, 15.6, 3, 4);   // hair
-    let hg = g.createLinearGradient(18, 8, 46, 18);                                   // straw hat
-    hg.addColorStop(0, '#e8d090'); hg.addColorStop(1, '#c9a860');
-    g.fillStyle = hg; g.beginPath(); g.ellipse(32, 14.4, 13, 3.4, 0, 0, 7); g.fill();
-    g.fillStyle = hg; g.beginPath(); g.ellipse(32, 10, 6.4, 5.4, 0, Math.PI, 0, true); g.fill();
-    g.fillStyle = '#8a1414'; g.fillRect(26.6, 11.6, 10.8, 1.4);                       // hatband
-  });
-  SPR.civilianF = outlined(g => {
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    g.fillStyle = '#c9906a'; g.fillRect(27, 55, 4, 7); g.fillRect(33, 55, 4, 7);       // bare calves
-    g.fillStyle = '#3a2f22'; g.fillRect(26, 59.6, 6, 3); g.fillRect(32, 59.6, 6, 3);
-    let dg = g.createLinearGradient(18, 27, 46, 56);                                  // full floral-print dress
-    dg.addColorStop(0, '#d8577a'); dg.addColorStop(0.5, '#b8395e'); dg.addColorStop(1, '#7e2140');
-    g.fillStyle = dg;
-    g.beginPath(); g.moveTo(24, 30); g.quadraticCurveTo(32, 26.5, 40, 30); g.lineTo(46, 55); g.lineTo(18, 55); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(255,255,255,0.18)';                                           // print dots
-    for (const [fx, fy] of [[27, 36], [37, 34], [30, 44], [40, 42], [24, 48], [42, 50]]) { g.beginPath(); g.arc(fx, fy, 1.4, 0, 7); g.fill(); }
-    g.fillStyle = 'rgba(0,0,0,0.16)'; g.beginPath(); g.moveTo(38, 30); g.lineTo(44, 54); g.lineTo(40, 54); g.lineTo(35, 30); g.closePath(); g.fill();
-    g.fillStyle = '#7e2140'; g.fillRect(26, 38, 12, 2.2);                             // waist sash
-    g.strokeStyle = '#c9906a'; g.lineWidth = 4; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(24, 32); g.lineTo(19, 44); g.stroke();
-    g.beginPath(); g.moveTo(40, 32); g.lineTo(45, 44); g.stroke();
-    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(18.4, 45, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(45.6, 45, 2.4, 0, 7); g.fill();
-    g.fillStyle = '#a8724a'; g.beginPath(); g.arc(32, 19.6, 7.6, 0, 7); g.fill();
-    g.fillStyle = 'rgba(90,50,25,0.32)'; g.beginPath(); g.ellipse(34.6, 22, 4, 2.8, -0.15, 0, 7); g.fill();
-    g.fillStyle = '#5e3a24'; g.fillRect(29.4, 24.8, 5.4, 1.1);
-    let hair = g.createLinearGradient(20, 10, 44, 26);                                // dark hair swept back
-    hair.addColorStop(0, '#2a1a10'); hair.addColorStop(1, '#140c06');
-    g.fillStyle = hair; g.beginPath(); g.ellipse(32, 15, 9.4, 8.4, 0, Math.PI * 0.9, Math.PI * 2.15); g.fill();
-    g.fillStyle = '#d84040'; g.beginPath(); g.arc(24.6, 13, 1.6, 0, 7); g.fill();      // a flower behind the ear
-  });
+  // ---------------------------------------------------------------------------
+  // Shared realistic humanoid builder — the same Doom-sprite proportions as the
+  // combat sprites (head ≈ 1/5 of the figure, jointed limbs, tapered torso, one
+  // upper-left key light). Every civilian/NPC below rides this one skeleton and
+  // only describes what makes them THEM: garment palette, arm pose, hair/hat,
+  // held props. Keeping all bodies on one skeleton is what retires the old
+  // big-head paper-cutout look for good.
+  // ---------------------------------------------------------------------------
+  function person(g, o) {
+    const [skL, skM, skD] = o.skin || ['#e8b98a', '#c08a5e', '#8f5f3c'];
+    const sw = o.shoulderW || 1;
+    const tLen = o.torsoLen || 40;                                     // jacket/coat hem (40 = tucked at the waist)
+    g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath(); g.ellipse(32, 62, 12, 2.8, 0, 0, 7); g.fill();
+    if (o.skirt) {                                                     // full skirt: bare calves under it
+      g.fillStyle = skM; g.fillRect(27.6, 49, 3.6, 9.5);
+      g.fillStyle = skD; g.fillRect(33, 49, 3.6, 9.5);
+      const shs = o.shoes || ['#3a2f22', '#181209'];
+      g.fillStyle = shs[0]; g.fillRect(26.4, 57.5, 5.6, 5); g.fillRect(32.6, 57.5, 5.6, 5);
+      g.fillStyle = shs[1]; g.fillRect(26, 61.4, 6.4, 1.4); g.fillRect(32.4, 61.4, 6.4, 1.4);
+      const sg = g.createLinearGradient(20, 36, 44, 55);
+      sg.addColorStop(0, o.skirt[0]); sg.addColorStop(0.5, o.skirt[1]); sg.addColorStop(1, o.skirt[2]);
+      g.fillStyle = sg;
+      if (o.skirtFn) o.skirtFn(g);
+      else { g.beginPath(); g.moveTo(25.5, 36); g.lineTo(38.5, 36); g.lineTo(42, 54); g.lineTo(22, 54); g.closePath(); g.fill(); }
+      g.fillStyle = 'rgba(0,0,0,0.2)';                                 // skirt core shadow, right side
+      g.beginPath(); g.moveTo(36, 36.5); g.lineTo(40.5, 53.5); g.lineTo(37, 53.5); g.lineTo(33.5, 36.5); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 0.8;           // hanging folds
+      g.beginPath(); g.moveTo(28, 38); g.lineTo(26.5, 53); g.moveTo(32.5, 38); g.lineTo(32.5, 53); g.stroke();
+    } else {
+      const tr = o.trousers || ['#42454e', '#31333b', '#202228'];
+      const shortsEnd = o.shorts ? 48 : 56;                            // shorts stop at the knee, skin below
+      const lg = g.createLinearGradient(24, 0, 40, 0);
+      lg.addColorStop(0, tr[0]); lg.addColorStop(0.55, tr[1]); lg.addColorStop(1, tr[2] || tr[1]);
+      g.fillStyle = lg;
+      g.beginPath(); g.moveTo(26.5, 38); g.lineTo(31.5, 38); g.lineTo(30.5, shortsEnd); g.lineTo(26, shortsEnd); g.closePath(); g.fill();
+      g.beginPath(); g.moveTo(32.5, 38); g.lineTo(37.5, 38); g.lineTo(38, shortsEnd); g.lineTo(33.5, shortsEnd); g.closePath(); g.fill();
+      g.fillStyle = 'rgba(255,255,255,0.08)'; g.fillRect(27.2, 39, 1, shortsEnd - 41); g.fillRect(34, 39, 1, shortsEnd - 41);
+      if (o.shorts) {                                                  // bare shins down to the footwear
+        g.fillStyle = skM; g.fillRect(27.2, 48, 3.6, 9);
+        g.fillStyle = skD; g.fillRect(33.8, 48, 3.6, 9);
+      } else {
+        g.strokeStyle = 'rgba(0,0,0,0.28)'; g.lineWidth = 1;           // knee creases
+        g.beginPath(); g.moveTo(27, 47); g.lineTo(30.5, 47.4); g.stroke();
+        g.beginPath(); g.moveTo(34, 47.6); g.lineTo(37.5, 47.2); g.stroke();
+      }
+      const shs = o.shoes || ['#2c2620', '#0d0b09'];
+      const sg = g.createLinearGradient(0, 55, 0, 63);
+      sg.addColorStop(0, shs[0]); sg.addColorStop(1, shs[1]);
+      g.fillStyle = sg; g.fillRect(25, 55.5, 6.6, 7); g.fillRect(33.2, 55.5, 6.6, 7);
+      g.fillStyle = 'rgba(255,255,255,0.12)'; g.fillRect(25.4, 56, 5.8, 1); g.fillRect(33.6, 56, 5.8, 1);
+      g.fillStyle = '#000'; g.fillRect(24.6, 61.5, 7.4, 1.5); g.fillRect(33, 61.5, 7.4, 1.5);
+    }
+    // ---- torso: shoulders tapering to the waist (or flaring to a jacket hem) ----
+    const t = o.torso;
+    const tg = g.createLinearGradient(20, 18, 44, tLen);
+    tg.addColorStop(0, t[0]); tg.addColorStop(0.4, t[1]); tg.addColorStop(1, t[2]);
+    g.fillStyle = tg;
+    const hemW = tLen > 40 ? 8 : 7;                                    // longer coats flare a little
+    g.beginPath();
+    g.moveTo(32 - 10 * sw, 21); g.quadraticCurveTo(32, 17.5, 32 + 10 * sw, 21);
+    g.lineTo(32 + 9 * sw, 34); g.quadraticCurveTo(32 + 8.5 * sw, (34 + tLen) / 2, 32 + hemW * sw, tLen);
+    g.lineTo(32 - hemW * sw, tLen); g.quadraticCurveTo(32 - 8.5 * sw, (34 + tLen) / 2, 32 - 9 * sw, 34);
+    g.closePath(); g.fill();
+    g.fillStyle = 'rgba(0,0,0,0.22)';                                  // core shadow, right side
+    g.beginPath(); g.moveTo(32 + 6 * sw, 21); g.quadraticCurveTo(32 + 9.5 * sw, (21 + tLen) / 2, 32 + (hemW - 1) * sw, tLen);
+    g.lineTo(32 + 3 * sw, tLen); g.quadraticCurveTo(32 + 5 * sw, (21 + tLen) / 2, 32 + 3.5 * sw, 21.5); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.13)';                            // chest highlight
+    g.beginPath(); g.ellipse(32 - 4.5 * sw, 26, 3.4, 5.6, 0.2, 0, 7); g.fill();
+    if (o.chest) o.chest(g);
+    // ---- arms: stroked polylines with round joints; hands at the ends ----
+    const bare = o.sleeve === 'skin';
+    const sl = bare ? [skM, skD] : o.sleeve || [t[1], t[2]];
+    const armL = o.armL || [[23, 22.5], [20.5, 29.5], [22, 36]];
+    const armR = o.armR || [[41, 22.5], [43.5, 29.5], [42, 36]];
+    g.lineCap = 'round'; g.lineJoin = 'round'; g.lineWidth = o.armW || 4.6;
+    g.strokeStyle = sl[0]; g.beginPath(); g.moveTo(armL[0][0], armL[0][1]); for (let i = 1; i < armL.length; i++) g.lineTo(armL[i][0], armL[i][1]); g.stroke();
+    g.strokeStyle = sl[1]; g.beginPath(); g.moveTo(armR[0][0], armR[0][1]); for (let i = 1; i < armR.length; i++) g.lineTo(armR[i][0], armR[i][1]); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.16)'; g.lineWidth = 1.3;       // lit edge on the near arm
+    g.beginPath(); g.moveTo(armL[0][0] - 0.5, armL[0][1] + 0.5); g.lineTo(armL[1][0] - 0.5, armL[1][1]); g.stroke();
+    const hL = o.handL || armL[armL.length - 1], hR = o.handR || armR[armR.length - 1];
+    g.fillStyle = skM; g.beginPath(); g.arc(hL[0], hL[1], 2.4, 0, 7); g.fill();
+    g.fillStyle = skD; g.beginPath(); g.arc(hR[0], hR[1], 2.4, 0, 7); g.fill();
+    // ---- neck + head (radial-lit, jaw shade, ear) — optionally turned ----
+    if (o.headTurn) { g.save(); g.translate(32, 12); g.rotate(o.headTurn); g.translate(-32, -12); }
+    g.fillStyle = skD; g.fillRect(29.6, 14.5, 4.8, 4.4);
+    const hr = o.headR || [5, 5.6];
+    const rg = g.createRadialGradient(29.5, 9, 1.5, 32, 11, 7);
+    rg.addColorStop(0, skL); rg.addColorStop(0.65, skM); rg.addColorStop(1, skD);
+    g.fillStyle = rg; g.beginPath(); g.ellipse(32, 11, hr[0], hr[1], 0, 0, 7); g.fill();
+    g.fillStyle = 'rgba(60,30,12,0.3)';                                // jaw shading
+    g.beginPath(); g.ellipse(33.5, 13.4, 3.3, 2.1, -0.15, 0, 7); g.fill();
+    g.fillStyle = skD; g.beginPath(); g.ellipse(32 + hr[0] * 0.94, 11.5, 1, 1.6, 0, 0, 7); g.fill();  // ear
+    if (!o.noFace) {
+      g.fillStyle = '#2a1c12'; g.fillRect(29.2, 9.8, 1.5, 1.5); g.fillRect(33.3, 9.8, 1.5, 1.5);      // eyes
+      g.fillStyle = 'rgba(60,30,12,0.45)'; g.fillRect(31.4, 12, 1.4, 1.6);                            // nose shadow
+      g.fillStyle = '#5e3a24'; g.fillRect(30.2, 14.6, 3.8, 1.1);                                      // mouth
+    }
+    if (o.face) o.face(g);
+    if (o.hair) o.hair(g);
+    if (o.headTurn) g.restore();
+    if (o.extras) o.extras(g);
+  }
+
+  SPR.civilianM = outlined(g => person(g, {                            // local in a guayabera + straw hat
+    trousers: ['#cbb896', '#a89878', '#8a7a5c'], shoes: ['#4a3c2c', '#241c12'],
+    torso: ['#f4eeda', '#d9d0b4', '#a89c78'], sleeve: 'skin',
+    chest: gg => {
+      gg.strokeStyle = 'rgba(120,105,75,0.45)'; gg.lineWidth = 0.8;    // guayabera pleats
+      gg.beginPath(); gg.moveTo(28.5, 21.5); gg.lineTo(27.5, 39); gg.moveTo(35.5, 21.5); gg.lineTo(36.5, 39); gg.stroke();
+      gg.fillStyle = '#8a7a5c'; for (let y = 23; y < 38; y += 3.6) gg.fillRect(31.6, y, 0.9, 0.9);    // button line
+    },
+    face: gg => { gg.fillStyle = '#4a2e1a'; gg.fillRect(30, 13.2, 4, 1); },                           // moustache
+    hair: gg => {
+      gg.fillStyle = '#241a10'; gg.fillRect(27.4, 8.4, 1.8, 3.4); gg.fillRect(34.8, 8.4, 1.8, 3.4);   // sideburns
+      const hg = gg.createLinearGradient(20, 3, 44, 10);               // straw hat
+      hg.addColorStop(0, '#e8d090'); hg.addColorStop(1, '#c9a860');
+      gg.fillStyle = hg; gg.beginPath(); gg.ellipse(32, 8.2, 9.6, 2.5, 0, 0, 7); gg.fill();
+      gg.beginPath(); gg.ellipse(32, 5.4, 4.9, 4, 0, Math.PI, 0, true); gg.fill();
+      gg.fillStyle = '#8a1414'; gg.fillRect(27.6, 6.2, 8.8, 1.3);      // hatband
+      gg.fillStyle = 'rgba(0,0,0,0.22)'; gg.beginPath(); gg.ellipse(32, 8.8, 5.2, 1.2, 0, 0, 7); gg.fill();  // brim shadow on brow
+    },
+  }));
+  SPR.civilianF = outlined(g => person(g, {                            // local in a floral print dress
+    skirt: ['#d8577a', '#b8395e', '#7e2140'], shoes: ['#3a2f22', '#181209'],
+    torso: ['#d8577a', '#b8395e', '#7e2140'], sleeve: 'skin', armW: 4, shoulderW: 0.85, headR: [4.6, 5.2],
+    chest: gg => {
+      gg.fillStyle = '#7e2140'; gg.fillRect(26.5, 36, 11, 2);          // waist sash
+      gg.fillStyle = 'rgba(255,255,255,0.2)';                          // print dots, bodice + skirt
+      for (const [fx, fy] of [[28, 26], [35.5, 29], [30, 33], [27, 42], [36, 44], [31.5, 49], [39, 50]]) { gg.beginPath(); gg.arc(fx, fy, 1.3, 0, 7); gg.fill(); }
+    },
+    face: gg => { gg.fillStyle = '#a83838'; gg.beginPath(); gg.ellipse(32.1, 14.9, 1.7, 0.8, 0, 0, 7); gg.fill(); },  // lipstick
+    hair: gg => {
+      const hair = gg.createLinearGradient(24, 4, 40, 16);             // dark hair swept back
+      hair.addColorStop(0, '#2a1a10'); hair.addColorStop(1, '#140c06');
+      gg.fillStyle = hair;
+      gg.beginPath(); gg.ellipse(32, 8.6, 5.6, 5, 0, Math.PI * 0.92, Math.PI * 2.1); gg.fill();
+      gg.beginPath(); gg.ellipse(27.6, 10.5, 1.6, 3.4, 0.2, 0, 7); gg.fill();                          // side sweep
+      gg.beginPath(); gg.ellipse(36.6, 10.8, 1.5, 3.2, -0.2, 0, 7); gg.fill();
+      gg.fillStyle = '#d84040'; gg.beginPath(); gg.arc(27.2, 8.6, 1.4, 0, 7); gg.fill();               // flower behind the ear
+    },
+  }));
   SPR.civilianCorpse = outlined(g => {
     g.fillStyle = 'rgba(0,0,0,0.24)'; g.beginPath(); g.ellipse(31, 58, 22, 5, 0, 0, 7); g.fill();
     let tg = g.createLinearGradient(10, 50, 50, 60);
@@ -3266,310 +3739,287 @@ const World = (() => {
   // waiter, a tourist, a police officer, a fisherman, a flower girl. Neutral,
   // same wander/stationary behavior + low-hp/one-hit-down rules as civilianM/F.
   // ---------------------------------------------------------------------------
-  SPR.vendor = outlined(g => {                                       // street vendor, apron + tray of goods
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    let lg = g.createLinearGradient(0, 48, 0, 62);
-    lg.addColorStop(0, '#7a6248'); lg.addColorStop(1, '#584434');
-    g.fillStyle = lg; g.fillRect(27, 49, 4, 12); g.fillRect(33, 49, 4, 12);
-    g.fillStyle = '#241a12'; g.fillRect(26, 59, 6, 3.6); g.fillRect(32, 59, 6, 3.6);
-    let tg = g.createLinearGradient(20, 26, 44, 50);                              // work shirt under an apron
-    tg.addColorStop(0, '#8a9078'); tg.addColorStop(1, '#5c6248');
-    g.fillStyle = tg;
-    g.beginPath(); g.moveTo(23, 29); g.quadraticCurveTo(32, 25.5, 41, 29); g.lineTo(40, 48); g.quadraticCurveTo(32, 51, 24, 48); g.closePath(); g.fill();
-    let ap = g.createLinearGradient(24, 32, 40, 50);
-    ap.addColorStop(0, '#d8c8a0'); ap.addColorStop(1, '#a8926a');
-    g.fillStyle = ap; g.beginPath(); g.moveTo(25, 33); g.lineTo(39, 33); g.lineTo(37, 49); g.lineTo(27, 49); g.closePath(); g.fill();
-    g.strokeStyle = 'rgba(90,75,50,0.4)'; g.lineWidth = 0.8; g.strokeRect(27, 38, 10, 8);
-    g.strokeStyle = '#c9a06a'; g.lineWidth = 4.4; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(23, 31); g.lineTo(17, 40); g.stroke();
-    g.beginPath(); g.moveTo(41, 31); g.lineTo(47, 40); g.stroke();
-    g.fillStyle = '#a8734a'; g.beginPath(); g.arc(16.4, 39, 2.6, 0, 7); g.fill();
-    g.fillStyle = '#8a5c38'; g.beginPath(); g.arc(47.6, 39, 2.6, 0, 7); g.fill();
-    let tray = g.createLinearGradient(8, 36, 26, 42);                             // tray of wares balanced on one arm
-    tray.addColorStop(0, '#b8875a'); tray.addColorStop(1, '#8a5c38');
-    g.fillStyle = tray; g.beginPath(); g.ellipse(15, 38.6, 8, 3, 0, 0, 7); g.fill();
-    g.fillStyle = '#c9a227'; for (const [fx, fy] of [[11, 37], [15, 36.4], [19, 37.4]]) { g.beginPath(); g.arc(fx, fy, 1.8, 0, 7); g.fill(); }
-    g.fillStyle = '#a8724a'; g.beginPath(); g.arc(32, 19, 8, 0, 7); g.fill();
-    g.fillStyle = 'rgba(90,50,25,0.35)'; g.beginPath(); g.ellipse(35, 21.6, 4.4, 3, -0.15, 0, 7); g.fill();
-    g.fillStyle = '#5e3a24'; g.fillRect(29, 24.4, 6, 1.2);
-    g.fillStyle = '#241a10'; g.fillRect(28, 15.6, 3, 4); g.fillRect(33, 15.6, 3, 4);
-    g.fillStyle = '#3a3226'; g.beginPath(); g.ellipse(32, 15, 9, 4, 0, Math.PI, 0, true); g.fill();   // flat cap
-  });
+  SPR.vendor = outlined(g => person(g, {                               // street vendor, apron + tray of goods
+    trousers: ['#7a6248', '#5c4a36', '#463828'], shoes: ['#241a12', '#0e0a06'],
+    torso: ['#98a084', '#6a7254', '#4a5038'], sleeve: 'skin',
+    armL: [[23, 22.5], [18.5, 29], [21, 35]], handL: [21, 35],
+    armR: [[41, 22.5], [45.5, 27.5], [43.5, 33]], handR: [43.5, 33],
+    chest: gg => {
+      const ap = gg.createLinearGradient(26, 24, 38, 40);              // canvas apron over the work shirt
+      ap.addColorStop(0, '#d8c8a0'); ap.addColorStop(1, '#a8926a');
+      gg.fillStyle = ap; gg.beginPath(); gg.moveTo(27, 24); gg.lineTo(37, 24); gg.lineTo(36.5, 39.5); gg.lineTo(27.5, 39.5); gg.closePath(); gg.fill();
+      gg.strokeStyle = 'rgba(90,75,50,0.45)'; gg.lineWidth = 0.8; gg.strokeRect(28.5, 31, 7, 6);      // apron pocket
+      gg.strokeStyle = '#8a7a58'; gg.lineWidth = 1;                    // neck straps
+      gg.beginPath(); gg.moveTo(28, 24); gg.lineTo(31, 19.5); gg.moveTo(36, 24); gg.lineTo(33.4, 19.5); gg.stroke();
+    },
+    face: gg => { gg.fillStyle = '#4a2e1a'; gg.fillRect(30, 13.2, 4, 1); },                            // moustache
+    hair: gg => {
+      gg.fillStyle = '#241a10'; gg.fillRect(27.4, 8.2, 1.8, 3.2); gg.fillRect(34.8, 8.2, 1.8, 3.2);
+      gg.fillStyle = '#3a3226'; gg.beginPath(); gg.ellipse(32, 8, 5.6, 3, 0, Math.PI, 0, true); gg.fill();  // flat cap
+      gg.fillStyle = '#2a241a'; gg.beginPath(); gg.ellipse(34.5, 8.2, 3.4, 1, 0, 0, 7); gg.fill();          // cap brim
+    },
+    extras: gg => {
+      const tray = gg.createLinearGradient(40, 30, 56, 36);            // tray of wares balanced on the far hand
+      tray.addColorStop(0, '#b8875a'); tray.addColorStop(1, '#8a5c38');
+      gg.fillStyle = tray; gg.beginPath(); gg.ellipse(48, 32, 7.5, 2.6, 0, 0, 7); gg.fill();
+      gg.fillStyle = 'rgba(0,0,0,0.25)'; gg.beginPath(); gg.ellipse(48, 32.8, 7.5, 1.2, 0, 0, 7); gg.fill();
+      gg.fillStyle = '#c9a227'; for (const [fx, fy] of [[44.5, 30.6], [48, 29.8], [51.5, 30.8]]) { gg.beginPath(); gg.arc(fx, fy, 1.7, 0, 7); gg.fill(); }
+      gg.fillStyle = '#d84040'; gg.beginPath(); gg.arc(46.2, 30, 1.2, 0, 7); gg.fill();
+    },
+  }));
 
-  SPR.waiter = outlined(g => {                                       // café waiter, white jacket + bow tie + tray
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    g.fillStyle = '#1c1e22'; g.fillRect(27, 49, 4, 12); g.fillRect(33, 49, 4, 12);        // black trousers
-    g.fillStyle = '#0c0d10'; g.fillRect(26, 59, 6, 3.6); g.fillRect(32, 59, 6, 3.6);
-    let tg = g.createLinearGradient(20, 26, 44, 50);                                     // crisp white jacket
-    tg.addColorStop(0, '#f4f0e4'); tg.addColorStop(1, '#c9c4b0');
-    g.fillStyle = tg;
-    g.beginPath(); g.moveTo(23, 29); g.quadraticCurveTo(32, 25.5, 41, 29); g.lineTo(40, 48); g.quadraticCurveTo(32, 51, 24, 48); g.closePath(); g.fill();
-    g.strokeStyle = 'rgba(120,115,95,0.4)'; g.lineWidth = 0.8;
-    g.beginPath(); g.moveTo(32, 30); g.lineTo(32, 48); g.stroke();
-    g.fillStyle = '#1c1e22'; g.beginPath(); g.moveTo(29, 30); g.lineTo(35, 30); g.lineTo(32, 34); g.closePath(); g.fill();  // bow tie
-    g.fillStyle = 'rgba(0,0,0,0.15)'; g.beginPath(); g.ellipse(37, 36, 5, 12, 0, 0, 7); g.fill();
-    g.strokeStyle = '#c9a06a'; g.lineWidth = 4.4; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(23, 31); g.lineTo(18, 44); g.stroke();
-    g.beginPath(); g.moveTo(41, 31); g.lineTo(46, 30); g.stroke();                       // raised serving arm
-    g.fillStyle = '#a8734a'; g.beginPath(); g.arc(17.4, 45, 2.6, 0, 7); g.fill();
-    g.fillStyle = '#8a5c38'; g.beginPath(); g.arc(46.6, 30, 2.6, 0, 7); g.fill();
-    let tray = g.createLinearGradient(38, 22, 58, 28);                                   // tray held aloft, a drink on it
-    tray.addColorStop(0, '#d8d8dc'); tray.addColorStop(1, '#9098a0');
-    g.fillStyle = tray; g.beginPath(); g.ellipse(50, 27, 9, 2.6, 0, 0, 7); g.fill();
-    g.fillStyle = '#e8dca0'; g.fillRect(48, 20, 3, 6); g.fillStyle = '#8a1414'; g.fillRect(48, 20, 3, 2);
-    g.fillStyle = '#a8724a'; g.beginPath(); g.arc(32, 19, 8, 0, 7); g.fill();
-    g.fillStyle = 'rgba(90,50,25,0.35)'; g.beginPath(); g.ellipse(35, 21.6, 4.4, 3, -0.15, 0, 7); g.fill();
-    g.fillStyle = '#5e3a24'; g.fillRect(29, 24.4, 6, 1.2);
-    g.fillStyle = '#241a10'; g.fillRect(28, 15.6, 3, 4); g.fillRect(33, 15.6, 3, 4);
-  });
+  SPR.waiter = outlined(g => person(g, {                               // café waiter, white jacket + bow tie + tray aloft
+    trousers: ['#23252b', '#17181d', '#0e0f13'], shoes: ['#17181d', '#060708'],
+    torso: ['#f7f3e7', '#d9d3bf', '#a8a28e'], sleeve: ['#e8e2d0', '#b8b29c'],
+    armR: [[40.5, 22], [45.5, 17], [49.5, 12.5]], handR: [49.5, 12.5],
+    chest: gg => {
+      gg.strokeStyle = 'rgba(120,115,95,0.45)'; gg.lineWidth = 0.8;    // jacket seam
+      gg.beginPath(); gg.moveTo(32, 22); gg.lineTo(32, 39.5); gg.stroke();
+      gg.fillStyle = '#1c1e22';                                        // bow tie at the collar
+      gg.beginPath(); gg.moveTo(29.6, 20.4); gg.lineTo(32, 21.6); gg.lineTo(29.6, 22.8); gg.closePath(); gg.fill();
+      gg.beginPath(); gg.moveTo(34.4, 20.4); gg.lineTo(32, 21.6); gg.lineTo(34.4, 22.8); gg.closePath(); gg.fill();
+      gg.fillRect(31.3, 20.8, 1.5, 1.5);
+      gg.fillStyle = '#a8a28e'; for (let y = 25; y < 38; y += 3.8) gg.fillRect(31.6, y, 0.9, 0.9);    // buttons
+    },
+    hair: gg => {
+      const hg = gg.createLinearGradient(26, 4, 38, 10);               // slicked dark hair
+      hg.addColorStop(0, '#2a1e12'); hg.addColorStop(1, '#140d06');
+      gg.fillStyle = hg; gg.beginPath(); gg.ellipse(32, 8.4, 5.2, 4, 0, Math.PI, 0, true); gg.fill();
+      gg.fillStyle = 'rgba(255,255,255,0.16)'; gg.beginPath(); gg.ellipse(29.8, 6.6, 2.2, 1, -0.3, 0, 7); gg.fill();  // pomade shine
+    },
+    extras: gg => {
+      const tray = gg.createLinearGradient(44, 8, 60, 12);             // silver tray balanced overhead
+      tray.addColorStop(0, '#d8d8dc'); tray.addColorStop(1, '#9098a0');
+      gg.fillStyle = tray; gg.beginPath(); gg.ellipse(52, 10.5, 7.5, 2.2, 0, 0, 7); gg.fill();
+      gg.fillStyle = 'rgba(0,0,0,0.25)'; gg.beginPath(); gg.ellipse(52, 11.2, 7.5, 1, 0, 0, 7); gg.fill();
+      gg.fillStyle = '#e8dca0'; gg.fillRect(50.4, 4.5, 2.8, 5.4);      // a drink riding it
+      gg.fillStyle = '#8a1414'; gg.fillRect(50.4, 4.5, 2.8, 1.8);
+    },
+  }));
 
-  SPR.tourist = outlined(g => {                                      // loud shirt, camera, sun hat
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    let lg = g.createLinearGradient(0, 48, 0, 62);
-    lg.addColorStop(0, '#d8ceb0'); lg.addColorStop(1, '#a89c78');
-    g.fillStyle = lg; g.fillRect(27, 49, 4, 12); g.fillRect(33, 49, 4, 12);
-    g.fillStyle = '#c9a06a'; g.fillRect(26, 59, 6, 3.6); g.fillRect(32, 59, 6, 3.6);      // sandals
-    let tg = g.createLinearGradient(20, 26, 44, 50);                                     // Hawaiian shirt
-    tg.addColorStop(0, '#3a7a6a'); tg.addColorStop(1, '#1e4a3e');
-    g.fillStyle = tg;
-    g.beginPath(); g.moveTo(23, 29); g.quadraticCurveTo(32, 25.5, 41, 29); g.lineTo(40, 48); g.quadraticCurveTo(32, 51, 24, 48); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(230,190,90,0.6)';                                                // print flowers
-    for (const [fx, fy] of [[27, 34], [37, 32], [30, 42], [34, 44], [24, 40]]) { g.beginPath(); g.arc(fx, fy, 1.8, 0, 7); g.fill(); }
-    g.strokeStyle = '#e8d0a0'; g.lineWidth = 4.4; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(23, 31); g.lineTo(18, 44); g.stroke();
-    g.beginPath(); g.moveTo(41, 31); g.lineTo(46, 44); g.stroke();
-    g.fillStyle = '#c9946a'; g.beginPath(); g.arc(17.4, 45, 2.6, 0, 7); g.fill();
-    g.fillStyle = '#a8734a'; g.beginPath(); g.arc(46.6, 45, 2.6, 0, 7); g.fill();
-    g.fillStyle = '#1c1e22'; g.fillRect(29, 33, 6, 4);                                   // camera on a strap
-    g.fillStyle = '#3a3d44'; g.beginPath(); g.arc(32, 35, 1.8, 0, 7); g.fill();
-    g.strokeStyle = 'rgba(30,20,10,0.5)'; g.lineWidth = 1; g.beginPath(); g.moveTo(26, 27); g.lineTo(32, 33); g.lineTo(38, 27); g.stroke();
-    g.fillStyle = '#c9a06a'; g.beginPath(); g.arc(32, 19, 8, 0, 7); g.fill();
-    g.fillStyle = 'rgba(160,100,40,0.3)'; g.beginPath(); g.ellipse(35, 21.6, 4.4, 3, -0.15, 0, 7); g.fill();
-    let hg = g.createLinearGradient(16, 8, 48, 18);                                      // wide sun hat
-    hg.addColorStop(0, '#f0e0b0'); hg.addColorStop(1, '#d0b878');
-    g.fillStyle = hg; g.beginPath(); g.ellipse(32, 13.6, 15, 3.8, 0, 0, 7); g.fill();
-    g.fillStyle = hg; g.beginPath(); g.ellipse(32, 9.6, 6.4, 5.4, 0, Math.PI, 0, true); g.fill();
-    g.fillStyle = 'rgba(20,20,24,0.7)'; g.fillRect(26, 20, 5, 2.6); g.fillRect(33, 20, 5, 2.6);   // sunglasses
-  });
+  SPR.tourist = outlined(g => person(g, {                              // loud shirt, camera, sun hat, sandals
+    skin: ['#f0c8a0', '#d0a074', '#a0764c'],                           // sunburnt-pale next to the locals
+    trousers: ['#d8ceb0', '#b8ac8a', '#948a68'], shorts: true, shoes: ['#a8783e', '#5c3e1c'],
+    torso: ['#4a8a78', '#2e6a58', '#1c4a3c'], sleeve: 'skin',
+    chest: gg => {
+      gg.fillStyle = 'rgba(230,190,90,0.6)';                           // hibiscus print
+      for (const [fx, fy] of [[27.5, 25], [36, 27], [29, 31], [34.5, 35], [27, 37]]) { gg.beginPath(); gg.arc(fx, fy, 1.7, 0, 7); gg.fill(); }
+      gg.strokeStyle = 'rgba(20,14,8,0.5)'; gg.lineWidth = 1;          // camera strap
+      gg.beginPath(); gg.moveTo(26.5, 21.5); gg.lineTo(32, 27.5); gg.lineTo(37.5, 21.5); gg.stroke();
+      gg.fillStyle = '#1c1e22'; gg.fillRect(29.2, 26.5, 5.6, 3.8);     // camera on the chest
+      gg.fillStyle = '#3a3d44'; gg.beginPath(); gg.arc(32, 28.4, 1.6, 0, 7); gg.fill();
+      gg.fillStyle = 'rgba(200,220,240,0.7)'; gg.beginPath(); gg.arc(31.5, 27.9, 0.6, 0, 7); gg.fill();
+    },
+    face: gg => {
+      gg.fillStyle = 'rgba(16,16,20,0.85)';                            // sunglasses
+      gg.fillRect(28.4, 9.4, 3, 2.2); gg.fillRect(32.6, 9.4, 3, 2.2); gg.fillRect(31.2, 9.9, 1.6, 0.9);
+      gg.fillStyle = 'rgba(160,200,235,0.4)'; gg.fillRect(28.7, 9.7, 1.4, 1);
+    },
+    hair: gg => {
+      const hg = gg.createLinearGradient(20, 2, 44, 10);               // wide floppy sun hat
+      hg.addColorStop(0, '#f0e0b0'); hg.addColorStop(1, '#d0b878');
+      gg.fillStyle = hg; gg.beginPath(); gg.ellipse(32, 8, 11, 2.8, 0.06, 0, 7); gg.fill();
+      gg.beginPath(); gg.ellipse(32, 5, 4.8, 3.8, 0, Math.PI, 0, true); gg.fill();
+      gg.fillStyle = 'rgba(0,0,0,0.2)'; gg.beginPath(); gg.ellipse(32, 8.6, 5.4, 1.2, 0, 0, 7); gg.fill();
+    },
+  }));
 
-  SPR.officer = outlined(g => {                                      // Cuban police officer, uniform + cap
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    let lg = g.createLinearGradient(0, 48, 0, 62);
-    lg.addColorStop(0, '#3a4a5e'); lg.addColorStop(1, '#242e3a');
-    g.fillStyle = lg; g.fillRect(27, 49, 4, 12); g.fillRect(33, 49, 4, 12);
-    g.fillStyle = '#0c0d10'; g.fillRect(26, 59, 6, 3.6); g.fillRect(32, 59, 6, 3.6);      // boots
-    let tg = g.createLinearGradient(20, 26, 44, 50);                                     // uniform tunic
-    tg.addColorStop(0, '#4a5e74'); tg.addColorStop(1, '#2a3a4a');
-    g.fillStyle = tg;
-    g.beginPath(); g.moveTo(23, 29); g.quadraticCurveTo(32, 25.5, 41, 29); g.lineTo(40, 48); g.quadraticCurveTo(32, 51, 24, 48); g.closePath(); g.fill();
-    g.fillStyle = '#c9a227'; g.fillRect(24, 38, 16, 2);                                  // belt
-    g.fillStyle = 'rgba(0,0,0,0.2)'; g.beginPath(); g.moveTo(38, 30); g.lineTo(44, 48); g.lineTo(40, 48); g.lineTo(35, 30); g.closePath(); g.fill();
-    g.strokeStyle = '#c9a06a'; g.lineWidth = 4.4; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(23, 31); g.lineTo(18, 44); g.stroke();
-    g.beginPath(); g.moveTo(41, 31); g.lineTo(46, 44); g.stroke();
-    g.fillStyle = '#a8734a'; g.beginPath(); g.arc(17.4, 45, 2.6, 0, 7); g.fill();
-    g.fillStyle = '#8a5c38'; g.beginPath(); g.arc(46.6, 45, 2.6, 0, 7); g.fill();
-    g.fillStyle = '#1c1e22'; g.fillRect(43, 40, 2.4, 8);                                 // baton at the hip
-    g.fillStyle = '#a8724a'; g.beginPath(); g.arc(32, 19, 8, 0, 7); g.fill();
-    g.fillStyle = 'rgba(90,50,25,0.35)'; g.beginPath(); g.ellipse(35, 21.6, 4.4, 3, -0.15, 0, 7); g.fill();
-    let cg = g.createLinearGradient(20, 8, 44, 20);                                      // peaked cap
-    cg.addColorStop(0, '#3a4a5e'); cg.addColorStop(1, '#1c242e');
-    g.fillStyle = cg; g.beginPath(); g.ellipse(32, 13.6, 9, 6, 0, Math.PI, 0, true); g.fill();
-    g.fillStyle = '#1c242e'; g.beginPath(); g.ellipse(32, 18, 10.4, 2.4, 0, 0, 7); g.fill();
-    g.fillStyle = '#c9a227'; g.beginPath(); g.arc(32, 14, 1.6, 0, 7); g.fill();          // cap badge
-  });
+  SPR.officer = outlined(g => person(g, {                              // Cuban police officer, uniform + peaked cap
+    trousers: ['#3e4e63', '#2c3a4a', '#1e2836'], shoes: ['#17181d', '#060708'],
+    torso: ['#54687e', '#3a4c60', '#263444'],
+    chest: gg => {
+      gg.fillStyle = '#c9a227'; gg.fillRect(25.5, 36.5, 13, 2.2);      // duty belt
+      gg.fillStyle = '#fff2c0'; gg.fillRect(30.8, 36.8, 2.4, 1.6);     // buckle
+      gg.strokeStyle = 'rgba(0,0,0,0.35)'; gg.lineWidth = 0.8;         // breast pockets
+      gg.strokeRect(26.8, 24.5, 4.4, 3.6); gg.strokeRect(32.8, 24.5, 4.4, 3.6);
+      gg.fillStyle = '#c9a227'; for (let y = 23; y < 36; y += 3.4) gg.fillRect(31.6, y, 0.9, 0.9);    // brass buttons
+      gg.fillStyle = '#c9a227'; gg.fillRect(23.5, 20.5, 3.4, 1.4); gg.fillRect(37.1, 20.5, 3.4, 1.4); // shoulder boards
+    },
+    hair: gg => {
+      const cg2 = gg.createLinearGradient(26, 2, 40, 10);              // peaked cap
+      cg2.addColorStop(0, '#3e5066'); cg2.addColorStop(1, '#1c242e');
+      gg.fillStyle = cg2; gg.beginPath(); gg.ellipse(32, 7.2, 5.8, 3.8, 0, Math.PI, 0, true); gg.fill();
+      gg.fillStyle = '#141a22'; gg.beginPath(); gg.ellipse(32, 7.6, 6.2, 1.6, 0, 0, 7); gg.fill();    // band
+      gg.fillStyle = '#0e1218'; gg.beginPath(); gg.ellipse(32.6, 8.9, 5, 1.2, 0.05, 0, 7); gg.fill(); // visor
+      gg.fillStyle = '#c9a227'; gg.beginPath(); gg.arc(32, 6.2, 1.2, 0, 7); gg.fill();                // badge
+    },
+    extras: gg => {
+      gg.save(); gg.translate(41.5, 38); gg.rotate(0.25);              // baton hanging off the belt
+      gg.fillStyle = '#1c1e22'; gg.fillRect(-1.1, 0, 2.2, 9);
+      gg.fillStyle = 'rgba(255,255,255,0.15)'; gg.fillRect(-1.1, 0, 0.8, 9);
+      gg.restore();
+    },
+  }));
 
-  SPR.fisherman = outlined(g => {                                    // dockworker, rolled sleeves + net
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    let lg = g.createLinearGradient(0, 48, 0, 62);
-    lg.addColorStop(0, '#8a9088'); lg.addColorStop(1, '#5c6258');
-    g.fillStyle = lg; g.fillRect(27, 49, 4, 12); g.fillRect(33, 49, 4, 12);
-    g.fillStyle = '#241a12'; g.fillRect(26, 59, 6, 3.6); g.fillRect(32, 59, 6, 3.6);
-    let tg = g.createLinearGradient(20, 26, 44, 50);                                     // rolled-sleeve shirt
-    tg.addColorStop(0, '#c9c2a0'); tg.addColorStop(1, '#9c9478');
-    g.fillStyle = tg;
-    g.beginPath(); g.moveTo(23, 29); g.quadraticCurveTo(32, 25.5, 41, 29); g.lineTo(40, 48); g.quadraticCurveTo(32, 51, 24, 48); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(0,0,0,0.15)'; g.beginPath(); g.ellipse(37, 36, 5, 12, 0, 0, 7); g.fill();
-    g.strokeStyle = '#c9a06a'; g.lineWidth = 5.2; g.lineCap = 'round';                   // thicker bare forearms
-    g.beginPath(); g.moveTo(23, 31); g.lineTo(18, 44); g.stroke();
-    g.beginPath(); g.moveTo(41, 31); g.lineTo(46, 40); g.stroke();
-    g.fillStyle = '#a8734a'; g.beginPath(); g.arc(17.4, 45, 3, 0, 7); g.fill();
-    g.fillStyle = '#8a5c38'; g.beginPath(); g.arc(46.6, 40, 3, 0, 7); g.fill();
-    g.strokeStyle = 'rgba(230,220,200,0.55)'; g.lineWidth = 0.8;                         // a coil of net over one shoulder
-    for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(38 + i * 2, 28); g.lineTo(46 + i * 1.5, 38); g.stroke(); }
-    g.fillStyle = '#a8724a'; g.beginPath(); g.arc(32, 19, 8, 0, 7); g.fill();
-    g.fillStyle = 'rgba(90,50,25,0.35)'; g.beginPath(); g.ellipse(35, 21.6, 4.4, 3, -0.15, 0, 7); g.fill();
-    g.fillStyle = '#5e3a24'; g.fillRect(29, 24.4, 6, 1.2);
-    g.fillStyle = '#241a10'; g.fillRect(28, 15.6, 3, 4); g.fillRect(33, 15.6, 3, 4);
-    g.fillStyle = '#3a3226'; g.beginPath(); g.ellipse(32, 15, 8.6, 3.6, 0, Math.PI, 0, true); g.fill();  // flat cap
-  });
+  SPR.fisherman = outlined(g => person(g, {                            // dockworker, rolled sleeves + net over the shoulder
+    trousers: ['#8a9088', '#646a60', '#4a5046'], shoes: ['#241a12', '#0e0a06'],
+    torso: ['#d4cdab', '#a89f7d', '#7c745a'], sleeve: 'skin', armW: 5.2,
+    chest: gg => {
+      gg.fillStyle = '#7c745a'; for (let y = 22.5; y < 30; y += 3) gg.fillRect(31.6, y, 0.9, 0.9);    // henley buttons
+      gg.strokeStyle = 'rgba(90,80,55,0.4)'; gg.lineWidth = 0.8;       // shirt strain folds
+      gg.beginPath(); gg.moveTo(26, 30); gg.quadraticCurveTo(29, 31.5, 31, 30.5); gg.stroke();
+    },
+    face: gg => { gg.fillStyle = 'rgba(60,40,25,0.28)'; gg.beginPath(); gg.ellipse(32, 14, 3.2, 2, 0, 0, 7); gg.fill(); },  // stubble
+    hair: gg => {
+      gg.fillStyle = '#241a10'; gg.fillRect(27.4, 8.2, 1.8, 3.2); gg.fillRect(34.8, 8.2, 1.8, 3.2);
+      gg.fillStyle = '#3a3226'; gg.beginPath(); gg.ellipse(32, 8, 5.4, 2.8, 0, Math.PI, 0, true); gg.fill();  // flat cap
+      gg.fillStyle = '#2a241a'; gg.beginPath(); gg.ellipse(34.2, 8.2, 3.2, 1, 0, 0, 7); gg.fill();
+    },
+    extras: gg => {
+      gg.fillStyle = 'rgba(180,170,145,0.5)';                          // bundled net slung over the right shoulder
+      gg.beginPath(); gg.ellipse(39.5, 22, 3.4, 2.4, 0.5, 0, 7); gg.fill();
+      gg.strokeStyle = 'rgba(230,220,200,0.55)'; gg.lineWidth = 0.8;
+      for (let i = 0; i < 5; i++) { gg.beginPath(); gg.moveTo(38 + i * 1.6, 22.5); gg.quadraticCurveTo(43 + i * 1.4, 30, 44.5 + i * 1.2, 37); gg.stroke(); }
+      for (let i = 0; i < 3; i++) { gg.beginPath(); gg.moveTo(39, 26 + i * 4); gg.lineTo(48, 27.5 + i * 4); gg.stroke(); }  // cross-strands
+    },
+  }));
 
-  SPR.flowergirl = outlined(g => {                                   // apron + basket, matches the flower cart prop
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    g.fillStyle = '#c9906a'; g.fillRect(27, 55, 4, 7); g.fillRect(33, 55, 4, 7);
-    g.fillStyle = '#3a2f22'; g.fillRect(26, 59.6, 6, 3); g.fillRect(32, 59.6, 6, 3);
-    let dg = g.createLinearGradient(18, 27, 46, 56);                                     // plain work dress
-    dg.addColorStop(0, '#d89060'); dg.addColorStop(0.5, '#b86a3e'); dg.addColorStop(1, '#7e4526');
-    g.fillStyle = dg;
-    g.beginPath(); g.moveTo(24, 30); g.quadraticCurveTo(32, 26.5, 40, 30); g.lineTo(46, 55); g.lineTo(18, 55); g.closePath(); g.fill();
-    let ap = g.createLinearGradient(22, 34, 42, 55);                                     // apron
-    ap.addColorStop(0, '#f0ead6'); ap.addColorStop(1, '#c9c0a0');
-    g.fillStyle = ap; g.beginPath(); g.moveTo(23, 35); g.lineTo(41, 35); g.lineTo(38, 55); g.lineTo(26, 55); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(0,0,0,0.16)'; g.beginPath(); g.moveTo(38, 30); g.lineTo(44, 54); g.lineTo(40, 54); g.lineTo(35, 30); g.closePath(); g.fill();
-    g.strokeStyle = '#c9906a'; g.lineWidth = 4; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(24, 32); g.lineTo(19, 44); g.stroke();
-    g.beginPath(); g.moveTo(40, 32); g.lineTo(45, 42); g.stroke();
-    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(18.4, 45, 2.4, 0, 7); g.fill();
-    let bsk = g.createLinearGradient(38, 36, 52, 44);                                    // basket of flowers
-    bsk.addColorStop(0, '#a8794a'); bsk.addColorStop(1, '#7a5430');
-    g.fillStyle = bsk; g.beginPath(); g.ellipse(46, 41, 6.4, 4.4, 0, 0, 7); g.fill();
-    g.fillStyle = '#d84040'; for (const [fx, fy] of [[42, 37], [46, 35.4], [50, 37]]) { g.beginPath(); g.arc(fx, fy, 1.8, 0, 7); g.fill(); }
-    g.fillStyle = '#e8d040'; g.beginPath(); g.arc(48, 37.4, 1.4, 0, 7); g.fill();
-    g.fillStyle = '#a8724a'; g.beginPath(); g.arc(32, 19.6, 7.6, 0, 7); g.fill();
-    g.fillStyle = 'rgba(90,50,25,0.32)'; g.beginPath(); g.ellipse(34.6, 22, 4, 2.8, -0.15, 0, 7); g.fill();
-    let hair = g.createLinearGradient(20, 10, 44, 26);
-    hair.addColorStop(0, '#3a2416'); hair.addColorStop(1, '#1c1208');
-    g.fillStyle = hair; g.beginPath(); g.ellipse(32, 15, 9.4, 8.4, 0, Math.PI * 0.9, Math.PI * 2.15); g.fill();
-    g.fillStyle = '#d84040'; g.beginPath(); g.arc(24.6, 13, 1.6, 0, 7); g.fill();
-  });
+  SPR.flowergirl = outlined(g => person(g, {                           // apron dress + basket, matches the flower cart prop
+    skirt: ['#d89060', '#b86a3e', '#7e4526'], shoes: ['#3a2f22', '#181209'],
+    torso: ['#d89060', '#b86a3e', '#7e4526'], sleeve: 'skin', armW: 4, shoulderW: 0.85, headR: [4.6, 5.2],
+    armR: [[40, 23], [44.5, 30], [43.5, 36]], handR: [43.5, 36],
+    chest: gg => {
+      const ap = gg.createLinearGradient(24, 30, 40, 52);              // work apron over the dress
+      ap.addColorStop(0, '#f0ead6'); ap.addColorStop(1, '#c9c0a0');
+      gg.fillStyle = ap; gg.beginPath(); gg.moveTo(27, 30); gg.lineTo(37, 30); gg.lineTo(39.5, 52); gg.lineTo(24.5, 52); gg.closePath(); gg.fill();
+      gg.strokeStyle = 'rgba(120,105,75,0.4)'; gg.lineWidth = 0.8;
+      gg.beginPath(); gg.moveTo(27.5, 38); gg.lineTo(36.5, 38); gg.stroke();             // apron tie line
+    },
+    hair: gg => {
+      const hair = gg.createLinearGradient(24, 4, 40, 16);
+      hair.addColorStop(0, '#3a2416'); hair.addColorStop(1, '#1c1208');
+      gg.fillStyle = hair;
+      gg.beginPath(); gg.ellipse(32, 8.6, 5.6, 5, 0, Math.PI * 0.92, Math.PI * 2.1); gg.fill();
+      gg.beginPath(); gg.ellipse(27.6, 10.5, 1.6, 3.4, 0.2, 0, 7); gg.fill();
+      gg.beginPath(); gg.ellipse(36.6, 10.8, 1.5, 3.2, -0.2, 0, 7); gg.fill();
+      gg.fillStyle = '#d84040'; gg.beginPath(); gg.arc(27.2, 8.6, 1.4, 0, 7); gg.fill();
+    },
+    extras: gg => {
+      const bsk = gg.createLinearGradient(40, 34, 52, 42);             // basket of flowers on the far arm
+      bsk.addColorStop(0, '#a8794a'); bsk.addColorStop(1, '#7a5430');
+      gg.fillStyle = bsk; gg.beginPath(); gg.ellipse(46.5, 38, 5.8, 4, 0, 0, 7); gg.fill();
+      gg.strokeStyle = 'rgba(60,40,20,0.4)'; gg.lineWidth = 0.7;       // weave lines
+      gg.beginPath(); gg.moveTo(41.5, 37); gg.lineTo(51.5, 37); gg.moveTo(42, 39.5); gg.lineTo(51, 39.5); gg.stroke();
+      gg.fillStyle = '#d84040'; for (const [fx, fy] of [[43.5, 34.5], [47, 33], [50, 34.6]]) { gg.beginPath(); gg.arc(fx, fy, 1.7, 0, 7); gg.fill(); }
+      gg.fillStyle = '#e8d040'; gg.beginPath(); gg.arc(48.6, 35, 1.3, 0, 7); gg.fill();
+      gg.fillStyle = '#3a7a3a'; gg.fillRect(44.8, 34.5, 0.9, 2.4);     // stems
+    },
+  }));
 
-  SPR.carlotta = outlined(g => {                                      // Carlotta — a unique local, hair pinned up, waiting
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    g.fillStyle = '#c9906a'; g.fillRect(27, 55, 4, 7); g.fillRect(33, 55, 4, 7);
-    g.fillStyle = '#8a1414'; g.fillRect(26, 59.6, 6, 3); g.fillRect(32, 59.6, 6, 3);      // red heels
-    let dg = g.createLinearGradient(18, 27, 46, 56);                                     // fitted red dress, slit skirt
-    dg.addColorStop(0, '#e0304a'); dg.addColorStop(0.5, '#b8172e'); dg.addColorStop(1, '#6e0e1c');
-    g.fillStyle = dg;
-    g.beginPath(); g.moveTo(24, 30); g.quadraticCurveTo(32, 26, 40, 30); g.lineTo(44, 55); g.lineTo(36, 55); g.lineTo(34, 40); g.lineTo(30, 55); g.lineTo(20, 55); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(0,0,0,0.18)'; g.beginPath(); g.moveTo(38, 30); g.lineTo(43, 54); g.lineTo(39, 54); g.lineTo(35, 30); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(255,255,255,0.14)'; g.fillRect(26, 38, 12, 1.6);                 // waist highlight
-    g.strokeStyle = '#c9906a'; g.lineWidth = 4.2; g.lineCap = 'round';                   // one hand on hip
-    g.beginPath(); g.moveTo(24, 32); g.lineTo(17, 38); g.lineTo(20, 44); g.stroke();
-    g.beginPath(); g.moveTo(40, 32); g.lineTo(45, 44); g.stroke();
-    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(20, 44.4, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(45.6, 44.4, 2.4, 0, 7); g.fill();
-    g.fillStyle = '#a8724a'; g.beginPath(); g.arc(32, 19.4, 7.6, 0, 7); g.fill();         // head
-    g.fillStyle = 'rgba(90,50,25,0.3)'; g.beginPath(); g.ellipse(34.6, 21.8, 4, 2.8, -0.15, 0, 7); g.fill();
-    g.fillStyle = '#8a1414'; g.beginPath(); g.ellipse(31.6, 22.6, 2, 1, 0, 0, 7); g.fill(); // red lips
-    g.fillStyle = '#5e3a24'; g.fillRect(29.4, 24.6, 5.4, 1.1);
-    let hair = g.createLinearGradient(20, 6, 44, 24);                                    // hair pinned UP in an elegant bun
-    hair.addColorStop(0, '#3a2416'); hair.addColorStop(1, '#1c1208');
-    g.fillStyle = hair;
-    g.beginPath(); g.ellipse(32, 15, 8.6, 8, 0, Math.PI * 0.95, Math.PI * 2.1); g.fill();
-    g.beginPath(); g.ellipse(32, 8.4, 5.6, 5, 0, 0, 7); g.fill();                        // the bun on top
-    g.strokeStyle = '#e8dca0'; g.lineWidth = 1.6; g.lineCap = 'round';                   // the hairpin, glinting, holding it up
-    g.beginPath(); g.moveTo(27, 7); g.lineTo(37.5, 9.4); g.stroke();
-    g.fillStyle = 'rgba(255,250,220,0.7)'; g.beginPath(); g.arc(37.5, 9.4, 0.9, 0, 7); g.fill();
-    g.fillStyle = '#d84040'; g.beginPath(); g.arc(24.4, 13.4, 1.8, 0, 7); g.fill();       // a flower behind the ear
-  });
+  SPR.carlotta = outlined(g => person(g, {                             // Carlotta — hair pinned up, red dress, waiting
+    skirt: ['#e0304a', '#b8172e', '#6e0e1c'], shoes: ['#8a1414', '#4a0a0a'],
+    skirtFn: gg => {                                                   // fitted skirt with a slit
+      gg.beginPath(); gg.moveTo(25.5, 36); gg.lineTo(38.5, 36); gg.lineTo(41.5, 54); gg.lineTo(35.5, 54);
+      gg.lineTo(33.8, 42); gg.lineTo(31, 54); gg.lineTo(22.5, 54); gg.closePath(); gg.fill();
+    },
+    torso: ['#e0304a', '#b8172e', '#6e0e1c'], sleeve: 'skin', armW: 4, shoulderW: 0.82, headR: [4.6, 5.2],
+    armL: [[24, 23], [18.5, 28.5], [23, 33.5]], handL: [23, 33.5],     // one hand on the hip
+    chest: gg => { gg.fillStyle = 'rgba(255,255,255,0.14)'; gg.fillRect(26.5, 35, 11, 1.5); },
+    face: gg => { gg.fillStyle = '#8a1414'; gg.beginPath(); gg.ellipse(32.1, 14.9, 1.8, 0.9, 0, 0, 7); gg.fill(); },  // red lips
+    hair: gg => {
+      const hair = gg.createLinearGradient(24, 2, 40, 14);
+      hair.addColorStop(0, '#3a2416'); hair.addColorStop(1, '#1c1208');
+      gg.fillStyle = hair;
+      gg.beginPath(); gg.ellipse(32, 8.6, 5.4, 4.8, 0, Math.PI * 0.95, Math.PI * 2.08); gg.fill();
+      gg.beginPath(); gg.ellipse(32, 4.4, 3.6, 3, 0, 0, 7); gg.fill(); // the bun on top
+      gg.strokeStyle = '#e8dca0'; gg.lineWidth = 1.3; gg.lineCap = 'round';   // the jeweled hairpin, glinting
+      gg.beginPath(); gg.moveTo(28.4, 3.2); gg.lineTo(35.6, 5); gg.stroke();
+      gg.fillStyle = 'rgba(255,250,220,0.85)'; gg.beginPath(); gg.arc(35.6, 5, 0.9, 0, 7); gg.fill();
+      gg.fillStyle = '#d84040'; gg.beginPath(); gg.arc(27.4, 8.4, 1.5, 0, 7); gg.fill();   // flower behind the ear
+    },
+  }));
 
-  SPR.drz = outlined(g => {                                          // Dr. Z — balding mad scientist, wild side-hair, lab coat
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    g.fillStyle = '#1c1e22'; g.fillRect(27, 55, 4, 7); g.fillRect(33, 55, 4, 7);
-    g.fillStyle = '#0c0d10'; g.fillRect(26, 59.6, 6, 3); g.fillRect(32, 59.6, 6, 3);
-    let coat = g.createLinearGradient(18, 27, 46, 56);                                    // lab coat, off-white
-    coat.addColorStop(0, '#eeeadf'); coat.addColorStop(0.5, '#cfcab9'); coat.addColorStop(1, '#9a9484');
-    g.fillStyle = coat;
-    g.beginPath(); g.moveTo(23, 30); g.quadraticCurveTo(32, 26, 41, 30); g.lineTo(45, 55); g.lineTo(19, 55); g.closePath(); g.fill();
-    // lapels — folded collar catching the light, breaks up the flat coat front
-    g.fillStyle = 'rgba(255,255,255,0.3)'; g.beginPath(); g.moveTo(26, 30); g.lineTo(31, 34); g.lineTo(29, 38); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(0,0,0,0.14)'; g.beginPath(); g.moveTo(38, 30); g.lineTo(33, 34); g.lineTo(35, 38); g.closePath(); g.fill();
-    g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(32, 34); g.lineTo(32, 55); g.stroke();
-    g.fillStyle = '#2b2e34'; g.fillRect(29.6, 30.4, 4.8, 4.2);                              // dark shirt/tie sliver under lapels
-    g.strokeStyle = 'rgba(0,0,0,0.12)'; g.lineWidth = 0.6;
-    g.beginPath(); g.moveTo(24, 44); g.lineTo(26.4, 51); g.stroke(); g.beginPath(); g.moveTo(40, 44); g.lineTo(37.6, 51); g.stroke(); // hem creases
-    g.fillStyle = '#8a8478'; g.strokeStyle = '#6f6a5e'; g.lineWidth = 0.5;
-    g.fillRect(23.6, 40, 4.4, 3.4); g.strokeRect(23.6, 40, 4.4, 3.4);                      // breast pocket
-    g.fillStyle = '#b23a2c'; g.fillRect(24.2, 39.4, 0.8, 3);                               // red pen clipped in pocket
-    g.fillStyle = '#3a5fae'; g.fillRect(25.4, 39.4, 0.8, 3);                               // blue pen
-    g.strokeStyle = '#c9c4b4'; g.lineWidth = 4.2; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(23, 32); g.lineTo(16, 40); g.stroke();
-    g.beginPath(); g.moveTo(41, 32); g.lineTo(48, 40); g.stroke();
-    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(15.4, 41, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(48.6, 41, 2.4, 0, 7); g.fill();
-    // head — high balding dome, hair swept to the sides only
-    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(32, 18.6, 7.4, 0, 7); g.fill();
-    g.fillStyle = 'rgba(90,50,25,0.22)'; g.beginPath(); g.ellipse(34.4, 20.8, 3.6, 2.6, -0.15, 0, 7); g.fill();  // cheek shade
-    g.fillStyle = 'rgba(255,255,255,0.22)'; g.beginPath(); g.ellipse(29.4, 13.4, 4.4, 3, -0.3, 0, 7); g.fill(); // bald-dome shine
-    // wild white side/back hair — spiky static-shocked tufts, NOT a solid halo: hairline stays low+bald on top
-    let hair = g.createLinearGradient(14, 10, 50, 24);
-    hair.addColorStop(0, '#f4f4f0'); hair.addColorStop(1, '#c9c4b4');
-    g.fillStyle = hair;
-    const tuft = (hx, hy, rot, len, w) => {
-      g.save(); g.translate(hx, hy); g.rotate(rot);
-      g.beginPath(); g.moveTo(-w, 1); g.quadraticCurveTo(-w * 0.3, -len * 0.6, 0, -len); g.quadraticCurveTo(w * 0.3, -len * 0.6, w, 1); g.closePath(); g.fill();
-      g.restore();
-    };
-    // left side burst
-    tuft(21, 17, -1.9, 7, 2.2); tuft(19.5, 15, -2.3, 6, 1.8); tuft(23, 14.5, -1.5, 6.5, 1.9); tuft(20, 20, -2.6, 5, 1.6);
-    // right side burst
-    tuft(43, 17, 1.9, 7, 2.2); tuft(44.5, 15, 2.3, 6, 1.8); tuft(41, 14.5, 1.5, 6.5, 1.9); tuft(44, 20, 2.6, 5, 1.6);
-    // a few wisps combed back over the crown (thin, sparse — reads as balding, not covered)
-    g.strokeStyle = hair; g.lineWidth = 1.1; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(26, 12.5); g.quadraticCurveTo(29, 10.2, 32.5, 11.4); g.stroke();
-    g.beginPath(); g.moveTo(35, 11.6); g.quadraticCurveTo(31.5, 9.6, 27.5, 10.8); g.stroke();
-    g.fillStyle = '#3a3a3a'; g.fillRect(28.6, 22.4, 1.6, 1); g.fillRect(35.8, 22.4, 1.6, 1);    // bushy brows
-    g.strokeStyle = '#1c1e22'; g.lineWidth = 1; g.beginPath(); g.arc(29, 20, 2.6, 0, 7); g.stroke(); g.beginPath(); g.arc(35, 20, 2.6, 0, 7); g.stroke();  // round glasses
-    g.beginPath(); g.moveTo(31.6, 20); g.lineTo(32.4, 20); g.stroke();
-    g.beginPath(); g.moveTo(26.6, 19.4); g.lineTo(24.6, 18.4); g.stroke(); g.beginPath(); g.moveTo(37.4, 19.4); g.lineTo(39.4, 18.4); g.stroke(); // temple arms
-    g.fillStyle = 'rgba(160,215,235,0.4)'; g.beginPath(); g.arc(29, 20, 2.2, 0, 7); g.fill(); g.beginPath(); g.arc(35, 20, 2.2, 0, 7); g.fill();
-    g.fillStyle = 'rgba(255,255,255,0.55)'; g.beginPath(); g.arc(28.2, 19.2, 0.7, 0, 7); g.fill(); g.beginPath(); g.arc(34.2, 19.2, 0.7, 0, 7); g.fill(); // lens glint
-    g.strokeStyle = '#8a5a3a'; g.lineWidth = 1.1; g.lineCap = 'round'; g.beginPath(); g.moveTo(28.2, 24.6); g.quadraticCurveTo(32, 25.6, 35.8, 24.6); g.stroke(); // faint smile line, not a bar
-  });
+  SPR.drz = outlined(g => person(g, {                                  // Dr. Z — balding mad scientist, wild side-hair, lab coat
+    trousers: ['#23252b', '#17181d', '#0e0f13'], shoes: ['#17181d', '#060708'],
+    torso: ['#eeeadf', '#cfcab9', '#9a9484'], sleeve: ['#e0dbc9', '#b3ad9b'], torsoLen: 47,
+    skin: ['#e8c39a', '#c9906a', '#96603a'],
+    chest: gg => {
+      gg.fillStyle = 'rgba(255,255,255,0.3)'; gg.beginPath(); gg.moveTo(28, 21); gg.lineTo(31.5, 24); gg.lineTo(30, 27.5); gg.closePath(); gg.fill();  // lapels
+      gg.fillStyle = 'rgba(0,0,0,0.14)'; gg.beginPath(); gg.moveTo(36, 21); gg.lineTo(32.5, 24); gg.lineTo(34, 27.5); gg.closePath(); gg.fill();
+      gg.fillStyle = '#2b2e34'; gg.fillRect(30.4, 21, 3.2, 3.6);       // dark shirt sliver under the lapels
+      gg.strokeStyle = 'rgba(0,0,0,0.18)'; gg.lineWidth = 0.8; gg.beginPath(); gg.moveTo(32, 25); gg.lineTo(32, 46.5); gg.stroke();
+      gg.fillStyle = '#8a8478'; gg.fillRect(26, 29, 3.8, 3);           // breast pocket
+      gg.fillStyle = '#b23a2c'; gg.fillRect(26.5, 28.4, 0.8, 2.6);     // red pen clipped in it
+      gg.fillStyle = '#3a5fae'; gg.fillRect(27.7, 28.4, 0.8, 2.6);     // blue pen
+    },
+    noFace: true,
+    face: gg => {
+      gg.fillStyle = '#3a3a3a'; gg.fillRect(28.8, 8.6, 1.7, 0.9); gg.fillRect(33.5, 8.6, 1.7, 0.9);   // bushy brows
+      gg.strokeStyle = '#1c1e22'; gg.lineWidth = 0.9;                  // round wire glasses
+      gg.beginPath(); gg.arc(29.8, 10.4, 1.9, 0, 7); gg.stroke(); gg.beginPath(); gg.arc(34.2, 10.4, 1.9, 0, 7); gg.stroke();
+      gg.beginPath(); gg.moveTo(31.6, 10.4); gg.lineTo(32.4, 10.4); gg.stroke();
+      gg.beginPath(); gg.moveTo(27.9, 10); gg.lineTo(26.6, 9.4); gg.moveTo(36.1, 10); gg.lineTo(37.4, 9.4); gg.stroke();  // temple arms
+      gg.fillStyle = 'rgba(160,215,235,0.4)'; gg.beginPath(); gg.arc(29.8, 10.4, 1.6, 0, 7); gg.fill(); gg.beginPath(); gg.arc(34.2, 10.4, 1.6, 0, 7); gg.fill();
+      gg.fillStyle = 'rgba(255,255,255,0.6)'; gg.beginPath(); gg.arc(29.2, 9.9, 0.5, 0, 7); gg.fill(); gg.beginPath(); gg.arc(33.6, 9.9, 0.5, 0, 7); gg.fill();  // lens glint
+      gg.fillStyle = 'rgba(60,30,12,0.45)'; gg.fillRect(31.4, 12, 1.4, 1.6);
+      gg.strokeStyle = '#8a5a3a'; gg.lineWidth = 1; gg.lineCap = 'round';
+      gg.beginPath(); gg.moveTo(30.2, 14.6); gg.quadraticCurveTo(32, 15.3, 33.8, 14.6); gg.stroke();  // faint smile line
+    },
+    hair: gg => {
+      gg.fillStyle = 'rgba(255,255,255,0.22)'; gg.beginPath(); gg.ellipse(30, 7, 3.2, 2.2, -0.3, 0, 7); gg.fill();  // bald-dome shine
+      const hair = gg.createLinearGradient(22, 6, 42, 14);
+      hair.addColorStop(0, '#f4f4f0'); hair.addColorStop(1, '#c9c4b4');
+      gg.fillStyle = hair;
+      const tuft = (hx, hy, rot, len, w2) => {                         // spiky static-shocked side tufts, NOT a halo
+        gg.save(); gg.translate(hx, hy); gg.rotate(rot);
+        gg.beginPath(); gg.moveTo(-w2, 1); gg.quadraticCurveTo(-w2 * 0.3, -len * 0.6, 0, -len); gg.quadraticCurveTo(w2 * 0.3, -len * 0.6, w2, 1); gg.closePath(); gg.fill();
+        gg.restore();
+      };
+      tuft(26.8, 10.5, -1.9, 5, 1.6); tuft(26, 9, -2.3, 4.4, 1.4); tuft(28, 8, -1.5, 4.6, 1.4);       // left burst
+      tuft(37.2, 10.5, 1.9, 5, 1.6); tuft(38, 9, 2.3, 4.4, 1.4); tuft(36, 8, 1.5, 4.6, 1.4);          // right burst
+      gg.strokeStyle = hair; gg.lineWidth = 0.9; gg.lineCap = 'round';                                 // sparse comb-over wisps
+      gg.beginPath(); gg.moveTo(28.5, 6.8); gg.quadraticCurveTo(31, 5.2, 33.5, 6); gg.stroke();
+      gg.beginPath(); gg.moveTo(34.5, 6.4); gg.quadraticCurveTo(32, 4.8, 29.5, 5.6); gg.stroke();
+    },
+  }));
 
-  SPR.defector = outlined(g => {                                     // the defector — nervous, sharp suit, glancing back
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    g.fillStyle = '#1c1e22'; g.fillRect(27, 55, 4, 7); g.fillRect(33, 55, 4, 7);
-    g.fillStyle = '#0c0d10'; g.fillRect(26, 59.6, 6, 3); g.fillRect(32, 59.6, 6, 3);
-    let su = g.createLinearGradient(18, 27, 46, 56);                                     // charcoal suit
-    su.addColorStop(0, '#4a4e58'); su.addColorStop(0.5, '#33363e'); su.addColorStop(1, '#1e2026');
-    g.fillStyle = su;
-    g.beginPath(); g.moveTo(23, 30); g.quadraticCurveTo(32, 26, 41, 30); g.lineTo(45, 55); g.lineTo(19, 55); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(255,255,255,0.08)'; g.beginPath(); g.moveTo(26, 31); g.lineTo(30, 42); g.lineTo(27, 55); g.lineTo(23, 55); g.closePath(); g.fill();
-    let sh = g.createLinearGradient(29, 30, 35, 40);
-    sh.addColorStop(0, '#f0ece0'); sh.addColorStop(1, '#c9c4b4');
-    g.fillStyle = sh; g.beginPath(); g.moveTo(29.4, 30); g.lineTo(32, 40); g.lineTo(34.6, 30); g.closePath(); g.fill();
-    g.fillStyle = '#701818'; g.fillRect(31, 30.6, 2, 9);                                  // tie
-    g.strokeStyle = '#33363e'; g.lineWidth = 4.2; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(23, 32); g.lineTo(17, 41); g.lineTo(19, 48); g.stroke();       // one hand clutching a lapel
-    g.beginPath(); g.moveTo(41, 32); g.lineTo(47, 40); g.stroke();
-    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(19, 49, 2.2, 0, 7); g.fill(); g.beginPath(); g.arc(47.6, 40.6, 2.2, 0, 7); g.fill();
-    g.save(); g.translate(32, 19.4); g.rotate(0.32);                                       // head turned, glancing over shoulder
-    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(0, 0, 7.6, 0, 7); g.fill();
-    g.fillStyle = 'rgba(90,50,25,0.3)'; g.beginPath(); g.ellipse(2.6, 2.4, 4, 2.8, -0.15, 0, 7); g.fill();
-    g.fillStyle = '#241a10'; g.fillRect(-2.6, -4.8, 5.4, 1.1);
-    g.fillStyle = '#1c1710'; g.beginPath(); g.ellipse(0, -6, 7.2, 4.2, 0, Math.PI, 0, true); g.fill();  // slicked hair
-    g.restore();
-    g.fillStyle = 'rgba(0,0,0,0.15)'; g.beginPath(); g.ellipse(46, 30, 4, 6, 0.2, 0, 7); g.fill();       // sweat/shadow, on edge
-  });
+  SPR.defector = outlined(g => person(g, {                             // the defector — nervous, sharp suit, glancing back
+    trousers: ['#2a2c33', '#1c1e24', '#101116'], shoes: ['#17181d', '#060708'],
+    torso: ['#4a4e58', '#33363e', '#1e2026'], torsoLen: 45, headTurn: 0.3,
+    armL: [[23, 22.5], [19, 29], [23.5, 33]], handL: [23.5, 33],       // one hand clutching a lapel
+    chest: gg => {
+      const sh = gg.createLinearGradient(29, 21, 35, 32);              // shirt V
+      sh.addColorStop(0, '#f0ece0'); sh.addColorStop(1, '#c9c4b4');
+      gg.fillStyle = sh; gg.beginPath(); gg.moveTo(29.6, 21); gg.lineTo(32, 30); gg.lineTo(34.4, 21); gg.closePath(); gg.fill();
+      gg.save(); gg.translate(32, 21.5); gg.rotate(0.08);              // tie knocked slightly askew
+      gg.fillStyle = '#701818'; gg.fillRect(-1, 0, 2, 8.5);
+      gg.restore();
+      gg.fillStyle = 'rgba(255,255,255,0.08)';                         // lapel light
+      gg.beginPath(); gg.moveTo(27, 22); gg.lineTo(29.5, 30); gg.lineTo(27.5, 38); gg.lineTo(25.5, 38); gg.closePath(); gg.fill();
+    },
+    face: gg => {
+      gg.strokeStyle = 'rgba(40,22,10,0.7)'; gg.lineWidth = 0.9;       // worried brows
+      gg.beginPath(); gg.moveTo(28.8, 9); gg.lineTo(30.6, 9.6); gg.moveTo(35.2, 9); gg.lineTo(33.4, 9.6); gg.stroke();
+      gg.fillStyle = 'rgba(255,255,255,0.25)'; gg.beginPath(); gg.ellipse(29.5, 12.8, 1, 0.6, 0.3, 0, 7); gg.fill();  // sheen of sweat
+    },
+    hair: gg => {
+      const hg = gg.createLinearGradient(26, 4, 38, 10);               // slicked dark hair
+      hg.addColorStop(0, '#241c12'); hg.addColorStop(1, '#120d06');
+      gg.fillStyle = hg; gg.beginPath(); gg.ellipse(32, 8.2, 5.2, 3.8, 0, Math.PI, 0, true); gg.fill();
+    },
+  }));
 
-  SPR.agent005 = outlined(g => {                                     // Agent 005 — sharp navy suit, confident
-    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
-    g.fillStyle = '#1c1e22'; g.fillRect(27, 55, 4, 7); g.fillRect(33, 55, 4, 7);
-    g.fillStyle = '#0c0d10'; g.fillRect(26, 59.6, 6, 3); g.fillRect(32, 59.6, 6, 3);
-    let su = g.createLinearGradient(18, 27, 46, 56);                                      // navy suit
-    su.addColorStop(0, '#2e3a5c'); su.addColorStop(0.5, '#202a44'); su.addColorStop(1, '#131a2c');
-    g.fillStyle = su;
-    g.beginPath(); g.moveTo(23, 30); g.quadraticCurveTo(32, 26, 41, 30); g.lineTo(45, 55); g.lineTo(19, 55); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(255,255,255,0.08)'; g.beginPath(); g.moveTo(37, 31); g.lineTo(34, 42); g.lineTo(37, 55); g.lineTo(41, 55); g.closePath(); g.fill();
-    let sh = g.createLinearGradient(29, 30, 35, 40);
-    sh.addColorStop(0, '#f0ece0'); sh.addColorStop(1, '#c9c4b4');
-    g.fillStyle = sh; g.beginPath(); g.moveTo(29.4, 30); g.lineTo(32, 40); g.lineTo(34.6, 30); g.closePath(); g.fill();
-    g.fillStyle = '#8a1414'; g.fillRect(31, 30.6, 2, 9);                                   // tie
-    g.strokeStyle = '#202a44'; g.lineWidth = 4.2; g.lineCap = 'round';
-    g.beginPath(); g.moveTo(23, 32); g.lineTo(18, 44); g.stroke();
-    g.beginPath(); g.moveTo(41, 32); g.lineTo(46, 44); g.stroke();
-    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(17.4, 45, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(46.6, 45, 2.4, 0, 7); g.fill();
-    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(32, 19.4, 7.6, 0, 7); g.fill();
-    g.fillStyle = 'rgba(90,50,25,0.3)'; g.beginPath(); g.ellipse(34.6, 21.8, 4, 2.8, -0.15, 0, 7); g.fill();
-    g.fillStyle = '#241a10'; g.beginPath(); g.ellipse(32, 15, 8.6, 6.4, 0, Math.PI, 0, true); g.fill();  // neat dark hair
-    g.fillStyle = '#5e3a24'; g.fillRect(29.4, 24.8, 5.4, 1.1);
-    g.fillStyle = 'rgba(255,255,255,0.7)'; g.beginPath(); g.arc(30, 18.4, 0.7, 0, 7); g.fill();          // a knowing glint in the eye
-  });
-
-  // ---------------------------------------------------------------------------
-  // OUTDOOR / GENRE PROPS — off the Havana palette, into 1960s spy-thriller
-  // territory generally: the parked sedan, the dead-drop phone booth, the
-  // sentry post at the edge of the compound. Built for open-air placement.
-  // ---------------------------------------------------------------------------
+  SPR.agent005 = outlined(g => person(g, {                             // Agent 005 — sharp navy suit, confident
+    trousers: ['#23252b', '#17181d', '#0e0f13'], shoes: ['#17181d', '#060708'],
+    torso: ['#2e3a5c', '#202a44', '#131a2c'], torsoLen: 45,
+    chest: gg => {
+      const sh = gg.createLinearGradient(29, 21, 35, 32);              // shirt V
+      sh.addColorStop(0, '#f0ece0'); sh.addColorStop(1, '#c9c4b4');
+      gg.fillStyle = sh; gg.beginPath(); gg.moveTo(29.6, 21); gg.lineTo(32, 30); gg.lineTo(34.4, 21); gg.closePath(); gg.fill();
+      gg.fillStyle = '#8a1414'; gg.fillRect(31.1, 21.5, 1.9, 8.5);     // red tie
+      gg.fillStyle = 'rgba(255,255,255,0.08)';                         // crisp lapel light
+      gg.beginPath(); gg.moveTo(37, 22); gg.lineTo(34.5, 30); gg.lineTo(36.5, 38); gg.lineTo(38.5, 38); gg.closePath(); gg.fill();
+      gg.fillStyle = '#f0ece0'; gg.fillRect(26.4, 24.5, 2.6, 1.4);     // pocket square
+    },
+    face: gg => { gg.fillStyle = 'rgba(255,255,255,0.75)'; gg.beginPath(); gg.arc(29.9, 9.9, 0.55, 0, 7); gg.fill(); },  // the knowing glint
+    hair: gg => {
+      const hg = gg.createLinearGradient(26, 4, 38, 10);               // neat dark hair, side part
+      hg.addColorStop(0, '#2a1e12'); hg.addColorStop(1, '#140d06');
+      gg.fillStyle = hg; gg.beginPath(); gg.ellipse(32, 8.4, 5.3, 4.2, 0, Math.PI, 0, true); gg.fill();
+      gg.strokeStyle = 'rgba(255,255,255,0.14)'; gg.lineWidth = 0.8;
+      gg.beginPath(); gg.moveTo(29.5, 5.2); gg.lineTo(28.5, 8); gg.stroke();   // part line
+    },
+  }));
   SPR.sedan = outlined(g => {                                      // sleek black getaway sedan, three-quarter rear view
     g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath(); g.ellipse(32, 56, 29, 5, 0, 0, 7); g.fill();
     let body = g.createLinearGradient(4, 24, 60, 50);
