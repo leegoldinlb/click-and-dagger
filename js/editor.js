@@ -42,6 +42,8 @@ const Editor = (() => {
     { kind: 'wpn_laser', name: 'LASER GADGET', spr: 'wpn_laser' },
     { kind: 'wpn_golden', name: 'GOLDEN GUN', spr: 'wpn_golden' },
     { kind: 'camera', name: 'CAMERA', spr: 'camera' },
+    { kind: 'disguise', name: 'DISGUISE KIT', spr: 'disguise' },
+    { kind: 'book', name: 'OPEN BOOK', spr: 'book' },
     { kind: 'safe', name: 'SAFE', spr: 'safe' },
     { kind: 'filecab', name: 'FILE CABINET', spr: 'filecab' },
     { kind: 'globe', name: 'GLOBE', spr: 'globe' },
@@ -63,6 +65,7 @@ const Editor = (() => {
     { kind: 'officer', name: 'POLICE OFFICER', spr: 'officer' },
     { kind: 'fisherman', name: 'FISHERMAN', spr: 'fisherman' },
     { kind: 'flowergirl', name: 'FLOWER GIRL', spr: 'flowergirl' },
+    { kind: 'carlotta', name: 'CARLOTTA', spr: 'carlotta' },
     { kind: 'sedan', name: 'SEDAN', spr: 'sedan' },
     { kind: 'motorcycle', name: 'MOTORCYCLE', spr: 'motorcycle' },
     { kind: 'phonebooth', name: 'PHONE BOOTH', spr: 'phonebooth' },
@@ -98,7 +101,7 @@ const Editor = (() => {
     { kind: 'conftable', name: 'CONFERENCE TABLE', spr: 'conftable' },
     { kind: 'punchclock', name: 'PUNCH CLOCK', spr: 'punchclock' },
   ];
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl']);      // neutral — placed with a default wander behavior
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta']);      // neutral — placed with a default wander behavior
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 
   // ---- state ----

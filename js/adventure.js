@@ -5,6 +5,7 @@ const Adventure = (() => {
   const flags = {
     lockpick: false, punchcard: false, tube: false,
     tubeIn: false, radioOpen: false, deskOpen: false, exitOpen: false,
+    knowsCombo: false, safeOpen: false, gotMoney: false, gotRose: false, roseGiven: false,
   };
   let verb = 'look';
   let selected = null;            // selected inventory item id
@@ -95,7 +96,7 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
@@ -129,6 +130,11 @@ const Adventure = (() => {
       case 'flowergirl': return e.dead
         ? 'The basket spilled red across the stones. This is on you.'
         : 'A flower girl with a basket of the day’s cuttings, working the crowd near the cart.';
+      case 'carlotta': return e.dead
+        ? 'The flower is still behind her ear. This is on you.'
+        : (flags.roseGiven
+          ? 'Carlotta, hair down, rose behind her ear. She smiles like she means it.'
+          : 'Carlotta, hair pinned up, watching the square like she owns it. “You should let your hair down,” you try. She is not impressed.');
       case 'agent': return e.has
         ? 'Agent 004. He didn’t make it. His lockpick kit is still in his hand — he’d want you to have it.'
         : '004 rests easier without the hardware. You’ll drink one for him in Geneva.';
@@ -151,7 +157,19 @@ const Adventure = (() => {
       case 'wpn_laser': return 'A gadget that hums when you get close. Whatever it does, it is not standard issue.';
       case 'wpn_golden': return 'A pistol, gold from grip to barrel, resting on velvet. One shot. Make it count.';
       case 'camera': return 'A subminiature spy camera. Volkov photographs his enemies before he disposes of them. Sentimental.';
-      case 'safe': return 'A wall safe, dial locked. Whatever is in there is above your pay grade, and also welded shut.';
+      case 'safe': return flags.safeOpen
+        ? 'Empty now. Dial spun back to zero, professionally.'
+        : (flags.knowsCombo
+          ? 'A wall safe, dial locked. You happen to know it opens on 11.22.63.'
+          : 'A wall safe, dial locked. Whatever is in there is above your pay grade, and also welded shut.');
+      case 'disguise': return 'Glasses, a rubber nose, a moustache, and a fedora to complete the picture. Q Branch has a sense of humour after all.';
+      case 'book': {
+        const first = !flags.knowsCombo;
+        flags.knowsCombo = true;
+        return first
+          ? 'Tucked between the pages, a slip of paper: “11.22.63.” You commit it to memory.'
+          : 'The book, and the slip of paper you already memorized: 11.22.63.';
+      }
       case 'filecab': return 'Three drawers of surveillance files, alphabetized by paranoia.';
       case 'globe': return 'A desk globe. Someone has circled Havana in red grease pencil.';
       case 'briefcase': return 'A leather attaché case. Standard issue for men who deny working for anyone.';
@@ -178,7 +196,12 @@ const Adventure = (() => {
       case 'trafficlight': return 'Stuck on green. Traffic in Havana takes this as a suggestion regardless.';
       case 'watertower': return 'A water tower, up where the rooflines meet. Good sightlines, if you were the sort to use them.';
       case 'barrier': return 'A striped sawhorse. ROAD CLOSED, or so the story goes.';
-      case 'vendingmachine': return 'Cigarettes, by the pack. Volkov’s men are chain smokers, to a man.';
+      case 'vendingmachine': {
+        if (flags.gotMoney) return 'Cigarettes, by the pack. Volkov’s men are chain smokers, to a man.';
+        flags.gotMoney = true;
+        addItem('money', 'LOOSE CHANGE');
+        return 'Cigarettes, by the pack. On a hunch, you check the coin return — someone left MONEY behind.';
+      }
       case 'flowercart': return 'A flower cart, unattended. The vendor stepped away at a very convenient moment.';
       case 'bed': return 'Made up tight enough to bounce a coin off. Someone here was in the service.';
       case 'sofa': return 'A sofa that has absorbed a great many uncomfortable silences.';
@@ -220,10 +243,12 @@ const Adventure = (() => {
         : 'Absolutely not. He bites.';
       case 'brute': return e.dead ? 'Nothing on him but a busted knuckle brace. He fought with what he had.' : 'You would need a crane.';
       case 'sniper': return e.dead ? 'A rifle, a canteen, a half-written letter home. You leave the letter.' : 'He is not putting that rifle down for you.';
-      case 'civilianM': case 'civilianF': case 'vendor': case 'waiter': case 'tourist': case 'officer': case 'fisherman': case 'flowergirl':
+      case 'civilianM': case 'civilianF': case 'vendor': case 'waiter': case 'tourist': case 'officer': case 'fisherman': case 'flowergirl': case 'carlotta':
         return 'They are a person, not a prop. Leave them be.';
       case 'desk': return 'It’s a desk. Even you couldn’t expense that.';
-      case 'medkit': case 'ammo': case 'wpn_sterling': case 'wpn_ar7': case 'wpn_laser': case 'wpn_golden':
+      case 'safe': return 'Bolted to the wall. You are a spy, not a mover.';
+      case 'book': return 'You have what you need from it. No sense hauling a library.';
+      case 'medkit': case 'ammo': case 'wpn_sterling': case 'wpn_ar7': case 'wpn_laser': case 'wpn_golden': case 'disguise':
         return 'Just walk over it. This is still a shooter.';
       case 'plant': case 'royalpalm': case 'bananaplant': case 'bougainvillea': case 'fern': case 'cactus': case 'hedge':
         return 'Your cover is “orchid dealer”, not “palm smuggler”.';
@@ -235,7 +260,7 @@ const Adventure = (() => {
   function useEnt(e) {
     if (e.kind === 'desk') {
       if (e.open) return 'The drawer has given up all its secrets.';
-      if (selected === 'lockpick') {
+      if (selected === 'lockpick' || selected === 'hairpin') {
         e.open = true;
         flags.deskOpen = true;
         flags.punchcard = true;
@@ -245,12 +270,55 @@ const Adventure = (() => {
       }
       return 'Locked. You need picks, not fingernails.';
     }
+    if (e.kind === 'safe') {
+      if (flags.safeOpen) return 'Already emptied, dial spun back to zero.';
+      if (!flags.knowsCombo) { Sfx.denied(); return 'Dial-locked. You would need the combination.'; }
+      flags.safeOpen = true;
+      addItem('lettersoftransit', 'LETTERS OF TRANSIT');
+      Sfx.pick();
+      return 'You dial 11.22.63. The tumblers fall into place. Inside: a thick envelope, LETTERS OF TRANSIT, signed and stamped.';
+    }
     if (e.kind === 'bar') return 'You mix a quick martini. Shaken, given the circumstances. Morale restored; aim unaffected, officially.';
-    if (e.kind === 'goon' && !e.dead) return 'He is not open to conversation. Try the Walther.';
-    if ((e.kind === 'brute' || e.kind === 'sniper') && !e.dead) return 'He is not open to conversation. Try the Walther.';
+    if (['goon', 'brute', 'sniper'].includes(e.kind) && !e.dead) {
+      if (selected === 'lettersoftransit') {
+        const geo = World.getGeo();
+        let count = 0;
+        for (const s of geo.sectors) { if (s.hostile) { s.hostile = false; count++; } }
+        removeItem('lettersoftransit');
+        Sfx.pick();
+        return count
+          ? 'You slide the envelope across. He studies the seal, nods once, and waves you through — every checkpoint in the compound, forever.'
+          : 'He studies the letters, unimpressed. There is nothing here for them to open.';
+      }
+      return 'He is not open to conversation. Try the Walther.';
+    }
     if (e.kind === 'agent') return 'He’s beyond extraction. Take the picks — he’d insist.';
     if (e.kind === 'tube') return 'Take it first. Then find it a socket.';
-    if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl'].includes(e.kind))
+    if (e.kind === 'flowergirl') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'money') {
+        if (flags.gotRose) return 'Her basket is a little lighter. She already gave you her prettiest one.';
+        flags.gotRose = true;
+        removeItem('money');
+        addItem('rose', 'ROSE');
+        Sfx.pickup();
+        return 'She takes the coins with a smile and tucks a single rose into your hand.';
+      }
+      return 'She has nothing to do with your mission. Unless you are buying, of course.';
+    }
+    if (e.kind === 'carlotta') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'rose') {
+        if (flags.roseGiven) return 'She is already wearing it, tucked behind one ear.';
+        flags.roseGiven = true;
+        removeItem('rose');
+        addItem('hairpin', 'HAIRPIN');
+        Sfx.pickup();
+        return 'She lets her hair down — somehow even more dangerous than up. “Thank you,” she says, “for opening my heart.” She presses her hairpin into your hand, so you will never forget her.';
+      }
+      return 'She is clearly waiting for something more romantic than that.';
+    }
+    if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman'].includes(e.kind))
       return e.dead ? 'There is nothing left to do here.' : 'They have nothing to do with your mission. Move along.';
     return 'That doesn’t work. And the clock is running.';
   }
@@ -271,7 +339,7 @@ const Adventure = (() => {
 
   function useWall(t) {
     if (t.val === 4) {                                     // radio room
-      if (selected === 'lockpick') {
+      if (selected === 'lockpick' || selected === 'hairpin') {
         openWall(t);
         flags.radioOpen = true;
         Sfx.pick(); Sfx.door();

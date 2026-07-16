@@ -42,7 +42,7 @@ const Game = (() => {
     sniper: { speed: 1.4, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 10, atkCd: 1.3,
               ranged: true, rangedRange: 7, rangedDmg: [10, 16] },
   };
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl']);
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta']);
   const totalHostiles = World.ents.filter(e => HOSTILE[e.kind]).length;
   // Quest-critical kinds never take damage — destroying 004's body, the vacuum
   // tube, or Volkov's desk could strand the puzzle chain with no way to recover.
@@ -67,7 +67,9 @@ const Game = (() => {
 
   function switchWeapon(kind) {
     if (!G.owned[kind]) { Adventure.msg('You don’t have that yet.', 1.5); return; }
-    if (G.weapon === kind) return;
+    const wasDrawn = G.combat;
+    if (!G.combat) requestCombat();         // picking a weapon pulls it — no separate "draw" step needed
+    if (G.weapon === kind) { if (!wasDrawn) Adventure.msg(WEAPONS[kind].name + ' READY.', 1.5); return; }
     G.weapon = kind;
     G.gunSprite = WEAPONS[kind].spr;
     G.fireT = 0;
@@ -83,8 +85,8 @@ const Game = (() => {
     G.combat = document.pointerLockElement === canvas;
     document.body.classList.toggle('adventure', !G.combat);
     modeEl.textContent = G.combat
-      ? 'COMBAT MODE — right-click to holster & point-and-click'
-      : 'ADVENTURE MODE — pick a verb, click the world · right-click to draw your gun';
+      ? 'COMBAT MODE — F (or right-click) to holster & point-and-click'
+      : 'ADVENTURE MODE — pick a verb, click the world · F (or right-click) to draw your gun';
   }
   document.addEventListener('pointerlockchange', syncMode);
   document.addEventListener('pointerlockerror', syncMode);
@@ -101,12 +103,12 @@ const Game = (() => {
     return true;
   }
 
-  document.addEventListener('contextmenu', e => {
-    e.preventDefault();
+  function toggleMode() {
     if (!G.started || G.over) return;
     if (G.combat) document.exitPointerLock();
     else requestCombat();
-  });
+  }
+  document.addEventListener('contextmenu', e => { e.preventDefault(); toggleMode(); });
   document.getElementById('drawgun').addEventListener('click', requestCombat);
 
   // ---------------------------------------------------------------- input --
@@ -117,6 +119,7 @@ const Game = (() => {
     if (G.started && !G.over) {
       const wi = WEAPON_KEYS.indexOf(e.code);
       if (wi >= 0) switchWeapon(WEAPON_ORDER[wi]);
+      if (e.code === 'KeyF' && !e.repeat) toggleMode();   // faster than right-click for switching combat <-> adventure
     }
   });
   document.addEventListener('keyup', e => { keys[e.code] = false; });
@@ -137,7 +140,11 @@ const Game = (() => {
   canvas.addEventListener('mousedown', e => {
     if (!G.started || G.over || e.button !== 0) return;
     if (G.combat) { mouseDown = true; shoot(); }
-    else if (mouse.x >= 0) Adventure.clickAt(mouse.x, mouse.y);
+    else if (mouse.x >= 0) {
+      const t = Adventure.resolveAt(mouse.x, mouse.y);
+      if (t && t.dist <= 3.2) Adventure.clickAt(mouse.x, mouse.y);   // something to LOOK/TAKE/USE — normal adventure click
+      else requestCombat();                                          // nothing there — draw your weapon instead
+    }
   });
   window.addEventListener('mouseup', () => { mouseDown = false; });
 
@@ -331,6 +338,13 @@ const Game = (() => {
           switchWeapon(wk);
           Adventure.msg('Acquired: ' + wpn.name + '. Press ' + (WEAPON_ORDER.indexOf(wk) + 1) + ' to switch to it.', 4);
         }
+      } else if (e.pickup === 'disguise') {
+        if (G.blown) {
+          G.blown = false;
+          Adventure.msg('Glasses, nose, moustache, a tilted fedora — you become nobody in particular. Cover regained.', 4);
+        } else {
+          Adventure.msg('A disguise kit. You already look like nobody in particular.');
+        }
       } else {
         G.ammo.walther = Math.min(WEAPONS.walther.maxAmmo, G.ammo.walther + 10);
         Adventure.msg('+10 rounds for the Walther. A love language.');
@@ -427,7 +441,7 @@ const Game = (() => {
     G.started = true;
     G.t0 = performance.now();
     overlay.classList.add('hidden');
-    requestCombat();
+    // start holstered — drawing happens automatically: pick a weapon (1-5) or fire on empty ground
     Adventure.msg('Reach the DOCK. The harbour gate will not open politely.', 6);
   });
 

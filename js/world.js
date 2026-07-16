@@ -1660,6 +1660,35 @@ const World = (() => {
     g.fillStyle = '#d84040'; g.beginPath(); g.arc(24.6, 13, 1.6, 0, 7); g.fill();
   });
 
+  SPR.carlotta = outlined(g => {                                      // Carlotta — a unique local, hair pinned up, waiting
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 62, 11, 2.6, 0, 0, 7); g.fill();
+    g.fillStyle = '#c9906a'; g.fillRect(27, 55, 4, 7); g.fillRect(33, 55, 4, 7);
+    g.fillStyle = '#8a1414'; g.fillRect(26, 59.6, 6, 3); g.fillRect(32, 59.6, 6, 3);      // red heels
+    let dg = g.createLinearGradient(18, 27, 46, 56);                                     // fitted red dress, slit skirt
+    dg.addColorStop(0, '#e0304a'); dg.addColorStop(0.5, '#b8172e'); dg.addColorStop(1, '#6e0e1c');
+    g.fillStyle = dg;
+    g.beginPath(); g.moveTo(24, 30); g.quadraticCurveTo(32, 26, 40, 30); g.lineTo(44, 55); g.lineTo(36, 55); g.lineTo(34, 40); g.lineTo(30, 55); g.lineTo(20, 55); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(0,0,0,0.18)'; g.beginPath(); g.moveTo(38, 30); g.lineTo(43, 54); g.lineTo(39, 54); g.lineTo(35, 30); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.14)'; g.fillRect(26, 38, 12, 1.6);                 // waist highlight
+    g.strokeStyle = '#c9906a'; g.lineWidth = 4.2; g.lineCap = 'round';                   // one hand on hip
+    g.beginPath(); g.moveTo(24, 32); g.lineTo(17, 38); g.lineTo(20, 44); g.stroke();
+    g.beginPath(); g.moveTo(40, 32); g.lineTo(45, 44); g.stroke();
+    g.fillStyle = '#c9906a'; g.beginPath(); g.arc(20, 44.4, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(45.6, 44.4, 2.4, 0, 7); g.fill();
+    g.fillStyle = '#a8724a'; g.beginPath(); g.arc(32, 19.4, 7.6, 0, 7); g.fill();         // head
+    g.fillStyle = 'rgba(90,50,25,0.3)'; g.beginPath(); g.ellipse(34.6, 21.8, 4, 2.8, -0.15, 0, 7); g.fill();
+    g.fillStyle = '#8a1414'; g.beginPath(); g.ellipse(31.6, 22.6, 2, 1, 0, 0, 7); g.fill(); // red lips
+    g.fillStyle = '#5e3a24'; g.fillRect(29.4, 24.6, 5.4, 1.1);
+    let hair = g.createLinearGradient(20, 6, 44, 24);                                    // hair pinned UP in an elegant bun
+    hair.addColorStop(0, '#3a2416'); hair.addColorStop(1, '#1c1208');
+    g.fillStyle = hair;
+    g.beginPath(); g.ellipse(32, 15, 8.6, 8, 0, Math.PI * 0.95, Math.PI * 2.1); g.fill();
+    g.beginPath(); g.ellipse(32, 8.4, 5.6, 5, 0, 0, 7); g.fill();                        // the bun on top
+    g.strokeStyle = '#e8dca0'; g.lineWidth = 1.6; g.lineCap = 'round';                   // the hairpin, glinting, holding it up
+    g.beginPath(); g.moveTo(27, 7); g.lineTo(37.5, 9.4); g.stroke();
+    g.fillStyle = 'rgba(255,250,220,0.7)'; g.beginPath(); g.arc(37.5, 9.4, 0.9, 0, 7); g.fill();
+    g.fillStyle = '#d84040'; g.beginPath(); g.arc(24.4, 13.4, 1.8, 0, 7); g.fill();       // a flower behind the ear
+  });
+
   // ---------------------------------------------------------------------------
   // OUTDOOR / GENRE PROPS — off the Havana palette, into 1960s spy-thriller
   // territory generally: the parked sedan, the dead-drop phone booth, the
@@ -2788,6 +2817,61 @@ const World = (() => {
     g.fillStyle = '#c9a227'; g.fillRect(19, 32, 6, 1.4);                    // gold brand plate
   });
 
+  SPR.disguise = outlined(g => {                                  // novelty glasses/nose/moustache under a tilted fedora
+    g.fillStyle = 'rgba(0,0,0,0.26)'; g.beginPath(); g.ellipse(32, 51, 17, 3, 0, 0, 7); g.fill();
+    let brim = g.createLinearGradient(10, 30, 54, 40);                       // fedora brim, tilted
+    brim.addColorStop(0, '#8a6a3e'); brim.addColorStop(0.5, '#6b4e28'); brim.addColorStop(1, '#4a3418');
+    g.fillStyle = brim; g.beginPath(); g.ellipse(32, 34, 22, 7, -0.08, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1; g.beginPath(); g.ellipse(32, 34, 22, 7, -0.08, 0, 7); g.stroke();
+    g.fillStyle = 'rgba(255,235,190,0.18)'; g.beginPath(); g.ellipse(30, 31.4, 16, 3, -0.08, 0, 7); g.fill();
+    let crown = g.createLinearGradient(16, 12, 48, 30);                      // crown, dented top, sitting back on the brim
+    crown.addColorStop(0, '#9a7a48'); crown.addColorStop(0.5, '#7a5c30'); crown.addColorStop(1, '#4a3418');
+    g.fillStyle = crown;
+    g.beginPath(); g.moveTo(18, 30); g.quadraticCurveTo(16, 12, 32, 10); g.quadraticCurveTo(48, 12, 46, 30); g.closePath(); g.fill();
+    g.fillStyle = '#241a10'; g.fillRect(16, 26, 32, 4);                      // hatband
+    g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 1;                     // dent crease
+    g.beginPath(); g.moveTo(32, 11); g.lineTo(32, 24); g.stroke();
+    g.fillStyle = '#0c0d10'; g.beginPath(); g.ellipse(20, 42, 5.6, 4, 0, 0, 7); g.fill();  // glasses frames, big round
+    g.fillStyle = '#0c0d10'; g.beginPath(); g.ellipse(44, 42, 5.6, 4, 0, 0, 7); g.fill();
+    g.strokeStyle = '#0c0d10'; g.lineWidth = 2.4; g.beginPath(); g.moveTo(25.4, 42); g.lineTo(38.6, 42); g.stroke();  // bridge
+    g.fillStyle = 'rgba(120,160,190,0.3)'; g.beginPath(); g.ellipse(20, 42, 4, 2.8, 0, 0, 7); g.fill();
+    g.fillStyle = 'rgba(120,160,190,0.3)'; g.beginPath(); g.ellipse(44, 42, 4, 2.8, 0, 0, 7); g.fill();
+    let nose = g.createRadialGradient(32, 46, 1, 32, 46, 6);                 // the big fake nose
+    nose.addColorStop(0, '#e0a878'); nose.addColorStop(1, '#a8703e');
+    g.fillStyle = nose; g.beginPath(); g.ellipse(32, 46.4, 5, 5.6, 0, 0, 7); g.fill();
+    g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.arc(29.6, 47.6, 1, 0, 7); g.fill(); g.beginPath(); g.arc(34.4, 47.6, 1, 0, 7); g.fill();
+    g.fillStyle = '#1c1712';                                                 // the bushy moustache
+    g.beginPath(); g.moveTo(20, 51); g.quadraticCurveTo(26, 47.6, 32, 50.4); g.quadraticCurveTo(38, 47.6, 44, 51);
+    g.quadraticCurveTo(38, 54.4, 32, 52.4); g.quadraticCurveTo(26, 54.4, 20, 51); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.08)'; g.beginPath(); g.moveTo(22, 50.4); g.quadraticCurveTo(27, 48.4, 32, 50.4); g.stroke();
+  });
+
+  SPR.book = outlined(g => {                                      // an open book, a folded paper tucked inside
+    g.fillStyle = 'rgba(0,0,0,0.26)'; g.beginPath(); g.ellipse(32, 47, 19, 3, 0, 0, 7); g.fill();
+    let cov = g.createLinearGradient(10, 32, 54, 32);                        // left + right covers, fanned open
+    cov.addColorStop(0, '#6e2418'); cov.addColorStop(0.5, '#8a3020'); cov.addColorStop(1, '#6e2418');
+    g.fillStyle = cov;
+    g.beginPath(); g.moveTo(10, 44); g.lineTo(13, 30); g.lineTo(32, 34); g.lineTo(32, 47); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(54, 44); g.lineTo(51, 30); g.lineTo(32, 34); g.lineTo(32, 47); g.closePath(); g.fill();
+    let pg = g.createLinearGradient(0, 30, 0, 46);                           // pages, cream, fanned
+    pg.addColorStop(0, '#f0e8d0'); pg.addColorStop(1, '#d8cca4');
+    g.fillStyle = pg;
+    g.beginPath(); g.moveTo(13.6, 32.6); g.lineTo(16, 31.6); g.lineTo(32, 35.4); g.lineTo(32, 46); g.lineTo(15, 43.4); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(50.4, 32.6); g.lineTo(48, 31.6); g.lineTo(32, 35.4); g.lineTo(32, 46); g.lineTo(49, 43.4); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(120,100,60,0.35)'; g.lineWidth = 0.6;              // text hint lines
+    for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(17, 34.6 + i * 2); g.lineTo(29, 36.2 + i * 1.6); g.stroke(); g.beginPath(); g.moveTo(35, 36.2 + i * 1.6); g.lineTo(47, 34.6 + i * 2); g.stroke(); }
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(32, 34); g.lineTo(32, 47); g.stroke();  // spine
+    let paper = g.createLinearGradient(24, 38, 40, 48);                      // the folded paper, poking out
+    paper.addColorStop(0, '#fff8e0'); paper.addColorStop(1, '#e8dcae');
+    g.fillStyle = paper; g.save(); g.translate(32, 43); g.rotate(0.15);
+    g.fillRect(-9, -6, 18, 12);
+    g.restore();
+    g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 0.8;
+    g.save(); g.translate(32, 43); g.rotate(0.15); g.strokeRect(-9, -6, 18, 12);
+    g.fillStyle = '#8a1414'; g.font = 'bold 7px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('11.22.63', 0, 0); g.restore();
+  });
+
   SPR.filecab = outlined(g => {                                   // olive-steel filing cabinet, three drawers
     g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 61.5, 15, 2.6, 0, 0, 7); g.fill();
     let bd = g.createLinearGradient(0, 20, 0, 60);
@@ -3332,6 +3416,8 @@ const World = (() => {
     wpn_laser: (x, y) => prop('wpn_laser', 'LASER GADGET', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'laser', grantAmmo: 8 }),
     wpn_golden: (x, y) => prop('wpn_golden', 'GOLDEN GUN', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'golden', grantAmmo: 1 }),
     camera: (x, y) => prop('camera', 'SPY CAMERA', x, y, 0.4, false),
+    disguise: (x, y) => prop('disguise', 'DISGUISE KIT', x, y, 0.45, false, { pickup: 'disguise' }),
+    book: (x, y) => prop('book', 'OPEN BOOK', x, y, 0.4, false),
     safe: (x, y) => prop('safe', 'WALL SAFE', x, y, 0.8, true),
     filecab: (x, y) => prop('filecab', 'FILING CABINET', x, y, 0.82, true),
     globe: (x, y) => prop('globe', 'DESK GLOBE', x, y, 0.6, false),
@@ -3394,6 +3480,11 @@ const World = (() => {
       kind: 'flowergirl', name: 'FLOWER GIRL', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
       behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
       getTex() { return this.dead ? SPR.civilianCorpse : SPR.flowergirl; },
+    }),
+    carlotta: (x, y, e) => ({
+      kind: 'carlotta', name: 'CARLOTTA', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.carlotta; },
     }),
     sedan: (x, y) => prop('sedan', 'PARKED SEDAN', x, y, 1.3, true),
     motorcycle: (x, y) => prop('motorcycle', 'MOTORCYCLE', x, y, 1.0, true),
