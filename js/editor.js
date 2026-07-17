@@ -155,8 +155,38 @@ const Editor = (() => {
     { kind: 'sedan1963', name: "'63 SEDAN", spr: 'sedan1963' },
     { kind: 'flagpole', name: 'FLAGPOLE', spr: 'flagpole' },
     { kind: 'stormdrain', name: 'STORM DRAIN', spr: 'stormdrain' },
+    { kind: 'yellowcab', name: 'YELLOW CAB', spr: 'yellowcab' },
+    { kind: 'policecarny', name: 'POLICE CRUISER', spr: 'policecarny' },
+    { kind: 'hotdogcart', name: 'HOT DOG CART', spr: 'hotdogcart' },
+    { kind: 'subwaygrate', name: 'SUBWAY GRATE', spr: 'subwaygrate' },
+    { kind: 'glassbooth', name: 'PHONE BOOTH', spr: 'glassbooth' },
+    { kind: 'worldsfair', name: "WORLD'S FAIR UNISPHERE", spr: 'worldsfair' },
+    { kind: 'fireescape', name: 'FIRE ESCAPE', spr: 'fireescape' },
+    { kind: 'brownstonestoop', name: 'BROWNSTONE STOOP', spr: 'brownstonestoop' },
+    { kind: 'rickshaw', name: 'RICKSHAW', spr: 'rickshaw' },
+    { kind: 'junkboat', name: 'JUNK BOAT', spr: 'junkboat' },
+    { kind: 'dimsumcart', name: 'DIM SUM CART', spr: 'dimsumcart' },
+    { kind: 'mahjongtable', name: 'MAHJONG TABLE', spr: 'mahjongtable' },
+    { kind: 'neonsignboard', name: 'NEON SIGNBOARD', spr: 'neonsignboard' },
+    { kind: 'lanternstring', name: 'PAPER LANTERNS', spr: 'lanternstring' },
+    { kind: 'teastall', name: 'TEA STALL', spr: 'teastall' },
+    { kind: 'birdcage', name: 'BIRD CAGE', spr: 'birdcage' },
+    { kind: 'matron', name: 'THE MATRON', spr: 'matron' },
+    { kind: 'streetartist', name: 'STREET ARTIST', spr: 'streetartist' },
+    { kind: 'headshot', name: 'HEADSHOT', spr: 'headshot' },
+    { kind: 'metroticket', name: 'METRO TICKET', spr: 'metroticket' },
+    { kind: 'fabergeegg', name: 'FABERGÉ EGG', spr: 'fabergeegg' },
+    { kind: 'laundrylady', name: 'LAUNDRY LADY', spr: 'laundrylady' },
+    { kind: 'double', name: 'THE DOUBLE', spr: 'double' },
+    { kind: 'patsy', name: 'THE PATSY', spr: 'patsy' },
+    { kind: 'nixonmask', name: 'NIXON MASK', spr: 'nixonmask' },
+    { kind: 'maskstand', name: 'MASK STAND', spr: 'maskstand' },
+    { kind: 'laundryticket', name: 'LAUNDRY TICKET', spr: 'laundryticket' },
+    { kind: 'package', name: 'WRAPPED PACKAGE', spr: 'package' },
+    { kind: 'curtainrods', name: 'CURTAIN RODS', spr: 'curtainrods' },
+    { kind: 'suitrack', name: 'GARMENT RACK', spr: 'suitrack' },
   ];
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector']);      // neutral — placed with a default wander behavior
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 
   // ---- state ----
@@ -169,6 +199,12 @@ const Editor = (() => {
   const texset = { name: 'brick', target: 'surf' };              // texture-tool settings
   let eyedrop = false;
   let rectMode = false, rectStart = null;                       // rectangle bulk-fill
+  // 3D-preview starting viewpoint, settable from the 2D map (CAMERA tool) so you
+  // can pan/scroll to a distant part of a big map and land exactly there when
+  // switching to 3D, instead of always restarting at spawn / a sector corner.
+  // Also kept in sync on every preview exit, so simply toggling 3D→2D→3D resumes
+  // wherever you last stood — that's the "camera stays put" half of the fix.
+  let previewCam = null;
   // ---- vector sector geometry (Build-style DRAW mode) ----
   // verts: {x,y} in world units (float). sectors: { loop:[vertIndices], floor, ceil, parent }.
   const geo = { verts: [], sectors: [] };
@@ -205,6 +241,7 @@ const Editor = (() => {
 
   // ---- level <-> editor state ----
   function fromLevel(json) {
+    previewCam = null;   // a freshly loaded level has a different coordinate space — don't carry over a stale 3D start point
     lv.w = json.w; lv.h = json.h;
     lv.cells = []; lv.fh = []; lv.ch = []; lv.stex = []; lv.ctex = []; lv.fsx = []; lv.fsy = [];
     for (let y = 0; y < lv.h; y++) {
@@ -230,7 +267,7 @@ const Editor = (() => {
     geo.verts = (json.geo && json.geo.verts) ? json.geo.verts.map(v => ({ x: v.x, y: v.y })) : [];
     geo.sectors = (json.geo && json.geo.sectors) ? json.geo.sectors.map(s => ({
       loop: s.loop.slice(), floor: s.floor || 0, ceil: s.ceil == null ? 1 : s.ceil,
-      floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, win: !!s.win, hostile: !!s.hostile,
+      floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, skyTex: s.skyTex || null, win: !!s.win, hostile: !!s.hostile,
       texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : null,
       wallTex: s.wallTex ? s.wallTex.slice() : null,
       wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : null, parent: s.parent == null ? -1 : s.parent,
@@ -276,7 +313,7 @@ const Editor = (() => {
     if (geo.sectors.length) {
       out.geo = {
         verts: geo.verts.map(v => ({ x: v.x, y: v.y })),
-        sectors: geo.sectors.map(s => ({ loop: s.loop.slice(), floor: s.floor, ceil: s.ceil, floorTex: s.floorTex, ceilTex: s.ceilTex, sky: !!s.sky, win: !!s.win, hostile: !!s.hostile, texScale: s.texScale || 1,
+        sectors: geo.sectors.map(s => ({ loop: s.loop.slice(), floor: s.floor, ceil: s.ceil, floorTex: s.floorTex, ceilTex: s.ceilTex, sky: !!s.sky, skyTex: s.skyTex || undefined, win: !!s.win, hostile: !!s.hostile, texScale: s.texScale || 1,
           wallDoor: (s.wallDoor && s.wallDoor.some(Boolean)) ? s.wallDoor.slice() : undefined,
           wallTex: (s.wallTex && s.wallTex.some(Boolean)) ? s.wallTex.slice() : undefined,
           wallTexScale: (s.wallTexScale && s.wallTexScale.some(v => v && v !== 1)) ? s.wallTexScale.slice() : undefined,
@@ -358,6 +395,10 @@ const Editor = (() => {
       gg.strokeStyle = '#ff8a3a'; gg.lineWidth = 3;
       gg.beginPath(); gg.moveTo(8, 8); gg.lineTo(22, 22); gg.moveTo(22, 8); gg.lineTo(8, 22); gg.stroke();
     }), () => { tool = { t: 'erase' }; });
+    toolBtn(spEl, 'PREVIEW CAM', thumb(gg => {
+      gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
+      drawCamMarker(gg, 15, 15, 11, 0);
+    }), () => { tool = { t: 'campos' }; status('PREVIEW CAM: click the map to set the 3D preview start point. Right-click to clear it.'); });
 
     const htEl = document.getElementById('htools');
     toolBtn(htEl, 'RAISE/LWR', thumb(gg => {
@@ -425,6 +466,19 @@ const Editor = (() => {
     gg.restore();
   }
 
+  // 3D-preview camera marker — a cyan eye/lens circle with a facing wedge, kept
+  // visually distinct from the green spawn arrow (spawn = where the MISSION
+  // starts; this = where the EDITOR's 3D preview starts, purely an editing aid)
+  function drawCamMarker(gg, cx, cy, r, a) {
+    gg.save(); gg.translate(cx, cy);
+    gg.fillStyle = 'rgba(90,220,255,0.25)'; gg.strokeStyle = '#5adcff'; gg.lineWidth = Math.max(1, r * 0.12);
+    gg.beginPath(); gg.arc(0, 0, r * 0.55, 0, 7); gg.fill(); gg.stroke();
+    gg.rotate(a);
+    gg.beginPath(); gg.moveTo(r * 0.5, 0); gg.lineTo(r * 1.15, -r * 0.5); gg.lineTo(r * 1.15, r * 0.5); gg.closePath();
+    gg.fillStyle = '#5adcff'; gg.fill();
+    gg.restore();
+  }
+
   function fitCanvas() {
     const base = Math.max(12, Math.min(30, Math.floor(740 / Math.max(lv.w, lv.h))));
     cellPx = Math.max(6, Math.min(160, Math.round(base * zoom)));
@@ -449,6 +503,8 @@ const Editor = (() => {
     }
     // spawn
     drawSpawnArrow(g, lv.spawn.x * c, lv.spawn.y * c, c * 0.38, lv.spawn.a);
+    // 3D-preview camera start point, if the CAMERA tool has placed one
+    if (previewCam) drawCamMarker(g, previewCam.x * c, previewCam.y * c, c * 0.38, previewCam.a);
     renderChecks();
   }
 
@@ -592,9 +648,16 @@ const Editor = (() => {
     if (drawMode) {                                  // vector map: place vertex / entity / spawn
       const w = worldFromEvent(e);
       if (e.button === 2) {                          // right-click: delete an entity, else cancel a draft
+        if (tool.t === 'campos') { previewCam = null; render(); status('PREVIEW CAM CLEARED — 3D preview will use the default start again.'); return; }
         const hit = entAtWorld(w.x, w.y);
         if (hit) { pushUndo(); lv.ents.splice(lv.ents.indexOf(hit), 1); render(); }
         else cancelDraft();
+        return;
+      }
+      if (tool.t === 'campos') {                     // 3D-preview starting viewpoint — not level data, no undo needed
+        previewCam = { x: +w.x.toFixed(2), y: +w.y.toFixed(2), a: +document.getElementById('spawnang').value };
+        render();
+        status('PREVIEW CAM SET AT ' + previewCam.x + ', ' + previewCam.y + ' — switch to 3D PREVIEW to land there.');
         return;
       }
       if (tool.t === 'ent') {
@@ -709,9 +772,15 @@ const Editor = (() => {
     status('RESIZED TO ' + w + '×' + h + '.');
   });
 
-  // ---- scroll-wheel zoom (centred on the cursor) ----
+  // ---- camera: scroll-wheel zoom (Ctrl/Cmd+scroll, centred on the cursor) ----
+  // Plain scroll/trackpad-swipe is left alone (no preventDefault) so the
+  // browser's native scrolling of the #gridscroll overflow container pans the
+  // view instead — that used to be hijacked into zoom unconditionally, which
+  // meant scrolling was the ONLY thing wheel input could do and there was no
+  // way to pan without dragging the (thin) scrollbars directly.
   const gridscroll = document.getElementById('gridscroll');
   gridscroll.addEventListener('wheel', e => {
+    if (!(e.ctrlKey || e.metaKey)) return;              // plain wheel/trackpad scroll → native pan; pinch/ctrl+wheel → zoom
     e.preventDefault();
     const before = cvs.getBoundingClientRect();
     const wx = (e.clientX - before.left) / cellPx;      // world point under the cursor (old scale)
@@ -725,6 +794,25 @@ const Editor = (() => {
     gridscroll.scrollTop = sr.top + gridscroll.clientTop + wy * cellPx - e.clientY;
     status('ZOOM ×' + zoom.toFixed(2));
   }, { passive: false });
+
+  // ---- camera: middle-mouse-drag pan (Photoshop/Blender-style grab-and-drag) ----
+  let panning = false, panX = 0, panY = 0, panScrollL = 0, panScrollT = 0;
+  gridscroll.addEventListener('mousedown', e => {
+    if (e.button !== 1) return;                         // middle button only — left/right stay paint/erase
+    e.preventDefault();
+    panning = true; panX = e.clientX; panY = e.clientY;
+    panScrollL = gridscroll.scrollLeft; panScrollT = gridscroll.scrollTop;
+    gridscroll.classList.add('panning');
+  });
+  window.addEventListener('mousemove', e => {
+    if (!panning) return;
+    gridscroll.scrollLeft = panScrollL - (e.clientX - panX);
+    gridscroll.scrollTop = panScrollT - (e.clientY - panY);
+  });
+  window.addEventListener('mouseup', e => {
+    if (e.button === 1 && panning) { panning = false; gridscroll.classList.remove('panning'); }
+  });
+  gridscroll.addEventListener('auxclick', e => { if (e.button === 1) e.preventDefault(); });  // suppress middle-click autoscroll/paste
 
   function save() {
     localStorage.setItem(LS_KEY, JSON.stringify(toLevel()));
@@ -935,6 +1023,15 @@ const Editor = (() => {
     const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
     const sec = geo.sectors[s]; sec.sky = !sec.sky;
     status('SECTOR ' + (s + 1) + ' SKY ' + (sec.sky ? 'ON' : 'OFF'));
+  }
+  // Shift+K cycles WHICH sky image a sky sector uses (Havana day / Paris night / …).
+  // Stored even when sky is off, so picking a sky ahead of time sticks once you turn it on.
+  function geoSkyTex() {
+    const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
+    const sec = geo.sectors[s], names = World.SKYNAMES;
+    let i = names.indexOf(sec.skyTex || 'havana'); if (i < 0) i = 0;
+    sec.skyTex = names[(i + 1) % names.length];
+    status('SECTOR ' + (s + 1) + ' SKY → ' + sec.skyTex.toUpperCase());
   }
   function geoWin() {                                          // tag the looked-at sector a WIN zone (goal)
     const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
@@ -1283,7 +1380,7 @@ const Editor = (() => {
       const doors = (sec.wallDoor && sec.wallDoor.filter(Boolean).length) || 0;
       el.textContent = (previewCompiled ? '◇ GRID SECTOR ' : '◆ SECTOR ') + (s + 1) + '   floor ' + sec.floor.toFixed(1) + ' · ceil ' + sec.ceil.toFixed(1) +
         '   ' + String(sec.floorTex).toUpperCase() + ' / ' + String(sec.ceilTex).toUpperCase() +
-        ((sec.texScale || 1) !== 1 ? ' ×' + sec.texScale : '') + (sec.sky ? ' · SKY' : '') + (sec.win ? ' · WIN' : '') + (sec.hostile ? ' · HOSTILE' : '') + (doors ? ' · ' + doors + ' DOOR' : '') +
+        ((sec.texScale || 1) !== 1 ? ' ×' + sec.texScale : '') + (sec.sky ? ' · SKY ' + String(sec.skyTex || 'havana').toUpperCase() : '') + (sec.win ? ' · WIN' : '') + (sec.hostile ? ' · HOSTILE' : '') + (doors ? ' · ' + doors + ' DOOR' : '') +
         (sec.parent >= 0 && !previewCompiled ? '   H solid' : '');
       el.style.display = 'block';
       // Shift picks the ceiling everywhere else (PgUp/[/T all read it the same way) —
@@ -1320,7 +1417,9 @@ const Editor = (() => {
     usePortal = true;
     portalGraph = Engine.buildGraph(geo);
     cam.pitch = 0; cam.sector = undefined;
-    if (previewCompiled) {                                       // start at the mission spawn
+    if (previewCam) {                                            // an explicit CAMERA-tool placement (or wherever you last stood) wins
+      cam.x = previewCam.x; cam.y = previewCam.y; cam.a = previewCam.a;
+    } else if (previewCompiled) {                                // start at the mission spawn
       cam.x = lv.spawn.x; cam.y = lv.spawn.y; cam.a = lv.spawn.a;
     } else {                                                     // start in a corner of the first drawn sector
       const L = geo.sectors[0].loop, v0 = geo.verts[L[0]], cn = centroid(L);
@@ -1337,7 +1436,7 @@ const Editor = (() => {
     document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
     document.getElementById('pcontrols').innerHTML = previewCompiled
       ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>ESC</b> map'
-      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> tex — wall (or its soffit/riser step) if aiming close, else floor (Shift ceil) &nbsp;·&nbsp; <b>R</b> riser tex (when a wall has both a soffit and a riser) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>P</b> mount a sprite on a wall (poster) &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply · <b>Shift</b>+ save favorite &nbsp;·&nbsp; <b>ESC</b> map';
+      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> tex — wall (or its soffit/riser step) if aiming close, else floor (Shift ceil) &nbsp;·&nbsp; <b>R</b> riser tex (when a wall has both a soffit and a riser) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky (<b>Shift</b>+<b>K</b> which sky) &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>P</b> mount a sprite on a wall (poster) &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply · <b>Shift</b>+ save favorite &nbsp;·&nbsp; <b>ESC</b> map';
     document.getElementById('favbar').style.display = previewCompiled ? 'none' : 'flex';
     renderFavbar();
     previewOn = true; plast = performance.now();
@@ -1345,6 +1444,7 @@ const Editor = (() => {
   }
   function exitPreview() {
     previewOn = false; if (praf) cancelAnimationFrame(praf);
+    previewCam = { x: +cam.x.toFixed(2), y: +cam.y.toFixed(2), a: cam.a };  // remember exactly where you left off
     if (previewCompiled) { geo.verts = []; geo.sectors = []; previewCompiled = false; }  // discard the throwaway grid compile
     document.getElementById('grid').hidden = false;
     document.getElementById('preview3d').hidden = true;
@@ -1380,7 +1480,7 @@ const Editor = (() => {
         if (wallHit && wallHit.dist < wallPickDist(wallHit)) geoWallTexScale(); else geoTexScale();
         e.preventDefault(); return;
       }
-      if (e.code === 'KeyK') { if (!e.repeat) pushUndo(); geoSky(); e.preventDefault(); return; }
+      if (e.code === 'KeyK') { if (!e.repeat) pushUndo(); if (sh) geoSkyTex(); else geoSky(); e.preventDefault(); return; }
       if (e.code === 'KeyG') { if (!e.repeat) pushUndo(); geoWin(); e.preventDefault(); return; }
       if (e.code === 'KeyN') { if (!e.repeat) pushUndo(); geoHostile(); e.preventDefault(); return; }
       if (e.code === 'KeyF') { if (!e.repeat) pushUndo(); geoDoor(); e.preventDefault(); return; }
@@ -1496,7 +1596,7 @@ const Editor = (() => {
   function closeSector() {
     const loop = draft.slice();
     if (polyArea(loop) < 0) loop.reverse();                    // normalise to CCW
-    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, win: false, hostile: false, texScale: 1, wallDoor: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false };
+    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, skyTex: null, win: false, hostile: false, texScale: 1, wallDoor: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false };
     const c = centroid(loop);
     for (let s = 0; s < geo.sectors.length; s++)
       if (pointInLoop(c.x, c.y, geo.sectors[s].loop)) { sec.parent = s; break; }  // nested → sub-sector

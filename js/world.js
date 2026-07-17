@@ -128,11 +128,6 @@ const World = (() => {
       "y": 20.78
     },
     {
-      "kind": "firehydrant",
-      "x": 17.88,
-      "y": 14.25
-    },
-    {
       "kind": "oildrum",
       "x": 18.41,
       "y": 7.95
@@ -462,16 +457,6 @@ const World = (() => {
       "y": 0.92
     },
     {
-      "kind": "wpn_sterling",
-      "x": 19.91,
-      "y": 2.03
-    },
-    {
-      "kind": "medkit",
-      "x": 19.89,
-      "y": 1.69
-    },
-    {
       "kind": "ciphermachine",
       "x": 18.89,
       "y": 1.16
@@ -665,6 +650,11 @@ const World = (() => {
       "x": 35.42,
       "y": 13.16,
       "behavior": "wander"
+    },
+    {
+      "kind": "flagpole",
+      "x": 21.4,
+      "y": 13.47
     }
   ],
   "blown": false,
@@ -712,23 +702,23 @@ const World = (() => {
       },
       {
         "x": 32,
-        "y": 2.5
+        "y": 3
       },
       {
-        "x": 25.5,
-        "y": 2.5
+        "x": 26,
+        "y": 3
       },
       {
-        "x": 25.5,
+        "x": 26,
         "y": 8
       },
       {
-        "x": 19.5,
+        "x": 19,
         "y": 8
       },
       {
-        "x": 19.5,
-        "y": 4
+        "x": 19,
+        "y": 3
       },
       {
         "x": 22,
@@ -875,59 +865,35 @@ const World = (() => {
         "y": 6
       },
       {
-        "x": 17,
-        "y": 9.5
-      },
-      {
-        "x": 17,
-        "y": 10
+        "x": 11,
+        "y": 24
       },
       {
         "x": 11,
         "y": 24.5
       },
       {
-        "x": 11,
-        "y": 25
-      },
-      {
-        "x": 7,
-        "y": 7
-      },
-      {
-        "x": 7,
-        "y": 25
-      },
-      {
-        "x": 7.5,
+        "x": 5.5,
         "y": 24.5
       },
       {
-        "x": 7.5,
-        "y": 7
+        "x": 5.5,
+        "y": 24
       },
       {
-        "x": 7.5,
-        "y": 9.5
+        "x": 19,
+        "y": 4
       },
       {
-        "x": 7.5,
-        "y": 10
-      },
-      {
-        "x": 19.5,
-        "y": 4.5
-      },
-      {
-        "x": 19.5,
+        "x": 19,
         "y": 5
       },
       {
-        "x": 25.5,
-        "y": 4.5
+        "x": 26,
+        "y": 4
       },
       {
-        "x": 25.5,
+        "x": 26,
         "y": 5
       },
       {
@@ -967,7 +933,7 @@ const World = (() => {
         "y": 6
       },
       {
-        "x": 22.5,
+        "x": 22,
         "y": 7.5
       },
       {
@@ -979,7 +945,7 @@ const World = (() => {
         "y": 8
       },
       {
-        "x": 22.5,
+        "x": 22,
         "y": 8
       },
       {
@@ -1187,12 +1153,12 @@ const World = (() => {
         "y": 3.5
       },
       {
-        "x": 19,
-        "y": 3.5
+        "x": 18.5,
+        "y": 3
       },
       {
-        "x": 19,
-        "y": 3
+        "x": 18.5,
+        "y": 2.5
       },
       {
         "x": 17.5,
@@ -1317,40 +1283,72 @@ const World = (() => {
       {
         "x": 9.5,
         "y": 17.5
+      },
+      {
+        "x": 6,
+        "y": 7
+      },
+      {
+        "x": 5.5,
+        "y": 7
+      },
+      {
+        "x": 17,
+        "y": 8.5
+      },
+      {
+        "x": 17,
+        "y": 9
+      },
+      {
+        "x": 5.5,
+        "y": 9
+      },
+      {
+        "x": 6,
+        "y": 8.5
+      },
+      {
+        "x": 6,
+        "y": 9
+      },
+      {
+        "x": 6,
+        "y": 24
       }
     ],
     "sectors": [
       {
         "loop": [
           14,
-          61,
-          62,
+          55,
+          56,
           13,
-          77,
-          76,
+          71,
+          70,
           12,
-          64,
-          63,
+          58,
+          57,
           11,
-          104,
-          105,
+          98,
+          99,
           10,
           47,
           48,
-          112,
-          113,
+          106,
+          107,
           9,
           8,
-          78,
-          79,
-          86,
-          87,
+          72,
+          73,
+          80,
+          81,
           7,
           6,
-          108,
-          110,
-          111,
-          109,
+          102,
+          104,
+          105,
+          103,
           5,
           40,
           39,
@@ -1359,13 +1357,13 @@ const World = (() => {
           24,
           23,
           2,
-          136,
+          130,
           1,
-          52,
-          51,
+          159,
+          158,
           0,
-          128,
-          129
+          122,
+          123
         ],
         "floor": 0.3,
         "ceil": 3.3,
@@ -1392,28 +1390,31 @@ const World = (() => {
           "windowrow",
           "windowrow",
           "azulejo",
-          "windowrow",
-          "stucco",
+          "windowbars",
+          "azulejo",
           "azulejo",
           "brick",
           "azulejo",
           "brick",
+          "azulejo",
+          "azulejo",
+          null,
+          "brick",
+          "brick",
+          null,
+          null,
+          "concretepergola",
+          null,
+          "concretepergola",
           "stucco",
           "stucco",
           null,
           "stucco",
           "stucco",
+          "marble",
+          "stucco",
           null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "marble"
+          "stucco"
         ],
         "wallTexScale": [
           1,
@@ -1437,7 +1438,8 @@ const World = (() => {
           0.5,
           0.5,
           0.5,
-          1,
+          0.5,
+          0.5,
           null,
           null,
           null,
@@ -1454,21 +1456,20 @@ const World = (() => {
           null,
           null,
           null,
-          null,
-          null,
+          2,
           null,
           null,
           1
         ],
         "wallStepTex": [
           null,
-          null,
-          null,
-          null,
-          "stucco",
           "windowrow",
           null,
           null,
+          "windowrow",
+          "windowrow",
+          null,
+          "windowrow",
           null,
           "balconywin",
           "brick",
@@ -1476,31 +1477,31 @@ const World = (() => {
           "brick",
           "windowrow",
           null,
-          "windowrow",
+          "windowbars",
           "stucco",
           "azulejo",
           null,
           "azulejo",
           "brick",
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          "brick",
-          null,
-          "brick",
-          null,
-          "brick",
-          null,
-          null,
+          "azulejo",
           null,
           null,
           null,
           null,
           null,
           "brick",
+          null,
+          "brick",
+          "concretepergola",
+          "brick",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "stucco",
           null,
           null,
           "brick"
@@ -1510,7 +1511,7 @@ const World = (() => {
           null,
           null,
           null,
-          "teak",
+          "sandstone",
           null,
           null,
           null,
@@ -1521,7 +1522,9 @@ const World = (() => {
           null,
           "limestone",
           null,
-          "rooftile",
+          "sandfloor",
+          null,
+          "azulejo",
           null,
           "azulejo",
           null,
@@ -1534,6 +1537,7 @@ const World = (() => {
           null,
           null,
           null,
+          "carpet",
           null,
           null,
           null,
@@ -1542,10 +1546,7 @@ const World = (() => {
           null,
           null,
           null,
-          null,
-          null,
-          null,
-          "brick",
+          "stucco",
           null,
           null,
           "brick"
@@ -1659,8 +1660,8 @@ const World = (() => {
           38,
           36,
           34,
-          54,
-          53,
+          52,
+          51,
           33,
           32
         ],
@@ -1680,6 +1681,19 @@ const World = (() => {
           "stucco",
           "stucco",
           "stucco",
+          "stucco",
+          "stucco"
+        ],
+        "wallStepFloorTex": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "stucco",
+          null,
+          null,
           null
         ],
         "parent": -1
@@ -1767,17 +1781,14 @@ const World = (() => {
       },
       {
         "loop": [
+          52,
+          53,
           54,
-          56,
-          55,
-          58,
-          59,
-          60,
-          57,
-          53
+          163,
+          51
         ],
-        "floor": 0.6,
-        "ceil": 1.3,
+        "floor": 0.8,
+        "ceil": 1.7,
         "floorTex": "carpet",
         "ceilTex": "ceiltile",
         "sky": false,
@@ -1788,31 +1799,14 @@ const World = (() => {
       },
       {
         "loop": [
+          55,
+          57,
+          58,
+          60,
           59,
-          51,
-          52,
-          60
+          56
         ],
-        "floor": 0.7,
-        "ceil": 1.3,
-        "floorTex": "teak",
-        "ceilTex": "ceiltile",
-        "sky": false,
-        "win": false,
-        "hostile": false,
-        "texScale": 1,
-        "parent": -1
-      },
-      {
-        "loop": [
-          61,
-          63,
-          64,
-          66,
-          65,
-          62
-        ],
-        "floor": 0.3,
+        "floor": 0,
         "ceil": 1.3,
         "floorTex": "carpet",
         "ceilTex": "ceiltile",
@@ -1828,21 +1822,29 @@ const World = (() => {
           "stucco",
           null
         ],
+        "wallStepFloorTex": [
+          null,
+          "ceiltile",
+          null,
+          null,
+          null,
+          "ceiltile"
+        ],
         "parent": -1
       },
       {
         "loop": [
-          66,
-          71,
-          70,
+          60,
+          65,
+          64,
+          63,
           69,
-          75,
-          74,
           68,
-          73,
-          72,
+          62,
           67,
-          65
+          66,
+          61,
+          59
         ],
         "floor": 0,
         "ceil": 1.2,
@@ -1853,7 +1855,7 @@ const World = (() => {
         "hostile": false,
         "texScale": 1,
         "wallTex": [
-          "teak",
+          "stucco",
           "stucco",
           "stucco",
           "stucco",
@@ -1894,13 +1896,13 @@ const World = (() => {
       },
       {
         "loop": [
-          77,
-          74,
-          75,
-          76
+          71,
+          68,
+          69,
+          70
         ],
         "floor": 0.5,
-        "ceil": 1,
+        "ceil": 1.2,
         "floorTex": "carpet",
         "ceilTex": "ceiltile",
         "sky": false,
@@ -1917,10 +1919,10 @@ const World = (() => {
       },
       {
         "loop": [
-          78,
-          80,
-          81,
-          79
+          72,
+          74,
+          75,
+          73
         ],
         "floor": 0.7,
         "ceil": 1.7,
@@ -1940,14 +1942,14 @@ const World = (() => {
       },
       {
         "loop": [
-          55,
-          85,
-          84,
-          83,
-          82,
-          58
+          79,
+          78,
+          77,
+          76,
+          156,
+          157
         ],
-        "floor": 0,
+        "floor": 0.1,
         "ceil": 3.4,
         "floorTex": "carpet",
         "ceilTex": "ceiltile",
@@ -1983,10 +1985,10 @@ const World = (() => {
       },
       {
         "loop": [
-          86,
-          88,
-          89,
-          87
+          80,
+          82,
+          83,
+          81
         ],
         "floor": 0.4,
         "ceil": 1.6,
@@ -2001,14 +2003,14 @@ const World = (() => {
       {
         "loop": [
           44,
-          90,
-          101,
-          100,
-          91,
-          92,
-          120,
-          121,
-          93,
+          84,
+          95,
+          94,
+          85,
+          86,
+          114,
+          115,
+          87,
           46
         ],
         "floor": 0.4,
@@ -2043,16 +2045,16 @@ const World = (() => {
       },
       {
         "loop": [
+          82,
           88,
-          94,
-          95,
-          99,
-          98,
-          96,
-          103,
-          102,
+          89,
+          93,
+          92,
+          90,
           97,
-          89
+          96,
+          91,
+          83
         ],
         "floor": 0.4,
         "ceil": 1.8,
@@ -2078,10 +2080,10 @@ const World = (() => {
       },
       {
         "loop": [
-          101,
-          98,
-          99,
-          100
+          95,
+          92,
+          93,
+          94
         ],
         "floor": 0.7,
         "ceil": 1.2,
@@ -2095,10 +2097,10 @@ const World = (() => {
       },
       {
         "loop": [
-          104,
-          106,
-          107,
-          105
+          98,
+          100,
+          101,
+          99
         ],
         "floor": 0.4,
         "ceil": 1.6,
@@ -2112,10 +2114,10 @@ const World = (() => {
       },
       {
         "loop": [
-          112,
-          115,
-          114,
-          113
+          106,
+          109,
+          108,
+          107
         ],
         "floor": 0.6,
         "ceil": 2.2,
@@ -2129,12 +2131,12 @@ const World = (() => {
       },
       {
         "loop": [
-          115,
-          116,
-          117,
-          118,
-          119,
-          114
+          109,
+          110,
+          111,
+          112,
+          113,
+          108
         ],
         "floor": 0.7,
         "ceil": 2.2,
@@ -2148,10 +2150,29 @@ const World = (() => {
       },
       {
         "loop": [
+          114,
+          116,
+          117,
+          115
+        ],
+        "floor": 0,
+        "ceil": 1,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          116,
+          118,
+          119,
           120,
-          122,
-          123,
-          121
+          121,
+          117
         ],
         "floor": 0,
         "ceil": 1,
@@ -2166,28 +2187,9 @@ const World = (() => {
       {
         "loop": [
           122,
-          124,
           125,
-          126,
-          127,
+          124,
           123
-        ],
-        "floor": 0,
-        "ceil": 1,
-        "floorTex": "carpet",
-        "ceilTex": "ceiltile",
-        "sky": false,
-        "win": false,
-        "hostile": false,
-        "texScale": 1,
-        "parent": -1
-      },
-      {
-        "loop": [
-          128,
-          131,
-          130,
-          129
         ],
         "floor": 0.4,
         "ceil": 1.7,
@@ -2201,12 +2203,12 @@ const World = (() => {
       },
       {
         "loop": [
-          131,
-          132,
-          133,
-          134,
-          135,
-          130
+          125,
+          126,
+          127,
+          128,
+          129,
+          124
         ],
         "floor": 0.5,
         "ceil": 1.8,
@@ -2220,9 +2222,9 @@ const World = (() => {
       },
       {
         "loop": [
-          136,
-          137,
-          138,
+          130,
+          131,
+          132,
           1
         ],
         "floor": 0.3,
@@ -2233,17 +2235,23 @@ const World = (() => {
         "win": false,
         "hostile": false,
         "texScale": 1,
+        "wallTex": [
+          "stucco",
+          null,
+          "stucco",
+          null
+        ],
         "parent": -1
       },
       {
         "loop": [
+          131,
           137,
-          143,
-          142,
-          141,
-          140,
-          139,
-          138
+          136,
+          135,
+          134,
+          133,
+          132
         ],
         "floor": 0.3,
         "ceil": 2.3,
@@ -2275,6 +2283,12 @@ const World = (() => {
       },
       {
         "loop": [
+          138,
+          139,
+          140,
+          141,
+          142,
+          143,
           144,
           145,
           146,
@@ -2286,13 +2300,7 @@ const World = (() => {
           152,
           153,
           154,
-          155,
-          156,
-          157,
-          158,
-          159,
-          160,
-          161
+          155
         ],
         "floor": 0,
         "ceil": 2.3,
@@ -2302,7 +2310,44 @@ const World = (() => {
         "win": false,
         "hostile": false,
         "texScale": 1,
-        "parent": 26
+        "parent": 25
+      },
+      {
+        "loop": [
+          159,
+          162,
+          160,
+          157,
+          156,
+          161,
+          158
+        ],
+        "floor": 0.8,
+        "ceil": 1.7,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          162,
+          163,
+          54,
+          160
+        ],
+        "floor": 0.8,
+        "ceil": 1.7,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
       }
     ]
   }
@@ -3349,6 +3394,200 @@ const World = (() => {
   });
 
   // ---------------------------------------------------------------------------
+  // PARIS, round 2 — a café awning, Seine embankment stone, a gilded Belle
+  // Époque ceiling, a bouquiniste book-stall's green paneling.
+  // ---------------------------------------------------------------------------
+  FLOOR.cafeawning = cnv(g => {                         // forest-green & cream bistro awning canvas
+    const stripes = ['#1e5c3a', '#f0ece0'];
+    for (let i = 0; i < 8; i++) { g.fillStyle = stripes[i % 2]; g.fillRect(i * 8, 0, 8, 64); }
+    g.strokeStyle = 'rgba(0,0,0,0.12)'; g.lineWidth = 0.6;
+    for (let y = 6; y < 64; y += 7) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }  // canvas weave
+    g.fillStyle = 'rgba(255,255,255,0.1)'; for (let i = 1; i < 8; i += 2) g.fillRect(i * 8, 0, 1.4, 64);
+    speck(g, 30, 'rgba(0,0,0,0.08)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,255,255,0.1)', 'rgba(0,0,0,0.25)');
+  });
+
+  FLOOR.riverstone = cnv(g => {                         // Seine embankment quay wall — grey limestone, mossy waterline
+    vgrad(g, 0, 0, 64, 64, '#9a988c', '#727060');
+    g.strokeStyle = 'rgba(40,40,32,0.35)'; g.lineWidth = 1;
+    for (let ty = 0; ty < 4; ty++) {
+      const y = ty * 16, off = (ty % 2) * 10;
+      g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke();
+      for (let x = -10 + off; x < 64; x += 20) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 16); g.stroke(); }
+    }
+    g.fillStyle = 'rgba(70,100,50,0.28)';                // moss creeping up from the waterline
+    for (let i = 0; i < 10; i++) { const x = Math.random() * 64, y = 44 + Math.random() * 20; g.beginPath(); g.ellipse(x, y, 3 + Math.random() * 3, 2, 0, 0, 7); g.fill(); }
+    g.fillStyle = 'rgba(255,255,255,0.1)';
+    for (let ty = 0; ty < 4; ty++) for (let tx = 0; tx < 3; tx++) g.fillRect(tx * 20 + 1, ty * 16 + 1, 8, 2.4);
+    speck(g, 55, 'rgba(20,20,15,0.14)'); speck(g, 25, 'rgba(255,255,255,0.06)');
+  });
+
+  FLOOR.gildedceiling = cnv(g => {                       // Belle Époque gold-leaf ceiling molding on cream plaster
+    vgrad(g, 0, 0, 64, 64, '#f0e8d4', '#d8ccac');
+    g.strokeStyle = '#c9a227'; g.lineWidth = 2;
+    g.beginPath(); g.rect(6, 6, 52, 52); g.stroke();
+    g.lineWidth = 1; g.beginPath(); g.rect(12, 12, 40, 40); g.stroke();
+    const leaf = (cx, cy, r) => { g.beginPath(); g.ellipse(cx, cy - r * 0.6, r * 0.5, r, -0.3, 0, 7); g.fill(); g.beginPath(); g.ellipse(cx, cy + r * 0.6, r * 0.5, r, 0.3, 0, 7); g.fill(); };
+    g.fillStyle = 'rgba(201,162,39,0.8)';
+    leaf(32, 32, 8);
+    for (const [cx, cy] of [[6, 6], [58, 6], [6, 58], [58, 58]]) { g.save(); g.translate(cx, cy); g.beginPath(); g.arc(0, 0, 5, 0, 7); g.fill(); g.restore(); }
+    g.fillStyle = 'rgba(255,250,230,0.3)'; g.beginPath(); g.ellipse(26, 24, 8, 4, -0.3, 0, 7); g.fill();
+    speck(g, 30, 'rgba(120,90,20,0.1)');
+  });
+
+  FLOOR.bouquiniste = cnv(g => {                         // Seine bouquiniste book-stall — dark green wood paneling
+    vgrad(g, 0, 0, 64, 64, '#2e5c40', '#1c3c28');
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 1.4;
+    for (let x = 0; x < 64; x += 16) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 64); g.stroke(); }
+    g.strokeStyle = 'rgba(0,0,0,0.15)'; g.lineWidth = 0.6;
+    for (let y = 8; y < 64; y += 10) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.fillStyle = 'rgba(255,255,255,0.08)'; for (let x = 2; x < 64; x += 16) g.fillRect(x, 0, 2.4, 64);
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.arc(16, 24, 1.4, 0, 7); g.fill(); g.beginPath(); g.arc(48, 40, 1.4, 0, 7); g.fill();  // latch hardware
+    stains(g, 5, ['#1a3a26', '#123020']);
+    speck(g, 40, 'rgba(0,0,0,0.12)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,255,255,0.06)', 'rgba(0,0,0,0.35)');
+  });
+
+  // ---------------------------------------------------------------------------
+  // NEW YORK 1964 textures — subway station tile, brownstone rowhouse facade,
+  // a deli's red/white checker floor, a glass-curtain-wall office tower,
+  // a Broadway marquee.
+  // ---------------------------------------------------------------------------
+  FLOOR.subwaytile = cnv(g => {                         // IND-style subway station tile, cream + colored band
+    vgrad(g, 0, 0, 64, 64, '#e8e2d0', '#c9c2a8');
+    g.strokeStyle = 'rgba(80,72,50,0.3)'; g.lineWidth = 1;
+    for (let x = 0; x <= 64; x += 8) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 64); g.stroke(); }
+    for (let y = 0; y <= 64; y += 8) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.fillStyle = '#1e5c3a'; g.fillRect(0, 24, 64, 8);    // colored ID band, IND green
+    g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 1; g.beginPath(); g.moveTo(0, 24); g.lineTo(64, 24); g.moveTo(0, 32); g.lineTo(64, 32); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,0.15)';
+    for (let ty = 0; ty < 8; ty++) for (let tx = 0; tx < 8; tx++) g.fillRect(tx * 8 + 1, ty * 8 + 1, 5, 1.4);
+    speck(g, 45, 'rgba(60,54,36,0.1)');
+  });
+
+  FLOOR.brownstone = cnv(g => {                          // NYC brownstone rowhouse facade, warm red-brown stone
+    vgrad(g, 0, 0, 64, 64, '#8a5240', '#5c3226');
+    g.strokeStyle = 'rgba(30,14,8,0.35)'; g.lineWidth = 1;
+    for (let ty = 0; ty < 5; ty++) {
+      const y = ty * 13, off = (ty % 2) * 8;
+      g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke();
+      for (let x = -8 + off; x < 64; x += 16) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 13); g.stroke(); }
+    }
+    g.fillStyle = 'rgba(255,220,200,0.1)';
+    for (let ty = 0; ty < 5; ty++) for (let tx = 0; tx < 4; tx++) g.fillRect(tx * 16 + 1, ty * 13 + 1, 8, 2.6);
+    stains(g, 5, ['#6a3c2c', '#4a2418']);
+    speck(g, 50, 'rgba(20,8,4,0.15)'); speck(g, 22, 'rgba(255,220,200,0.06)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,220,200,0.08)', 'rgba(20,8,4,0.3)');
+  });
+
+  FLOOR.delitile = cnv(g => {                            // deli/pizzeria checker floor, red & white
+    const sq = 16;
+    for (let ty = 0; ty < 4; ty++) for (let tx = 0; tx < 4; tx++) {
+      g.fillStyle = (tx + ty) % 2 === 0 ? '#e8e0cc' : '#8a1414';
+      g.fillRect(tx * sq, ty * sq, sq, sq);
+    }
+    g.fillStyle = 'rgba(255,255,255,0.14)';
+    for (let ty = 0; ty < 4; ty++) for (let tx = 0; tx < 4; tx++) if ((tx + ty) % 2 === 0) g.fillRect(tx * sq + 1, ty * sq + 1, sq - 2, 3);
+    g.strokeStyle = 'rgba(0,0,0,0.15)'; g.lineWidth = 0.6;
+    for (let x = 0; x <= 64; x += sq) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 64); g.stroke(); }
+    for (let y = 0; y <= 64; y += sq) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    speck(g, 30, 'rgba(0,0,0,0.08)');
+  });
+
+  FLOOR.skyscraperglass = cnv(g => {                     // International-Style curtain-wall office tower, blue glass
+    vgrad(g, 0, 0, 64, 64, '#4a7ca0', '#2c5074');
+    g.strokeStyle = 'rgba(20,30,40,0.5)'; g.lineWidth = 1.4;
+    for (let x = 0; x <= 64; x += 10.6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 64); g.stroke(); }
+    g.strokeStyle = 'rgba(20,30,40,0.3)'; g.lineWidth = 0.8;
+    for (let y = 0; y <= 64; y += 8) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.fillStyle = 'rgba(255,255,255,0.22)';
+    for (let x = 1; x < 64; x += 10.6) g.fillRect(x, 0, 2, 64);
+    g.fillStyle = 'rgba(200,225,240,0.12)'; g.beginPath(); g.moveTo(0, 0); g.lineTo(30, 0); g.lineTo(0, 40); g.closePath(); g.fill();
+    speck(g, 20, 'rgba(255,255,255,0.06)');
+  });
+
+  FLOOR.marquee = cnv(g => {                             // Broadway theater marquee, bulb lights + bold lettering band
+    vgrad(g, 0, 0, 64, 64, '#3a1414', '#240c0c');
+    g.fillStyle = '#c9242e'; g.fillRect(0, 20, 64, 24);   // red lettering band
+    bevel(g, 0, 20, 64, 24, 'rgba(255,220,180,0.2)', 'rgba(0,0,0,0.35)');
+    g.fillStyle = '#e8dca0'; g.fillRect(6, 28, 52, 8);
+    g.fillStyle = '#1c1214'; g.font = 'bold 7px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('TONIGHT', 32, 32.5);
+    g.fillStyle = 'rgba(255,225,140,0.9)';                // bulb lights ringing the band
+    for (let x = 3; x < 64; x += 6) { g.beginPath(); g.arc(x, 21, 1.3, 0, 7); g.fill(); g.beginPath(); g.arc(x, 43, 1.3, 0, 7); g.fill(); }
+    for (let y = 22; y < 43; y += 6) { g.beginPath(); g.arc(3, y, 1.3, 0, 7); g.fill(); g.beginPath(); g.arc(61, y, 1.3, 0, 7); g.fill(); }
+    speck(g, 25, 'rgba(0,0,0,0.15)');
+  });
+
+  // ---------------------------------------------------------------------------
+  // HONG KONG textures — glowing neon shop signage, lashed bamboo scaffolding,
+  // colorful tenement mosaic tile, weathered junk-boat deck wood, a dense
+  // high-rise tenement facade.
+  // ---------------------------------------------------------------------------
+  FLOOR.neonsign = cnv(g => {                            // glowing neon Cantonese-style shop sign, dark ground
+    vgrad(g, 0, 0, 64, 64, '#140a1c', '#0a0510');
+    const glow = (x1, y1, x2, y2, col) => {
+      g.strokeStyle = col; g.lineWidth = 3; g.lineCap = 'round';
+      g.shadowColor = col; g.shadowBlur = 6;
+      g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+      g.shadowBlur = 0;
+    };
+    g.strokeStyle = 'rgba(255,60,140,0.9)';
+    glow(14, 8, 14, 30, 'rgba(255,60,160,0.95)'); glow(14, 8, 22, 8, 'rgba(255,60,160,0.95)'); glow(14, 19, 20, 19, 'rgba(255,60,160,0.95)');
+    glow(30, 8, 30, 30, 'rgba(80,220,255,0.95)'); glow(30, 19, 38, 19, 'rgba(80,220,255,0.95)'); glow(38, 8, 38, 30, 'rgba(80,220,255,0.95)');
+    glow(46, 8, 46, 30, 'rgba(255,214,60,0.95)'); glow(46, 8, 52, 14, 'rgba(255,214,60,0.95)'); glow(46, 19, 52, 19, 'rgba(255,214,60,0.95)'); glow(46, 30, 52, 30, 'rgba(255,214,60,0.95)');
+    g.fillStyle = 'rgba(255,255,255,0.06)'; for (let y = 40; y < 64; y += 6) g.fillRect(0, y, 64, 1);
+    speck(g, 30, 'rgba(0,0,0,0.2)'); speck(g, 15, 'rgba(255,255,255,0.05)');
+  });
+
+  FLOOR.bambooscaffold = cnv(g => {                       // lashed bamboo construction scaffolding
+    vgrad(g, 0, 0, 64, 64, '#8a9840', '#5c6828');
+    const pole = (x) => { let pg = g.createLinearGradient(x - 3, 0, x + 3, 0); pg.addColorStop(0, '#a8b858'); pg.addColorStop(0.5, '#c9d878'); pg.addColorStop(1, '#7a8838'); g.fillStyle = pg; g.fillRect(x - 3, 0, 6, 64); };
+    pole(10); pole(32); pole(54);
+    g.strokeStyle = 'rgba(60,52,20,0.4)'; g.lineWidth = 1; for (const x of [10, 32, 54]) for (let y = 4; y < 64; y += 9) { g.beginPath(); g.moveTo(x - 3, y); g.lineTo(x + 3, y); g.stroke(); }
+    g.strokeStyle = '#5c4a28'; g.lineWidth = 2.4;           // diagonal lashed cross-poles
+    g.beginPath(); g.moveTo(4, 16); g.lineTo(60, 40); g.stroke();
+    g.beginPath(); g.moveTo(4, 48); g.lineTo(60, 12); g.stroke();
+    g.fillStyle = 'rgba(90,70,30,0.6)'; for (const [x, y] of [[10, 16], [32, 28], [54, 40], [10, 48], [32, 30], [54, 12]]) { g.beginPath(); g.arc(x, y, 2.4, 0, 7); g.fill(); }  // rope lashings
+    speck(g, 40, 'rgba(40,50,10,0.15)');
+  });
+
+  FLOOR.hongkongtile = cnv(g => {                         // colorful tenement mosaic — small square terrazzo chips
+    vgrad(g, 0, 0, 64, 64, '#d8d0b8', '#b8ac8c');
+    const cols = ['#c9242e', '#2a5f8a', '#d8a827', '#2a8a5c', '#5a3a7a'];
+    for (let i = 0; i < 90; i++) { g.fillStyle = cols[(Math.random() * cols.length) | 0]; g.globalAlpha = 0.5 + Math.random() * 0.3; const x = Math.random() * 64, y = Math.random() * 64; g.fillRect(x, y, 2, 2); }
+    g.globalAlpha = 1;
+    g.strokeStyle = 'rgba(60,54,36,0.25)'; g.lineWidth = 1;
+    for (let x = 0; x <= 64; x += 16) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 64); g.stroke(); }
+    for (let y = 0; y <= 64; y += 16) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    speck(g, 40, 'rgba(60,54,36,0.1)');
+  });
+
+  FLOOR.junkwood = cnv(g => {                             // weathered junk-boat deck planking, salt-bleached
+    vgrad(g, 0, 0, 64, 64, '#b8a880', '#8a7c5a');
+    g.strokeStyle = 'rgba(60,50,30,0.4)'; g.lineWidth = 1;
+    for (let y = 0; y < 64; y += 8) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.strokeStyle = 'rgba(40,34,20,0.25)'; g.lineWidth = 0.6;
+    for (let i = 0; i < 20; i++) { const x = Math.random() * 64, y0 = Math.random() * 64; g.beginPath(); g.moveTo(x, y0); g.lineTo(x + 1 + Math.random() * 3, y0 + 4 + Math.random() * 8); g.stroke(); }
+    g.fillStyle = '#5c4a2a'; for (let ty = 0; ty < 8; ty++) for (let tx = 0; tx < 2; tx++) g.fillRect(tx * 30 + 8, ty * 8 + 3.5, 2, 1.4);  // caulked plank pegs
+    stains(g, 5, ['#a89870', '#8a7a54']);
+    speck(g, 45, 'rgba(60,50,30,0.12)'); speck(g, 20, 'rgba(255,250,230,0.08)');
+  });
+
+  FLOOR.tenementwall = cnv(g => {                         // dense Kowloon-style tenement facade, tiny windows + AC units
+    vgrad(g, 0, 0, 64, 64, '#a8a090', '#7c7666');
+    g.strokeStyle = 'rgba(30,28,20,0.3)'; g.lineWidth = 1;
+    for (let x = 0; x <= 64; x += 10.6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 64); g.stroke(); }
+    for (let y = 0; y <= 64; y += 16) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.fillStyle = 'rgba(20,24,26,0.7)';                     // small dark windows
+    for (let ty = 0; ty < 4; ty++) for (let tx = 0; tx < 6; tx++) g.fillRect(tx * 10.6 + 2, ty * 16 + 3, 5, 6);
+    g.fillStyle = 'rgba(150,155,150,0.6)';                  // AC unit boxes jutting from a few windows
+    for (const [tx, ty] of [[1, 0], [3, 1], [0, 2], [4, 3], [2, 2]]) g.fillRect(tx * 10.6 + 2.5, ty * 16 + 9.5, 6, 3);
+    stains(g, 6, ['#8a8272', '#6c6656']);
+    speck(g, 55, 'rgba(30,28,18,0.14)'); speck(g, 20, 'rgba(255,250,230,0.05)');
+  });
+
+  // ---------------------------------------------------------------------------
   // MID-CENTURY SUBURBIA textures — pastel clapboard siding, a white picket
   // fence, shag carpet, checkerboard kitchen linoleum, dark walnut rec-room
   // paneling.
@@ -3566,6 +3805,73 @@ const World = (() => {
     g.fillStyle = '#7a5a38'; g.fillRect(120, 60, 6, 18); g.fillRect(118, 56, 10, 5);   // a distant tower (El Morro-ish)
   }, 256, 96);
 
+  // ---- a second parallax sky, selectable per sector: a Paris night ----
+  const SKY_PARISNIGHT = cnv(g => {
+    const grd = g.createLinearGradient(0, 0, 0, 96);
+    grd.addColorStop(0, '#0a1024'); grd.addColorStop(0.55, '#182c4a'); grd.addColorStop(0.8, '#3a4a68'); grd.addColorStop(1, '#5c6478');
+    g.fillStyle = grd; g.fillRect(0, 0, 256, 96);
+    g.fillStyle = 'rgba(240,238,220,0.95)';            // crescent moon
+    g.beginPath(); g.arc(210, 18, 9, 0, 7); g.fill();
+    g.fillStyle = grd; g.beginPath(); g.arc(214, 15, 8, 0, 7); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.85)';            // stars, scattered above the rooftop line
+    for (let i = 0; i < 70; i++) { const x = Math.random() * 256, y = Math.random() * 55; g.globalAlpha = 0.3 + Math.random() * 0.6; g.fillRect(x, y, 1, 1); }
+    g.globalAlpha = 1;
+    // Haussmann rooftop skyline along the horizon, warm windows lit
+    g.fillStyle = '#12182a'; for (let x = 0; x <= 256; x += 8) { const h = 62 + ((x * 5) % 9) - (x % 32 === 0 ? 6 : 0); g.fillRect(x, h, 8, 96 - h); }
+    g.fillStyle = 'rgba(255,214,140,0.55)';
+    for (let i = 0; i < 24; i++) { const x = (Math.random() * 256) | 0, y = 68 + ((Math.random() * 22) | 0); g.fillRect(x, y, 2, 2); }
+    // a distant Eiffel Tower silhouette — one continuous tapered outline: splayed
+    // legs → first platform → tapered shaft → second platform → spire
+    g.fillStyle = '#0a0e1c';
+    g.beginPath();
+    g.moveTo(86, 63); g.lineTo(95, 46); g.lineTo(94, 46); g.lineTo(98, 32); g.lineTo(97.3, 32);
+    g.lineTo(99.5, 18); g.lineTo(100, 11);                                    // up the left leg to the spire tip
+    g.lineTo(100.5, 18); g.lineTo(102.7, 32); g.lineTo(102, 32); g.lineTo(106, 46); g.lineTo(105, 46);
+    g.lineTo(114, 63);                                                        // down the right leg
+    g.closePath(); g.fill();
+    g.fillRect(88, 62, 24, 2.4);                                              // base platform bar
+    g.strokeStyle = '#0a0e1c'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(93.5, 46); g.lineTo(106.5, 46); g.stroke();       // first platform
+    g.beginPath(); g.moveTo(96.8, 32); g.lineTo(103.2, 32); g.stroke();       // second platform
+    g.fillStyle = 'rgba(255,214,140,0.55)'; g.fillRect(96.5, 47, 1, 1); g.fillRect(101.5, 47, 1, 1); g.fillRect(99.5, 34, 1, 1);
+  }, 256, 96);
+
+  // ---- a third parallax sky: Manhattan skyline by day, 1964 ----
+  const SKY_NYCDAY = cnv(g => {
+    const grd = g.createLinearGradient(0, 0, 0, 96);
+    grd.addColorStop(0, '#3f7fc0'); grd.addColorStop(0.6, '#8fbfe0'); grd.addColorStop(1, '#d8e8ec');
+    g.fillStyle = grd; g.fillRect(0, 0, 256, 96);
+    g.fillStyle = 'rgba(255,255,255,0.35)';               // scattered fair-weather clouds
+    [[40, 16, 16], [140, 12, 20], [200, 22, 14], [90, 26, 12]].forEach(([x, y, r]) => {
+      g.beginPath(); g.arc(x, y, r, 0, 7); g.arc(x + r, y + 3, r * 0.7, 0, 7); g.arc(x - r, y + 4, r * 0.6, 0, 7); g.fill();
+    });
+    // block skyline along the horizon, mixed heights
+    g.fillStyle = '#3a4048';
+    for (let x = 0; x <= 256; x += 9) { const h = 60 + ((x * 6) % 13) - (x % 45 === 0 ? 8 : 0); g.fillRect(x, h, 9, 96 - h); }
+    g.fillStyle = 'rgba(255,255,255,0.08)';
+    for (let x = 3; x <= 256; x += 9) g.fillRect(x, 40, 2, 40);              // window columns
+    // the Empire State Building — stepped setbacks, tapered spire, antenna mast
+    g.fillStyle = '#2c3038';
+    g.fillRect(94, 46, 20, 22);
+    g.fillRect(98, 38, 12, 8);
+    g.fillRect(101, 30, 6, 8);
+    g.beginPath(); g.moveTo(102, 30); g.lineTo(106, 30); g.lineTo(104.5, 18); g.lineTo(103.5, 18); g.closePath(); g.fill();
+    g.fillRect(103.6, 10, 0.8, 8);                                          // antenna mast
+    g.fillStyle = 'rgba(255,255,255,0.15)'; g.fillRect(96, 48, 2, 18); g.fillRect(115.5, 48, 1.5, 18);
+    // the Chrysler Building — terraced arched crown, a period-correct silhouette neighbour
+    g.fillStyle = '#3a3428';
+    g.fillRect(130, 50, 14, 18);
+    for (let i = 0; i < 5; i++) { const w2 = 14 - i * 2.4, x0 = 130 + i * 1.2, y0 = 50 - i * 5; g.fillRect(x0, y0, w2, 5); }
+    g.beginPath(); g.moveTo(133.5, 25); g.lineTo(140.5, 25); g.lineTo(137, 12); g.closePath(); g.fill();  // the spire point
+    g.fillRect(136.6, 6, 0.8, 7);
+    g.fillStyle = 'rgba(255,255,255,0.15)';
+    for (let i = 0; i < 5; i++) { const y0 = 50 - i * 5; g.beginPath(); g.arc(137, y0 + 2, 1.6, Math.PI, 0); g.fill(); }  // sunburst arches
+    speck(g, 20, 'rgba(255,255,255,0.06)');
+  }, 256, 96);
+
+  const SKIES = { havana: SKY, parisnight: SKY_PARISNIGHT, nycday: SKY_NYCDAY };
+  const SKYNAMES = ['havana', 'parisnight', 'nycday'];
+
   // ---- unified texture registry (name → canvas): walls + all surfaces ----
   // Every texture is assignable to any floor, ceiling, or wall in the editor.
   const TX = Object.assign({
@@ -3589,6 +3895,9 @@ const World = (() => {
     'rockwall', 'mossyrock', 'pond', 'wetstone',
     'sandstone', 'zellige', 'mashrabiya', 'kilim', 'sandfloor',
     'haussmann', 'wroughtiron', 'opart', 'toile', 'zincroof',
+    'cafeawning', 'riverstone', 'gildedceiling', 'bouquiniste',
+    'subwaytile', 'brownstone', 'delitile', 'skyscraperglass', 'marquee',
+    'neonsign', 'bambooscaffold', 'hongkongtile', 'junkwood', 'tenementwall',
     'clapboard', 'picketfence', 'shagcarpet', 'linoleum', 'woodpaneling',
     'concreteblock', 'redbanner', 'domemosaic', 'parquet', 'muralsoviet',
     'warehousebrick', 'concretepergola', 'lawngrass', 'roadway', 'sidewalk',
@@ -4366,6 +4675,126 @@ const World = (() => {
       gg.beginPath(); gg.moveTo(29.5, 5.2); gg.lineTo(28.5, 8); gg.stroke();   // part line
     },
   }));
+
+  SPR.matron = outlined(g => person(g, {                              // The Matron — gallery owner, ex-opera diva, furs + pearls
+    trousers: ['#3a2436', '#281826', '#180e18'], skirt: ['#5a2e4a', '#3a1c32', '#241220'], shoes: ['#180e18', '#0a0508'],
+    torso: ['#6a3454', '#4a2440', '#2e1428'], torsoLen: 46, shoulderW: 1.05, headR: [4.8, 5.4],
+    skirtFn: gg => { gg.beginPath(); gg.moveTo(24, 36); gg.lineTo(40, 36); gg.lineTo(43, 55); gg.lineTo(21, 55); gg.closePath(); gg.fill(); },
+    chest: gg => {
+      gg.fillStyle = 'rgba(240,236,224,0.9)';                         // fox-fur stole
+      gg.beginPath(); gg.ellipse(24, 24, 4.6, 3.2, -0.3, 0, 7); gg.fill();
+      gg.beginPath(); gg.ellipse(40, 24, 4.6, 3.2, 0.3, 0, 7); gg.fill();
+      gg.strokeStyle = 'rgba(200,196,184,0.6)'; gg.lineWidth = 0.8;
+      gg.beginPath(); gg.moveTo(24, 26); gg.quadraticCurveTo(32, 34, 40, 26); gg.stroke();
+      gg.fillStyle = '#f0ece0'; for (const [fx, fy] of [[27, 32], [32, 34.5], [37, 32]]) { gg.beginPath(); gg.arc(fx, fy, 1.1, 0, 7); gg.fill(); }  // pearls
+      gg.fillStyle = 'rgba(0,0,0,0.4)'; gg.beginPath(); gg.arc(22.5, 23, 0.8, 0, 7); gg.fill(); gg.beginPath(); gg.arc(41.5, 23, 0.8, 0, 7); gg.fill();  // fox eyes
+    },
+    face: gg => { gg.fillStyle = '#8a1428'; gg.beginPath(); gg.ellipse(32.1, 14.9, 1.8, 0.9, 0, 0, 7); gg.fill(); },  // deep red lipstick
+    hair: gg => {
+      const hair = gg.createLinearGradient(22, 3, 42, 16);            // silver upswept hair
+      hair.addColorStop(0, '#d8d4c8'); hair.addColorStop(1, '#a8a294');
+      gg.fillStyle = hair;
+      gg.beginPath(); gg.ellipse(32, 8, 6.2, 5.6, 0, Math.PI * 0.9, Math.PI * 2.15); gg.fill();
+      gg.beginPath(); gg.ellipse(32, 3.6, 4, 3.4, 0, 0, 7); gg.fill();
+      gg.strokeStyle = 'rgba(0,0,0,0.15)'; gg.lineWidth = 0.6; gg.beginPath(); gg.moveTo(28, 5); gg.quadraticCurveTo(32, 2.5, 36, 5); gg.stroke();
+    },
+    extras: gg => {
+      gg.strokeStyle = '#c9a227'; gg.lineWidth = 1;                    // opera glasses on a chain, held
+      gg.beginPath(); gg.moveTo(43.5, 36); gg.quadraticCurveTo(46, 30, 44, 24); gg.stroke();
+      gg.fillStyle = '#1c1e22'; gg.beginPath(); gg.arc(42.6, 22.4, 1.6, 0, 7); gg.fill(); gg.beginPath(); gg.arc(46, 22.4, 1.6, 0, 7); gg.fill();
+    },
+  }));
+
+  SPR.streetartist = outlined(g => person(g, {                        // Street Artist — beret, paint-smeared smock
+    trousers: ['#8a8478', '#6a6458', '#4a4438'], shoes: ['#3a2c14', '#1c1408'],
+    torso: ['#c9c2ac', '#a8a08c', '#847c68'], sleeve: 'skin', armW: 4.4,
+    armR: [[41, 22], [46, 27], [44.5, 33]], handR: [44.5, 33],
+    chest: gg => {
+      gg.fillStyle = 'rgba(180,60,50,0.6)'; gg.beginPath(); gg.ellipse(27, 30, 1.6, 1, -0.3, 0, 7); gg.fill();  // paint smears on the smock
+      gg.fillStyle = 'rgba(60,110,160,0.55)'; gg.beginPath(); gg.ellipse(35, 34, 1.8, 1, 0.4, 0, 7); gg.fill();
+      gg.fillStyle = 'rgba(220,190,50,0.55)'; gg.beginPath(); gg.ellipse(29, 37, 1.4, 0.9, 0, 0, 7); gg.fill();
+      gg.strokeStyle = 'rgba(90,80,60,0.4)'; gg.lineWidth = 0.8; gg.beginPath(); gg.moveTo(26, 22); gg.lineTo(24, 39); gg.moveTo(38, 22); gg.lineTo(40, 39); gg.stroke();
+    },
+    face: gg => { gg.fillStyle = 'rgba(60,40,25,0.3)'; gg.beginPath(); gg.ellipse(32, 14, 3, 1.8, 0, 0, 7); gg.fill(); },  // little goatee
+    hair: gg => {
+      gg.fillStyle = '#241a10'; gg.fillRect(27.4, 8.2, 1.8, 3.2); gg.fillRect(34.8, 8.2, 1.8, 3.2);
+      gg.fillStyle = '#2a1c30'; gg.beginPath(); gg.ellipse(32, 7.4, 5.8, 3, 0, Math.PI, 0, true); gg.fill();  // beret
+      gg.fillStyle = '#1c1224'; gg.beginPath(); gg.arc(36.5, 6, 1, 0, 7); gg.fill();
+    },
+    extras: gg => {
+      gg.save(); gg.translate(20, 32); gg.rotate(-0.3);                // palette on the near arm
+      gg.fillStyle = '#c9a06a'; gg.beginPath(); gg.ellipse(0, 0, 5, 3.6, 0, 0, 7); gg.fill();
+      gg.fillStyle = '#c9333a'; gg.beginPath(); gg.arc(-2, -1, 0.9, 0, 7); gg.fill();
+      gg.fillStyle = '#2a5f8a'; gg.beginPath(); gg.arc(0, -1.5, 0.9, 0, 7); gg.fill();
+      gg.fillStyle = '#d8a827'; gg.beginPath(); gg.arc(2, -1, 0.9, 0, 7); gg.fill();
+      gg.restore();
+    },
+  }));
+
+  SPR.laundrylady = outlined(g => person(g, {                          // laundry counter attendant — apron, headscarf
+    trousers: ['#8a8478', '#6a6458', '#4a4438'], shoes: ['#3a2c14', '#1c1408'],
+    torso: ['#a8b0a0', '#88907e', '#686e5c'], sleeve: 'skin', armW: 4,
+    chest: gg => {
+      const ap = gg.createLinearGradient(24, 24, 40, 50);              // apron over the housedress
+      ap.addColorStop(0, '#e8e2d0'); ap.addColorStop(1, '#c0baa4');
+      gg.fillStyle = ap; gg.beginPath(); gg.moveTo(26, 24); gg.lineTo(38, 24); gg.lineTo(39.5, 49.5); gg.lineTo(24.5, 49.5); gg.closePath(); gg.fill();
+      gg.strokeStyle = 'rgba(90,85,65,0.4)'; gg.lineWidth = 0.8; gg.strokeRect(28.5, 33, 7, 6);   // apron pocket
+    },
+    face: gg => { gg.fillStyle = 'rgba(60,40,25,0.2)'; gg.beginPath(); gg.ellipse(32, 13.6, 3, 1.6, 0, 0, 7); gg.fill(); },
+    hair: gg => {
+      gg.fillStyle = '#3a2a1a'; gg.fillRect(27.4, 8.2, 1.8, 3.2); gg.fillRect(34.8, 8.2, 1.8, 3.2);
+      const sc = gg.createLinearGradient(24, 4, 40, 12);               // headscarf, knotted
+      sc.addColorStop(0, '#8a3050'); sc.addColorStop(1, '#5c1e34');
+      gg.fillStyle = sc; gg.beginPath(); gg.ellipse(32, 7, 6.4, 4.6, 0, Math.PI, 0, true); gg.fill();
+      gg.fillStyle = sc; gg.beginPath(); gg.ellipse(38, 7.6, 2.2, 1.6, 0.4, 0, 7); gg.fill();   // knot
+    },
+    extras: gg => {
+      gg.fillStyle = '#f0ece0'; gg.fillRect(38, 26, 5, 9);             // a folded shirt over one arm
+      gg.strokeStyle = 'rgba(0,0,0,0.15)'; gg.lineWidth = 0.6; gg.strokeRect(38, 26, 5, 9);
+    },
+  }));
+
+  SPR.double = outlined(g => person(g, {                               // the double — plain, forgettable, waiting
+    trousers: ['#7a7468', '#5c564c', '#403a30'], shoes: ['#241a12', '#0e0a06'],
+    torso: ['#8a8478', '#6a6458', '#4a4438'], sleeve: ['#8a8478', '#6a6458'],
+    face: gg => { },
+  }));
+  SPR.doubleDressed = outlined(g => person(g, {                        // the double, suited and masked — the payoff
+    trousers: ['#23252b', '#17181d', '#0e0f13'], shoes: ['#17181d', '#060708'],
+    torso: ['#2e3040', '#1e2030', '#131420'], torsoLen: 45,
+    chest: gg => {
+      const sh = gg.createLinearGradient(29, 21, 35, 32);
+      sh.addColorStop(0, '#f0ece0'); sh.addColorStop(1, '#c9c4b4');
+      gg.fillStyle = sh; gg.beginPath(); gg.moveTo(29.6, 21); gg.lineTo(32, 30); gg.lineTo(34.4, 21); gg.closePath(); gg.fill();
+      gg.fillStyle = '#1c3a5c'; gg.fillRect(31.1, 21.5, 1.9, 8.5);
+    },
+    noFace: true,
+    hair: gg => {
+      const mk = gg.createRadialGradient(29, 9, 1, 32, 11, 8);         // a stiff novelty mask, not a real face
+      mk.addColorStop(0, '#e8c8a8'); mk.addColorStop(0.7, '#c99a72'); mk.addColorStop(1, '#8a6446');
+      gg.fillStyle = mk; gg.beginPath(); gg.ellipse(32, 11, 6.6, 7, 0, 0, 7); gg.fill();
+      gg.strokeStyle = 'rgba(0,0,0,0.3)'; gg.lineWidth = 0.8; gg.beginPath(); gg.ellipse(32, 11, 6.6, 7, 0, 0, 7); gg.stroke();
+      gg.fillStyle = '#1c1e22'; gg.fillRect(28.4, 9.4, 1.6, 1.2); gg.fillRect(33.6, 9.4, 1.6, 1.2);   // painted eyes
+      gg.fillStyle = '#7a4a30'; gg.beginPath(); gg.ellipse(32, 14.6, 2.4, 1, 0, 0, 7); gg.fill();     // painted mouth
+      gg.strokeStyle = 'rgba(180,150,120,0.5)'; gg.lineWidth = 0.6; gg.beginPath(); gg.moveTo(25.6, 11); gg.lineTo(38.4, 11); gg.stroke();  // mask seam
+      gg.fillStyle = '#241a10'; gg.beginPath(); gg.ellipse(32, 3.6, 5.6, 2.6, 0, Math.PI, 0, true); gg.fill();  // hair painted onto the mask
+    },
+  }));
+
+  SPR.patsy = outlined(g => person(g, {                                // the patsy — nervous, ill-fitting jacket, glasses
+    trousers: ['#5a5648', '#403c32', '#28241c'], shoes: ['#241a12', '#0e0a06'],
+    torso: ['#8a8266', '#6a6450', '#4a463a'], sleeve: 'skin', armW: 4,
+    chest: gg => { gg.strokeStyle = 'rgba(40,36,26,0.4)'; gg.lineWidth = 0.8; gg.beginPath(); gg.moveTo(28, 22); gg.lineTo(26.5, 39); gg.moveTo(36, 22); gg.lineTo(37.5, 39); gg.stroke(); },
+    face: gg => {
+      gg.strokeStyle = 'rgba(20,16,10,0.7)'; gg.lineWidth = 0.8;        // heavy black-frame glasses
+      gg.beginPath(); gg.rect(27.6, 9, 3.4, 2.6); gg.rect(33, 9, 3.4, 2.6); gg.stroke();
+      gg.beginPath(); gg.moveTo(31, 10.2); gg.lineTo(33, 10.2); gg.stroke();
+      gg.fillStyle = 'rgba(255,255,255,0.28)'; gg.fillRect(28, 9.3, 2.6, 1.8); gg.fillRect(33.4, 9.3, 2.6, 1.8);
+      gg.fillStyle = 'rgba(255,255,255,0.4)'; gg.beginPath(); gg.ellipse(29.2, 13, 1, 0.6, 0.2, 0, 7); gg.fill();  // sweat
+    },
+    hair: gg => { gg.fillStyle = '#241a10'; gg.beginPath(); gg.ellipse(32, 8, 5.6, 4, 0, Math.PI, 0, true); gg.fill(); },
+  }));
+
   SPR.sedan = outlined(g => {                                      // sleek black getaway sedan, three-quarter rear view
     g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath(); g.ellipse(32, 56, 29, 5, 0, 0, 7); g.fill();
     let body = g.createLinearGradient(4, 24, 60, 50);
@@ -6425,6 +6854,398 @@ const World = (() => {
     g.fillStyle = '#5a5e66'; g.beginPath(); g.arc(32, 39, 2.2, 0, 7); g.fill();          // pivot
   });
 
+  SPR.headshot = outlined(g => {                                  // a studio headshot photograph, cover-document issue
+    g.fillStyle = 'rgba(0,0,0,0.24)'; g.beginPath(); g.ellipse(32, 46, 14, 2.4, 0, 0, 7); g.fill();
+    let bd = g.createLinearGradient(16, 28, 48, 44);
+    bd.addColorStop(0, '#f0ece0'); bd.addColorStop(1, '#d4cebe');
+    g.fillStyle = bd; g.fillRect(16, 28, 32, 18);
+    bevel(g, 16, 28, 32, 18, 'rgba(255,255,255,0.3)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = '#3a342a'; g.fillRect(20, 31, 24, 12);              // the photo itself, sepia-toned
+    let sk = g.createRadialGradient(30, 35, 1, 32, 37, 6);
+    sk.addColorStop(0, '#a89078'); sk.addColorStop(1, '#6a5c48');
+    g.fillStyle = sk; g.beginPath(); g.arc(32, 37, 4.4, 0, 7); g.fill();  // face silhouette
+    g.fillStyle = '#241e18'; g.beginPath(); g.ellipse(32, 33.4, 4, 2.4, 0, Math.PI, 0, true); g.fill();  // hairline
+    g.fillStyle = 'rgba(240,236,224,0.5)'; g.fillRect(20, 40.5, 24, 1.4);
+  });
+
+  SPR.metroticket = outlined(g => {                               // a single Paris Métro ticket
+    g.fillStyle = 'rgba(0,0,0,0.22)'; g.beginPath(); g.ellipse(32, 42, 11, 2, 0, 0, 7); g.fill();
+    let tk = g.createLinearGradient(20, 34, 44, 44);
+    tk.addColorStop(0, '#e8d8a0'); tk.addColorStop(1, '#c9b878');
+    g.save(); g.translate(32, 39); g.rotate(-0.08);
+    g.fillStyle = tk; g.fillRect(-12, -5, 24, 10);
+    g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 0.8; g.strokeRect(-12, -5, 24, 10);
+    g.fillStyle = '#1c3a5c'; g.font = 'bold 3.6px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('METRO', 0, -1.6);
+    g.strokeStyle = 'rgba(30,58,92,0.5)'; g.lineWidth = 0.6; for (let x = -9; x <= 9; x += 3) { g.beginPath(); g.moveTo(x, 0.5); g.lineTo(x, 4); g.stroke(); }  // magnetic stripe hatching
+    g.restore();
+  });
+
+  SPR.fabergeegg = outlined(g => {                                // Romanov Fabergé egg — gold, jeweled, on a stand
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 58, 12, 2.6, 0, 0, 7); g.fill();
+    g.fillStyle = '#c9a227'; g.beginPath(); g.moveTo(24, 56); g.lineTo(40, 56); g.lineTo(36, 50); g.lineTo(28, 50); g.closePath(); g.fill();  // gold stand
+    g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 0.6; g.beginPath(); g.moveTo(28, 50); g.lineTo(24, 56); g.moveTo(36, 50); g.lineTo(40, 56); g.stroke();
+    const eg = g.createRadialGradient(27, 24, 1, 32, 32, 18);
+    eg.addColorStop(0, '#fff4c0'); eg.addColorStop(0.45, '#e8c860'); eg.addColorStop(0.8, '#b8892c'); eg.addColorStop(1, '#7a5a18');
+    g.fillStyle = eg; g.beginPath(); g.ellipse(32, 33, 12, 17, 0, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(90,60,20,0.4)'; g.lineWidth = 0.8;           // gilded lattice bands
+    g.beginPath(); g.ellipse(32, 33, 12, 17, 0, 0, 7); g.stroke();
+    g.beginPath(); g.moveTo(20, 33); g.lineTo(44, 33); g.stroke();
+    g.beginPath(); g.ellipse(32, 33, 5, 17, 0, 0, 7); g.stroke();
+    const jewel = (jx, jy, col) => { g.fillStyle = col; g.beginPath(); g.arc(jx, jy, 1.6, 0, 7); g.fill(); g.fillStyle = 'rgba(255,255,255,0.6)'; g.beginPath(); g.arc(jx - 0.4, jy - 0.4, 0.5, 0, 7); g.fill(); };
+    jewel(32, 22, '#c9242e'); jewel(24, 30, '#2a5f8a'); jewel(40, 30, '#2a8a5c'); jewel(32, 42, '#c9242e');
+    g.fillStyle = 'rgba(255,255,255,0.35)'; g.beginPath(); g.ellipse(27, 24, 3, 6, -0.2, 0, 7); g.fill();  // gold sheen
+  });
+
+  SPR.nixonmask = outlined(g => {                                 // rubber Nixon novelty mask, jowly caricature
+    g.fillStyle = 'rgba(0,0,0,0.26)'; g.beginPath(); g.ellipse(32, 50, 15, 3, 0, 0, 7); g.fill();
+    const sk = g.createRadialGradient(28, 28, 2, 32, 32, 16);
+    sk.addColorStop(0, '#e8c8a0'); sk.addColorStop(0.7, '#c9986a'); sk.addColorStop(1, '#8a6444');
+    g.fillStyle = sk; g.beginPath(); g.ellipse(32, 30, 13, 16, 0, 0, 7); g.fill();
+    g.fillStyle = 'rgba(120,80,50,0.3)'; g.beginPath(); g.ellipse(24, 34, 4, 6, -0.2, 0, 7); g.fill();      // jowls
+    g.beginPath(); g.ellipse(40, 34, 4, 6, 0.2, 0, 7); g.fill();
+    g.fillStyle = '#1c1e22'; g.fillRect(24.6, 22, 5, 1.6); g.fillRect(34.4, 22, 5, 1.6);                    // heavy brows
+    g.fillStyle = '#0e0f13'; g.beginPath(); g.ellipse(27.4, 27, 2, 1.4, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(36.6, 27, 2, 1.4, 0, 0, 7); g.fill();
+    g.fillStyle = 'rgba(120,80,50,0.4)'; g.beginPath(); g.moveTo(30, 30); g.quadraticCurveTo(32, 36, 30, 40); g.lineTo(34, 40); g.quadraticCurveTo(32, 36, 34, 30); g.closePath(); g.fill();  // nose
+    g.strokeStyle = '#5a3a1a'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(26, 42); g.quadraticCurveTo(32, 39, 38, 42); g.stroke();          // grin
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 0.8; g.beginPath(); g.ellipse(32, 30, 13, 16, 0, 0, 7); g.stroke();
+    g.fillStyle = '#e8dca0'; g.fillRect(38, 44, 8, 6);                 // the receipt, tucked half out
+    g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 0.4; for (let y = 46; y < 49; y += 1.2) { g.beginPath(); g.moveTo(39, y); g.lineTo(45, y); g.stroke(); }
+  });
+
+  SPR.maskstand = outlined(g => {                                 // novelty-shop mask display rack
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 61, 16, 3, 0, 0, 7); g.fill();
+    g.fillStyle = '#5c4222'; g.fillRect(30, 20, 3, 40);
+    g.fillStyle = '#3a2c14'; g.beginPath(); g.ellipse(32, 60, 12, 2.4, 0, 0, 7); g.fill();
+    g.strokeStyle = '#5c4222'; g.lineWidth = 2; g.beginPath(); g.moveTo(31.5, 22); g.lineTo(16, 26); g.stroke();
+    g.beginPath(); g.moveTo(31.5, 26); g.lineTo(48, 30); g.stroke();
+    g.beginPath(); g.moveTo(31.5, 30); g.lineTo(18, 40); g.stroke();
+    const mask = (cx, cy, col) => {
+      g.fillStyle = col; g.beginPath(); g.ellipse(cx, cy, 6, 7.4, 0, 0, 7); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 0.7; g.beginPath(); g.ellipse(cx, cy, 6, 7.4, 0, 0, 7); g.stroke();
+      g.fillStyle = '#1c1e22'; g.beginPath(); g.ellipse(cx - 2.2, cy - 1.5, 1, 0.8, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(cx + 2.2, cy - 1.5, 1, 0.8, 0, 0, 7); g.fill();
+    };
+    mask(16, 27, '#d8b888'); mask(48, 31, '#e8c8a0'); mask(18, 41, '#c9a06a');
+  });
+
+  SPR.laundryticket = outlined(g => {                             // a small paper claim ticket, numbered
+    g.fillStyle = 'rgba(0,0,0,0.2)'; g.beginPath(); g.ellipse(32, 40, 9, 1.6, 0, 0, 7); g.fill();
+    let tk = g.createLinearGradient(24, 32, 40, 40);
+    tk.addColorStop(0, '#e8dca0'); tk.addColorStop(1, '#c9bc78');
+    g.save(); g.translate(32, 36); g.rotate(0.1);
+    g.fillStyle = tk; g.fillRect(-9, -4, 18, 8);
+    g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 0.6; g.strokeRect(-9, -4, 18, 8);
+    g.fillStyle = '#8a1414'; g.font = 'bold 6px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('42', 0, 0.4);
+    g.strokeStyle = 'rgba(0,0,0,0.15)'; g.lineWidth = 0.4; g.beginPath(); g.moveTo(-7, 3); g.lineTo(7, 3); g.stroke();
+    g.restore();
+  });
+
+  SPR.package = outlined(g => {                                   // brown-paper package, tied with string
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 52, 18, 3.4, 0, 0, 7); g.fill();
+    let pk = g.createLinearGradient(12, 28, 52, 50);
+    pk.addColorStop(0, '#a8794a'); pk.addColorStop(1, '#7a5430');
+    g.fillStyle = pk; g.fillRect(12, 28, 40, 22);
+    bevel(g, 12, 28, 40, 22, 'rgba(255,240,210,0.16)', 'rgba(0,0,0,0.3)');
+    g.strokeStyle = '#e8dca0'; g.lineWidth = 1.6;                     // string, wrapped both ways
+    g.beginPath(); g.moveTo(32, 28); g.lineTo(32, 50); g.stroke();
+    g.beginPath(); g.moveTo(12, 39); g.lineTo(52, 39); g.stroke();
+    g.fillStyle = '#e8dca0'; g.beginPath(); g.ellipse(32, 39, 3, 2, 0, 0, 7); g.fill();  // bow
+    g.strokeStyle = 'rgba(60,40,18,0.3)'; g.lineWidth = 0.5;
+    for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(14 + i * 10, 28); g.lineTo(15 + i * 10, 50); g.stroke(); }
+  });
+
+  SPR.curtainrods = outlined(g => {                                // long paper-wrapped bundle, propped in a corner
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 60, 8, 2.4, 0, 0, 7); g.fill();
+    g.save(); g.translate(32, 34); g.rotate(0.12);
+    let pk = g.createLinearGradient(-6, -30, 6, 30);
+    pk.addColorStop(0, '#d8cca0'); pk.addColorStop(1, '#a89870');
+    g.fillStyle = pk; g.fillRect(-6, -30, 12, 60);
+    g.strokeStyle = 'rgba(80,70,40,0.3)'; g.lineWidth = 0.7; g.strokeRect(-6, -30, 12, 60);
+    g.strokeStyle = '#8a1414'; g.lineWidth = 1.2;                    // twine wraps
+    for (let y = -24; y < 28; y += 12) { g.beginPath(); g.moveTo(-6, y); g.lineTo(6, y); g.stroke(); }
+    g.fillStyle = '#5c5040'; g.beginPath(); g.ellipse(0, -30, 5, 1.6, 0, 0, 7); g.fill();  // rod ends peeking out
+    g.fillStyle = '#5c5040'; g.beginPath(); g.ellipse(0, 30, 5, 1.6, 0, 0, 7); g.fill();
+    g.restore();
+  });
+
+  SPR.suitrack = outlined(g => {                                   // rolling garment rack, one suit on a hanger
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 60, 18, 3, 0, 0, 7); g.fill();
+    g.strokeStyle = '#8a8a8a'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(10, 58); g.lineTo(14, 12); g.stroke();
+    g.beginPath(); g.moveTo(54, 58); g.lineTo(50, 12); g.stroke();
+    g.beginPath(); g.moveTo(14, 12); g.lineTo(50, 12); g.stroke();
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.arc(12, 59, 3, 0, 7); g.fill(); g.beginPath(); g.arc(52, 59, 3, 0, 7); g.fill();
+    g.strokeStyle = '#c9a227'; g.lineWidth = 1;                      // hanger
+    g.beginPath(); g.moveTo(32, 12); g.lineTo(28, 17); g.lineTo(36, 17); g.lineTo(32, 12); g.stroke();
+    let su = g.createLinearGradient(20, 17, 44, 50);
+    su.addColorStop(0, '#3a3d48'); su.addColorStop(0.5, '#26282e'); su.addColorStop(1, '#151619');
+    g.fillStyle = su;
+    g.beginPath(); g.moveTo(22, 20); g.quadraticCurveTo(32, 16, 42, 20); g.lineTo(40, 48); g.lineTo(24, 48); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.1)'; g.beginPath(); g.moveTo(28, 20); g.lineTo(27, 46); g.lineTo(30, 46); g.lineTo(31, 21); g.closePath(); g.fill();
+    g.fillStyle = '#e8e4d8'; g.beginPath(); g.moveTo(29.5, 20); g.lineTo(32, 27); g.lineTo(34.5, 20); g.closePath(); g.fill();  // shirt V
+  });
+
+  // ---------------------------------------------------------------------------
+  // NEW YORK 1964 props — Manhattan street clutter, World's Fair era.
+  // ---------------------------------------------------------------------------
+  SPR.yellowcab = outlined(g => {                                     // checker-cab-style NYC taxi, three-quarter rear
+    g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath(); g.ellipse(32, 56, 29, 5, 0, 0, 7); g.fill();
+    let body = g.createLinearGradient(2, 24, 62, 50);
+    body.addColorStop(0, '#f4c93a'); body.addColorStop(0.5, '#e8a800'); body.addColorStop(1, '#a87400');
+    g.fillStyle = body;
+    g.beginPath(); g.moveTo(4, 50); g.lineTo(6, 34); g.quadraticCurveTo(10, 26, 20, 25); g.lineTo(44, 25); g.quadraticCurveTo(54, 26, 58, 34); g.lineTo(60, 50); g.closePath(); g.fill();
+    g.fillStyle = '#1c1e22';                                          // checker stripe along the side
+    g.fillRect(8, 40, 48, 4);
+    g.fillStyle = '#f4c93a'; for (let x = 8; x < 56; x += 8) g.fillRect(x, 40, 4, 4);
+    let glass = g.createLinearGradient(10, 26, 54, 34);
+    glass.addColorStop(0, 'rgba(170,210,225,0.7)'); glass.addColorStop(1, 'rgba(120,160,180,0.55)');
+    g.fillStyle = glass; g.beginPath(); g.moveTo(16, 33); g.lineTo(19, 26); g.lineTo(45, 26); g.lineTo(48, 33); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 1; g.beginPath(); g.moveTo(32, 26); g.lineTo(32, 33); g.stroke();
+    g.fillStyle = '#1c1e22'; g.fillRect(24, 20, 16, 4);                // roof taxi light
+    g.fillStyle = '#c9242e'; g.font = 'bold 3px monospace'; g.textAlign = 'center'; g.fillText('TAXI', 32, 23);
+    g.fillStyle = '#e8e4d8'; g.fillRect(2, 40, 4, 3); g.fillRect(58, 40, 4, 3);
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.arc(15, 52, 6, 0, 7); g.fill(); g.beginPath(); g.arc(49, 52, 6, 0, 7); g.fill();
+    g.fillStyle = '#8a8a8a'; g.beginPath(); g.arc(15, 52, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(49, 52, 2.4, 0, 7); g.fill();
+  });
+
+  SPR.policecarny = outlined(g => {                                   // 1964 NYPD black-and-white cruiser
+    g.fillStyle = 'rgba(0,0,0,0.32)'; g.beginPath(); g.ellipse(32, 56, 29, 5, 0, 0, 7); g.fill();
+    let body = g.createLinearGradient(2, 24, 62, 50);
+    body.addColorStop(0, '#3a3d44'); body.addColorStop(0.5, '#1e2024'); body.addColorStop(1, '#0c0d0f');
+    g.fillStyle = body;
+    g.beginPath(); g.moveTo(4, 50); g.lineTo(6, 34); g.quadraticCurveTo(10, 26, 20, 25); g.lineTo(44, 25); g.quadraticCurveTo(54, 26, 58, 34); g.lineTo(60, 50); g.closePath(); g.fill();
+    g.fillStyle = '#e8e4d8'; g.fillRect(8, 40, 48, 5);                 // white door band
+    g.fillStyle = '#1c1e22'; g.font = 'bold 4px monospace'; g.textAlign = 'center'; g.fillText('POLICE', 32, 44);
+    let glass = g.createLinearGradient(10, 26, 54, 34);
+    glass.addColorStop(0, 'rgba(170,210,225,0.7)'); glass.addColorStop(1, 'rgba(120,160,180,0.55)');
+    g.fillStyle = glass; g.beginPath(); g.moveTo(16, 33); g.lineTo(19, 26); g.lineTo(45, 26); g.lineTo(48, 33); g.closePath(); g.fill();
+    g.fillStyle = '#c9242e'; g.beginPath(); g.ellipse(28, 22, 3.2, 2, 0, 0, 7); g.fill();  // roof light, single bubble (period)
+    g.fillStyle = 'rgba(255,120,110,0.5)'; g.beginPath(); g.ellipse(28, 22, 3.2, 2, 0, 0, 7); g.fill();
+    g.fillStyle = '#e8e4d8'; g.fillRect(2, 40, 4, 3); g.fillRect(58, 40, 4, 3);
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.arc(15, 52, 6, 0, 7); g.fill(); g.beginPath(); g.arc(49, 52, 6, 0, 7); g.fill();
+    g.fillStyle = '#8a8a8a'; g.beginPath(); g.arc(15, 52, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(49, 52, 2.4, 0, 7); g.fill();
+  });
+
+  SPR.hotdogcart = outlined(g => {                                    // NYC street hot dog cart, umbrella + steam box
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 58, 20, 3.6, 0, 0, 7); g.fill();
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.arc(18, 54, 5, 0, 7); g.fill(); g.beginPath(); g.arc(46, 54, 5, 0, 7); g.fill();
+    let cart = g.createLinearGradient(12, 32, 52, 52);
+    cart.addColorStop(0, '#e8e4d8'); cart.addColorStop(1, '#b8b4a4');
+    g.fillStyle = cart; g.fillRect(12, 34, 40, 20);
+    bevel(g, 12, 34, 40, 20, 'rgba(255,255,255,0.2)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = '#c9242e'; g.fillRect(12, 40, 40, 3); g.fillRect(12, 47, 40, 3);   // red trim stripes
+    g.fillStyle = '#1c1e22'; g.fillRect(18, 36, 10, 4);                // steam box window
+    g.fillStyle = 'rgba(230,230,230,0.4)'; g.beginPath(); g.ellipse(23, 32, 5, 3, 0, Math.PI, 0, true); g.fill();  // steam wisp
+    g.strokeStyle = '#8a8a8a'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(32, 34); g.lineTo(32, 12); g.stroke();  // umbrella pole
+    const um = g.createLinearGradient(12, 4, 52, 14);
+    um.addColorStop(0, '#c9242e'); um.addColorStop(1, '#8a1414');
+    g.fillStyle = um; g.beginPath(); g.moveTo(12, 12); g.quadraticCurveTo(32, 0, 52, 12); g.lineTo(32, 14); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.3)'; g.lineWidth = 0.8; for (let x = 16; x < 52; x += 9) { g.beginPath(); g.moveTo(x, 11); g.lineTo(32, 3); g.stroke(); }
+  });
+
+  SPR.subwaygrate = outlined(g => {                                   // sidewalk subway grate, steam rising
+    g.fillStyle = 'rgba(0,0,0,0.2)'; g.beginPath(); g.ellipse(32, 40, 20, 8, 0, 0, 7); g.fill();
+    let cc = g.createLinearGradient(12, 32, 52, 48);
+    cc.addColorStop(0, '#5c5850'); cc.addColorStop(1, '#3a3830');
+    g.fillStyle = cc; g.beginPath(); g.ellipse(32, 40, 20, 8, 0, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1.2;
+    for (let x = -16; x <= 16; x += 4) { g.beginPath(); g.moveTo(32 + x, 34); g.lineTo(32 + x * 0.86, 46); g.stroke(); }
+    g.strokeStyle = 'rgba(150,145,125,0.4)'; g.lineWidth = 1; g.beginPath(); g.ellipse(32, 40, 20, 8, 0, 0, 7); g.stroke();
+    g.fillStyle = 'rgba(220,220,220,0.35)';                           // steam rising off the grate
+    g.beginPath(); g.ellipse(26, 26, 5, 8, -0.2, 0, 7); g.fill();
+    g.beginPath(); g.ellipse(38, 20, 6, 10, 0.15, 0, 7); g.fill();
+    g.fillStyle = 'rgba(220,220,220,0.2)'; g.beginPath(); g.ellipse(32, 12, 7, 9, 0, 0, 7); g.fill();
+  });
+
+  SPR.glassbooth = outlined(g => {                                    // classic NYC glass-and-aluminum phone booth
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 61, 14, 2.8, 0, 0, 7); g.fill();
+    g.fillStyle = '#9098a0'; g.fillRect(16, 12, 3, 48); g.fillRect(45, 12, 3, 48);   // aluminum frame posts
+    g.fillRect(16, 12, 32, 3);
+    let glass = g.createLinearGradient(19, 15, 45, 58);
+    glass.addColorStop(0, 'rgba(180,215,225,0.35)'); glass.addColorStop(1, 'rgba(120,160,180,0.3)');
+    g.fillStyle = glass; g.fillRect(19, 15, 26, 43);
+    g.strokeStyle = 'rgba(150,150,155,0.5)'; g.lineWidth = 1;
+    for (let x = 19; x <= 45; x += 8.6) { g.beginPath(); g.moveTo(x, 15); g.lineTo(x, 58); g.stroke(); }
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.arc(32, 32, 2, 0, 7); g.fill(); g.fillRect(30, 26, 4, 6);  // handset
+    g.fillStyle = '#c9242e'; g.fillRect(24, 8, 16, 5);                 // BELL sign
+    g.fillStyle = '#e8e4d8'; g.font = 'bold 3px monospace'; g.textAlign = 'center'; g.fillText('BELL', 32, 11.4);
+    g.fillStyle = '#9098a0'; g.fillRect(16, 58, 32, 3);
+  });
+
+  SPR.worldsfair = outlined(g => {                                    // 1964 World's Fair Unisphere monument, small replica
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 60, 16, 3, 0, 0, 7); g.fill();
+    g.fillStyle = '#4a4a3e'; g.fillRect(20, 52, 24, 7);                // plinth
+    bevel(g, 20, 52, 24, 7, 'rgba(255,255,255,0.1)', 'rgba(0,0,0,0.3)');
+    g.strokeStyle = '#8a8a3a'; g.lineWidth = 1.6;                      // three tilted support legs
+    g.beginPath(); g.moveTo(26, 52); g.lineTo(30, 34); g.stroke();
+    g.beginPath(); g.moveTo(38, 52); g.lineTo(34, 34); g.stroke();
+    g.beginPath(); g.moveTo(32, 52); g.lineTo(32, 34); g.stroke();
+    const sph = g.createRadialGradient(27, 24, 1, 32, 28, 13);
+    sph.addColorStop(0, '#e8dca0'); sph.addColorStop(0.6, '#b8a850'); sph.addColorStop(1, '#7a6c28');
+    g.fillStyle = sph; g.beginPath(); g.arc(32, 27, 12, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(60,54,20,0.5)'; g.lineWidth = 0.8;           // meridian/lattice lines — the globe's steel frame
+    g.beginPath(); g.ellipse(32, 27, 12, 5, 0, 0, 7); g.stroke();
+    g.beginPath(); g.ellipse(32, 27, 12, 12, 0, Math.PI * 0.15, Math.PI * 0.85); g.stroke();
+    g.beginPath(); g.ellipse(32, 27, 5, 12, 0, 0, 7); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.2)'; g.lineWidth = 1; g.beginPath(); g.arc(32, 27, 12, Math.PI * 1.1, Math.PI * 1.4); g.stroke();
+  });
+
+  SPR.fireescape = outlined(g => {                                    // wrought-iron fire escape, bolted to a facade
+    g.strokeStyle = '#1c1e22'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(8, 4); g.lineTo(8, 60); g.stroke();
+    g.beginPath(); g.moveTo(56, 4); g.lineTo(56, 60); g.stroke();
+    const platform = (y) => {
+      g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(8, y, 48, 3);
+      g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 0.7;
+      for (let x = 10; x < 56; x += 4) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 3); g.stroke(); }
+      g.strokeStyle = '#1c1e22'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(8, y - 10); g.lineTo(8, y); g.moveTo(56, y - 10); g.lineTo(56, y); g.stroke();
+      g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 0.6;           // railing balusters
+      for (let x = 10; x < 56; x += 5) { g.beginPath(); g.moveTo(x, y - 10); g.lineTo(x, y); g.stroke(); }
+    };
+    platform(20); platform(38); platform(56);
+    g.strokeStyle = '#1c1e22'; g.lineWidth = 1.6;                     // zigzag drop-ladder between two platforms
+    g.beginPath(); g.moveTo(14, 38); g.lineTo(24, 48); g.lineTo(14, 56); g.stroke();
+  });
+
+  SPR.brownstonestoop = outlined(g => {                               // brownstone entrance stoop, iron railing
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 61, 22, 3, 0, 0, 7); g.fill();
+    let st = g.createLinearGradient(10, 30, 54, 60);
+    st.addColorStop(0, '#8a5240'); st.addColorStop(1, '#5c3226');
+    g.fillStyle = st;
+    for (let i = 0; i < 5; i++) { const w2 = 44 - i * 7, x0 = 32 - w2 / 2, y0 = 60 - i * 6; g.fillRect(x0, y0 - 6, w2, 6); }
+    g.strokeStyle = 'rgba(30,14,8,0.3)'; g.lineWidth = 0.6;
+    for (let i = 0; i < 5; i++) { const w2 = 44 - i * 7, x0 = 32 - w2 / 2, y0 = 60 - i * 6; g.strokeRect(x0, y0 - 6, w2, 6); }
+    g.strokeStyle = '#1c1e22'; g.lineWidth = 1.6;                     // wrought-iron railings, both sides
+    g.beginPath(); g.moveTo(10, 60); g.lineTo(16, 28); g.stroke();
+    g.beginPath(); g.moveTo(54, 60); g.lineTo(48, 28); g.stroke();
+    for (let i = 0; i < 8; i++) { const t = i / 8, x1 = 10 + (16 - 10) * t, y1 = 60 + (28 - 60) * t; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x1, y1 - 6); g.stroke(); }
+    g.fillStyle = '#3a2c1a'; g.fillRect(28, 22, 8, 8);                 // door glimpse at the top
+  });
+
+  // ---------------------------------------------------------------------------
+  // HONG KONG props — harbor, street-market, and tea-house clutter.
+  // ---------------------------------------------------------------------------
+  SPR.rickshaw = outlined(g => {                                      // pulled rickshaw, two big wheels, canopy folded back
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 58, 20, 3.6, 0, 0, 7); g.fill();
+    g.strokeStyle = '#3a2c14'; g.lineWidth = 1.4;                      // spoked wheels
+    g.beginPath(); g.arc(20, 48, 11, 0, 7); g.stroke(); g.beginPath(); g.arc(44, 48, 11, 0, 7); g.stroke();
+    for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283; g.beginPath(); g.moveTo(20, 48); g.lineTo(20 + Math.cos(a) * 10.5, 48 + Math.sin(a) * 10.5); g.stroke(); g.beginPath(); g.moveTo(44, 48); g.lineTo(44 + Math.cos(a) * 10.5, 48 + Math.sin(a) * 10.5); g.stroke(); }
+    g.fillStyle = '#5c4222'; g.beginPath(); g.arc(20, 48, 2, 0, 7); g.fill(); g.beginPath(); g.arc(44, 48, 2, 0, 7); g.fill();
+    let seat = g.createLinearGradient(14, 24, 50, 42);
+    seat.addColorStop(0, '#8a1414'); seat.addColorStop(1, '#5c0e0e');
+    g.fillStyle = seat; g.beginPath(); g.moveTo(16, 40); g.lineTo(48, 40); g.lineTo(44, 26); g.lineTo(20, 26); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,215,140,0.5)'; g.beginPath(); g.ellipse(24, 28, 5, 8, -0.2, 0, 7); g.fill();
+    g.fillStyle = '#241a10'; g.beginPath(); g.ellipse(32, 20, 13, 4, 0, Math.PI, 0, true); g.fill();  // folded canopy hood, at the back
+    g.strokeStyle = '#5c4222'; g.lineWidth = 2.2;                       // pull shafts
+    g.beginPath(); g.moveTo(16, 40); g.lineTo(2, 52); g.stroke();
+    g.beginPath(); g.moveTo(48, 40); g.lineTo(62, 52); g.stroke();
+  });
+
+  SPR.junkboat = outlined(g => {                                      // Chinese junk, red-brown battened sails
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 54, 30, 5, 0, 0, 7); g.fill();
+    let hull = g.createLinearGradient(4, 36, 60, 52);
+    hull.addColorStop(0, '#8a5a2e'); hull.addColorStop(1, '#5c3a1c');
+    g.fillStyle = hull; g.beginPath(); g.moveTo(4, 44); g.quadraticCurveTo(6, 52, 16, 52); g.lineTo(52, 52); g.quadraticCurveTo(60, 50, 58, 42); g.lineTo(50, 40); g.lineTo(10, 40); g.closePath(); g.fill();
+    g.fillStyle = '#3a2410'; g.beginPath(); g.moveTo(50, 40); g.quadraticCurveTo(56, 30, 50, 22); g.lineTo(44, 22); g.quadraticCurveTo(48, 32, 44, 40); g.closePath(); g.fill();  // raised stern
+    g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 0.8; for (let x = 12; x < 52; x += 6) { g.beginPath(); g.moveTo(x, 41); g.lineTo(x - 1, 51); g.stroke(); }
+    const sail = (x, topY, botY, w, col) => {
+      g.fillStyle = col; g.beginPath(); g.moveTo(x, topY); g.lineTo(x + w, topY + 4); g.lineTo(x + w - 2, botY); g.lineTo(x - 2, botY - 4); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 1; for (let y = topY + 6; y < botY; y += 6) { g.beginPath(); g.moveTo(x - 1, y); g.lineTo(x + w - 2, y + 2); g.stroke(); }
+    };
+    g.strokeStyle = '#3a2410'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(20, 40); g.lineTo(20, 8); g.stroke();
+    sail(9, 10, 38, 22, '#a8442e');
+    g.strokeStyle = '#3a2410'; g.beginPath(); g.moveTo(40, 40); g.lineTo(40, 16); g.stroke();
+    sail(32, 18, 40, 14, '#8a3a26');
+  });
+
+  SPR.dimsumcart = outlined(g => {                                    // dim sum trolley, stacked bamboo steamers
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 58, 20, 3.6, 0, 0, 7); g.fill();
+    g.fillStyle = '#1c1e22'; g.beginPath(); g.arc(16, 54, 5, 0, 7); g.fill(); g.beginPath(); g.arc(48, 54, 5, 0, 7); g.fill();
+    let cart = g.createLinearGradient(10, 36, 54, 54);
+    cart.addColorStop(0, '#c9302a'); cart.addColorStop(1, '#8a1414');
+    g.fillStyle = cart; g.fillRect(10, 38, 44, 16);
+    bevel(g, 10, 38, 44, 16, 'rgba(255,255,255,0.14)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = '#d8a827'; g.font = 'bold 5px monospace'; g.textAlign = 'center'; g.fillText('點心', 32, 47);
+    const steamer = (x, y) => {
+      let bg = g.createLinearGradient(x - 8, y - 3, x + 8, y + 3);
+      bg.addColorStop(0, '#c9a06a'); bg.addColorStop(1, '#8a6a3a');
+      g.fillStyle = bg; g.fillRect(x - 8, y - 3, 16, 6);
+      g.strokeStyle = 'rgba(60,40,15,0.4)'; g.lineWidth = 0.6; for (let i = -6; i <= 6; i += 3) { g.beginPath(); g.moveTo(x + i, y - 3); g.lineTo(x + i, y + 3); g.stroke(); }
+    };
+    steamer(24, 30); steamer(40, 30); steamer(32, 22);
+    g.fillStyle = 'rgba(230,230,230,0.35)'; g.beginPath(); g.ellipse(32, 16, 6, 8, 0, Math.PI, 0, true); g.fill();  // steam wisp
+  });
+
+  SPR.mahjongtable = outlined(g => {                                  // square mahjong table, tiles mid-game
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 58, 20, 4, 0, 0, 7); g.fill();
+    g.fillStyle = '#3a2c14'; g.fillRect(12, 50, 4, 10); g.fillRect(48, 50, 4, 10);   // table legs
+    let top = g.createLinearGradient(8, 24, 56, 48);
+    top.addColorStop(0, '#3a6a4a'); top.addColorStop(1, '#254a32');
+    g.fillStyle = top; g.fillRect(8, 26, 48, 24);
+    bevel(g, 8, 26, 48, 24, 'rgba(255,255,255,0.14)', 'rgba(0,0,0,0.35)');
+    g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 1; g.strokeRect(12, 30, 40, 16);
+    const tile = (x, y) => { g.fillStyle = '#e8e2d0'; g.fillRect(x, y, 5, 7); g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 0.5; g.strokeRect(x, y, 5, 7); g.fillStyle = '#8a1414'; g.fillRect(x + 1, y + 2, 3, 1); };
+    for (let i = 0; i < 6; i++) tile(14 + i * 6, 34);
+    g.fillStyle = '#c9a227'; for (const [x, y] of [[20, 44], [30, 46], [40, 44]]) { g.beginPath(); g.arc(x, y, 1.6, 0, 7); g.fill(); }  // stacked coin counters
+  });
+
+  SPR.neonsignboard = outlined(g => {                                 // hanging vertical neon shop sign, Cantonese glow
+    g.strokeStyle = '#3a3630'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(32, 2); g.lineTo(32, 10); g.stroke();
+    g.fillStyle = '#0e0a14'; g.fillRect(18, 10, 28, 48);
+    bevel(g, 18, 10, 28, 48, 'rgba(255,255,255,0.08)', 'rgba(0,0,0,0.4)');
+    const glowChar = (cy, col) => {
+      g.strokeStyle = col; g.lineWidth = 2.2; g.lineCap = 'round'; g.shadowColor = col; g.shadowBlur = 5;
+      g.beginPath(); g.moveTo(23, cy - 5); g.lineTo(41, cy - 5); g.moveTo(32, cy - 5); g.lineTo(32, cy + 5); g.moveTo(24, cy + 5); g.lineTo(40, cy + 5); g.stroke();
+      g.shadowBlur = 0;
+    };
+    glowChar(20, 'rgba(255,60,160,0.95)'); glowChar(34, 'rgba(80,220,255,0.95)'); glowChar(48, 'rgba(255,214,60,0.95)');
+    g.fillStyle = '#3a3630'; g.fillRect(16, 8, 32, 3);
+  });
+
+  SPR.lanternstring = outlined(g => {                                 // string of hanging red paper lanterns
+    g.strokeStyle = '#3a2c14'; g.lineWidth = 1; g.beginPath(); g.moveTo(2, 4); g.quadraticCurveTo(32, 16, 62, 4); g.stroke();
+    const lantern = (x, y, s) => {
+      const lg = g.createRadialGradient(x - s * 0.3, y - s * 0.3, 1, x, y, s);
+      lg.addColorStop(0, '#e8503a'); lg.addColorStop(1, '#8a1414');
+      g.fillStyle = lg; g.beginPath(); g.ellipse(x, y, s, s * 1.15, 0, 0, 7); g.fill();
+      g.fillStyle = '#c9a227'; g.fillRect(x - s * 0.3, y - s * 1.2, s * 0.6, 2); g.fillRect(x - s * 0.3, y + s * 1.05, s * 0.6, 2);
+      g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 0.6; for (let yy = -s * 0.6; yy <= s * 0.6; yy += s * 0.5) { g.beginPath(); g.ellipse(x, y, s, s * 1.15, 0, 0, 7); g.stroke(); }
+      g.fillStyle = 'rgba(255,220,150,0.4)'; g.beginPath(); g.ellipse(x - s * 0.3, y - s * 0.3, s * 0.4, s * 0.5, 0, 0, 7); g.fill();
+    };
+    lantern(10, 10, 7); lantern(32, 15, 8); lantern(54, 10, 7);
+  });
+
+  SPR.teastall = outlined(g => {                                      // street tea/herbal stall, jars + kettle
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 58, 20, 3.6, 0, 0, 7); g.fill();
+    g.fillStyle = '#5c4222'; g.fillRect(10, 20, 3, 38); g.fillRect(51, 20, 3, 38);   // stall frame posts
+    let awn = g.createLinearGradient(8, 12, 56, 22);
+    awn.addColorStop(0, '#3a6a4a'); awn.addColorStop(1, '#254a32');
+    g.fillStyle = awn; g.beginPath(); g.moveTo(6, 22); g.lineTo(58, 22); g.lineTo(52, 12); g.lineTo(12, 12); g.closePath(); g.fill();
+    let counter = g.createLinearGradient(8, 40, 56, 56);
+    counter.addColorStop(0, '#a8794a'); counter.addColorStop(1, '#7a5430');
+    g.fillStyle = counter; g.fillRect(8, 42, 48, 14);
+    const jar = (x, col) => { g.fillStyle = col; g.beginPath(); g.ellipse(x, 36, 4, 6, 0, 0, 7); g.fill(); g.fillStyle = '#5c4222'; g.fillRect(x - 4, 30, 8, 2); };
+    jar(16, 'rgba(200,160,90,0.7)'); jar(24, 'rgba(120,90,50,0.7)'); jar(48, 'rgba(160,60,40,0.7)');
+    g.fillStyle = '#8a8a8a'; g.beginPath(); g.ellipse(36, 38, 5, 5, 0, 0, 7); g.fill();   // kettle
+    g.fillRect(40, 36, 4, 1.6); g.fillStyle = 'rgba(230,230,230,0.4)'; g.beginPath(); g.ellipse(38, 30, 3, 5, 0, Math.PI, 0, true); g.fill();
+  });
+
+  SPR.birdcage = outlined(g => {                                      // ornate hanging bamboo/brass bird cage
+    g.strokeStyle = '#3a2c14'; g.lineWidth = 1; g.beginPath(); g.moveTo(32, 2); g.lineTo(32, 10); g.stroke();
+    g.fillStyle = '#c9a227'; g.beginPath(); g.ellipse(32, 11, 3, 1.6, 0, 0, 7); g.fill();   // hook ring
+    let dome = g.createLinearGradient(16, 12, 48, 18);
+    dome.addColorStop(0, '#c9a06a'); dome.addColorStop(1, '#8a6438');
+    g.fillStyle = dome; g.beginPath(); g.ellipse(32, 16, 15, 6, 0, Math.PI, 0, true); g.fill();
+    g.strokeStyle = '#8a6438'; g.lineWidth = 1;                        // bamboo bars
+    for (let x = 18; x <= 46; x += 4) { g.beginPath(); g.moveTo(x, 16); g.lineTo(x, 46); g.stroke(); }
+    g.beginPath(); g.moveTo(17, 24); g.lineTo(47, 24); g.stroke(); g.beginPath(); g.moveTo(17, 38); g.lineTo(47, 38); g.stroke();
+    g.fillStyle = dome; g.beginPath(); g.ellipse(32, 46, 16, 5, 0, 0, 7); g.fill();
+    g.fillStyle = '#3a2c14'; g.beginPath(); g.ellipse(32, 47, 12, 3, 0, 0, 7); g.fill();
+    g.fillStyle = '#2a3a2c'; g.beginPath(); g.ellipse(28, 30, 3, 4, 0, 0, 7); g.fill(); g.fillStyle = '#c9a227'; g.beginPath(); g.arc(29.4, 28.4, 0.7, 0, 7); g.fill();  // a small bird silhouette
+    g.fillStyle = '#e8dca0'; g.fillRect(20, 42, 3, 2); g.fillRect(40, 42, 3, 2);  // seed/water dishes
+  });
+
   SPR.filecab = outlined(g => {                                   // olive-steel filing cabinet, three drawers
     g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 61.5, 15, 2.6, 0, 0, 7); g.fill();
     let bd = g.createLinearGradient(0, 20, 0, 60);
@@ -7071,6 +7892,44 @@ const World = (() => {
       kind: 'agent005', name: 'AGENT 005', x, y, solid: true, scale: 0.85, hp: 220, dead: false, aggro: false, atkT: 0, flash: 0,
       getTex() { return this.dead ? SPR.corpse : SPR.agent005; },
     }),
+    matron: (x, y, e) => ({
+      kind: 'matron', name: 'THE MATRON', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.matron; },
+    }),
+    streetartist: (x, y, e) => ({
+      kind: 'streetartist', name: 'STREET ARTIST', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.streetartist; },
+    }),
+    headshot: (x, y) => prop('headshot', 'HEADSHOT', x, y, 0.3, false),
+    metroticket: (x, y) => prop('metroticket', 'METRO TICKET', x, y, 0.26, false),
+    fabergeegg: (x, y) => prop('fabergeegg', 'FABERGÉ EGG', x, y, 0.55, true),
+    laundrylady: (x, y, e) => ({
+      kind: 'laundrylady', name: 'LAUNDRY LADY', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.laundrylady; },
+    }),
+    // The double starts plain-clothed and unremarkable; useEnt() flips `disguised`
+    // true once suited AND masked, swapping to SPR.doubleDressed — the same
+    // kind-preserving state-flip trick used for the boss005 reveal, just visual
+    // here rather than combat-relevant.
+    double: (x, y, e) => ({
+      kind: 'double', name: 'THE DOUBLE', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0, disguised: false,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : (this.disguised ? SPR.doubleDressed : SPR.double); },
+    }),
+    patsy: (x, y, e) => ({
+      kind: 'patsy', name: 'THE PATSY', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.patsy; },
+    }),
+    nixonmask: (x, y) => prop('nixonmask', 'NIXON MASK', x, y, 0.4, false),
+    maskstand: (x, y) => prop('maskstand', 'MASK STAND', x, y, 0.85, true),
+    laundryticket: (x, y) => prop('laundryticket', 'LAUNDRY TICKET', x, y, 0.26, false),
+    package: (x, y) => prop('package', 'WRAPPED PACKAGE', x, y, 0.5, false),
+    curtainrods: (x, y) => prop('curtainrods', 'CURTAIN RODS', x, y, 0.7, true),
+    suitrack: (x, y) => prop('suitrack', 'GARMENT RACK', x, y, 0.9, true),
     sedan: (x, y) => prop('sedan', 'PARKED SEDAN', x, y, 1.3, true),
     motorcycle: (x, y) => prop('motorcycle', 'MOTORCYCLE', x, y, 1.0, true),
     phonebooth: (x, y) => prop('phonebooth', 'PHONE BOOTH', x, y, 0.85, true),
@@ -7153,6 +8012,24 @@ const World = (() => {
     sedan1963: (x, y) => prop('sedan1963', "'63 SEDAN", x, y, 1.3, true),
     flagpole: (x, y) => prop('flagpole', 'FLAGPOLE', x, y, 1.15, true),
     stormdrain: (x, y) => prop('stormdrain', 'STORM DRAIN', x, y, 0.5, false),
+    // New York 1964 wave
+    yellowcab: (x, y) => prop('yellowcab', 'YELLOW CAB', x, y, 1.3, true),
+    policecarny: (x, y) => prop('policecarny', 'POLICE CRUISER', x, y, 1.3, true),
+    hotdogcart: (x, y) => prop('hotdogcart', 'HOT DOG CART', x, y, 0.95, true),
+    subwaygrate: (x, y) => prop('subwaygrate', 'SUBWAY GRATE', x, y, 0.5, false),
+    glassbooth: (x, y) => prop('glassbooth', 'PHONE BOOTH', x, y, 0.95, true),
+    worldsfair: (x, y) => prop('worldsfair', "WORLD'S FAIR UNISPHERE", x, y, 1.1, true),
+    fireescape: (x, y) => prop('fireescape', 'FIRE ESCAPE', x, y, 1.15, false),
+    brownstonestoop: (x, y) => prop('brownstonestoop', 'BROWNSTONE STOOP', x, y, 1.1, true),
+    // Hong Kong wave
+    rickshaw: (x, y) => prop('rickshaw', 'RICKSHAW', x, y, 1.0, true),
+    junkboat: (x, y) => prop('junkboat', 'JUNK BOAT', x, y, 1.3, true),
+    dimsumcart: (x, y) => prop('dimsumcart', 'DIM SUM CART', x, y, 0.95, true),
+    mahjongtable: (x, y) => prop('mahjongtable', 'MAHJONG TABLE', x, y, 1.0, true),
+    neonsignboard: (x, y) => prop('neonsignboard', 'NEON SIGNBOARD', x, y, 1.1, false),
+    lanternstring: (x, y) => prop('lanternstring', 'PAPER LANTERNS', x, y, 0.9, false),
+    teastall: (x, y) => prop('teastall', 'TEA STALL', x, y, 1.0, true),
+    birdcage: (x, y) => prop('birdcage', 'BIRD CAGE', x, y, 0.7, false),
   };
 
   function removeEnt(ent) {
@@ -7212,7 +8089,7 @@ const World = (() => {
       verts: level.geo.verts.map(v => ({ x: v.x, y: v.y })),
       sectors: level.geo.sectors.map(s => ({
         loop: s.loop.slice(), floor: s.floor || 0, ceil: s.ceil == null ? 1 : s.ceil,
-        floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, win: !!s.win, hostile: !!s.hostile,
+        floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, skyTex: s.skyTex || null, win: !!s.win, hostile: !!s.hostile,
         texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : undefined,
         wallTex: s.wallTex ? s.wallTex.slice() : undefined,
         wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : undefined,
@@ -7239,7 +8116,7 @@ const World = (() => {
   return {
     T, CH, SURF, get, set, isSolid, winAt, charAt, surfAt, floorZAt,
     setFloorZ, setCeilZ, setSurfTex, setCeilTex, setFloorSlope, compileGeo, getGeo,
-    TEX, SPR, FLOOR, SKY, TX, TXNAMES, wallTex, wallTexName, WALLTX,
+    TEX, SPR, FLOOR, SKY, SKIES, SKYNAMES, TX, TXNAMES, wallTex, wallTexName, WALLTX,
     ents, removeEnt, setPowered, spawnFx, FX_LIFE,
     spawn, load, defaultLevel, get isCustom() { return isCustom; }, get geoRev() { return geoRev; },
     get startBlown() { return startBlown; },

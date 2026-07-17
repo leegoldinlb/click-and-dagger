@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>LAIR ARCHITECT &mdash; CLICK &amp; DAGGER</title>
-<link rel="stylesheet" href="editor.css?v=8">
+<link rel="stylesheet" href="editor.css?v=11">
 </head>
 <body>
 <div id="wrap">
@@ -22,17 +22,6 @@
       <h2>PERSONNEL &amp; PROPS</h2>
       <div id="entsPal" class="tools"></div>
       <p class="hint"><b>[</b> <b>]</b> cycles which one you're placing.</p>
-      <h2>SPECIAL</h2>
-      <div id="specials" class="tools"></div>
-      <div class="row">
-        <label>AGENT FACES</label>
-        <select id="spawnang">
-          <option value="-1.5707963">NORTH</option>
-          <option value="0">EAST</option>
-          <option value="1.5707963">SOUTH</option>
-          <option value="3.1415927">WEST</option>
-        </select>
-      </div>
 
       <div class="gridtool">
         <h2>SECTOR HEIGHT</h2>
@@ -91,8 +80,9 @@
         sector: <b>PgUp</b>/<b>PgDn</b> raise/lower floor (<b>Shift</b> = ceiling) &nbsp;·&nbsp; <b>,</b> <b>.</b> slope &nbsp;·&nbsp; <b>[</b> <b>]</b>/<b>scroll</b> texture &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply favorite &nbsp;·&nbsp; <b>Shift</b>+<b>1</b>-<b>9</b>/<b>0</b> save favorite &nbsp;·&nbsp; <b>ESC</b> map
         &nbsp;·&nbsp; cyan glow = the surface you're about to edit</div>
       </div>
-      <div id="drawhelp"><b>SPACE</b>/click vertex &nbsp;·&nbsp; <b>drag</b> a vertex to move it &nbsp;·&nbsp; close on the first to make a sector &nbsp;·&nbsp; <b>I</b> insert on a wall &nbsp;·&nbsp; <b>DEL</b> remove vertex/sector &nbsp;·&nbsp; <b>Ctrl-Z</b> undo &nbsp;·&nbsp; <b>scroll</b> = zoom &nbsp;·&nbsp; white = solid, red = sector wall</div>
       <div id="gridscroll"><canvas id="grid"></canvas></div>
+      <div id="drawhelp"><b>SPACE</b>/click vertex &nbsp;·&nbsp; <b>drag</b> a vertex to move it &nbsp;·&nbsp; close on the first to make a sector &nbsp;·&nbsp; <b>I</b> insert on a wall &nbsp;·&nbsp; <b>DEL</b> remove vertex/sector &nbsp;·&nbsp; <b>Ctrl-Z</b> undo &nbsp;·&nbsp; <b>scroll</b> = pan &nbsp;·&nbsp; <b>Ctrl</b>+<b>scroll</b> = zoom &nbsp;·&nbsp; <b>middle-drag</b> = pan &nbsp;·&nbsp; white = solid, red = sector wall
+      &nbsp;·&nbsp; <b>PREVIEW CAM</b> sets where 3D PREVIEW starts — click to place (cyan marker), right-click to clear. Exiting 3D preview always remembers where you last stood.</div>
       <div id="statusbar">
         <span id="coords">&nbsp;</span>
         <span id="status">&nbsp;</span>
@@ -100,6 +90,17 @@
     </main>
 
     <aside id="side">
+      <h2>SPECIAL</h2>
+      <div id="specials" class="tools"></div>
+      <div class="row">
+        <label>FACING (spawn / camera)</label>
+        <select id="spawnang">
+          <option value="-1.5707963">NORTH</option>
+          <option value="0">EAST</option>
+          <option value="1.5707963">SOUTH</option>
+          <option value="3.1415927">WEST</option>
+        </select>
+      </div>
       <h2>MISSION CHECK</h2>
       <ul id="checks"></ul>
       <h2>MAP SIZE</h2>
@@ -131,8 +132,8 @@
   </div>
 </div>
 <input type="file" id="filein" accept=".json,application/json" hidden>
-<script src="js/world.js?v=54"></script>
-<script src="js/engine.js?v=40"></script>
-<script src="js/editor.js?v=54"></script>
+<script src="js/world.js?v=60"></script>
+<script src="js/engine.js?v=41"></script>
+<script src="js/editor.js?v=62"></script>
 </body>
 </html>

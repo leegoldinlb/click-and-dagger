@@ -417,7 +417,6 @@ const Engine = (() => {
     const horizon = H * 0.5 + (p.pitch || 0);
     const FX = (W / 2) / 0.66, NEAR = 0.04;
     const wt = cacheOf(World.TX.brick);
-    const skyTex = cacheOf(World.SKY);
     const facadeTex = cacheOf(World.TX.stucco || World.TX.brick);   // building wall up to the sky roofline
     const stepDn = cacheOf(World.TX.metal);                         // riser of a step UP (neighbour floor higher)
     const stepUp = cacheOf(World.TX.vent);                          // soffit of a step DOWN (indoor lower ceiling)
@@ -434,6 +433,7 @@ const Engine = (() => {
       const isc = 1 / (sec.texScale || 1);              // floor/ceiling tile size: >1 = bigger tiles, <1 = smaller
       const ftex = cacheOf(World.TX[sec.floorTex] || World.TX.carpet);
       const ctex = cacheOf(World.TX[sec.ceilTex] || World.TX.ceiltile);
+      const skyTex = sky ? cacheOf(World.SKIES[sec.skyTex] || World.SKY) : null;  // per-sector sky choice (Havana default)
       // project every visible wall, then sort near → far
       const vis = [];
       const through = [];                                            // open portals the eye sits ON → flood straight past

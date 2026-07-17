@@ -14,14 +14,30 @@ const Adventure = (() => {
     familySmuggled: false, defectorFollowing: false, defectorLost: false,
     // Learn the Truth
     met005: false, gotTruth005: false, revealed005: false,
+    // The Oeuvre (Paris)
+    metArtist: false, gotCityscape: false, gotHeadshot: false, portraitMade: false, gotPortrait: false,
+    metMatron: false, galleryAccess: false, hasEgg: false, gotTicket: false,
+    // The Double (Dealey Plaza)
+    gotNixonMask: false, exchangedMask: false, metLaundry: false, laundryDone: false,
+    suitReady: false, gotSuit: false, doubleSuited: false, doubleComplete: false,
+    // The Patsy (Dealey Plaza)
+    gotPackage: false, curtainsUsed: false, coinsReady: false, gotCoins: false,
+    gotDrPepper: false, metPatsy: false, patsyComplete: false,
   };
   let verb = 'look';
   let selected = null;            // selected inventory item id
   const inv = [];
   let winFn = null;                // registered by main.js — lets a puzzle payoff end the mission directly
   let loseFn = null;                // ditto, for a puzzle failure (cutting the wrong wire)
+  let blowFn = null;                // ditto, for a puzzle payoff that blows cover (getting caught red-handed)
   function setWinTrigger(fn) { winFn = fn; }
   function setLoseTrigger(fn) { loseFn = fn; }
+  function setBlowTrigger(fn) { blowFn = fn; }
+  // The Double + The Patsy are two independent side-quests that converge on one
+  // shared win — called after either completes, fires only once both are true.
+  function checkDealeyWin() {
+    if (flags.doubleComplete && flags.patsyComplete && winFn) winFn();
+  }
 
   const invEl = document.getElementById('inventory');
   const invEmptyEl = document.getElementById('invempty');
@@ -108,7 +124,7 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
@@ -263,6 +279,46 @@ const Adventure = (() => {
       case 'wallmap': return 'A map on an easel, a route inked in red. It ends at the harbour.';
       case 'conftable': return 'A long table, chairs pushed in neat. Whatever was decided here, it was decided quietly.';
       case 'punchclock': return 'A time clock, a card half-fed into the slot. Someone clocked out and never came back.';
+      case 'matron': return e.dead
+        ? 'A voice that once filled the Palais Garnier, silenced. This is on you.'
+        : (flags.galleryAccess
+          ? 'The Matron, presiding over her gallery with the same command she once gave an audience of two thousand.'
+          : 'The Matron, furs and pearls and the bearing of a woman who has been applauded by kings. She has not looked at you twice.');
+      case 'streetartist': return e.dead
+        ? 'His palette lies face-down in the gutter, colors bleeding together. This is on you.'
+        : 'A street artist under a striped awning, beret cocked, charcoal-stained fingers working fast for tourist francs.';
+      case 'easel': return flags.portraitMade
+        ? (flags.gotPortrait ? 'The easel, canvas bare again — you already took the portrait.' : 'A finished portrait on the easel, uncannily accurate. Worth taking.')
+        : 'An artist\'s tripod easel, blank canvas waiting for a subject.';
+      case 'headshot': return 'A studio headshot — cover-issue, unsmiling, in your best light. An artist could work from this.';
+      case 'metroticket': return 'A single Métro ticket. One ride, one way.';
+      case 'fabergeegg': return flags.hasEgg
+        ? 'The case stands empty. You already have what you came for.'
+        : 'A Romanov Fabergé egg, gold and jeweled, behind glass. The Matron\'s prize possession, and yours, if she ever lets you close enough.';
+      case 'metroentrance': return 'The Métro entrance, ironwork lilies and a lettered plaque. Down those stairs, and you are gone.';
+      case 'laundrylady': return e.dead
+        ? 'The steam still rises off the press. This is on you.'
+        : 'A laundry counter attendant, half-buried in tickets and pressed shirts.';
+      case 'double': return e.dead
+        ? 'Whatever he was standing in for, it is over now. This is on you.'
+        : (flags.doubleComplete
+          ? 'The double, suited and masked, standing exactly where he was told to stand.'
+          : (flags.doubleSuited ? 'The double, suited up, waiting on the mask.' : 'A man built along the right lines, in the wrong clothes, waiting for instructions.'));
+      case 'patsy': return e.dead
+        ? 'Whatever he knew — or didn\'t — is gone now. This is on you.'
+        : (flags.patsyComplete
+          ? 'The patsy, calmer now, nursing a Dr Pepper like it is the only stable thing in his day.'
+          : 'A nervous man, watching the door more than the street. Somebody needs him to stay exactly here.');
+      case 'nixonmask': return 'A rubber Nixon mask, jowls and all. “There\'s a receipt inside.”';
+      case 'maskstand': return 'A costume shop\'s novelty rack — masks of every president who ever needed forgiving.';
+      case 'laundryticket': return 'A claim ticket, numbered. Somebody\'s dry cleaning, or somebody\'s alibi.';
+      case 'package': return 'A brown-paper package, tied with string. Long enough for curtain rods, if anyone asks.';
+      case 'curtainrods': return flags.coinsReady
+        ? (flags.gotCoins ? 'Just curtain rods now. Whatever was in there, you already took it.' : 'The rods rattle when you shift them. Something is in there that isn\'t hardware.')
+        : 'Curtain rods, wrapped for delivery. Above suspicion, if a little heavy for the job.';
+      case 'suitrack': return flags.suitReady
+        ? (flags.gotSuit ? 'One empty hanger, swinging slightly. You already took the suit.' : 'Row three: a suit, pressed sharp enough to cut.')
+        : 'Rows of pressed suits, none of them claimed. Yet.';
     }
     return 'It defies description. The dossier said nothing about this.';
   }
@@ -288,7 +344,8 @@ const Adventure = (() => {
       case 'brute': return e.dead ? 'Nothing on him but a busted knuckle brace. He fought with what he had.' : 'You would need a crane.';
       case 'sniper': return e.dead ? 'A rifle, a canteen, a half-written letter home. You leave the letter.' : 'He is not putting that rifle down for you.';
       case 'civilianM': case 'civilianF': case 'vendor': case 'waiter': case 'tourist': case 'officer': case 'fisherman': case 'flowergirl': case 'carlotta':
-      case 'drz': case 'defector': case 'agent005': case 'boss005':
+      case 'drz': case 'defector': case 'agent005': case 'boss005': case 'matron': case 'streetartist':
+      case 'laundrylady': case 'double': case 'patsy':
         return 'They are a person, not a prop. Leave them be.';
       case 'desk': return 'It’s a desk. Even you couldn’t expense that.';
       case 'safe': return 'Bolted to the wall. You are a spy, not a mover.';
@@ -341,6 +398,60 @@ const Adventure = (() => {
         return 'A pair of pliers, well used.';
       case 'ciphermachine': case 'bomb': case 'microfichemachine': case 'sportscar':
         return 'That is bolted down, and staying that way.';
+      case 'headshot':
+        if (inv.some(i => i.id === 'headshot')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('headshot', 'HEADSHOT');
+        return 'You pocket your own headshot. Vain, perhaps, but it may buy you a favor.';
+      case 'metroticket':
+        if (inv.some(i => i.id === 'ticket')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('ticket', 'METRO TICKET');
+        return 'A single Métro ticket. One ride, and you had better make it count.';
+      case 'easel':
+        if (!flags.portraitMade) return 'Just a blank canvas. Nothing to take yet.';
+        if (flags.gotPortrait) return 'You already have the portrait.';
+        flags.gotPortrait = true;
+        addItem('portrait', 'PORTRAIT');
+        return 'You take the portrait, still smelling faintly of turpentine. Uncanny, really.';
+      case 'fabergeegg':
+        if (flags.hasEgg) return 'You already have it.';
+        if (!flags.galleryAccess) return 'Behind glass, and the Matron has not so much as glanced your way. Not yet.';
+        World.removeEnt(e);
+        flags.hasEgg = true;
+        addItem('egg', 'FABERGÉ EGG');
+        if (blowFn) blowFn();
+        return '“Thief!” The Matron’s voice — the one that once filled an opera house — carries across the entire block. Cover’s blown.';
+      case 'nixonmask':
+        if (inv.some(i => i.id === 'nixonmask')) return 'You already have it.';
+        World.removeEnt(e);
+        flags.gotNixonMask = true;
+        addItem('nixonmask', 'NIXON MASK');
+        return '“There\'s a receipt inside.” Someone bought this in a hurry and never checked the bag.';
+      case 'laundryticket':
+        if (inv.some(i => i.id === 'laundryticket')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('laundryticket', 'LAUNDRY TICKET');
+        return 'A numbered claim ticket. Somebody\'s coming back for this.';
+      case 'package':
+        if (inv.some(i => i.id === 'package')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('package', 'WRAPPED PACKAGE');
+        return 'A brown-paper package, tied with string. Long enough for curtain rods, if anyone asks.';
+      case 'maskstand':
+        return 'Bolted to the counter. The masks aren\'t, though.';
+      case 'suitrack':
+        if (!flags.suitReady) return 'Rows of pressed suits, none of them claimed. Yet.';
+        if (flags.gotSuit) return 'You already have the suit.';
+        flags.gotSuit = true;
+        addItem('suit', 'PRESSED SUIT');
+        return 'Row three, just like she said. A suit, pressed sharp enough to cut.';
+      case 'curtainrods':
+        if (!flags.coinsReady) return 'Just curtain rods, wrapped for delivery. Above suspicion, if a little heavy.';
+        if (flags.gotCoins) return 'Nothing left in there.';
+        flags.gotCoins = true;
+        addItem('coins', 'LOOSE COINS');
+        return 'You fish a handful of coins out from among the rods. Somebody\'s exact change for something.';
     }
     return 'You can’t take that.';
   }
@@ -522,6 +633,143 @@ const Adventure = (() => {
       }
       return 'Locked. You would need keys.';
     }
+    if (e.kind === 'streetartist') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'headshot' && !flags.portraitMade) {
+        flags.portraitMade = true;
+        removeItem('headshot');
+        Sfx.pick();
+        return 'She studies the headshot, charcoal already moving. “Twenty minutes,” she says. “Don\'t rush genius.”';
+      }
+      if (!flags.metArtist) {
+        flags.metArtist = true;
+        return '“Portrait? Painting? Name your poison, mon ami.”';
+      }
+      if (!flags.gotCityscape) {
+        flags.gotCityscape = true;
+        addItem('cityscape', 'CITYSCAPE PAINTING');
+        Sfx.pick();
+        return '“Ten francs for a view of the Seine.” She rolls a canvas and hands it over. “Sold.”';
+      }
+      if (flags.portraitMade) return '“Patience. Genius takes time.” She keeps working.';
+      return '“Something else, or are you just admiring the view?”';
+    }
+    if (e.kind === 'matron') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'portrait') {
+        if (flags.galleryAccess) return '“Yes, yes, you\'re already welcome here.”';
+        flags.galleryAccess = true;
+        removeItem('portrait');
+        Sfx.power();
+        return '“What a talent!” she says, studying the portrait at arm\'s length. “Welcome to my gallery.”';
+      }
+      if (selected === 'cityscape') return '“Talentless hack!” She waves the painting away without a second glance.';
+      if (!flags.metMatron) {
+        flags.metMatron = true;
+        return '“This is a gallery, not a tourist trap. Come back with something worth my time.”';
+      }
+      return flags.galleryAccess
+        ? '“Enjoy the collection. Touch nothing you haven\'t earned.”'
+        : '“I have nothing further to say to you.”';
+    }
+    if (e.kind === 'metroentrance') {
+      if (selected === 'ticket') {
+        if (!flags.hasEgg) return '“I\'m not leaving without accomplishing my mission.”';
+        removeItem('ticket');
+        Sfx.power();
+        if (winFn) winFn();
+        return 'You slip through the turnstile and vanish into the Métro, the egg tucked safe against your ribs. Paris keeps its secrets; so, now, do you.';
+      }
+      return 'The turnstile wants a ticket, not a conversation.';
+    }
+    if (e.kind === 'maskstand') {
+      if (selected === 'nixonmask') {
+        if (flags.exchangedMask) return '“One trade a day,” the shopkeep says. “House rules.”';
+        flags.exchangedMask = true;
+        removeItem('nixonmask');
+        addItem('jfkmask', 'JFK MASK');
+        Sfx.pick();
+        return '“Even trade,” the shopkeep says, not looking up. “Everybody wants to be somebody else today.”';
+      }
+      return 'A costume shop\'s novelty rack — masks of every president who ever needed forgiving.';
+    }
+    if (e.kind === 'laundrylady') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'laundryticket') {
+        if (flags.laundryDone) return '“You already got your suit, hon.”';
+        flags.laundryDone = true;
+        flags.suitReady = true;
+        removeItem('laundryticket');
+        Sfx.pick();
+        return 'She checks the number against a rack of pressed suits. “Row three,” she says, already turning away.';
+      }
+      if (!flags.metLaundry) {
+        flags.metLaundry = true;
+        return '“Ticket or nothing, I\'ve got a line.”';
+      }
+      return '“Ticket or nothing.”';
+    }
+    if (e.kind === 'double') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'suit') {
+        if (flags.doubleSuited) return 'He is already wearing the suit.';
+        flags.doubleSuited = true;
+        removeItem('suit');
+        Sfx.pick();
+        return 'He pulls the suit on over his own clothes. “How do I look?” Terrifyingly average. That is rather the point.';
+      }
+      if (selected === 'jfkmask') {
+        if (!flags.doubleSuited) return '“The suit first,” he says. “I\'m not doing this half dressed.”';
+        if (flags.doubleComplete) return 'He is already in position, mask and all.';
+        flags.doubleComplete = true;
+        removeItem('jfkmask');
+        e.disguised = true;
+        Sfx.power();
+        checkDealeyWin();
+        return 'He settles the mask into place. From ten feet, in bad light, he could fool a crowd. That is the idea.';
+      }
+      return flags.doubleComplete ? 'He holds his position, mask and all, saying nothing.' : 'He is waiting on instructions, and clothes.';
+    }
+    if (e.kind === 'patsy') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'drpepper') {
+        if (flags.patsyComplete) return 'He is still nursing the Dr Pepper, calmer than he has any right to be.';
+        flags.patsyComplete = true;
+        removeItem('drpepper');
+        Sfx.pick();
+        checkDealeyWin();
+        return '“...Dr Pepper?” His shoulders drop half an inch — the first calm he has shown all day. “Yeah. Yeah, okay. I can wait here.”';
+      }
+      if (!flags.metPatsy) {
+        flags.metPatsy = true;
+        return '“I didn\'t do anything,” he says, before you\'ve said a word.';
+      }
+      return '“I just need somewhere to wait,” he says. Again.';
+    }
+    if (e.kind === 'curtainrods') {
+      if (selected === 'package') {
+        if (flags.curtainsUsed) return 'One package is plenty. Any more and someone will notice.';
+        flags.curtainsUsed = true;
+        flags.coinsReady = true;
+        removeItem('package');
+        Sfx.pick();
+        return 'You tuck the package in among the rods. Something inside rattles — and it isn\'t curtain hardware.';
+      }
+      return flags.coinsReady
+        ? 'The rods rattle when you shift them.'
+        : 'Curtain rods, wrapped for delivery. Above suspicion, if a little heavy for the job.';
+    }
+    if (e.kind === 'vendingmachine') {
+      if (selected === 'coins') {
+        if (flags.gotDrPepper) return 'Empty-handed this time. You already got what you needed.';
+        flags.gotDrPepper = true;
+        removeItem('coins');
+        addItem('drpepper', 'DR PEPPER');
+        Sfx.pick();
+        return 'Coins in, a satisfying clunk, and a cold Dr Pepper rolls out.';
+      }
+      return 'A vending machine, coin slot waiting.';
+    }
     if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman'].includes(e.kind))
       return e.dead ? 'There is nothing left to do here.' : 'They have nothing to do with your mission. Move along.';
     return 'That doesn’t work. And the clock is running.';
@@ -598,5 +846,5 @@ const Adventure = (() => {
   }
 
   renderInv();
-  return { flags, msg, setVerb, clickAt, nameAt, resolveAt, addItem, setWinTrigger, setLoseTrigger, get selected() { return selected; } };
+  return { flags, msg, setVerb, clickAt, nameAt, resolveAt, addItem, setWinTrigger, setLoseTrigger, setBlowTrigger, get selected() { return selected; } };
 })();

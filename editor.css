@@ -164,7 +164,7 @@ input[type="number"] { width: 52px; }
   box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo);
 }
 #drawhelp {
-  margin-bottom: 8px; font-size: 11px; letter-spacing: 1px; color: var(--parchment-dim); line-height: 1.6;
+  margin-top: 8px; font-size: 11px; letter-spacing: 1px; color: var(--parchment-dim); line-height: 1.6;
 }
 #drawhelp b { color: var(--gold-bright); }
 #viewhint { color: #8a7a58; font-size: 11px; letter-spacing: 1px; }
@@ -177,6 +177,7 @@ input[type="number"] { width: 52px; }
   box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5);
   background: var(--panel-deep);
 }
+#gridscroll.panning, #gridscroll.panning #grid { cursor: grabbing !important; }
 #grid {
   background: var(--panel-deep);
   cursor: crosshair;
