@@ -3869,8 +3869,20 @@ const World = (() => {
     speck(g, 20, 'rgba(255,255,255,0.06)');
   }, 256, 96);
 
-  const SKIES = { havana: SKY, parisnight: SKY_PARISNIGHT, nycday: SKY_NYCDAY };
-  const SKYNAMES = ['havana', 'parisnight', 'nycday'];
+  // ---- a fourth parallax sky: a plain starry night, no skyline ----
+  const SKY_STARRYNIGHT = cnv(g => {
+    const grd = g.createLinearGradient(0, 0, 0, 96);
+    grd.addColorStop(0, '#050810'); grd.addColorStop(0.6, '#0c1428'); grd.addColorStop(1, '#182238');
+    g.fillStyle = grd; g.fillRect(0, 0, 256, 96);
+    g.fillStyle = 'rgba(255,255,255,0.9)';
+    for (let i = 0; i < 140; i++) { const x = Math.random() * 256, y = Math.random() * 96; g.globalAlpha = 0.25 + Math.random() * 0.65; g.fillRect(x, y, 1, 1); }
+    g.globalAlpha = 1;
+    g.fillStyle = 'rgba(255,255,255,0.6)';                // a few brighter stars
+    for (let i = 0; i < 12; i++) { const x = (Math.random() * 256) | 0, y = (Math.random() * 96) | 0; g.fillRect(x, y, 1, 1); g.fillRect(x - 1, y, 1, 1); g.fillRect(x + 1, y, 1, 1); g.fillRect(x, y - 1, 1, 1); g.fillRect(x, y + 1, 1, 1); }
+  }, 256, 96);
+
+  const SKIES = { havana: SKY, parisnight: SKY_PARISNIGHT, nycday: SKY_NYCDAY, starrynight: SKY_STARRYNIGHT };
+  const SKYNAMES = ['havana', 'parisnight', 'nycday', 'starrynight'];
 
   // ---- unified texture registry (name → canvas): walls + all surfaces ----
   // Every texture is assignable to any floor, ceiling, or wall in the editor.

@@ -187,6 +187,9 @@ const Editor = (() => {
     { kind: 'suitrack', name: 'GARMENT RACK', spr: 'suitrack' },
   ];
   const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
+  const WEAPON_KINDS = new Set(['medkit', 'ammo', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden', 'camera', 'disguise']);  // pulled out of PERSONNEL & PROPS into their own WEAPONS & POWER-UPS palette
+  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);
+  const ITEM_KINDS = new Set(['tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 
   // ---- state ----
@@ -374,14 +377,18 @@ const Editor = (() => {
       const b = toolBtn(tilesEl, t.name, tc, () => { tool = { t: 'tile', v: t.ch }; });
       if (t.ch === tool.v) b.classList.add('sel');
     }
-    const entsEl = document.getElementById('entsPal');
+    const propsEl = document.getElementById('propsPal');
+    const personnelEl = document.getElementById('personnelPal');
+    const itemsEl = document.getElementById('itemsPal');
+    const wpnEl = document.getElementById('wpnPal');
     entBtns = ENTS.map(e => {
       const tc = thumb(gg => {
         gg.imageSmoothingEnabled = false;
         gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
         gg.drawImage(World.SPR[e.spr], 0, 0, 64, 64, 1, 1, 28, 28);
       });
-      const b = toolBtn(entsEl, e.name, tc, () => { tool = { t: 'ent', v: e.kind }; });
+      const parent = WEAPON_KINDS.has(e.kind) ? wpnEl : PERSONNEL_KINDS.has(e.kind) ? personnelEl : ITEM_KINDS.has(e.kind) ? itemsEl : propsEl;
+      const b = toolBtn(parent, e.name, tc, () => { tool = { t: 'ent', v: e.kind }; });
       if (e.kind === tool.v) b.classList.add('sel');
       return b;
     });
@@ -519,6 +526,8 @@ const Editor = (() => {
     return n;
   }
   function renderChecks() {
+    const ul = document.getElementById('checks');
+    if (!ul) return;                              // panel removed from the UI — kept for a future readme/re-enable
     const winSectors = geo.sectors.filter(s => s.win).length;
     const items = [
       [geo.sectors.length > 0, 'SECTORS DRAWN (' + geo.sectors.length + ')'],
@@ -526,7 +535,6 @@ const Editor = (() => {
       [winSectors > 0, 'WIN ZONE TAGGED (' + winSectors + ')'],
       [entCount('agent') > 0, 'AGENT 004 (LOCKPICKS) PLACED'],
     ];
-    const ul = document.getElementById('checks');
     ul.innerHTML = '';
     for (const [ok, label] of items) {
       const li = document.createElement('li');
@@ -884,6 +892,7 @@ const Editor = (() => {
   const pcur = { cx: -1, cy: -1 };            // cursor position in the render buffer (for surface picking)
   const pkeys = {};
   let previewOn = false, pengineReady = false, praf = null, plast = 0, pdrag = false, plx = 0, ply = 0;
+  let manualEyeZ = false;                                      // once SPACE/C has flown the eye, it stops auto-following the floor
   let usePortal = false, portalGraph = null;  // portal render path when the level has vector sectors
   let previewCompiled = false;                // preview is a grid level compiled to geo (walk-only; sculpt drawn sectors)
 
@@ -1120,6 +1129,28 @@ const Editor = (() => {
     const sec = geo.sectors[hit.s];
     return { up: nsec.ceil < sec.ceil - 0.001, down: nsec.floor > sec.floor + 0.001 };
   }
+  // resolves exactly what surface the crosshair (plus Shift) is editing right now —
+  // used by every texture-assignment entry point (cycle keys, the palette, favorites)
+  // so they all agree. A wall with BOTH a soffit and a riser is ambiguous; Shift picks
+  // the SOFFIT over the RISER there, mirroring how Shift already means "the ceiling"
+  // everywhere else (PgUp/PgDn, the plain floor/ceiling texture cycle below). A step
+  // is always reachable no matter the range — it's a thin band between two sectors,
+  // easy to be "far" from even while clearly aiming at it — but a plain full-height
+  // wall only counts within wallPickDist, so aiming across a room at the floor doesn't
+  // accidentally grab a wall on the far side.
+  function texTarget(shift) {
+    const wallHit = pickGeoWall();
+    if (wallHit) {
+      const step = wallStepInfo(wallHit);
+      if (step.up && step.down) return { kind: shift ? 'soffit' : 'riser', hit: wallHit };
+      if (step.up) return { kind: 'soffit', hit: wallHit };
+      if (step.down) return { kind: 'riser', hit: wallHit };
+      if (!shift && wallHit.dist < wallPickDist(wallHit)) return { kind: 'wall', hit: wallHit };
+    }
+    const s = pickGeoSector();
+    if (s < 0) return null;
+    return { kind: shift ? 'ceil' : 'floor', s };
+  }
   function geoWallStepTex(dir) {                               // cycle the SOFFIT above a stepped-down opening
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
     const sec = geo.sectors[hit.s], names = World.TXNAMES;
@@ -1177,14 +1208,71 @@ const Editor = (() => {
     if (idx >= 0 && lv.ents[idx]) lv.ents[idx].solid = ent.solid;
     status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + (ent.solid ? 'SOLID' : 'WALK-THROUGH'));
   }
-  function cycleTex(dir, shift) {                              // [ ] / wheel: wall if aiming close at one, else floor/ceil
-    const wallHit = !shift && pickGeoWall();
-    if (wallHit && wallHit.dist < wallPickDist(wallHit)) {
-      const step = wallStepInfo(wallHit);                      // a portal's plain wall.tex renders nowhere — retexture
-      if (step.up) geoWallStepTex(dir);                        // whichever step surface is actually visible instead
-      else if (step.down) geoWallStepFloorTex(dir);
-      else geoWallTex(dir);
-    } else geoTex(dir, shift);
+  function cycleTex(dir, shift) {                              // [ ] / wheel: wall (Shift = soffit over riser) else floor/ceil
+    const t = texTarget(shift);
+    if (!t) { status('LOOK AT A SURFACE.'); return; }
+    if (t.kind === 'soffit') geoWallStepTex(dir);
+    else if (t.kind === 'riser') geoWallStepFloorTex(dir);
+    else if (t.kind === 'wall') geoWallTex(dir);
+    else geoTex(dir, t.kind === 'ceil');
+  }
+  // assign a SPECIFIC texture name (not cycle) to whatever cycleTex would currently
+  // act on — the texture-palette popup's click handler
+  function setTexAtTarget(name, shift) {
+    const t = texTarget(shift);
+    if (!t) { status('LOOK AT A SURFACE.'); return; }
+    if (t.kind === 'floor' || t.kind === 'ceil') {
+      const sec = geo.sectors[t.s];
+      if (t.kind === 'ceil') sec.ceilTex = name; else sec.floorTex = name;
+      status('SECTOR ' + (t.s + 1) + ' ' + (t.kind === 'ceil' ? 'CEIL' : 'FLOOR') + ' → ' + name.toUpperCase());
+      return;
+    }
+    const hit = t.hit, sec = geo.sectors[hit.s];
+    if (t.kind === 'soffit') {
+      if (!sec.wallStepTex) sec.wallStepTex = new Array(sec.loop.length).fill(null);
+      sec.wallStepTex[hit.i] = name;
+      status('WALL ' + (hit.i + 1) + ' SOFFIT → ' + name.toUpperCase());
+    } else if (t.kind === 'riser') {
+      if (!sec.wallStepFloorTex) sec.wallStepFloorTex = new Array(sec.loop.length).fill(null);
+      sec.wallStepFloorTex[hit.i] = name;
+      status('WALL ' + (hit.i + 1) + ' RISER → ' + name.toUpperCase());
+    } else {
+      if (!sec.wallTex) sec.wallTex = new Array(sec.loop.length).fill(null);
+      sec.wallTex[hit.i] = name;
+      status('WALL ' + (hit.i + 1) + ' → ' + name.toUpperCase());
+    }
+    portalGraph = Engine.buildGraph(geo);
+  }
+  // texture palette popup — \ opens it over the 3D preview, click a swatch to apply
+  // it to whatever's under the crosshair right now, ESC cancels without changing anything
+  let texPaletteOpen = false, texPaletteShift = false;
+  function renderTexPalette() {
+    const el = document.getElementById('texpaletteGrid');
+    el.innerHTML = '';
+    for (const name of World.TXNAMES) {
+      const tc = thumb(gg => {
+        gg.imageSmoothingEnabled = false;
+        gg.drawImage(World.TX[name], 0, 0, 64, 64, 0, 0, 30, 30);
+      });
+      toolBtn(el, name.toUpperCase(), tc, () => {
+        pushUndo();
+        setTexAtTarget(name, texPaletteShift);
+        closeTexPalette();
+      });
+    }
+  }
+  function openTexPalette(shift) {
+    if (previewCompiled) { status('DRAW SECTORS TO SCULPT — GRID PREVIEW HAS NO SURFACES TO RETEXTURE.'); return; }
+    Object.keys(pkeys).forEach(k => { pkeys[k] = false; });        // stop any held WASD/turn while the palette is up
+    texPaletteShift = shift;
+    texPaletteOpen = true;
+    renderTexPalette();
+    document.getElementById('texpalette').hidden = false;
+    status('TEXTURE PALETTE — click one to apply, ESC to cancel.');
+  }
+  function closeTexPalette() {
+    texPaletteOpen = false;
+    document.getElementById('texpalette').hidden = true;
   }
   function geoWallTexScale() {                                 // cycle the looked-at WALL's tile size
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
@@ -1221,14 +1309,6 @@ const Editor = (() => {
   }
   let favorites = loadFavorites();
   function persistFavorites() { try { localStorage.setItem('cloakclick.favorites', JSON.stringify(favorites)); } catch (e) { /* storage may be unavailable */ } }
-  // the surface currently under the crosshair: a close wall, else the sector's floor —
-  // same wall-priority test [ ] already uses (without Shift, which is the save/apply toggle here).
-  function favTarget() {
-    const wallHit = pickGeoWall();
-    if (wallHit && wallHit.dist < wallPickDist(wallHit)) return wallHit;
-    const s = pickGeoSector();
-    return s < 0 ? null : { s, i: -1 };
-  }
   function renderFavbar() {
     const el = document.getElementById('favbar'); if (!el) return;
     el.innerHTML = '';
@@ -1250,48 +1330,49 @@ const Editor = (() => {
       el.appendChild(cell);
     });
   }
-  function favSave(slot) {
-    const t = favTarget(); if (!t) { status('LOOK AT A SURFACE.'); return; }
-    const sec = geo.sectors[t.s];
+  // Ctrl+1-9/0 saves, plain 1-9/0 applies; Shift (either way) picks the SOFFIT over
+  // the RISER on a stepped wall, same as the cycle keys and the texture palette.
+  function favSave(slot, shift) {
+    const t = texTarget(shift); if (!t) { status('LOOK AT A SURFACE.'); return; }
     let name;
-    if (t.i >= 0) {
-      const step = wallStepInfo(t);
-      name = step.up ? ((sec.wallStepTex && sec.wallStepTex[t.i]) || 'vent')
-        : step.down ? ((sec.wallStepFloorTex && sec.wallStepFloorTex[t.i]) || 'metal')
-        : ((sec.wallTex && sec.wallTex[t.i]) || 'brick');
-    } else {
-      name = sec.floorTex;
+    if (t.kind === 'floor') name = geo.sectors[t.s].floorTex;
+    else if (t.kind === 'ceil') name = geo.sectors[t.s].ceilTex;
+    else {
+      const sec = geo.sectors[t.hit.s];
+      name = t.kind === 'soffit' ? ((sec.wallStepTex && sec.wallStepTex[t.hit.i]) || 'vent')
+        : t.kind === 'riser' ? ((sec.wallStepFloorTex && sec.wallStepFloorTex[t.hit.i]) || 'metal')
+        : ((sec.wallTex && sec.wallTex[t.hit.i]) || 'brick');
     }
     favorites[slot] = name;
     persistFavorites(); renderFavbar();
     status('SLOT ' + FAV_LABELS[slot] + ' SAVED — ' + name.toUpperCase());
   }
-  function favApply(slot) {
+  function favApply(slot, shift) {
     const name = favorites[slot];
-    if (!name) { status('SLOT ' + FAV_LABELS[slot] + ' IS EMPTY — SHIFT+' + FAV_LABELS[slot] + ' TO SAVE ONE.'); return; }
-    const t = favTarget(); if (!t) { status('LOOK AT A SURFACE.'); return; }
+    if (!name) { status('SLOT ' + FAV_LABELS[slot] + ' IS EMPTY — CTRL+' + FAV_LABELS[slot] + ' TO SAVE ONE.'); return; }
+    const t = texTarget(shift); if (!t) { status('LOOK AT A SURFACE.'); return; }
     pushUndo();
-    const sec = geo.sectors[t.s];
-    if (t.i >= 0) {
-      const step = wallStepInfo(t);
-      if (step.up) {
-        if (!sec.wallStepTex) sec.wallStepTex = new Array(sec.loop.length).fill(null);
-        sec.wallStepTex[t.i] = name;
-        status('WALL ' + (t.i + 1) + ' SOFFIT → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
-      } else if (step.down) {
-        if (!sec.wallStepFloorTex) sec.wallStepFloorTex = new Array(sec.loop.length).fill(null);
-        sec.wallStepFloorTex[t.i] = name;
-        status('WALL ' + (t.i + 1) + ' RISER → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
-      } else {
-        if (!sec.wallTex) sec.wallTex = new Array(sec.loop.length).fill(null);
-        sec.wallTex[t.i] = name;
-        status('WALL ' + (t.i + 1) + ' → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
-      }
-      portalGraph = Engine.buildGraph(geo);
-    } else {
-      sec.floorTex = name;
-      status('SECTOR ' + (t.s + 1) + ' FLOOR → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
+    if (t.kind === 'floor' || t.kind === 'ceil') {
+      const sec = geo.sectors[t.s];
+      if (t.kind === 'ceil') sec.ceilTex = name; else sec.floorTex = name;
+      status('SECTOR ' + (t.s + 1) + ' ' + (t.kind === 'ceil' ? 'CEIL' : 'FLOOR') + ' → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
+      return;
     }
+    const sec = geo.sectors[t.hit.s];
+    if (t.kind === 'soffit') {
+      if (!sec.wallStepTex) sec.wallStepTex = new Array(sec.loop.length).fill(null);
+      sec.wallStepTex[t.hit.i] = name;
+      status('WALL ' + (t.hit.i + 1) + ' SOFFIT → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
+    } else if (t.kind === 'riser') {
+      if (!sec.wallStepFloorTex) sec.wallStepFloorTex = new Array(sec.loop.length).fill(null);
+      sec.wallStepFloorTex[t.hit.i] = name;
+      status('WALL ' + (t.hit.i + 1) + ' RISER → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
+    } else {
+      if (!sec.wallTex) sec.wallTex = new Array(sec.loop.length).fill(null);
+      sec.wallTex[t.hit.i] = name;
+      status('WALL ' + (t.hit.i + 1) + ' → ' + name.toUpperCase() + ' (slot ' + FAV_LABELS[slot] + ')');
+    }
+    portalGraph = Engine.buildGraph(geo);
   }
 
   function pSolid(x, y) {
@@ -1322,9 +1403,17 @@ const Editor = (() => {
         if (d < min && d > 1e-4) { cam.x = e.x + (dx / d) * min; cam.y = e.y + (dy / d) * min; }
       }
     }
-    const s = Engine.sectorAt(cam.x, cam.y, geo);
-    const target = (s >= 0 ? geo.sectors[s].floor : 0) + 0.5;
-    cam.eyeZ += (target - cam.eyeZ) * Math.min(1, dt * 10);
+    // SPACE/C free-fly the eye up/down for navigation. The first tap of either
+    // permanently drops the "eye follows the floor" snap below for this preview
+    // session — otherwise the snap would drag a flown height straight back down
+    // the instant you let go. Only C ever lowers it again from then on.
+    if (pkeys.Space) { manualEyeZ = true; cam.eyeZ = Math.min(20, cam.eyeZ + 3.0 * dt); }
+    if (pkeys.KeyC) { manualEyeZ = true; cam.eyeZ = Math.max(-8, cam.eyeZ - 3.0 * dt); }
+    if (!manualEyeZ) {
+      const s = Engine.sectorAt(cam.x, cam.y, geo);
+      const target = (s >= 0 ? geo.sectors[s].floor : 0) + 0.5;
+      cam.eyeZ += (target - cam.eyeZ) * Math.min(1, dt * 10);
+    }
   }
   function pStep(dt) {                                             // one preview frame — also used as a debug hook
     pUpdate(dt || 1 / 60);
@@ -1350,16 +1439,21 @@ const Editor = (() => {
       return;
     }
     if (usePortal) {
-      const wallHit = pickGeoWall();
-      if (wallHit && wallHit.dist < wallPickDist(wallHit)) {    // close-range wall: show ITS texture/scale/door
-        const sec = geo.sectors[wallHit.s];
+      // Shift picks the ceiling off a plain surface, or the SOFFIT over the RISER on
+      // a stepped wall — the same live modifier every texture command reads, so the
+      // highlight always shows exactly what a keypress would actually hit right now.
+      const shiftHeld = !!(pkeys.ShiftLeft || pkeys.ShiftRight);
+      const t = texTarget(shiftHeld);
+      if (!t) { el.style.display = 'none'; Engine.setHighlight(null); return; }
+      if (t.kind === 'soffit' || t.kind === 'riser' || t.kind === 'wall') {
+        const wallHit = t.hit, sec = geo.sectors[wallHit.s];
         const wscale = (sec.wallTexScale && sec.wallTexScale[wallHit.i]) || 1;
         const wdoor = sec.wallDoor && sec.wallDoor[wallHit.i];
         const wdecal = sec.wallDecal && sec.wallDecal[wallHit.i];
         const step = wallStepInfo(wallHit);
         let label, hint;
-        if (step.up) { label = 'SOFFIT ' + String((sec.wallStepTex && sec.wallStepTex[wallHit.i]) || 'vent').toUpperCase(); hint = '[ ] soffit tex' + (step.down ? ' · R riser tex' : ''); }
-        else if (step.down) { label = 'RISER ' + String((sec.wallStepFloorTex && sec.wallStepFloorTex[wallHit.i]) || 'metal').toUpperCase(); hint = '[ ] riser tex'; }
+        if (t.kind === 'soffit') { label = 'SOFFIT ' + String((sec.wallStepTex && sec.wallStepTex[wallHit.i]) || 'vent').toUpperCase(); hint = '[ ] soffit tex' + (step.down ? ' · Shift = riser' : ''); }
+        else if (t.kind === 'riser') { label = 'RISER ' + String((sec.wallStepFloorTex && sec.wallStepFloorTex[wallHit.i]) || 'metal').toUpperCase(); hint = '[ ] riser tex' + (step.up ? ' · Shift = soffit' : ''); }
         else { label = String((sec.wallTex && sec.wallTex[wallHit.i]) || 'brick').toUpperCase(); hint = 'T tile · F door · P decal'; }
         el.textContent = '■ WALL ' + (wallHit.i + 1) + (wallHit.portal ? ' (portal)' : ' (solid)') +
           '   ' + label + (wscale !== 1 ? ' ×' + wscale : '') + (wdoor ? ' · ' + wdoor.toUpperCase() : '') + (wdecal ? ' · ' + wdecal.toUpperCase() + ' DECAL' : '') +
@@ -1368,9 +1462,7 @@ const Editor = (() => {
         Engine.setHighlight({ sec: wallHit.s, edge: wallHit.i });
         return;
       }
-      const s = pickGeoSector();
-      if (s < 0) { el.style.display = 'none'; Engine.setHighlight(null); return; }
-      const sec = geo.sectors[s];
+      const s = t.s, sec = geo.sectors[s];
       if (sec.solid) {                                          // a column/pillar — no floor/ceiling to report
         el.textContent = '■ SECTOR ' + (s + 1) + ' — SOLID COLUMN' + (previewCompiled ? '' : '   H to make walkable');
         el.style.display = 'block';
@@ -1383,11 +1475,7 @@ const Editor = (() => {
         ((sec.texScale || 1) !== 1 ? ' ×' + sec.texScale : '') + (sec.sky ? ' · SKY ' + String(sec.skyTex || 'havana').toUpperCase() : '') + (sec.win ? ' · WIN' : '') + (sec.hostile ? ' · HOSTILE' : '') + (doors ? ' · ' + doors + ' DOOR' : '') +
         (sec.parent >= 0 && !previewCompiled ? '   H solid' : '');
       el.style.display = 'block';
-      // Shift picks the ceiling everywhere else (PgUp/[/T all read it the same way) —
-      // the highlight tracks the SAME modifier live so it always shows what a keypress
-      // would actually hit right now, without waiting for one.
-      const shiftHeld = !!(pkeys.ShiftLeft || pkeys.ShiftRight);
-      Engine.setHighlight({ sec: s, kind: shiftHeld ? 'ceil' : 'floor' });
+      Engine.setHighlight({ sec: s, kind: t.kind === 'ceil' ? 'ceil' : 'floor' });
       return;
     }
     Engine.setHighlight(null);
@@ -1417,6 +1505,7 @@ const Editor = (() => {
     usePortal = true;
     portalGraph = Engine.buildGraph(geo);
     cam.pitch = 0; cam.sector = undefined;
+    manualEyeZ = false;                                          // fresh preview session — eye follows the floor again until SPACE/C
     if (previewCam) {                                            // an explicit CAMERA-tool placement (or wherever you last stood) wins
       cam.x = previewCam.x; cam.y = previewCam.y; cam.a = previewCam.a;
     } else if (previewCompiled) {                                // start at the mission spawn
@@ -1435,8 +1524,8 @@ const Editor = (() => {
     b.classList.add('active'); b.innerHTML = '&#9638; MAP EDITOR';
     document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
     document.getElementById('pcontrols').innerHTML = previewCompiled
-      ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>ESC</b> map'
-      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> tex — wall (or its soffit/riser step) if aiming close, else floor (Shift ceil) &nbsp;·&nbsp; <b>R</b> riser tex (when a wall has both a soffit and a riser) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky (<b>Shift</b>+<b>K</b> which sky) &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>P</b> mount a sprite on a wall (poster) &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply · <b>Shift</b>+ save favorite &nbsp;·&nbsp; <b>ESC</b> map';
+      ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>ESC</b> map'
+      : '<b>WASD</b> move &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> / <b>\\</b> tex — wall if aiming close, else floor (Shift ceil; on a stepped wall Shift picks the SOFFIT over the RISER) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky (<b>Shift</b>+<b>K</b> which sky) &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>P</b> mount a sprite on a wall (poster) &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply favorite (Shift = soffit) &nbsp;·&nbsp; <b>Ctrl</b>+<b>1</b>-<b>9</b>/<b>0</b> save favorite &nbsp;·&nbsp; <b>ESC</b> map';
     document.getElementById('favbar').style.display = previewCompiled ? 'none' : 'flex';
     renderFavbar();
     previewOn = true; plast = performance.now();
@@ -1464,12 +1553,17 @@ const Editor = (() => {
     if (!previewOn) return;
     const el = document.activeElement;
     if (el && (el.tagName === 'INPUT' || el.tagName === 'SELECT')) return;
+    if (texPaletteOpen) {                          // popup swallows everything except its own cancel key
+      if (e.code === 'Escape') { closeTexPalette(); e.preventDefault(); }
+      return;
+    }
     if (e.code === 'Escape') { exitPreview(); return; }
     // Portal preview sculpts the VECTOR sector under the crosshair (Shift = ceiling).
     // A grid level compiled just for the walkthrough (previewCompiled) isn't sculpted
     // in 3D — draw sectors, or edit heights/textures in the 2D map.
     if (!previewCompiled) {
       const sh = e.shiftKey;
+      if (e.code === 'Backslash') { openTexPalette(sh); e.preventDefault(); return; }
       if (e.code === 'PageUp') { if (!e.repeat) pushUndo(); geoRaise(+1, sh); e.preventDefault(); return; }
       if (e.code === 'PageDown') { if (!e.repeat) pushUndo(); geoRaise(-1, sh); e.preventDefault(); return; }
       if (e.code === 'BracketRight') { if (!e.repeat) pushUndo(); cycleTex(+1, sh); e.preventDefault(); return; }
@@ -1485,20 +1579,14 @@ const Editor = (() => {
       if (e.code === 'KeyN') { if (!e.repeat) pushUndo(); geoHostile(); e.preventDefault(); return; }
       if (e.code === 'KeyF') { if (!e.repeat) pushUndo(); geoDoor(); e.preventDefault(); return; }
       if (e.code === 'KeyH') { if (!e.repeat) pushUndo(); geoToggleSolid(); e.preventDefault(); return; }
-      if (e.code === 'KeyR') {                                 // riser (down-step): [ ] prefers the soffit when a wall
-        if (!e.repeat) pushUndo();                              // has both, so this is the only way to reach the riser then
-        const wallHit = pickGeoWall();
-        if (wallHit && wallStepInfo(wallHit).down) geoWallStepFloorTex(1); else status('NO RISER ON THIS WALL.');
-        e.preventDefault(); return;
-      }
       if (e.code === 'KeyP') { if (!e.repeat) pushUndo(); geoWallDecal(); e.preventDefault(); return; }   // mount/cycle a sprite on the wall, poster-style
       const favIdx = FAV_KEYS.indexOf(e.code);
-      if (favIdx >= 0) { if (!e.repeat) { if (sh) favSave(favIdx); else favApply(favIdx); } e.preventDefault(); return; }
+      if (favIdx >= 0) { if (!e.repeat) { if (e.ctrlKey) favSave(favIdx, sh); else favApply(favIdx, sh); } e.preventDefault(); return; }
     }
     // works on either a grid or vector level — toggles whether a placed entity
     // blocks movement, independent of any sector/wall sculpting
     if (e.code === 'KeyJ') { if (!e.repeat) pushUndo(); geoToggleEntSolid(); e.preventDefault(); return; }
-    if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+    if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyC'].includes(e.code)) {
       pkeys[e.code] = true; e.preventDefault();
     }
     if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') pkeys[e.code] = true;   // tracked for the live floor/ceiling highlight
@@ -1510,16 +1598,16 @@ const Editor = (() => {
     pcur.cy = Math.floor((e.clientY - r.top) / r.height * Engine.H);
   }
   pcanvas.addEventListener('mousemove', updatePcur);
-  pcanvas.addEventListener('mousedown', e => { pdrag = true; plx = e.clientX; ply = e.clientY; updatePcur(e); });
+  pcanvas.addEventListener('mousedown', e => { if (texPaletteOpen) return; pdrag = true; plx = e.clientX; ply = e.clientY; updatePcur(e); });
   window.addEventListener('mouseup', () => { pdrag = false; });
   window.addEventListener('mousemove', e => {
-    if (!pdrag || !previewOn) return;
+    if (!pdrag || !previewOn || texPaletteOpen) return;
     cam.a += (e.clientX - plx) * 0.005;
     cam.pitch = Math.max(-70, Math.min(70, cam.pitch - (e.clientY - ply) * 0.4));
     plx = e.clientX; ply = e.clientY;
   });
   pcanvas.addEventListener('wheel', e => {                    // scroll = cycle texture on whatever you're aiming at
-    if (!previewOn || previewCompiled) return;
+    if (!previewOn || previewCompiled || texPaletteOpen) return;
     e.preventDefault();
     pushUndo(); cycleTex(e.deltaY < 0 ? +1 : -1, e.shiftKey);
   }, { passive: false });

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>LAIR ARCHITECT &mdash; CLICK &amp; DAGGER</title>
-<link rel="stylesheet" href="editor.css?v=11">
+<link rel="stylesheet" href="editor.css?v=12">
 </head>
 <body>
 <div id="wrap">
@@ -19,8 +19,12 @@
         <h2>WALLS &amp; DOORS</h2>
         <div id="tiles" class="tools"></div>
       </div>
-      <h2>PERSONNEL &amp; PROPS</h2>
-      <div id="entsPal" class="tools"></div>
+      <h2>PERSONNEL</h2>
+      <div id="personnelPal" class="tools"></div>
+      <h2>PROPS</h2>
+      <div id="propsPal" class="tools"></div>
+      <h2>INVENTORY ITEMS</h2>
+      <div id="itemsPal" class="tools"></div>
       <p class="hint"><b>[</b> <b>]</b> cycles which one you're placing.</p>
 
       <div class="gridtool">
@@ -76,8 +80,12 @@
         <canvas id="pcanvas" width="640" height="360"></canvas>
         <div id="ptarget"></div>
         <div id="favbar"></div>
+        <div id="texpalette" hidden>
+          <div class="texpalette-head">TEXTURES <span class="hint">click one to apply &middot; ESC to cancel &middot; hold Shift when pressing \ for the soffit over the riser</span></div>
+          <div id="texpaletteGrid" class="tools"></div>
+        </div>
         <div id="pcontrols"><b>WASD</b> move &nbsp;·&nbsp; <b>ARROWS</b>/<b>DRAG</b> look &nbsp;·&nbsp;
-        sector: <b>PgUp</b>/<b>PgDn</b> raise/lower floor (<b>Shift</b> = ceiling) &nbsp;·&nbsp; <b>,</b> <b>.</b> slope &nbsp;·&nbsp; <b>[</b> <b>]</b>/<b>scroll</b> texture &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply favorite &nbsp;·&nbsp; <b>Shift</b>+<b>1</b>-<b>9</b>/<b>0</b> save favorite &nbsp;·&nbsp; <b>ESC</b> map
+        sector: <b>PgUp</b>/<b>PgDn</b> raise/lower floor (<b>Shift</b> = ceiling) &nbsp;·&nbsp; <b>,</b> <b>.</b> slope &nbsp;·&nbsp; <b>[</b> <b>]</b>/<b>scroll</b> texture (Shift = soffit over riser) &nbsp;·&nbsp; <b>\</b> texture palette &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply favorite &nbsp;·&nbsp; <b>Ctrl</b>+<b>1</b>-<b>9</b>/<b>0</b> save favorite &nbsp;·&nbsp; <b>ESC</b> map
         &nbsp;·&nbsp; cyan glow = the surface you're about to edit</div>
       </div>
       <div id="gridscroll"><canvas id="grid"></canvas></div>
@@ -101,8 +109,8 @@
           <option value="3.1415927">WEST</option>
         </select>
       </div>
-      <h2>MISSION CHECK</h2>
-      <ul id="checks"></ul>
+      <h2>WEAPONS &amp; POWER-UPS</h2>
+      <div id="wpnPal" class="tools"></div>
       <h2>MAP SIZE</h2>
       <div class="row">
         <input id="mw" type="number" min="8" max="48" value="24"> &times;
@@ -113,8 +121,6 @@
       <div class="row">
         <label><input id="startblown" type="checkbox"> Start mission with cover already BLOWN</label>
       </div>
-      <p class="hint">Off = start Undercover (henchmen ignore you until you fire, shoot a civilian,
-      or cross into a room tagged Hostile — <b>N</b> in the 3D preview). On = combat from the first frame.</p>
       <h2>FILE</h2>
       <div id="filebtns">
         <button id="save">SAVE TO BROWSER</button>
@@ -124,16 +130,12 @@
         <button id="loaddefault">LOAD PLAZA VIEJA</button>
         <button id="newmap">NEW BLANK MAP</button>
       </div>
-      <p class="hint">LEFT-DRAG paints. RIGHT-CLICK erases (entity first, then wall).
-      Placing an entity or the spawn clears the wall under it.
-      The blast door needs the full chain: 004's picks &rarr; desk &rarr; punch card,
-      tube &rarr; mainframe &rarr; power.</p>
     </aside>
   </div>
 </div>
 <input type="file" id="filein" accept=".json,application/json" hidden>
-<script src="js/world.js?v=60"></script>
+<script src="js/world.js?v=61"></script>
 <script src="js/engine.js?v=41"></script>
-<script src="js/editor.js?v=62"></script>
+<script src="js/editor.js?v=69"></script>
 </body>
 </html>
