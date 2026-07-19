@@ -290,7 +290,7 @@ const Adventure = (() => {
       case 'easel': return flags.portraitMade
         ? (flags.gotPortrait ? 'The easel, canvas bare again — you already took the portrait.' : 'A finished portrait on the easel, uncannily accurate. Worth taking.')
         : 'An artist\'s tripod easel, blank canvas waiting for a subject.';
-      case 'headshot': return 'A studio headshot — cover-issue, unsmiling, in your best light. An artist could work from this.';
+      case 'headshot': return 'An old publicity photograph — the Matron in her opera days, luminous, every inch the star. An artist could work from this.';
       case 'metroticket': return 'A single Métro ticket. One ride, one way.';
       case 'fabergeegg': return flags.hasEgg
         ? 'The case stands empty. You already have what you came for.'
@@ -401,8 +401,8 @@ const Adventure = (() => {
       case 'headshot':
         if (inv.some(i => i.id === 'headshot')) return 'You already have it.';
         World.removeEnt(e);
-        addItem('headshot', 'HEADSHOT');
-        return 'You pocket your own headshot. Vain, perhaps, but it may buy you a favor.';
+        addItem('headshot', "MATRON'S HEADSHOT");
+        return "You pocket the old publicity photo. An artist could paint quite a flattering portrait from this.";
       case 'metroticket':
         if (inv.some(i => i.id === 'ticket')) return 'You already have it.';
         World.removeEnt(e);
@@ -637,9 +637,11 @@ const Adventure = (() => {
       if (e.dead) return 'There is nothing left to do here.';
       if (selected === 'headshot' && !flags.portraitMade) {
         flags.portraitMade = true;
+        flags.gotPortrait = true;
         removeItem('headshot');
+        addItem('portrait', 'PORTRAIT');
         Sfx.pick();
-        return 'She studies the headshot, charcoal already moving. “Twenty minutes,” she says. “Don\'t rush genius.”';
+        return '“Now THIS is a face worth painting.” He works fast, charcoal then color, and hands you a portrait of the Matron — uncannily flattering.';
       }
       if (!flags.metArtist) {
         flags.metArtist = true;
@@ -649,9 +651,8 @@ const Adventure = (() => {
         flags.gotCityscape = true;
         addItem('cityscape', 'CITYSCAPE PAINTING');
         Sfx.pick();
-        return '“Ten francs for a view of the Seine.” She rolls a canvas and hands it over. “Sold.”';
+        return '“Ten francs for a view of the Seine.” He rolls a canvas and hands it over. “Sold.”';
       }
-      if (flags.portraitMade) return '“Patience. Genius takes time.” She keeps working.';
       return '“Something else, or are you just admiring the view?”';
     }
     if (e.kind === 'matron') {
@@ -660,8 +661,9 @@ const Adventure = (() => {
         if (flags.galleryAccess) return '“Yes, yes, you\'re already welcome here.”';
         flags.galleryAccess = true;
         removeItem('portrait');
+        e.behavior = 'wander';                      // she steps away from the doorway, gallery now open to you
         Sfx.power();
-        return '“What a talent!” she says, studying the portrait at arm\'s length. “Welcome to my gallery.”';
+        return '“What a talent — he\'s captured me exactly.” She steps aside, beaming. “Welcome to my gallery.”';
       }
       if (selected === 'cityscape') return '“Talentless hack!” She waves the painting away without a second glance.';
       if (!flags.metMatron) {

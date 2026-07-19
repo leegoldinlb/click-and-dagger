@@ -16,7 +16,7 @@
 // look-up / look-down (pitch).  Output is a 320x180 framebuffer scaled up.
 // ---------------------------------------------------------------------------
 const Engine = (() => {
-  const W = 320, H = 180;
+  const W = 640, H = 360;
   const DW = 640, DH = 360;
   const MAXD = 44;
 

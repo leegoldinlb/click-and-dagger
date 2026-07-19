@@ -63,6 +63,8 @@ const Game = (() => {
   const keys = {};
   const mouse = { x: -1, y: -1 };            // internal canvas coords
   let mouseDown = false;                     // held for full-auto weapons
+  let ctrlDown = false;                      // Ctrl is an alternate fire key, held for full-auto weapons — kept
+                                              // separate from mouseDown so releasing one doesn't cut off the other
 
   const hpEl = document.getElementById('hp');
   const ammoEl = document.getElementById('ammo');
@@ -128,9 +130,13 @@ const Game = (() => {
       const wi = WEAPON_KEYS.indexOf(e.code);
       if (wi >= 0) switchWeapon(WEAPON_ORDER[wi]);
       if (e.code === 'KeyF' && !e.repeat) toggleMode();   // faster than right-click for switching combat <-> adventure
+      if ((e.code === 'ControlLeft' || e.code === 'ControlRight') && G.combat) { ctrlDown = true; if (!e.repeat) shoot(); }
     }
   });
-  document.addEventListener('keyup', e => { keys[e.code] = false; });
+  document.addEventListener('keyup', e => {
+    keys[e.code] = false;
+    if (e.code === 'ControlLeft' || e.code === 'ControlRight') ctrlDown = false;
+  });
 
   document.addEventListener('mousemove', e => {
     if (G.combat) {
@@ -286,7 +292,7 @@ const Game = (() => {
 
     G.fireT = Math.max(0, G.fireT - dt);
     p.hurtT = Math.max(0, p.hurtT - dt);
-    if (mouseDown && G.combat && WEAPONS[G.weapon].auto) shoot();   // full-auto: hold LMB, gated by the same cooldown as any other shot
+    if ((mouseDown || ctrlDown) && G.combat && WEAPONS[G.weapon].auto) shoot();   // full-auto: hold LMB or Ctrl, gated by the same cooldown as any other shot
 
     // enemies move at a crawl while you're pointing and clicking
     const edt = G.combat ? dt : dt * 0.25;

@@ -173,7 +173,7 @@ const Editor = (() => {
     { kind: 'birdcage', name: 'BIRD CAGE', spr: 'birdcage' },
     { kind: 'matron', name: 'THE MATRON', spr: 'matron' },
     { kind: 'streetartist', name: 'STREET ARTIST', spr: 'streetartist' },
-    { kind: 'headshot', name: 'HEADSHOT', spr: 'headshot' },
+    { kind: 'headshot', name: "MATRON'S HEADSHOT", spr: 'headshot' },
     { kind: 'metroticket', name: 'METRO TICKET', spr: 'metroticket' },
     { kind: 'fabergeegg', name: 'FABERGÉ EGG', spr: 'fabergeegg' },
     { kind: 'laundrylady', name: 'LAUNDRY LADY', spr: 'laundrylady' },
@@ -1175,7 +1175,10 @@ const Editor = (() => {
   // brick — drawn once (no tiling) over the plain wall texture. A curated list,
   // not every SPR kind, since most (henchmen, plants, furniture) don't read as
   // wall-mountable images; the paper/board props do.
-  const DECAL_KINDS = [null, 'wallmap', 'corkboard', 'wallclock', 'telegram', 'personnelfile', 'businesscard', 'letter'];
+  const DECAL_KINDS = [null, 'wallmap', 'corkboard', 'wallclock', 'telegram', 'personnelfile', 'businesscard', 'letter',
+    'decalHavanaTravel', 'decalWantedSpanish', 'decalRugWall', 'decalBrassPlaque', 'decalGalleryPoster', 'decalMetroMap',
+    'decalFamilyPhoto', 'decalForSale', 'decalPropagandaPoster', 'decalPravda', 'decalWantedTreason', 'decalCampaignPoster',
+    'decalBroadwayPoster', 'decalSubwayMap', 'decalCouplets', 'decalKungFuPoster'];
   function geoWallDecal() {
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
     const sec = geo.sectors[hit.s];
@@ -1207,6 +1210,18 @@ const Editor = (() => {
     ent.solid = !ent.solid;
     if (idx >= 0 && lv.ents[idx]) lv.ents[idx].solid = ent.solid;
     status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + (ent.solid ? 'SOLID' : 'WALK-THROUGH'));
+  }
+  // toggle WANDER ⇄ STATIONARY on the civilian/NPC under the crosshair — overrides
+  // that kind's baseline default (most civilians wander; a few, like the Matron or
+  // Street Artist, default to standing put) per placed copy, same idea as J above.
+  function geoToggleEntWander() {
+    const r = pickEntNear();
+    if (!r) { status('LOOK AT A CHARACTER.'); return; }
+    const ent = r.ent, idx = World.ents.indexOf(ent);
+    if (!('behavior' in ent)) { status((ent.name || ent.kind || 'OBJECT').toUpperCase() + " DOESN'T WANDER."); return; }
+    ent.behavior = ent.behavior === 'wander' ? 'stationary' : 'wander';
+    if (idx >= 0 && lv.ents[idx]) lv.ents[idx].behavior = ent.behavior;
+    status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + ent.behavior.toUpperCase());
   }
   function cycleTex(dir, shift) {                              // [ ] / wheel: wall (Shift = soffit over riser) else floor/ceil
     const t = texTarget(shift);
@@ -1433,7 +1448,8 @@ const Editor = (() => {
     const entHit = pickEntNear();
     if (entHit) {
       el.textContent = '● ' + (entHit.ent.name || entHit.ent.kind).toUpperCase() + '   ' +
-        (entHit.ent.solid ? 'SOLID' : 'WALK-THROUGH') + '   J to toggle';
+        (entHit.ent.solid ? 'SOLID' : 'WALK-THROUGH') + '   J to toggle' +
+        ('behavior' in entHit.ent ? '   ·   ' + entHit.ent.behavior.toUpperCase() + '   B to toggle' : '');
       el.style.display = 'block';
       Engine.setHighlight(null);
       return;
@@ -1524,8 +1540,8 @@ const Editor = (() => {
     b.classList.add('active'); b.innerHTML = '&#9638; MAP EDITOR';
     document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
     document.getElementById('pcontrols').innerHTML = previewCompiled
-      ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>ESC</b> map'
-      : '<b>WASD</b> move &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> / <b>\\</b> tex — wall if aiming close, else floor (Shift ceil; on a stepped wall Shift picks the SOFFIT over the RISER) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky (<b>Shift</b>+<b>K</b> which sky) &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>P</b> mount a sprite on a wall (poster) &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply favorite (Shift = soffit) &nbsp;·&nbsp; <b>Ctrl</b>+<b>1</b>-<b>9</b>/<b>0</b> save favorite &nbsp;·&nbsp; <b>ESC</b> map';
+      ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>B</b> character wander ⇄ stationary &nbsp;·&nbsp; <b>ESC</b> map'
+      : '<b>WASD</b> move &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> / <b>\\</b> tex — wall if aiming close, else floor (Shift ceil; on a stepped wall Shift picks the SOFFIT over the RISER) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky (<b>Shift</b>+<b>K</b> which sky) &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>P</b> mount a sprite on a wall (poster) &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>B</b> character wander ⇄ stationary &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply favorite (Shift = soffit) &nbsp;·&nbsp; <b>Ctrl</b>+<b>1</b>-<b>9</b>/<b>0</b> save favorite &nbsp;·&nbsp; <b>ESC</b> map';
     document.getElementById('favbar').style.display = previewCompiled ? 'none' : 'flex';
     renderFavbar();
     previewOn = true; plast = performance.now();
@@ -1586,6 +1602,7 @@ const Editor = (() => {
     // works on either a grid or vector level — toggles whether a placed entity
     // blocks movement, independent of any sector/wall sculpting
     if (e.code === 'KeyJ') { if (!e.repeat) pushUndo(); geoToggleEntSolid(); e.preventDefault(); return; }
+    if (e.code === 'KeyB') { if (!e.repeat) pushUndo(); geoToggleEntWander(); e.preventDefault(); return; }
     if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyC'].includes(e.code)) {
       pkeys[e.code] = true; e.preventDefault();
     }
