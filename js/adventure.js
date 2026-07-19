@@ -349,7 +349,9 @@ const Adventure = (() => {
         return 'They are a person, not a prop. Leave them be.';
       case 'desk': return 'It’s a desk. Even you couldn’t expense that.';
       case 'safe': return 'Bolted to the wall. You are a spy, not a mover.';
-      case 'book': return 'You have what you need from it. No sense hauling a library.';
+      case 'book': return flags.knowsCombo
+        ? 'You have what you need from it. No sense hauling a library.'
+        : 'Just an old book. Might be worth a closer look before you leave it.';
       case 'medkit': case 'ammo': case 'wpn_sterling': case 'wpn_ar7': case 'wpn_laser': case 'wpn_golden': case 'disguise':
         return 'Just walk over it. This is still a shooter.';
       case 'plant': case 'royalpalm': case 'bananaplant': case 'bougainvillea': case 'fern': case 'cactus': case 'hedge':

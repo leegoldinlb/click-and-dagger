@@ -774,6 +774,27 @@ const World = (() => {
         "kind": "fabergeegg",
         "x": 33.8,
         "y": 4.59
+      },
+      {
+        "kind": "defector",
+        "x": 23.26,
+        "y": 11.63,
+        "behavior": "wander"
+      },
+      {
+        "kind": "watch",
+        "x": 15.17,
+        "y": 10.06
+      },
+      {
+        "kind": "letter",
+        "x": 27.66,
+        "y": 21.46
+      },
+      {
+        "kind": "telegram",
+        "x": 19.4,
+        "y": 19.91
       }
     ],
     "blown": false,
@@ -1101,7 +1122,7 @@ const World = (() => {
         },
         {
           "x": 27,
-          "y": 13
+          "y": 12.5
         },
         {
           "x": 27,
@@ -1109,7 +1130,7 @@ const World = (() => {
         },
         {
           "x": 28,
-          "y": 13
+          "y": 12.5
         },
         {
           "x": 28,
@@ -1466,6 +1487,38 @@ const World = (() => {
         {
           "x": 14,
           "y": 5
+        },
+        {
+          "x": 17,
+          "y": 10
+        },
+        {
+          "x": 17,
+          "y": 11
+        },
+        {
+          "x": 16.5,
+          "y": 10
+        },
+        {
+          "x": 16.5,
+          "y": 11
+        },
+        {
+          "x": 15.5,
+          "y": 10.5
+        },
+        {
+          "x": 14.5,
+          "y": 10.5
+        },
+        {
+          "x": 14.5,
+          "y": 9.5
+        },
+        {
+          "x": 16.5,
+          "y": 9.5
         }
       ],
       "sectors": [
@@ -1510,6 +1563,8 @@ const World = (() => {
             2,
             130,
             1,
+            173,
+            172,
             159,
             158,
             169,
@@ -1565,6 +1620,8 @@ const World = (() => {
             "stucco",
             "stucco",
             "marble",
+            "stucco",
+            null,
             "stucco",
             null,
             "stucco"
@@ -1701,7 +1758,7 @@ const World = (() => {
             null,
             "stucco",
             null,
-            null,
+            "stucco",
             "brick"
           ],
           "wallDecal": [
@@ -2558,6 +2615,42 @@ const World = (() => {
           ],
           "floor": 0.1,
           "ceil": 1.8,
+          "floorTex": "carpet",
+          "ceilTex": "ceiltile",
+          "sky": false,
+          "win": false,
+          "hostile": false,
+          "texScale": 1,
+          "parent": -1
+        },
+        {
+          "loop": [
+            173,
+            175,
+            174,
+            172
+          ],
+          "floor": 0,
+          "ceil": 1,
+          "floorTex": "carpet",
+          "ceilTex": "ceiltile",
+          "sky": false,
+          "win": false,
+          "hostile": false,
+          "texScale": 1,
+          "parent": -1
+        },
+        {
+          "loop": [
+            175,
+            176,
+            177,
+            178,
+            179,
+            174
+          ],
+          "floor": 0,
+          "ceil": 1,
           "floorTex": "carpet",
           "ceilTex": "ceiltile",
           "sky": false,
