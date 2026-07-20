@@ -9295,6 +9295,7 @@ const World = (() => {
     double: 'assets/sprites/double.png?v=1',
     doubleSuited: 'assets/sprites/doubleSuited.png?v=1',
     doubleDressed: 'assets/sprites/doubleDressed.png?v=1',
+    eiffeltower: 'assets/sprites/eiffeltower.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash' };  // hit-flash white silhouettes
                                                                                           // derived from these — regenerate
