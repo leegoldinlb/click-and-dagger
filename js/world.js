@@ -2813,6 +2813,7 @@ const World = (() => {
   let isCustom = false;
   let authoredGeo = null;                          // vector geo authored in the editor (source of truth when present)
   let startBlown = false;                          // does this level start with Cover already blown? (main.js reads at boot)
+  let musicUndercover = 'undercover', musicCoverBlown = 'coverblown';   // per-mission music track keys (main.js reads at boot; see js/music.js)
 
   const charAt = (x, y) => (x < 0 || y < 0 || x >= MW || y >= MH) ? '%' : grid[y][x];
   const get = (x, y) => CH[charAt(x, y)] || 0;    // numeric wall id (0 = walkable floor)
@@ -8885,6 +8886,8 @@ const World = (() => {
       })),
     } : null;
     startBlown = !!level.blown;
+    musicUndercover = level.musicUndercover || 'undercover';
+    musicCoverBlown = level.musicCoverBlown || 'coverblown';
     geoRev++;                                     // new geometry → callers recompile
   }
 
@@ -8905,5 +8908,7 @@ const World = (() => {
     ents, removeEnt, setPowered, spawnFx, FX_LIFE,
     spawn, load, defaultLevel, get isCustom() { return isCustom; }, get geoRev() { return geoRev; },
     get startBlown() { return startBlown; },
+    get musicUndercover() { return musicUndercover; },
+    get musicCoverBlown() { return musicCoverBlown; },
   };
 })();

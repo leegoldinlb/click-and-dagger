@@ -110,6 +110,7 @@ const Game = (() => {
     if (G.blown) return false;
     G.blown = true;
     Sfx.alarm();
+    Music.setBlown(true);
     return true;
   }
 
@@ -398,6 +399,7 @@ const Game = (() => {
           for (const h of World.ents) {
             if (HOSTILE[h.kind] && !h.dead) { h.aggro = false; h.atkT = 0; }
           }
+          Music.setBlown(false);
           Adventure.msg('Glasses, nose, moustache, a tilted fedora — you become nobody in particular. Cover regained.', 4);
         } else {
           Adventure.msg('A disguise kit. You already look like nobody in particular.');
@@ -454,6 +456,7 @@ const Game = (() => {
     if (G.over) return;
     G.over = true;
     document.exitPointerLock();
+    Music.stop();
     endOverlay('MISSION FAILED', '',
       'Volkov’s men stand over you in the plaza while a trio plays on, unbothered.',
       '[ INSERT NEXT AGENT ]');
@@ -463,6 +466,7 @@ const Game = (() => {
     if (G.over) return;
     G.over = true;
     document.exitPointerLock();
+    Music.stop();
     endOverlay('MISSION FAILED', '',
       'Three bodies in the plaza that were never on Volkov’s payroll. London does not send its regards.',
       '[ INSERT NEXT AGENT ]');
@@ -472,6 +476,7 @@ const Game = (() => {
     if (G.over) return;
     G.over = true;
     document.exitPointerLock();
+    Music.stop();
     endOverlay('MISSION FAILED', '',
       'The defector never made it out. Whatever he knew, it dies with him — and so does London’s trust in you.',
       '[ INSERT NEXT AGENT ]');
@@ -481,6 +486,7 @@ const Game = (() => {
     if (G.over) return;
     G.over = true;
     document.exitPointerLock();
+    Music.stop();
     endOverlay('MISSION FAILED', '',
       'Wrong wire. Dr. Z never got his prize, and neither did you.',
       '[ INSERT NEXT AGENT ]');
@@ -491,6 +497,7 @@ const Game = (() => {
     G.over = true;
     document.exitPointerLock();
     Sfx.win();
+    Music.stop();
     const secs = Math.round((performance.now() - G.t0) / 1000);
     endOverlay('MISSION COMPLETE', 'win',
       'The launch pulls away from the dock into Havana bay. On the malecón, Volkov screams into a red telephone.<br><br>' +
@@ -513,6 +520,9 @@ const Game = (() => {
 
   document.getElementById('startbtn').addEventListener('click', () => {
     Sfx.unlock();
+    Music.unlock();
+    Music.setTracks(World.musicUndercover, World.musicCoverBlown);
+    Music.setBlown(G.blown);
     G.started = true;
     G.t0 = performance.now();
     overlay.classList.add('hidden');

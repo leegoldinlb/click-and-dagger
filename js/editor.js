@@ -195,7 +195,7 @@ const Editor = (() => {
   // ---- state ----
   // fh/ch: per-cell floor/ceil height overrides (null = material default)
   // stex/ctex: per-cell surface(floor/wall) and ceiling texture overrides (null = default)
-  const lv = { w: 24, h: 24, cells: [], fh: [], ch: [], stex: [], ctex: [], fsx: [], fsy: [], spawn: { x: 2.5, y: 2.5, a: 0 }, ents: [], blown: false };
+  const lv = { w: 24, h: 24, cells: [], fh: [], ch: [], stex: [], ctex: [], fsx: [], fsy: [], spawn: { x: 2.5, y: 2.5, a: 0 }, ents: [], blown: false, musicUndercover: 'undercover', musicCoverBlown: 'coverblown' };
   let tool = { t: 'tile', v: '#' };
   let entBtns = [];                                              // ENTS-index → palette button, for keyboard/wheel cycling
   const hset = { f: 0.0, c: 1.0, applyF: true, applyC: false };  // height-tool settings
@@ -267,6 +267,10 @@ const Editor = (() => {
     lv.ents = json.ents.map(e => ({ ...e }));                     // keep extra fields (e.g. civilian `behavior`)
     lv.blown = !!json.blown;
     document.getElementById('startblown').checked = lv.blown;
+    lv.musicUndercover = json.musicUndercover || 'undercover';
+    lv.musicCoverBlown = json.musicCoverBlown || 'coverblown';
+    document.getElementById('musicUndercover').value = lv.musicUndercover;
+    document.getElementById('musicCoverBlown').value = lv.musicCoverBlown;
     geo.verts = (json.geo && json.geo.verts) ? json.geo.verts.map(v => ({ x: v.x, y: v.y })) : [];
     geo.sectors = (json.geo && json.geo.sectors) ? json.geo.sectors.map(s => ({
       loop: s.loop.slice(), floor: s.floor || 0, ceil: s.ceil == null ? 1 : s.ceil,
@@ -300,6 +304,8 @@ const Editor = (() => {
       spawn: { x: lv.spawn.x, y: lv.spawn.y, a: lv.spawn.a },
       ents: lv.ents.map(e => ({ ...e })),
       blown: !!lv.blown,
+      musicUndercover: lv.musicUndercover,
+      musicCoverBlown: lv.musicCoverBlown,
     };
     if (anyH) {
       out.floor = lv.fh.map(r => r.map(v => v == null ? null : v));
@@ -882,6 +888,14 @@ const Editor = (() => {
     } catch (err) { status('IMPORT FAILED: ' + String(err.message || err).toUpperCase()); }
   });
   document.getElementById('startblown').addEventListener('change', e => { lv.blown = e.target.checked; });
+  (function initMusicPals() {
+    const ucSel = document.getElementById('musicUndercover'), cbSel = document.getElementById('musicCoverBlown');
+    for (const t of MUSIC_TRACKS.undercover) ucSel.appendChild(new Option(t.name, t.key));
+    for (const t of MUSIC_TRACKS.coverblown) cbSel.appendChild(new Option(t.name, t.key));
+    ucSel.value = lv.musicUndercover; cbSel.value = lv.musicCoverBlown;
+    ucSel.addEventListener('change', e => { lv.musicUndercover = e.target.value; });
+    cbSel.addEventListener('change', e => { lv.musicCoverBlown = e.target.value; });
+  })();
   document.getElementById('newmap').addEventListener('click', () => {
     const w = Math.max(8, Math.min(48, parseInt(document.getElementById('mw').value) || 24));
     const h = Math.max(8, Math.min(48, parseInt(document.getElementById('mh').value) || 24));
