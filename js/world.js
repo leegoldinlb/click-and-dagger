@@ -6889,6 +6889,132 @@ const World = (() => {
   });
 
   // ---------------------------------------------------------------------------
+  // PARIS LANDMARKS — big background scenery silhouettes, meant to be placed
+  // large (scale it way up with the 3D-preview +/- keys) and seen from across
+  // a plaza or over the rooftops.
+  // ---------------------------------------------------------------------------
+  SPR.eiffeltower = outlined(g => {                                   // the Eiffel Tower — iron lattice silhouette
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 61, 15, 2.6, 0, 0, 7); g.fill();
+    const ig = g.createLinearGradient(0, 2, 0, 60);
+    ig.addColorStop(0, '#8a6a48'); ig.addColorStop(1, '#4a3420');
+    g.fillStyle = ig;
+    g.beginPath(); g.moveTo(9, 58); g.lineTo(27, 27); g.lineTo(30, 27); g.lineTo(19, 58); g.closePath(); g.fill();     // near leg
+    g.beginPath(); g.moveTo(55, 58); g.lineTo(37, 27); g.lineTo(34, 27); g.lineTo(45, 58); g.closePath(); g.fill();    // far leg
+    g.fillRect(22, 25, 20, 3);                                                                                          // first platform
+    g.beginPath(); g.moveTo(25, 25); g.lineTo(29, 9); g.lineTo(35, 9); g.lineTo(39, 25); g.closePath(); g.fill();       // mid tower
+    g.fillRect(28.5, 7.5, 7, 2.2);                                                                                      // second platform
+    g.beginPath(); g.moveTo(30.5, 7.5); g.lineTo(31.6, 2); g.lineTo(32.4, 2); g.lineTo(33.5, 7.5); g.closePath(); g.fill(); // spire
+    g.strokeStyle = 'rgba(20,14,8,0.45)'; g.lineWidth = 0.8;                                                             // lattice cross-braces
+    for (let i = 0; i < 5; i++) {
+      const y0 = 30 + i * 5.5, xl = 9 + (58 - y0) / 31 * 18, xr = 55 - (58 - y0) / 31 * 18;
+      g.beginPath(); g.moveTo(xl, y0); g.lineTo(xr, y0); g.stroke();
+    }
+    g.fillStyle = 'rgba(255,220,160,0.08)'; g.fillRect(30, 2, 4, 56);
+  });
+
+  SPR.arcdetriomphe = outlined(g => {                                  // the Arc de Triomphe — pale stone triumphal arch
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 61, 22, 3, 0, 0, 7); g.fill();
+    const sg = g.createLinearGradient(4, 4, 60, 58);
+    sg.addColorStop(0, '#d8cfb4'); sg.addColorStop(1, '#a89a78');
+    g.fillStyle = sg; g.fillRect(4, 6, 56, 52);
+    g.strokeStyle = 'rgba(80,68,44,0.3)'; g.lineWidth = 0.8;
+    for (let y = 6; y < 58; y += 6) { g.beginPath(); g.moveTo(4, y); g.lineTo(60, y); g.stroke(); }         // coursed stone
+    const og = g.createLinearGradient(20, 20, 44, 58);
+    og.addColorStop(0, '#3a3428'); og.addColorStop(1, '#161410');
+    g.fillStyle = og; g.beginPath();                                                                          // dark arched opening
+    g.moveTo(21, 58); g.lineTo(21, 32); g.quadraticCurveTo(21, 21.5, 32, 21.5); g.quadraticCurveTo(43, 21.5, 43, 32); g.lineTo(43, 58); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(60,52,34,0.6)'; g.lineWidth = 1.4; g.beginPath();
+    g.moveTo(20, 32); g.quadraticCurveTo(20, 20, 32, 20); g.quadraticCurveTo(44, 20, 44, 32); g.stroke();
+    g.fillStyle = 'rgba(140,120,80,0.4)'; g.fillRect(4, 4, 56, 4);                                          // top cornice band
+    bevel(g, 4, 4, 56, 4, 'rgba(255,250,230,0.2)', 'rgba(0,0,0,0.25)');
+    g.fillStyle = 'rgba(90,78,52,0.5)'; g.fillRect(8, 30, 8, 22); g.fillRect(48, 30, 8, 22);                // relief-carving panels
+    g.strokeStyle = 'rgba(60,52,34,0.4)'; g.lineWidth = 0.6; g.strokeRect(8, 30, 8, 22); g.strokeRect(48, 30, 8, 22);
+    speck(g, 40, 'rgba(60,52,34,0.1)');
+    bevel(g, 4, 6, 56, 52, 'rgba(255,250,230,0.12)', 'rgba(40,32,15,0.25)');
+  });
+
+  SPR.notredame = outlined(g => {                                      // Notre-Dame — twin Gothic towers + rose window
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 61, 22, 3, 0, 0, 7); g.fill();
+    const sg = g.createLinearGradient(2, 2, 62, 58);
+    sg.addColorStop(0, '#c9c0a8'); sg.addColorStop(1, '#948a6c');
+    g.fillStyle = sg;
+    g.fillRect(4, 8, 16, 50); g.fillRect(44, 8, 16, 50);                                                    // twin towers
+    g.fillRect(16, 20, 32, 38);                                                                              // central facade
+    g.strokeStyle = 'rgba(70,60,40,0.3)'; g.lineWidth = 0.7;
+    for (let y = 10; y < 56; y += 6) { g.beginPath(); g.moveTo(4, y); g.lineTo(60, y); g.stroke(); }
+    g.fillStyle = sg; for (const tx of [4, 8, 12, 16, 44, 48, 52, 56]) g.fillRect(tx, 5, 2.6, 4);           // tower crenellations
+    const rg = g.createRadialGradient(32, 32, 1, 32, 32, 9);                                                 // rose window
+    rg.addColorStop(0, '#e0c840'); rg.addColorStop(0.5, '#c94848'); rg.addColorStop(1, '#2a3a6a');
+    g.fillStyle = rg; g.beginPath(); g.arc(32, 32, 9, 0, 7); g.fill();
+    g.strokeStyle = '#3a3020'; g.lineWidth = 1;
+    for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283; g.beginPath(); g.moveTo(32, 32); g.lineTo(32 + Math.cos(a) * 9, 32 + Math.sin(a) * 9); g.stroke(); }
+    g.beginPath(); g.arc(32, 32, 9, 0, 7); g.stroke();
+    g.fillStyle = 'rgba(30,26,18,0.7)';                                                                       // three portals
+    for (const cx of [22, 32, 42]) { g.beginPath(); g.moveTo(cx - 4, 58); g.lineTo(cx - 4, 50); g.quadraticCurveTo(cx - 4, 45, cx, 45); g.quadraticCurveTo(cx + 4, 45, cx + 4, 50); g.lineTo(cx + 4, 58); g.closePath(); g.fill(); }
+    speck(g, 40, 'rgba(70,60,40,0.1)');
+    bevel(g, 4, 8, 56, 50, 'rgba(255,250,230,0.1)', 'rgba(30,24,10,0.25)');
+  });
+
+  SPR.louvrepyramid = outlined(g => {                                  // the Louvre glass pyramid, courtyard base
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 60, 22, 3, 0, 0, 7); g.fill();
+    g.fillStyle = '#8a8474'; g.fillRect(2, 52, 60, 8);                                                       // stone courtyard base
+    bevel(g, 2, 52, 60, 8, 'rgba(255,250,230,0.15)', 'rgba(0,0,0,0.3)');
+    const glass = g.createLinearGradient(10, 14, 54, 52);
+    glass.addColorStop(0, '#a8d0d8'); glass.addColorStop(0.5, '#4a7480'); glass.addColorStop(1, '#1c2e34');
+    g.fillStyle = glass;
+    g.beginPath(); g.moveTo(32, 8); g.lineTo(56, 52); g.lineTo(8, 52); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(20,20,18,0.6)'; g.lineWidth = 1;                                                    // steel lattice frame
+    for (let i = 1; i < 6; i++) {
+      const t = i / 6;
+      g.beginPath(); g.moveTo(32 - (32 - 8) * t, 8 + (52 - 8) * t); g.lineTo(32 + (56 - 32) * t, 8 + (52 - 8) * t); g.stroke();
+    }
+    g.beginPath(); g.moveTo(32, 8); g.lineTo(8, 52); g.moveTo(32, 8); g.lineTo(56, 52); g.moveTo(32, 8); g.lineTo(32, 52); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,0.18)'; g.beginPath(); g.moveTo(32, 8); g.lineTo(20, 40); g.lineTo(26, 40); g.closePath(); g.fill();  // sun glint facet
+    speck(g, 20, 'rgba(255,255,255,0.06)');
+  });
+
+  SPR.moulinrouge = outlined(g => {                                    // Moulin Rouge — red windmill atop the cabaret facade
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 61, 20, 3, 0, 0, 7); g.fill();
+    const bg = g.createLinearGradient(2, 30, 62, 58);
+    bg.addColorStop(0, '#3a1a1a'); bg.addColorStop(1, '#200e0e');
+    g.fillStyle = bg; g.fillRect(4, 30, 56, 28);
+    g.fillStyle = '#c9242e'; g.fillRect(4, 46, 56, 4);                                                       // red awning stripe
+    g.fillStyle = 'rgba(255,214,60,0.85)';
+    for (let i = 0; i < 6; i++) g.fillRect(8 + i * 9, 34, 5, 9);                                             // marquee bulbs / lit windows
+    g.fillStyle = '#5c3a26'; g.fillRect(27, 10, 10, 22);                                                     // windmill tower
+    g.fillStyle = '#3a2418'; g.beginPath(); g.moveTo(25, 10); g.lineTo(32, 2); g.lineTo(39, 10); g.closePath(); g.fill();
+    g.save(); g.translate(32, 12);                                                                            // sails (cross)
+    g.strokeStyle = '#c9242e'; g.lineWidth = 2.4; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-14, -14); g.lineTo(14, 14); g.moveTo(14, -14); g.lineTo(-14, 14); g.stroke();
+    g.fillStyle = 'rgba(240,230,210,0.85)';
+    for (const [dx, dy] of [[-14, -14], [14, -14], [14, 14], [-14, 14]]) { g.save(); g.translate(dx, dy); g.rotate(Math.atan2(-dy, -dx)); g.fillRect(-8, -2.4, 10, 4.8); g.restore(); }
+    g.restore();
+    g.fillStyle = '#2a1414'; g.beginPath(); g.arc(32, 12, 2.2, 0, 7); g.fill();                               // hub
+    speck(g, 30, 'rgba(0,0,0,0.2)');
+  });
+
+  SPR.sacrecoeur = outlined(g => {                                     // Sacré-Cœur — white travertine domes atop Montmartre
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 61, 22, 3, 0, 0, 7); g.fill();
+    const sg = g.createLinearGradient(2, 20, 62, 58);
+    sg.addColorStop(0, '#f0ece0'); sg.addColorStop(1, '#c8c0a8');
+    g.fillStyle = sg; g.fillRect(6, 34, 52, 24);                                                              // base structure
+    g.strokeStyle = 'rgba(120,110,88,0.3)'; g.lineWidth = 0.7;
+    for (let y = 36; y < 58; y += 6) { g.beginPath(); g.moveTo(6, y); g.lineTo(58, y); g.stroke(); }
+    g.fillStyle = sg; g.beginPath(); g.arc(32, 26, 13, Math.PI, 0); g.fill();                                 // central big dome
+    g.strokeStyle = 'rgba(150,140,110,0.3)'; g.beginPath(); g.arc(32, 26, 13, Math.PI, 0); g.stroke();
+    g.fillStyle = '#c9a227'; g.beginPath(); g.arc(32, 12, 1.8, 0, 7); g.fill();                               // gold cross finial
+    g.strokeStyle = '#c9a227'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(32, 4); g.lineTo(32, 12); g.moveTo(29, 7); g.lineTo(35, 7); g.stroke();
+    for (const cx of [14, 50]) {                                                                              // side smaller domes
+      g.fillStyle = sg; g.beginPath(); g.arc(cx, 32, 6, Math.PI, 0); g.fill();
+      g.fillStyle = '#c9a227'; g.beginPath(); g.arc(cx, 26, 1, 0, 7); g.fill();
+    }
+    g.fillStyle = 'rgba(40,36,26,0.6)'; g.beginPath();                                                        // arched entrance
+    g.moveTo(26, 58); g.lineTo(26, 48); g.quadraticCurveTo(26, 42, 32, 42); g.quadraticCurveTo(38, 42, 38, 48); g.lineTo(38, 58); g.closePath(); g.fill();
+    speck(g, 35, 'rgba(120,110,88,0.08)');
+    bevel(g, 6, 34, 52, 24, 'rgba(255,255,255,0.12)', 'rgba(80,72,54,0.2)');
+  });
+
+  // ---------------------------------------------------------------------------
   // MID-CENTURY SUBURBIA props — American backyard/driveway clutter, 1950s-60s.
   // ---------------------------------------------------------------------------
   SPR.stationwagon = outlined(g => {                                  // finned woodgrain station wagon, three-quarter rear
@@ -9472,6 +9598,12 @@ const World = (() => {
     champagnebucket: (x, y) => prop('champagnebucket', 'CHAMPAGNE BUCKET', x, y, 0.5, false),
     jukebox: (x, y) => prop('jukebox', 'JUKEBOX', x, y, 0.85, true),
     metroentrance: (x, y) => prop('metroentrance', 'METRO ENTRANCE', x, y, 1.2, true),
+    eiffeltower: (x, y) => prop('eiffeltower', 'EIFFEL TOWER', x, y, 2.4, true),
+    arcdetriomphe: (x, y) => prop('arcdetriomphe', 'ARC DE TRIOMPHE', x, y, 1.6, true),
+    notredame: (x, y) => prop('notredame', 'NOTRE-DAME', x, y, 1.8, true),
+    louvrepyramid: (x, y) => prop('louvrepyramid', 'LOUVRE PYRAMID', x, y, 1.3, true),
+    moulinrouge: (x, y) => prop('moulinrouge', 'MOULIN ROUGE', x, y, 1.3, true),
+    sacrecoeur: (x, y) => prop('sacrecoeur', 'SACRÉ-CŒUR', x, y, 1.6, true),
     // Mid-century suburbia wave
     stationwagon: (x, y) => prop('stationwagon', 'STATION WAGON', x, y, 1.3, true),
     mailboxpost: (x, y) => prop('mailboxpost', 'MAILBOX', x, y, 0.6, true),

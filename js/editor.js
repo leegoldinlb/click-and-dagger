@@ -131,6 +131,12 @@ const Editor = (() => {
     { kind: 'champagnebucket', name: 'CHAMPAGNE BUCKET', spr: 'champagnebucket' },
     { kind: 'jukebox', name: 'JUKEBOX', spr: 'jukebox' },
     { kind: 'metroentrance', name: 'METRO ENTRANCE', spr: 'metroentrance' },
+    { kind: 'eiffeltower', name: 'EIFFEL TOWER', spr: 'eiffeltower' },
+    { kind: 'arcdetriomphe', name: 'ARC DE TRIOMPHE', spr: 'arcdetriomphe' },
+    { kind: 'notredame', name: 'NOTRE-DAME', spr: 'notredame' },
+    { kind: 'louvrepyramid', name: 'LOUVRE PYRAMID', spr: 'louvrepyramid' },
+    { kind: 'moulinrouge', name: 'MOULIN ROUGE', spr: 'moulinrouge' },
+    { kind: 'sacrecoeur', name: 'SACRÉ-CŒUR', spr: 'sacrecoeur' },
     { kind: 'stationwagon', name: 'STATION WAGON', spr: 'stationwagon' },
     { kind: 'mailboxpost', name: 'MAILBOX', spr: 'mailboxpost' },
     { kind: 'bbqgrill', name: 'BBQ GRILL', spr: 'bbqgrill' },
@@ -1241,6 +1247,18 @@ const Editor = (() => {
     if (idx >= 0 && lv.ents[idx]) lv.ents[idx].behavior = ent.behavior;
     status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + ent.behavior.toUpperCase());
   }
+  // +/- : grow/shrink the placed entity under the crosshair — lets a landmark
+  // prop (or anything else) be scaled up into background scenery, or down to
+  // fit a tight spot, independent of that kind's baseline FACT scale.
+  function geoScaleEnt(dir) {
+    const r = pickEntNear();
+    if (!r) { status('LOOK AT AN OBJECT.'); return; }
+    const ent = r.ent, idx = World.ents.indexOf(ent);
+    const next = Math.max(0.15, Math.min(6, ent.scale * (dir > 0 ? 1.08 : 1 / 1.08)));
+    ent.scale = Math.round(next * 100) / 100;
+    if (idx >= 0 && lv.ents[idx]) lv.ents[idx].scale = ent.scale;
+    status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' SCALE → ' + ent.scale.toFixed(2));
+  }
   function cycleTex(dir, shift) {                              // [ ] / wheel: wall (Shift = soffit over riser) else floor/ceil
     const t = texTarget(shift);
     if (!t) { status('LOOK AT A SURFACE.'); return; }
@@ -1467,7 +1485,8 @@ const Editor = (() => {
     if (entHit) {
       el.textContent = '● ' + (entHit.ent.name || entHit.ent.kind).toUpperCase() + '   ' +
         (entHit.ent.solid ? 'SOLID' : 'WALK-THROUGH') + '   J to toggle' +
-        ('behavior' in entHit.ent ? '   ·   ' + entHit.ent.behavior.toUpperCase() + '   B to toggle' : '');
+        ('behavior' in entHit.ent ? '   ·   ' + entHit.ent.behavior.toUpperCase() + '   B to toggle' : '') +
+        '   ·   SCALE ' + entHit.ent.scale.toFixed(2) + '   +/- to resize';
       el.style.display = 'block';
       Engine.setHighlight(null);
       return;
@@ -1558,8 +1577,8 @@ const Editor = (() => {
     b.classList.add('active'); b.innerHTML = '&#9638; MAP EDITOR';
     document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
     document.getElementById('pcontrols').innerHTML = previewCompiled
-      ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>B</b> character wander ⇄ stationary &nbsp;·&nbsp; <b>ESC</b> map'
-      : '<b>WASD</b> move &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> / <b>\\</b> tex — wall if aiming close, else floor (Shift ceil; on a stepped wall Shift picks the SOFFIT over the RISER) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky (<b>Shift</b>+<b>K</b> which sky) &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>P</b> mount a sprite on a wall (poster) &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>B</b> character wander ⇄ stationary &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply favorite (Shift = soffit) &nbsp;·&nbsp; <b>Ctrl</b>+<b>1</b>-<b>9</b>/<b>0</b> save favorite &nbsp;·&nbsp; <b>ESC</b> map';
+      ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>B</b> character wander ⇄ stationary &nbsp;·&nbsp; <b>+</b>/<b>-</b> scale object &nbsp;·&nbsp; <b>ESC</b> map'
+      : '<b>WASD</b> move &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> / <b>\\</b> tex — wall if aiming close, else floor (Shift ceil; on a stepped wall Shift picks the SOFFIT over the RISER) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky (<b>Shift</b>+<b>K</b> which sky) &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>P</b> mount a sprite on a wall (poster) &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>B</b> character wander ⇄ stationary &nbsp;·&nbsp; <b>+</b>/<b>-</b> scale object &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply favorite (Shift = soffit) &nbsp;·&nbsp; <b>Ctrl</b>+<b>1</b>-<b>9</b>/<b>0</b> save favorite &nbsp;·&nbsp; <b>ESC</b> map';
     document.getElementById('favbar').style.display = previewCompiled ? 'none' : 'flex';
     renderFavbar();
     previewOn = true; plast = performance.now();
@@ -1621,6 +1640,8 @@ const Editor = (() => {
     // blocks movement, independent of any sector/wall sculpting
     if (e.code === 'KeyJ') { if (!e.repeat) pushUndo(); geoToggleEntSolid(); e.preventDefault(); return; }
     if (e.code === 'KeyB') { if (!e.repeat) pushUndo(); geoToggleEntWander(); e.preventDefault(); return; }
+    if (e.code === 'Equal' || e.code === 'NumpadAdd') { if (!e.repeat) pushUndo(); geoScaleEnt(+1); e.preventDefault(); return; }
+    if (e.code === 'Minus' || e.code === 'NumpadSubtract') { if (!e.repeat) pushUndo(); geoScaleEnt(-1); e.preventDefault(); return; }
     if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyC'].includes(e.code)) {
       pkeys[e.code] = true; e.preventDefault();
     }
