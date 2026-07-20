@@ -4662,6 +4662,80 @@ const World = (() => {
   });
 
   // ---------------------------------------------------------------------------
+  // HONG KONG, round 2 — a window behind a rusted security grille, bamboo
+  // laundry poles hung with washing, a roll-down shopfront shutter, a wall
+  // thick with tangled cable and pipe conduit.
+  // ---------------------------------------------------------------------------
+  FLOOR.hkgrillewindow = cnv(g => {                      // window behind a rusted diamond-mesh security grille
+    vgrad(g, 0, 0, 64, 64, '#9c9484', '#726c5c');
+    stains(g, 6, ['#847c68', '#645e4c']);
+    speck(g, 45, 'rgba(30,28,18,0.1)');
+    g.fillStyle = 'rgba(20,22,22,0.75)'; g.fillRect(10, 10, 44, 38);         // dark window recess
+    const gl = g.createLinearGradient(12, 12, 52, 46);
+    gl.addColorStop(0, '#3a4038'); gl.addColorStop(1, '#161a16');
+    g.fillStyle = gl; g.fillRect(12, 12, 40, 34);
+    g.strokeStyle = 'rgba(120,70,30,0.55)'; g.lineWidth = 1.6;              // rusty diamond-mesh grille
+    for (let x = -8; x < 60; x += 8) { g.beginPath(); g.moveTo(x, 10); g.lineTo(x + 44, 48); g.stroke(); }
+    for (let x = -8; x < 60; x += 8) { g.beginPath(); g.moveTo(x + 44, 10); g.lineTo(x, 48); g.stroke(); }
+    g.strokeStyle = '#2a2622'; g.lineWidth = 2.4; g.strokeRect(10, 10, 44, 38); // frame
+    g.fillStyle = 'rgba(150,155,148,0.6)'; g.fillRect(46, 24, 9, 5);        // AC unit box
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 0.6; g.strokeRect(46, 24, 9, 5);
+    g.strokeStyle = 'rgba(60,60,55,0.5)'; g.lineWidth = 0.6;
+    for (let x = 47; x < 54; x += 1.4) { g.beginPath(); g.moveTo(x, 25); g.lineTo(x, 28); g.stroke(); }
+    speck(g, 25, 'rgba(255,255,255,0.05)');
+  });
+
+  FLOOR.hklaundrypole = cnv(g => {                        // tenement window, bamboo laundry poles + hung washing
+    vgrad(g, 0, 0, 64, 64, '#a89e88', '#7c7460');
+    stains(g, 5, ['#8a8268', '#6c6650']);
+    g.fillStyle = 'rgba(20,22,22,0.7)'; g.fillRect(20, 6, 30, 30);
+    const gl = g.createLinearGradient(22, 8, 48, 34);
+    gl.addColorStop(0, '#3a423c'); gl.addColorStop(1, '#181c18');
+    g.fillStyle = gl; g.fillRect(22, 8, 26, 26);
+    g.strokeStyle = '#2a2622'; g.lineWidth = 2; g.strokeRect(20, 6, 30, 30);
+    g.strokeStyle = '#c9b878'; g.lineWidth = 2; g.lineCap = 'round';        // bamboo poles jutting out
+    g.beginPath(); g.moveTo(6, 20); g.lineTo(50, 12); g.stroke();
+    g.beginPath(); g.moveTo(4, 34); g.lineTo(52, 26); g.stroke();
+    const laundry = ['#c94848', '#3a7ab0', '#e0c840', '#e8e4d8', '#5a9c5c'];
+    const hang = (px, py, w, h, col) => { g.fillStyle = col; g.fillRect(px, py, w, h); g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 0.6; g.strokeRect(px, py, w, h); };
+    hang(10, 20, 8, 12, laundry[0]); hang(22, 16, 7, 10, laundry[1]); hang(34, 13, 6, 9, laundry[2]);
+    hang(12, 34, 9, 13, laundry[3]); hang(26, 30, 7, 11, laundry[4]);
+    speck(g, 40, 'rgba(30,28,18,0.1)');
+    g.fillStyle = 'rgba(0,0,0,0.1)'; g.fillRect(0, 59, 64, 5);
+  });
+
+  FLOOR.hkrollshutter = cnv(g => {                        // ground-floor corrugated metal roll-down shopfront shutter
+    vgrad(g, 0, 0, 64, 64, '#8a8478', '#5c584e');
+    g.strokeStyle = 'rgba(20,18,14,0.4)'; g.lineWidth = 1;
+    for (let y = 4; y < 64; y += 5) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.fillStyle = 'rgba(255,255,255,0.08)';
+    for (let y = 4; y < 64; y += 5) g.fillRect(0, y - 1.6, 64, 1.4);        // corrugation highlight
+    stains(g, 6, ['#6a6458', '#4c4840']);
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(0, 0, 64, 6);               // top housing box
+    bevel(g, 0, 0, 64, 6, 'rgba(255,255,255,0.1)', 'rgba(0,0,0,0.4)');
+    g.fillStyle = '#2a2622'; g.beginPath(); g.arc(32, 40, 2.4, 0, 7); g.fill(); // padlock hasp
+    g.strokeStyle = '#2a2622'; g.lineWidth = 2; g.beginPath(); g.arc(32, 37, 2.6, Math.PI, 0); g.stroke();
+    speck(g, 55, 'rgba(20,18,14,0.16)'); speck(g, 20, 'rgba(255,255,255,0.05)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,255,255,0.06)', 'rgba(0,0,0,0.3)');
+  });
+
+  FLOOR.hkwireclutter = cnv(g => {                        // dense tangle of hanging cable + pipe conduit, walled-city wall
+    vgrad(g, 0, 0, 64, 64, '#8c8674', '#605c4c');
+    stains(g, 6, ['#726c5a', '#524e40']);
+    speck(g, 55, 'rgba(20,18,14,0.14)');
+    g.strokeStyle = 'rgba(30,28,22,0.6)'; g.lineWidth = 1.6;                // conduit pipes
+    g.beginPath(); g.moveTo(6, 0); g.lineTo(6, 64); g.moveTo(6, 14); g.lineTo(20, 14); g.moveTo(20, 14); g.lineTo(20, 64); g.stroke();
+    g.strokeStyle = 'rgba(20,18,14,0.5)'; g.lineWidth = 0.8;                // sagging cable bundles
+    for (let i = 0; i < 6; i++) {
+      const y0 = 4 + i * 10;
+      g.beginPath(); g.moveTo(0, y0); g.quadraticCurveTo(32, y0 + 10 + (i % 3) * 3, 64, y0 - 2); g.stroke();
+    }
+    g.fillStyle = '#3a3830'; g.fillRect(44, 8, 10, 14);                     // junction box
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1; g.strokeRect(44, 8, 10, 14);
+    speck(g, 30, 'rgba(255,255,255,0.04)');
+  });
+
+  // ---------------------------------------------------------------------------
   // MID-CENTURY SUBURBIA textures — pastel clapboard siding, a white picket
   // fence, shag carpet, checkerboard kitchen linoleum, dark walnut rec-room
   // paneling.
@@ -4985,6 +5059,7 @@ const World = (() => {
     'haussmannwindow', 'mansardwindow', 'parisshutters', 'parisshopfront',
     'subwaytile', 'brownstone', 'delitile', 'skyscraperglass', 'marquee',
     'neonsign', 'bambooscaffold', 'hongkongtile', 'junkwood', 'tenementwall',
+    'hkgrillewindow', 'hklaundrypole', 'hkrollshutter', 'hkwireclutter',
     'clapboard', 'picketfence', 'shagcarpet', 'linoleum', 'woodpaneling',
     'concreteblock', 'redbanner', 'domemosaic', 'parquet', 'muralsoviet',
     'warehousebrick', 'concretepergola', 'lawngrass', 'roadway', 'sidewalk',
