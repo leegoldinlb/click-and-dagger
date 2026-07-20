@@ -4423,6 +4423,106 @@ const World = (() => {
   });
 
   // ---------------------------------------------------------------------------
+  // PARIS, round 3 — building facades with windows: a Haussmann limestone
+  // front with a wrought-iron Juliet balcony, a zinc mansard dormer, an
+  // apartment front with blue-grey louvered shutters, a Belle Époque
+  // black-and-gold shopfront.
+  // ---------------------------------------------------------------------------
+  FLOOR.haussmannwindow = cnv(g => {                    // Haussmann limestone facade, tall French window + iron balcony
+    vgrad(g, 0, 0, 64, 64, '#ece4d0', '#c9bea0');
+    stains(g, 5, ['#a89870', '#8a7a54']);
+    speck(g, 40, 'rgba(70,55,30,0.08)'); speck(g, 25, 'rgba(255,252,240,0.06)');
+    g.fillStyle = 'rgba(60,50,30,0.18)'; g.fillRect(15, 6, 34, 32);           // recessed reveal
+    const gl = g.createLinearGradient(17, 8, 47, 36);
+    gl.addColorStop(0, '#3c4a56'); gl.addColorStop(1, '#161e24');
+    g.fillStyle = gl; g.fillRect(17, 8, 30, 28);
+    g.strokeStyle = 'rgba(255,255,255,0.10)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(21, 10); g.lineTo(25, 34); g.stroke();
+    g.strokeStyle = 'rgba(0,0,0,0.45)'; g.lineWidth = 1.4;                   // french-door mullions, two leaves
+    g.beginPath(); g.moveTo(32, 8); g.lineTo(32, 36); g.moveTo(17, 22); g.lineTo(47, 22); g.stroke();
+    g.strokeStyle = '#f4efe0'; g.lineWidth = 1.4; g.strokeRect(15, 6, 34, 32); // painted stone trim
+    g.strokeStyle = '#1c1a18'; g.lineWidth = 2.6; g.lineCap = 'round';       // wrought-iron Juliet balcony
+    g.beginPath(); g.moveTo(11, 41); g.lineTo(53, 41); g.stroke();
+    for (let x = 13; x <= 51; x += 5) { g.lineWidth = 1.4; g.beginPath(); g.moveTo(x, 36); g.lineTo(x, 41); g.stroke(); }
+    g.lineWidth = 1.1;
+    g.beginPath(); g.moveTo(11, 36); g.quadraticCurveTo(20, 32, 32, 36); g.quadraticCurveTo(44, 32, 53, 36); g.stroke();
+    g.fillStyle = 'rgba(40,32,15,0.35)'; g.fillRect(11, 41, 42, 2);
+    g.fillStyle = '#8a7a54'; g.fillRect(12, 43, 40, 3);                      // stone sill under the balcony
+    bevel(g, 15, 6, 34, 32, 'rgba(255,252,240,0.16)', 'rgba(40,32,15,0.25)');
+    g.fillStyle = 'rgba(0,0,0,0.1)'; g.fillRect(0, 59, 64, 5);
+  });
+
+  FLOOR.mansardwindow = cnv(g => {                       // zinc mansard roof with a dormer window, copper-green cap
+    vgrad(g, 0, 0, 64, 64, '#9098a0', '#6a7078');
+    g.strokeStyle = 'rgba(40,44,48,0.4)'; g.lineWidth = 1;
+    for (let ty = -1; ty < 5; ty++) for (let tx = -1; tx < 5; tx++) {
+      const x = tx * 16 + (ty % 2) * 8, y = ty * 8;
+      g.beginPath(); g.moveTo(x, y + 4); g.lineTo(x + 8, y); g.lineTo(x + 16, y + 4); g.lineTo(x + 8, y + 8); g.closePath(); g.stroke();
+    }
+    speck(g, 30, 'rgba(20,24,28,0.12)');
+    g.fillStyle = '#4a5258'; g.beginPath();                                 // dormer housing
+    g.moveTo(14, 30); g.lineTo(20, 12); g.lineTo(44, 12); g.lineTo(50, 30); g.closePath(); g.fill();
+    g.strokeStyle = '#2e3438'; g.lineWidth = 1.2; g.stroke();
+    g.fillStyle = '#3a7a5c'; g.beginPath();                                 // copper-green roof cap
+    g.moveTo(20, 12); g.lineTo(32, 4); g.lineTo(44, 12); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 1; g.stroke();
+    g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(20, 16, 24, 18);           // window reveal
+    const gl2 = g.createLinearGradient(22, 18, 42, 32);
+    gl2.addColorStop(0, '#3c4a52'); gl2.addColorStop(1, '#161e22');
+    g.fillStyle = gl2; g.fillRect(22, 18, 20, 14);
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1.2;
+    g.beginPath(); g.moveTo(32, 18); g.lineTo(32, 32); g.moveTo(22, 25); g.lineTo(42, 25); g.stroke();
+    g.strokeStyle = '#e8e2d4'; g.lineWidth = 1; g.strokeRect(20, 16, 24, 18);
+    g.fillStyle = '#5a6268'; g.fillRect(16, 30, 32, 4);                     // sill / roof-body joint
+    vgrad(g, 0, 40, 64, 24, '#7a828a', '#5a6068');                          // roof continues below the dormer
+    g.strokeStyle = 'rgba(40,44,48,0.35)'; g.lineWidth = 1;
+    for (let x = -8; x < 64; x += 16) { g.beginPath(); g.moveTo(x, 40); g.lineTo(x + 8, 64); g.stroke(); }
+    speck(g, 25, 'rgba(20,24,28,0.14)');
+  });
+
+  FLOOR.parisshutters = cnv(g => {                       // cream apartment facade, tall window, blue-grey louvered shutters
+    vgrad(g, 0, 0, 64, 64, '#e8e0cc', '#cabf9e');
+    stains(g, 6, ['#b8ab84', '#9c8f68']);
+    speck(g, 45, 'rgba(70,55,30,0.06)'); speck(g, 25, 'rgba(255,252,240,0.06)');
+    g.fillStyle = 'rgba(0,0,0,0.15)'; g.fillRect(13, 6, 38, 44);             // recessed reveal
+    const gl = g.createLinearGradient(16, 9, 47, 47);
+    gl.addColorStop(0, '#3a4a52'); gl.addColorStop(1, '#141c20');
+    g.fillStyle = gl; g.fillRect(16, 9, 32, 38);
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1.3;
+    g.beginPath(); g.moveTo(32, 9); g.lineTo(32, 47); g.moveTo(16, 24); g.lineTo(48, 24); g.moveTo(16, 36); g.lineTo(48, 36); g.stroke();
+    const shu = '#5c7080';                                                  // blue-grey louvered shutters, open
+    g.fillStyle = shu; g.fillRect(6, 8, 6, 42); g.fillRect(52, 8, 6, 42);
+    g.strokeStyle = 'rgba(0,0,0,0.28)'; g.lineWidth = 0.8;
+    for (let y = 10; y < 48; y += 3) { g.beginPath(); g.moveTo(6, y); g.lineTo(12, y); g.moveTo(52, y); g.lineTo(58, y); g.stroke(); }
+    bevel(g, 6, 8, 6, 42, 'rgba(255,255,255,0.12)', 'rgba(0,0,0,0.3)');
+    bevel(g, 52, 8, 6, 42, 'rgba(255,255,255,0.12)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = '#a89870'; g.fillRect(11, 48, 42, 4);                     // stone sill
+    bevel(g, 11, 48, 42, 4, 'rgba(255,250,230,0.22)', 'rgba(0,0,0,0.28)');
+    g.fillStyle = 'rgba(0,0,0,0.1)'; g.fillRect(0, 59, 64, 5);
+  });
+
+  FLOOR.parisshopfront = cnv(g => {                      // Belle Époque shopfront: black wood frame, gold fascia lettering
+    vgrad(g, 0, 0, 64, 64, '#1c1a18', '#100e0c');
+    g.fillStyle = '#0c0b0a'; g.fillRect(4, 14, 56, 40);                     // frame surround
+    bevel(g, 4, 14, 56, 40, 'rgba(255,220,140,0.12)', 'rgba(0,0,0,0.5)');
+    const gl = g.createLinearGradient(8, 18, 56, 50);
+    gl.addColorStop(0, '#5a747c'); gl.addColorStop(0.45, '#2a3a40'); gl.addColorStop(0.55, '#1c2a2e'); gl.addColorStop(1, '#0e1618');
+    g.fillStyle = gl; g.fillRect(8, 18, 48, 32);
+    g.fillStyle = 'rgba(255,255,255,0.14)'; g.beginPath();                  // diagonal glare streak
+    g.moveTo(12, 48); g.lineTo(22, 20); g.lineTo(27, 20); g.lineTo(17, 48); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(10,8,6,0.6)'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(32, 18); g.lineTo(32, 50); g.stroke();
+    g.fillStyle = '#c9a227'; g.fillRect(0, 0, 64, 12);                      // gold fascia band
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(0, 12); g.lineTo(64, 12); g.stroke();
+    g.fillStyle = 'rgba(30,20,8,0.7)';
+    for (let i = 0; i < 5; i++) g.fillRect(8 + i * 10, 4, 6, 4);            // abstracted gold-leaf lettering blocks
+    g.fillStyle = '#8a6a1c'; g.fillRect(0, 50, 64, 6);                      // brass kick plate
+    bevel(g, 0, 50, 64, 6, 'rgba(255,230,160,0.3)', 'rgba(0,0,0,0.4)');
+    speck(g, 30, 'rgba(0,0,0,0.15)');
+  });
+
+  // ---------------------------------------------------------------------------
   // NEW YORK 1964 textures — subway station tile, brownstone rowhouse facade,
   // a deli's red/white checker floor, a glass-curtain-wall office tower,
   // a Broadway marquee.
@@ -4882,6 +4982,7 @@ const World = (() => {
     'sandstone', 'zellige', 'mashrabiya', 'kilim', 'sandfloor',
     'haussmann', 'wroughtiron', 'opart', 'toile', 'zincroof',
     'cafeawning', 'riverstone', 'gildedceiling', 'bouquiniste',
+    'haussmannwindow', 'mansardwindow', 'parisshutters', 'parisshopfront',
     'subwaytile', 'brownstone', 'delitile', 'skyscraperglass', 'marquee',
     'neonsign', 'bambooscaffold', 'hongkongtile', 'junkwood', 'tenementwall',
     'clapboard', 'picketfence', 'shagcarpet', 'linoleum', 'woodpaneling',
