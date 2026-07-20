@@ -6040,6 +6040,7 @@ const World = (() => {
     g.fillStyle = '#f0d840'; g.fillRect(5, 45, 2, 3); g.fillRect(57, 45, 2, 3);                // amber taillights
     g.fillStyle = '#e8ecf0'; g.fillRect(28, 48, 8, 2);                                         // chrome rear bumper
   });
+  SPR.sportscarOpen = SPR.sportscar;   // doors-open state (keys used) — placeholder until/unless shipped art overrides it, same as every other ART_ASSETS entry
 
   SPR.motorcycle = outlined(g => {                                 // chase-scene motorcycle with a sidecar
     g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(34, 58, 26, 4, 0, 0, 7); g.fill();
@@ -9306,6 +9307,12 @@ const World = (() => {
     gunAR7: 'assets/sprites/gunAR7.png?v=1',
     gunLaser: 'assets/sprites/gunLaser.png?v=1',
     gunGolden: 'assets/sprites/gunGolden.png?v=1',
+    maskstand: 'assets/sprites/maskstand.png?v=1',
+    nixonmask: 'assets/sprites/nixonmask.png?v=1',
+    sportscar: 'assets/sprites/sportscar.png?v=1',
+    sportscarOpen: 'assets/sprites/sportscarOpen.png?v=1',
+    book: 'assets/sprites/book.png?v=1',
+    fabergeegg: 'assets/sprites/fabergeegg.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash' };  // hit-flash white silhouettes
                                                                                           // derived from these — regenerate
@@ -9459,7 +9466,9 @@ const World = (() => {
       getTex() { return this.casingOpen ? SPR.bombOpen : SPR.bomb; } }),
     microfichemachine: (x, y) => prop('microfichemachine', 'MICROFICHE VIEWER', x, y, 0.8, true, { showingArticle: false,
       getTex() { return this.showingArticle ? SPR.microfichemachineOn : SPR.microfichemachine; } }),
-    sportscar: (x, y) => prop('sportscar', 'SPORTS CAR', x, y, 1.3, true),
+    sportscar: (x, y) => prop('sportscar', 'SPORTS CAR', x, y, 1.3, true, {
+      open: false, getTex() { return this.open ? SPR.sportscarOpen : SPR.sportscar; },
+    }),
     filecab: (x, y) => prop('filecab', 'FILING CABINET', x, y, 0.82, true),
     globe: (x, y) => prop('globe', 'DESK GLOBE', x, y, 0.6, false),
     briefcase: (x, y) => prop('briefcase', 'ATTACHÉ CASE', x, y, 0.55, false),

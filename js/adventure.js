@@ -630,8 +630,9 @@ const Adventure = (() => {
     if (e.kind === 'sportscar') {
       if (selected === 'keys') {
         removeItem('keys');
+        e.open = true;
         if (winFn) winFn();
-        return 'The engine roars to life. You are three blocks away before anyone even reaches the square.';
+        return 'The door swings up. The engine roars to life. You are three blocks away before anyone even reaches the square.';
       }
       return 'Locked. You would need keys.';
     }
