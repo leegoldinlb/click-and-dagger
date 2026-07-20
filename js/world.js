@@ -9302,6 +9302,7 @@ const World = (() => {
     sacrecoeur: 'assets/sprites/sacrecoeur.png?v=1',
     notredame: 'assets/sprites/notredame.png?v=1',
     gun: 'assets/sprites/gun.png?v=2',
+    gunSterling: 'assets/sprites/gunSterling.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash' };  // hit-flash white silhouettes
                                                                                           // derived from these — regenerate
