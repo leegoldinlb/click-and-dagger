@@ -703,9 +703,11 @@ const Adventure = (() => {
         if (flags.laundryDone) return '“You already got your suit, hon.”';
         flags.laundryDone = true;
         flags.suitReady = true;
+        flags.gotSuit = true;
         removeItem('laundryticket');
+        addItem('suit', 'PRESSED SUIT');
         Sfx.pick();
-        return 'She checks the number against a rack of pressed suits. “Row three,” she says, already turning away.';
+        return 'She checks the number, disappears into the back, and comes out with a suit on a hanger. “Row three,” she says, already turning away.';
       }
       if (!flags.metLaundry) {
         flags.metLaundry = true;
