@@ -718,9 +718,10 @@ const Adventure = (() => {
       if (selected === 'suit') {
         if (flags.doubleSuited) return 'He is already wearing the suit.';
         flags.doubleSuited = true;
+        e.suited = true;
         removeItem('suit');
         Sfx.pick();
-        return 'He pulls the suit on over his own clothes. “How do I look?” Terrifyingly average. That is rather the point.';
+        return 'He steps behind the curtain and comes back suited. “How do I look?” Close enough, in the right light.';
       }
       if (selected === 'jfkmask') {
         if (!flags.doubleSuited) return '“The suit first,” he says. “I\'m not doing this half dressed.”';

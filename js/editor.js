@@ -385,8 +385,9 @@ const Editor = (() => {
       const tc = thumb(gg => {
         gg.imageSmoothingEnabled = false;
         gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
-        gg.drawImage(World.SPR[e.spr], 0, 0, 64, 64, 1, 1, 28, 28);
-      });
+        const tx = World.SPR[e.spr];
+        gg.drawImage(tx, 0, 0, tx.width, tx.height, 1, 1, 28, 28);   // sample the sprite's OWN size, not a hardcoded
+      });                                                              // 64x64 — shipped art can be much bigger than that
       const parent = WEAPON_KINDS.has(e.kind) ? wpnEl : PERSONNEL_KINDS.has(e.kind) ? personnelEl : ITEM_KINDS.has(e.kind) ? itemsEl : propsEl;
       const b = toolBtn(parent, e.name, tc, () => { tool = { t: 'ent', v: e.kind }; });
       if (e.kind === tool.v) b.classList.add('sel');
@@ -506,7 +507,10 @@ const Editor = (() => {
     // entities (free-positioned)
     for (const e of lv.ents) {
       const def = ENTS.find(d => d.kind === e.kind);
-      if (def) g.drawImage(World.SPR[def.spr], 0, 0, 64, 64, (e.x - 0.5) * c + 1, (e.y - 0.5) * c + 1, c - 2, c - 2);
+      if (def) {
+        const tx = World.SPR[def.spr];                      // sample the sprite's OWN size, not a hardcoded 64x64 —
+        g.drawImage(tx, 0, 0, tx.width, tx.height, (e.x - 0.5) * c + 1, (e.y - 0.5) * c + 1, c - 2, c - 2);  // shipped art can be bigger
+      }
     }
     // spawn
     drawSpawnArrow(g, lv.spawn.x * c, lv.spawn.y * c, c * 0.38, lv.spawn.a);

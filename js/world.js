@@ -109,11 +109,6 @@ const World = (() => {
       },
       {
         "kind": "streetlamp",
-        "x": 31.06,
-        "y": 3.37
-      },
-      {
-        "kind": "streetlamp",
         "x": 26.53,
         "y": 3.54
       },
@@ -133,22 +128,16 @@ const World = (() => {
         "y": 7.95
       },
       {
-        "kind": "fisherman",
-        "x": 18.47,
-        "y": 9.54,
-        "behavior": "wander"
-      },
-      {
         "kind": "waiter",
         "x": 28.71,
         "y": 18.42,
-        "behavior": "wander"
+        "behavior": "stationary"
       },
       {
         "kind": "civilianM",
         "x": 17.88,
         "y": 11.84,
-        "behavior": "wander"
+        "behavior": "stationary"
       },
       {
         "kind": "brute",
@@ -408,11 +397,6 @@ const World = (() => {
         "y": 6.21
       },
       {
-        "kind": "sportscar",
-        "x": 30.92,
-        "y": 4.74
-      },
-      {
         "kind": "bomb",
         "x": 36.83,
         "y": 13.57
@@ -633,7 +617,7 @@ const World = (() => {
         "kind": "civilianM",
         "x": 18.5,
         "y": 18.38,
-        "behavior": "wander"
+        "behavior": "stationary"
       },
       {
         "kind": "civilianF",
@@ -645,7 +629,7 @@ const World = (() => {
         "kind": "fisherman",
         "x": 10.22,
         "y": 19.33,
-        "behavior": "wander"
+        "behavior": "stationary"
       },
       {
         "kind": "drz",
@@ -705,11 +689,6 @@ const World = (() => {
         "y": 5.49
       },
       {
-        "kind": "pliers",
-        "x": 16.42,
-        "y": 7.66
-      },
-      {
         "kind": "motorcycle",
         "x": 15.2,
         "y": 6.85
@@ -725,11 +704,6 @@ const World = (() => {
         "y": 5.81
       },
       {
-        "kind": "radioset",
-        "x": 15.66,
-        "y": 7.57
-      },
-      {
         "kind": "ammo",
         "x": 16.62,
         "y": 5.32
@@ -743,11 +717,6 @@ const World = (() => {
         "kind": "disguise",
         "x": 24.29,
         "y": 5.87
-      },
-      {
-        "kind": "screwdriver",
-        "x": 14.44,
-        "y": 6.4
       },
       {
         "kind": "tube",
@@ -779,7 +748,7 @@ const World = (() => {
         "kind": "defector",
         "x": 23.26,
         "y": 11.63,
-        "behavior": "wander"
+        "behavior": "stationary"
       },
       {
         "kind": "watch",
@@ -795,6 +764,46 @@ const World = (() => {
         "kind": "telegram",
         "x": 19.4,
         "y": 19.91
+      },
+      {
+        "kind": "streetlamp",
+        "x": 31.59,
+        "y": 3.61
+      },
+      {
+        "kind": "sportscar",
+        "x": 30.96,
+        "y": 1.94
+      },
+      {
+        "kind": "officer",
+        "x": 17.68,
+        "y": 12.43,
+        "behavior": "wander"
+      },
+      {
+        "kind": "double",
+        "x": 13.8,
+        "y": 10.2,
+        "behavior": "wander"
+      },
+      {
+        "kind": "tourist",
+        "x": 26.2,
+        "y": 14.63,
+        "behavior": "wander"
+      },
+      {
+        "kind": "vendor",
+        "x": 16.53,
+        "y": 21.1,
+        "behavior": "wander"
+      },
+      {
+        "kind": "patsy",
+        "x": 30.87,
+        "y": 18.47,
+        "behavior": "wander"
       }
     ],
     "blown": false,
@@ -802,7 +811,7 @@ const World = (() => {
       "verts": [
         {
           "x": 17,
-          "y": 4
+          "y": 4.5
         },
         {
           "x": 17,
@@ -1293,11 +1302,11 @@ const World = (() => {
           "y": 3.5
         },
         {
-          "x": 18.5,
+          "x": 18,
           "y": 3
         },
         {
-          "x": 18.5,
+          "x": 18,
           "y": 2.5
         },
         {
@@ -1334,7 +1343,7 @@ const World = (() => {
         },
         {
           "x": 15.5,
-          "y": 11
+          "y": 12
         },
         {
           "x": 8,
@@ -1434,7 +1443,7 @@ const World = (() => {
         },
         {
           "x": 17,
-          "y": 8.5
+          "y": 8
         },
         {
           "x": 17,
@@ -1478,11 +1487,11 @@ const World = (() => {
         },
         {
           "x": 17,
-          "y": 8
+          "y": 7.5
         },
         {
           "x": 14,
-          "y": 8
+          "y": 7.5
         },
         {
           "x": 14,
@@ -1506,19 +1515,59 @@ const World = (() => {
         },
         {
           "x": 15.5,
-          "y": 10.5
+          "y": 11
         },
         {
-          "x": 14.5,
-          "y": 10.5
+          "x": 13,
+          "y": 11.5
         },
         {
-          "x": 14.5,
+          "x": 12,
           "y": 9.5
         },
         {
           "x": 16.5,
           "y": 9.5
+        },
+        {
+          "x": 30.471,
+          "y": 2.618
+        },
+        {
+          "x": 31.5,
+          "y": 2.5
+        },
+        {
+          "x": 30.471,
+          "y": 2.618
+        },
+        {
+          "x": 30.5,
+          "y": 0.5
+        },
+        {
+          "x": 31.5,
+          "y": 0.5
+        },
+        {
+          "x": 15.5,
+          "y": 11.5
+        },
+        {
+          "x": 13,
+          "y": 10.5
+        },
+        {
+          "x": 12,
+          "y": 10.5
+        },
+        {
+          "x": 15.5,
+          "y": 8.5
+        },
+        {
+          "x": 12,
+          "y": 1.5
         }
       ],
       "sectors": [
@@ -1536,6 +1585,9 @@ const World = (() => {
             11,
             98,
             99,
+            182,
+            180,
+            181,
             10,
             47,
             48,
@@ -1576,7 +1628,7 @@ const World = (() => {
           "floor": 0.3,
           "ceil": 3.3,
           "floorTex": "tile",
-          "ceilTex": "ceiltile",
+          "ceilTex": "stucco",
           "sky": true,
           "win": false,
           "hostile": false,
@@ -1596,18 +1648,18 @@ const World = (() => {
             "brick",
             "windowrow",
             "windowrow",
+            "brick",
+            "windowrow",
+            "windowrow",
             "windowrow",
             "azulejo",
             "windowrow",
             "azulejo",
             "azulejo",
-            "brick",
-            "azulejo",
-            "brick",
             "azulejo",
             "azulejo",
             null,
-            "brick",
+            "azulejo",
             "brick",
             null,
             null,
@@ -1621,10 +1673,18 @@ const World = (() => {
             "stucco",
             "marble",
             "stucco",
+            "stucco",
+            "stucco",
+            "windowshut",
+            null,
+            "windowshut",
             null,
             "stucco",
             null,
-            "stucco"
+            null,
+            "windowshut",
+            null,
+            "windowshut"
           ],
           "wallTexScale": [
             1,
@@ -1644,9 +1704,9 @@ const World = (() => {
             1,
             1,
             1,
-            0.5,
-            0.5,
-            0.5,
+            1,
+            1,
+            1,
             0.5,
             0.5,
             0.5,
@@ -1668,8 +1728,15 @@ const World = (() => {
             null,
             2,
             null,
+            1,
+            1,
             null,
-            1
+            null,
+            null,
+            null,
+            null,
+            null,
+            4
           ],
           "wallStepTex": [
             null,
@@ -1685,18 +1752,18 @@ const World = (() => {
             "brick",
             null,
             "brick",
-            "windowrow",
+            "brick",
             null,
             "windowrow",
-            "stucco",
+            "windowrow",
             "azulejo",
-            null,
+            "windowrow",
             "azulejo",
             "brick",
             "azulejo",
+            "azulejo",
             null,
-            null,
-            null,
+            "azulejo",
             null,
             null,
             "brick",
@@ -1712,9 +1779,16 @@ const World = (() => {
             null,
             null,
             "stucco",
+            "stucco",
+            null,
+            "windowshut",
+            null,
+            "windowshut",
+            null,
+            "stucco",
             null,
             null,
-            "brick"
+            "windowshut"
           ],
           "wallStepFloorTex": [
             null,
@@ -1735,13 +1809,13 @@ const World = (() => {
             "stucco",
             null,
             "azulejo",
-            null,
+            "stucco",
             "azulejo",
             null,
             null,
+            "azulejo",
             null,
-            null,
-            null,
+            "azulejo",
             null,
             null,
             null,
@@ -1758,8 +1832,10 @@ const World = (() => {
             null,
             "stucco",
             null,
-            "stucco",
-            "brick"
+            null,
+            "brick",
+            null,
+            "brownstone"
           ],
           "wallDecal": [
             null,
@@ -1781,7 +1857,7 @@ const World = (() => {
             null,
             null,
             null,
-            "wallmap",
+            null,
             null,
             null,
             null,
@@ -2364,6 +2440,14 @@ const World = (() => {
           "win": false,
           "hostile": false,
           "texScale": 1,
+          "wallTex": [
+            null,
+            null,
+            null,
+            "stucco",
+            null,
+            null
+          ],
           "parent": -1
         },
         {
@@ -2410,7 +2494,7 @@ const World = (() => {
             123
           ],
           "floor": 0.4,
-          "ceil": 1.7,
+          "ceil": 2.1,
           "floorTex": "carpet",
           "ceilTex": "ceiltile",
           "sky": false,
@@ -2429,7 +2513,7 @@ const World = (() => {
             124
           ],
           "floor": 0.5,
-          "ceil": 1.8,
+          "ceil": 2.4,
           "floorTex": "carpet",
           "ceilTex": "ceiltile",
           "sky": false,
@@ -2538,16 +2622,27 @@ const World = (() => {
             157,
             156,
             161,
+            188,
             158
           ],
-          "floor": 0.8,
-          "ceil": 1.7,
+          "floor": 0.7,
+          "ceil": 1.4,
           "floorTex": "carpet",
           "ceilTex": "ceiltile",
           "sky": false,
           "win": false,
           "hostile": false,
           "texScale": 1,
+          "wallTex": [
+            "brownstone",
+            null,
+            "brownstone",
+            null,
+            "brownstone",
+            "brownstone",
+            "brownstone",
+            null
+          ],
           "parent": -1
         },
         {
@@ -2565,6 +2660,12 @@ const World = (() => {
           "win": false,
           "hostile": false,
           "texScale": 1,
+          "wallTex": [
+            "brownstone",
+            null,
+            "brownstone",
+            null
+          ],
           "parent": -1
         },
         {
@@ -2630,27 +2731,64 @@ const World = (() => {
             174,
             172
           ],
-          "floor": 0,
-          "ceil": 1,
+          "floor": 0.4,
+          "ceil": 1.5,
           "floorTex": "carpet",
           "ceilTex": "ceiltile",
           "sky": false,
           "win": false,
           "hostile": false,
           "texScale": 1,
+          "wallStepFloorTex": [
+            null,
+            "brick",
+            null,
+            null
+          ],
           "parent": -1
         },
         {
           "loop": [
             175,
             176,
+            185,
             177,
+            186,
+            187,
             178,
             179,
             174
           ],
-          "floor": 0,
-          "ceil": 1,
+          "floor": 0.5,
+          "ceil": 1.6,
+          "floorTex": "carpet",
+          "ceilTex": "ceiltile",
+          "sky": false,
+          "win": false,
+          "hostile": false,
+          "texScale": 1,
+          "wallTex": [
+            null,
+            null,
+            "panel",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "parent": -1
+        },
+        {
+          "loop": [
+            180,
+            183,
+            184,
+            181
+          ],
+          "floor": 0.1,
+          "ceil": 1.4,
           "floorTex": "carpet",
           "ceilTex": "ceiltile",
           "sky": false,
@@ -4233,11 +4371,12 @@ const World = (() => {
 
   // ---- sprites ----
   function whiteOf(src) {
-    return cnv(g => {
-      g.drawImage(src, 0, 0);
+    const w = src.width, h = src.height;                    // size from the source, not a hardcoded 64 — shipped
+    return cnv(g => {                                         // character art can be a much bigger canvas than that
+      g.drawImage(src, 0, 0, w, h);
       g.globalCompositeOperation = 'source-in';
-      g.fillStyle = '#fff'; g.fillRect(0, 0, 64, 64);
-    });
+      g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+    }, w, h);
   }
   // retro grit: per-pixel grain plus a whisper of vertical light falloff, applied
   // to every finished sprite. Flat vector fills read as paper-cutout ("South
@@ -4330,8 +4469,10 @@ const World = (() => {
     g.closePath(); g.fill();
     g.fillStyle = 'rgba(40,12,0,0.30)';                                        // core shadow, right side
     g.beginPath(); g.moveTo(38, 21); g.quadraticCurveTo(41.5, 30, 39, 40); g.lineTo(35, 40); g.quadraticCurveTo(37, 30, 35.5, 21.5); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(255,220,170,0.18)';                                    // chest highlight
+    g.fillStyle = 'rgba(255,220,170,0.3)';                                    // chest highlight
     g.beginPath(); g.ellipse(27.5, 26, 3.5, 6, 0.2, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(200,225,255,0.4)'; g.lineWidth = 2;                  // cool rim light, far shoulder edge
+    g.beginPath(); g.moveTo(41, 22); g.quadraticCurveTo(40.5, 30, 39, 39); g.stroke();
     g.strokeStyle = 'rgba(60,20,0,0.35)'; g.lineWidth = 1;                     // fabric folds
     g.beginPath(); g.moveTo(25, 31); g.quadraticCurveTo(29, 32.5, 31, 31.5); g.stroke();
     g.beginPath(); g.moveTo(33, 35); g.quadraticCurveTo(36, 36, 38.5, 34.5); g.stroke();
@@ -4452,6 +4593,8 @@ const World = (() => {
     g.beginPath(); g.moveTo(18, 24); g.quadraticCurveTo(32, 17, 46, 24); g.lineTo(45, 40); g.quadraticCurveTo(32, 44, 19, 40); g.closePath(); g.fill();
     g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(38, 30, 8, 13, 0, 0, 7); g.fill();
     g.fillStyle = 'rgba(255,235,200,0.16)'; g.beginPath(); g.ellipse(23, 26, 4, 10, 0, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(200,225,255,0.4)'; g.lineWidth = 2.2;                 // cool rim light, far side of the torso
+    g.beginPath(); g.moveTo(44.5, 25); g.quadraticCurveTo(44, 32, 42, 39.5); g.stroke();
     g.fillStyle = '#16130e'; g.fillRect(17, 39, 30, 5);                              // belt
     g.fillStyle = '#8a1414'; g.fillRect(29, 39.6, 6, 3.8);                            // red star buckle
     g.strokeStyle = '#8a7358'; g.lineWidth = 8; g.lineCap = 'round';                  // huge bare arms
@@ -4507,6 +4650,8 @@ const World = (() => {
     g.beginPath(); g.moveTo(23, 29); g.quadraticCurveTo(32, 25.5, 41, 29); g.lineTo(40, 41); g.quadraticCurveTo(32, 44, 24, 41); g.closePath(); g.fill();
     g.fillStyle = 'rgba(255,240,200,0.16)'; g.beginPath(); g.ellipse(27, 33, 3.4, 9, 0, 0, 7); g.fill();
     g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(37, 35, 5.4, 10, 0, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(200,225,255,0.4)'; g.lineWidth = 1.9;                  // cool rim light, far shoulder edge
+    g.beginPath(); g.moveTo(40.5, 30); g.quadraticCurveTo(40, 36, 38, 40.5); g.stroke();
     g.fillStyle = '#161811'; g.fillRect(21, 40, 22, 4);
     g.fillStyle = '#8a1414'; g.fillRect(30, 40.4, 4, 3.2);
     // rifle slung diagonally across the body
@@ -4616,11 +4761,13 @@ const World = (() => {
     g.lineTo(32 + 9 * sw, 34); g.quadraticCurveTo(32 + 8.5 * sw, (34 + tLen) / 2, 32 + hemW * sw, tLen);
     g.lineTo(32 - hemW * sw, tLen); g.quadraticCurveTo(32 - 8.5 * sw, (34 + tLen) / 2, 32 - 9 * sw, 34);
     g.closePath(); g.fill();
-    g.fillStyle = 'rgba(0,0,0,0.22)';                                  // core shadow, right side
+    g.fillStyle = 'rgba(0,0,0,0.34)';                                  // core shadow, right side (deeper for real volume)
     g.beginPath(); g.moveTo(32 + 6 * sw, 21); g.quadraticCurveTo(32 + 9.5 * sw, (21 + tLen) / 2, 32 + (hemW - 1) * sw, tLen);
     g.lineTo(32 + 3 * sw, tLen); g.quadraticCurveTo(32 + 5 * sw, (21 + tLen) / 2, 32 + 3.5 * sw, 21.5); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(255,255,255,0.13)';                            // chest highlight
+    g.fillStyle = 'rgba(255,255,255,0.24)';                            // chest highlight (key light, near/left side)
     g.beginPath(); g.ellipse(32 - 4.5 * sw, 26, 3.4, 5.6, 0.2, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(200,225,255,0.4)'; g.lineWidth = 2;          // cool rim light, far/right silhouette edge
+    g.beginPath(); g.moveTo(32 + 8.7 * sw, 22.5); g.quadraticCurveTo(32 + 8.2 * sw, (22 + tLen) / 2, 32 + (hemW - 0.4) * sw, tLen - 1.5); g.stroke();
     if (o.chest) o.chest(g);
     // ---- arms: stroked polylines with round joints; hands at the ends ----
     const bare = o.sleeve === 'skin';
@@ -4630,8 +4777,10 @@ const World = (() => {
     g.lineCap = 'round'; g.lineJoin = 'round'; g.lineWidth = o.armW || 4.6;
     g.strokeStyle = sl[0]; g.beginPath(); g.moveTo(armL[0][0], armL[0][1]); for (let i = 1; i < armL.length; i++) g.lineTo(armL[i][0], armL[i][1]); g.stroke();
     g.strokeStyle = sl[1]; g.beginPath(); g.moveTo(armR[0][0], armR[0][1]); for (let i = 1; i < armR.length; i++) g.lineTo(armR[i][0], armR[i][1]); g.stroke();
-    g.strokeStyle = 'rgba(255,255,255,0.16)'; g.lineWidth = 1.3;       // lit edge on the near arm
+    g.strokeStyle = 'rgba(255,255,255,0.3)'; g.lineWidth = 1.5;        // lit edge on the near arm
     g.beginPath(); g.moveTo(armL[0][0] - 0.5, armL[0][1] + 0.5); g.lineTo(armL[1][0] - 0.5, armL[1][1]); g.stroke();
+    g.strokeStyle = 'rgba(200,225,255,0.3)'; g.lineWidth = 1.4;        // cool rim on the far arm
+    g.beginPath(); g.moveTo(armR[0][0] + 0.5, armR[0][1] + 0.5); g.lineTo(armR[1][0] + 0.5, armR[1][1]); g.stroke();
     const hL = o.handL || armL[armL.length - 1], hR = o.handR || armR[armR.length - 1];
     g.fillStyle = skM; g.beginPath(); g.arc(hL[0], hL[1], 2.4, 0, 7); g.fill();
     g.fillStyle = skD; g.beginPath(); g.arc(hR[0], hR[1], 2.4, 0, 7); g.fill();
@@ -4640,15 +4789,31 @@ const World = (() => {
     g.fillStyle = skD; g.fillRect(29.6, 14.5, 4.8, 4.4);
     const hr = o.headR || [5, 5.6];
     const rg = g.createRadialGradient(29.5, 9, 1.5, 32, 11, 7);
-    rg.addColorStop(0, skL); rg.addColorStop(0.65, skM); rg.addColorStop(1, skD);
+    rg.addColorStop(0, skL); rg.addColorStop(0.4, skM); rg.addColorStop(0.75, skD); rg.addColorStop(1, skD);
     g.fillStyle = rg; g.beginPath(); g.ellipse(32, 11, hr[0], hr[1], 0, 0, 7); g.fill();
-    g.fillStyle = 'rgba(60,30,12,0.3)';                                // jaw shading
+    g.fillStyle = 'rgba(50,25,10,0.45)';                               // jaw shading, deeper for a real sculpted look
     g.beginPath(); g.ellipse(33.5, 13.4, 3.3, 2.1, -0.15, 0, 7); g.fill();
+    g.fillStyle = 'rgba(255,248,232,0.4)';                             // temple/cheekbone rim, opposite the jaw shade
+    g.beginPath(); g.ellipse(32 - hr[0] * 0.72, 9.4, 1.8, 3.2, -0.25, 0, 7); g.fill();
     g.fillStyle = skD; g.beginPath(); g.ellipse(32 + hr[0] * 0.94, 11.5, 1, 1.6, 0, 0, 7); g.fill();  // ear
     if (!o.noFace) {
-      g.fillStyle = '#2a1c12'; g.fillRect(29.2, 9.8, 1.5, 1.5); g.fillRect(33.3, 9.8, 1.5, 1.5);      // eyes
-      g.fillStyle = 'rgba(60,30,12,0.45)'; g.fillRect(31.4, 12, 1.4, 1.6);                            // nose shadow
-      g.fillStyle = '#5e3a24'; g.fillRect(30.2, 14.6, 3.8, 1.1);                                      // mouth
+      g.fillStyle = '#e8dcc8';                                                                         // eye whites (sclera)
+      g.beginPath(); g.ellipse(30, 10.5, 1.15, 0.95, 0, 0, 7); g.fill();
+      g.beginPath(); g.ellipse(34, 10.5, 1.15, 0.95, 0, 0, 7); g.fill();
+      g.fillStyle = '#1c130c'; g.beginPath(); g.arc(30.15, 10.55, 0.62, 0, 7); g.fill();                // irises/pupils
+      g.beginPath(); g.arc(34.15, 10.55, 0.62, 0, 7); g.fill();
+      g.fillStyle = 'rgba(255,255,255,0.9)'; g.fillRect(29.9, 10.15, 0.4, 0.4); g.fillRect(33.9, 10.15, 0.4, 0.4);  // catch-lights
+      g.strokeStyle = '#241a10'; g.lineWidth = 0.5;                                                     // lash line, opens the eye up
+      g.beginPath(); g.moveTo(28.9, 9.75); g.lineTo(31.15, 9.7); g.moveTo(32.9, 9.7); g.lineTo(35.1, 9.75); g.stroke();
+      g.fillStyle = 'rgba(45,25,12,0.85)';                                                              // bold eyebrows
+      g.beginPath(); g.moveTo(28.7, 8.7); g.lineTo(31.3, 8.5); g.lineTo(31.2, 9.15); g.lineTo(28.8, 9.3); g.closePath(); g.fill();
+      g.beginPath(); g.moveTo(32.8, 8.5); g.lineTo(35.3, 8.7); g.lineTo(35.2, 9.3); g.lineTo(32.9, 9.15); g.closePath(); g.fill();
+      g.fillStyle = 'rgba(50,25,10,0.5)'; g.fillRect(31.4, 11.8, 1.4, 1.9);                             // nose shadow
+      g.fillStyle = 'rgba(255,238,215,0.4)'; g.fillRect(31.15, 11, 0.7, 1.6);                           // nose bridge highlight
+      g.fillStyle = 'rgba(210,110,90,0.28)'; g.beginPath(); g.ellipse(29.6, 12.6, 1.5, 1.1, 0, 0, 7); g.fill();  // cheek blush, lit side
+      g.fillStyle = '#3c2216'; g.fillRect(30, 14.35, 4, 0.75);                                          // upper lip, dark
+      g.fillStyle = '#9a5c40'; g.fillRect(30, 15.05, 4, 0.85);                                          // lower lip, lit
+      g.fillStyle = 'rgba(255,235,220,0.35)'; g.fillRect(30.6, 15.1, 1.2, 0.35);                        // lip highlight
     }
     if (o.face) o.face(g);
     if (o.hair) o.hair(g);
@@ -5079,6 +5244,17 @@ const World = (() => {
   SPR.double = outlined(g => person(g, {                               // the double — plain, forgettable, waiting
     trousers: ['#7a7468', '#5c564c', '#403a30'], shoes: ['#241a12', '#0e0a06'],
     torso: ['#8a8478', '#6a6458', '#4a4438'], sleeve: ['#8a8478', '#6a6458'],
+    face: gg => { },
+  }));
+  SPR.doubleSuited = outlined(g => person(g, {                         // the double, suited but not yet masked
+    trousers: ['#23252b', '#17181d', '#0e0f13'], shoes: ['#17181d', '#060708'],
+    torso: ['#2e3040', '#1e2030', '#131420'], torsoLen: 45,
+    chest: gg => {
+      const sh = gg.createLinearGradient(29, 21, 35, 32);
+      sh.addColorStop(0, '#f0ece0'); sh.addColorStop(1, '#c9c4b4');
+      gg.fillStyle = sh; gg.beginPath(); gg.moveTo(29.6, 21); gg.lineTo(32, 30); gg.lineTo(34.4, 21); gg.closePath(); gg.fill();
+      gg.fillStyle = '#1c3a5c'; gg.fillRect(31.1, 21.5, 1.9, 8.5);
+    },
     face: gg => { },
   }));
   SPR.doubleDressed = outlined(g => person(g, {                        // the double, suited and masked — the payoff
@@ -8261,6 +8437,105 @@ const World = (() => {
   })();
 
   // -------------------------------------------------------------------------
+  // SHIPPED CHARACTER ART — real PNG assets replacing specific procedural
+  // SPR entries by default (distinct from CUSTOM ART above, which is a
+  // per-browser user override persisted to localStorage; this is checked
+  // into the repo as the actual shipped look for that kind). Loaded async
+  // at boot — every getTex() reads SPR[kind] fresh each frame, so a sprite
+  // arriving a few frames late just pops in with no special handling needed.
+  // -------------------------------------------------------------------------
+  const ART_ASSETS = {                                      // bump a path's ?v= whenever that file on disk changes
+    matron: 'assets/sprites/matron.png?v=2',
+    civilianM: 'assets/sprites/civilianM.png?v=1',
+    streetartist: 'assets/sprites/streetartist.png?v=1',
+    brute: 'assets/sprites/brute.png?v=1',
+    carlotta: 'assets/sprites/carlotta.png?v=1',
+    defector: 'assets/sprites/defector.png?v=1',
+    flowergirl: 'assets/sprites/flowergirl.png?v=1',
+    goon: 'assets/sprites/goon.png?v=1',
+    laundrylady: 'assets/sprites/laundrylady.png?v=1',
+    drz: 'assets/sprites/drz.png?v=1',
+    sniper: 'assets/sprites/sniper.png?v=1',
+    waiter: 'assets/sprites/waiter.png?v=1',
+    agent005: 'assets/sprites/agent005.png?v=1',
+    civilianF: 'assets/sprites/civilianF.png?v=1',
+    fisherman: 'assets/sprites/fisherman.png?v=1',
+    vendor: 'assets/sprites/vendor.png?v=1',
+    tourist: 'assets/sprites/tourist.png?v=1',
+    patsy: 'assets/sprites/patsy.png?v=1',
+    officer: 'assets/sprites/officer.png?v=1',
+    double: 'assets/sprites/double.png?v=1',
+    doubleSuited: 'assets/sprites/doubleSuited.png?v=1',
+    doubleDressed: 'assets/sprites/doubleDressed.png?v=1',
+  };
+  const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash' };  // hit-flash white silhouettes
+                                                                                          // derived from these — regenerate
+                                                                                          // whenever the base art is replaced
+  function isTainted(img) {                                // a canvas holding this image would throw on getImageData —
+    try {                                                    // e.g. index.html opened via file:// in a browser that
+      const c = document.createElement('canvas'); c.width = 1; c.height = 1;  // treats local files as cross-origin.
+      const g = c.getContext('2d');
+      g.drawImage(img, 0, 0, 1, 1);
+      g.getImageData(0, 0, 1, 1);
+      return false;
+    } catch (e) { return true; }
+  }
+  function trimTransparent(img) {                          // crop to the opaque bounding box — AI-generated character
+    const c = document.createElement('canvas');             // art tends to ship with a lot of empty padding around
+    c.width = img.width; c.height = img.height;             // the figure, which would otherwise shrink it on the canvas
+    const g = c.getContext('2d');
+    g.drawImage(img, 0, 0);
+    const d = g.getImageData(0, 0, c.width, c.height).data;
+    let minX = c.width, minY = c.height, maxX = 0, maxY = 0;
+    for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) {
+      if (d[(y * c.width + x) * 4 + 3] > 8) {
+        if (x < minX) minX = x; if (x > maxX) maxX = x;
+        if (y < minY) minY = y; if (y > maxY) maxY = y;
+      }
+    }
+    if (maxX < minX || maxY < minY) return img;             // fully transparent — nothing to trim
+    const w = maxX - minX + 1, h = maxY - minY + 1;
+    const t = document.createElement('canvas'); t.width = w; t.height = h;
+    t.getContext('2d').drawImage(c, minX, minY, w, h, 0, 0, w, h);
+    return t;
+  }
+  function fitCharacter(img, w, h) {                        // scale to fill the canvas HEIGHT and bottom-align (feet
+    const c = document.createElement('canvas');              // planted on the floor line) — matches how every procedural
+    c.width = w; c.height = h;                                // character fills ~all of the 64x64 canvas, feet near y=64,
+    const g = c.getContext('2d');                             // since the renderer maps the canvas's bottom edge to the floor
+    const s = h / img.height;
+    const dw = img.width * s;
+    g.imageSmoothingEnabled = true;
+    g.drawImage(img, (w - dw) / 2, 0, dw, h);
+    return c;
+  }
+  const ART_RES = 256;                                      // shipped PNG art renders at real resolution, not the
+                                                               // 64x64 procedural-canvas size — billboards sample at
+                                                               // their own texture size now (see engine.js), so there's
+                                                               // no upside to downscaling detailed art to 64x64 first
+  for (const [name, path] of Object.entries(ART_ASSETS)) {
+    if (!SPR[name]) continue;
+    const w = ART_RES, h = ART_RES;
+    const img = new Image();
+    img.onload = () => {
+      // A tainted canvas must NEVER reach SPR — the renderer's own texture
+      // cache (cacheOf in engine.js) reads pixel data from every sprite it
+      // draws, with no guard of its own; handing it a tainted canvas throws
+      // mid-frame and blanks the whole screen, not just this one character.
+      if (isTainted(img)) {
+        console.warn('Shipped character art blocked by the browser (canvas tainted — this happens opening index.html via file://; serve it from a local server instead, e.g. `python3 -m http.server`). Keeping the built-in art for:', path);
+        return;
+      }
+      try {
+        SPR[name] = fitCharacter(trimTransparent(img), w, h);
+        if (FLASH_OF[name]) SPR[FLASH_OF[name]] = whiteOf(SPR[name]);
+      } catch (e) { console.warn('Failed to apply shipped character art:', path, e); }
+    };
+    img.onerror = () => console.warn('Failed to load shipped character art (check the path/file exists):', path);
+    img.src = path;
+  }
+
+  // -------------------------------------------------------------------------
   // Entity factories, keyed by the `kind` stored in level data
   // -------------------------------------------------------------------------
   // Every plain prop is destructible by default: hp:20. On death main.js removes
@@ -8420,14 +8695,14 @@ const World = (() => {
       behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
       getTex() { return this.dead ? SPR.civilianCorpse : SPR.laundrylady; },
     }),
-    // The double starts plain-clothed and unremarkable; useEnt() flips `disguised`
-    // true once suited AND masked, swapping to SPR.doubleDressed — the same
-    // kind-preserving state-flip trick used for the boss005 reveal, just visual
-    // here rather than combat-relevant.
+    // The double starts plain-clothed and unremarkable; useEnt() flips `suited`
+    // once the suit goes on, then `disguised` (suited AND masked) once the mask
+    // follows — three visually distinct states, same kind-preserving state-flip
+    // trick used for the boss005 reveal, just visual here rather than combat-relevant.
     double: (x, y, e) => ({
-      kind: 'double', name: 'THE DOUBLE', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0, disguised: false,
+      kind: 'double', name: 'THE DOUBLE', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0, suited: false, disguised: false,
       behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
-      getTex() { return this.dead ? SPR.civilianCorpse : (this.disguised ? SPR.doubleDressed : SPR.double); },
+      getTex() { return this.dead ? SPR.civilianCorpse : (this.disguised ? SPR.doubleDressed : this.suited ? SPR.doubleSuited : SPR.double); },
     }),
     patsy: (x, y, e) => ({
       kind: 'patsy', name: 'THE PATSY', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,

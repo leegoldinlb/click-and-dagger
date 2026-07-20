@@ -272,16 +272,16 @@ const Engine = (() => {
       const hgt = (H / s.ty) * sc, wdt = hgt, top = baseY - hgt, left = sx - wdt / 2;
       const x0 = Math.max(0, Math.ceil(left)), x1 = Math.min(W - 1, Math.floor(left + wdt));
       const y0i = Math.max(0, Math.ceil(top)), y1i = Math.min(H - 1, Math.floor(baseY));
-      const tex = cacheOf(e.getTex());
-      const fog = fogAt(s.ty);
-      let drawn = false;
+      const tex = cacheOf(e.getTex());                     // billboards aren't tiled, so unlike wall/floor/ceiling
+      const fog = fogAt(s.ty);                              // textures they sample at THEIR OWN resolution, not a
+      let drawn = false;                                    // fixed 64 — lets higher-res character art stay crisp
       for (let x = x0; x <= x1; x++) {
-        const texX = clamp(((x - left) / wdt) * 64, 0, 63) | 0;
+        const texX = clamp((((x - left) / wdt) * tex.w) | 0, 0, tex.w - 1);
         for (let yy = y0i; yy <= y1i; yy++) {
           const idx = yy * W + x;
           if (s.ty > depth[idx] + 0.05) continue;          // hidden behind a nearer wall / floor / step
-          const texY = clamp(((yy - top) / hgt) * 64, 0, 63) | 0;
-          const c = tex.u32[texY * 64 + texX];
+          const texY = clamp((((yy - top) / hgt) * tex.h) | 0, 0, tex.h - 1);
+          const c = tex.u32[texY * tex.w + texX];
           if ((c >>> 24) < 128) continue;                  // transparent sprite pixel
           buf[idx] = shade(c, fog);
           drawn = true;
@@ -641,16 +641,16 @@ const Engine = (() => {
       const hgt = (H / d) * sc, wdt = hgt, top = baseY - hgt, left = sx - wdt / 2;
       const x0 = Math.max(0, Math.ceil(left)), x1 = Math.min(W - 1, Math.floor(left + wdt));
       const y0i = Math.max(0, Math.ceil(top)), y1i = Math.min(H - 1, Math.floor(baseY));
-      const tex = cacheOf(e.getTex());
+      const tex = cacheOf(e.getTex());                     // (see the grid renderer above — same not-tiled, own-res sampling)
       const fog = fogAt(d);
       let drawn = false;
       for (let x = x0; x <= x1; x++) {
-        const texX = clamp(((x - left) / wdt) * 64, 0, 63) | 0;
+        const texX = clamp((((x - left) / wdt) * tex.w) | 0, 0, tex.w - 1);
         for (let yy = y0i; yy <= y1i; yy++) {
           const idx = yy * W + x;
           if (d > depth[idx] + 0.05) continue;
-          const texY = clamp(((yy - top) / hgt) * 64, 0, 63) | 0;
-          const c = tex.u32[texY * 64 + texX];
+          const texY = clamp((((yy - top) / hgt) * tex.h) | 0, 0, tex.h - 1);
+          const c = tex.u32[texY * tex.w + texX];
           if ((c >>> 24) < 128) continue;
           buf[idx] = shade(c, fog); drawn = true;
         }
