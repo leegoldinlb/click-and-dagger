@@ -197,7 +197,7 @@ const Adventure = (() => {
       case 'wpn_sterling': return 'A hard case, stencilled STEN. Q Branch does not believe in subtlety.';
       case 'wpn_ar7': return 'A field rifle, broken down to fit the case. Assembles in under a minute, if your hands are steady.';
       case 'wpn_laser': return 'A gadget that hums when you get close. Whatever it does, it is not standard issue.';
-      case 'wpn_golden': return 'A pistol, gold from grip to barrel, resting on velvet. One shot. Make it count.';
+      case 'wpn_golden': return 'A pistol, gold from grip to barrel, resting on velvet. Every shot counts.';
       case 'camera': return 'A subminiature spy camera. Volkov photographs his enemies before he disposes of them. Sentimental.';
       case 'safe': return flags.safeOpen
         ? 'Empty now. Dial spun back to zero, professionally.'

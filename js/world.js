@@ -9313,6 +9313,8 @@ const World = (() => {
     sportscarOpen: 'assets/sprites/sportscarOpen.png?v=1',
     book: 'assets/sprites/book.png?v=1',
     fabergeegg: 'assets/sprites/fabergeegg.png?v=1',
+    agent: 'assets/sprites/agent.png?v=1',
+    agentCase: 'assets/sprites/agentCase.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash' };  // hit-flash white silhouettes
                                                                                           // derived from these — regenerate
@@ -9345,14 +9347,14 @@ const World = (() => {
     t.getContext('2d').drawImage(c, minX, minY, w, h, 0, 0, w, h);
     return t;
   }
-  function fitCharacter(img, w, h) {                        // scale to fill the canvas HEIGHT and bottom-align (feet
+  function fitCharacter(img, w, h) {                        // scale to fit WITHIN the canvas and bottom-align (feet
     const c = document.createElement('canvas');              // planted on the floor line) — matches how every procedural
     c.width = w; c.height = h;                                // character fills ~all of the 64x64 canvas, feet near y=64,
-    const g = c.getContext('2d');                             // since the renderer maps the canvas's bottom edge to the floor
-    const s = h / img.height;
-    const dw = img.width * s;
-    g.imageSmoothingEnabled = true;
-    g.drawImage(img, (w - dw) / 2, 0, dw, h);
+    const g = c.getContext('2d');                             // since the renderer maps the canvas's bottom edge to the floor.
+    const s = Math.min(h / img.height, w / img.width);        // contain-fit, not fill-height: a trimmed image wider than
+    const dw = img.width * s, dh = img.height * s;            // it is tall (a car, a reclining body, an open book) would
+    g.imageSmoothingEnabled = true;                           // otherwise overflow the square canvas and get clipped left/right
+    g.drawImage(img, (w - dw) / 2, h - dh, dw, dh);
     return c;
   }
   function fitWeapon(img, w, h) {                           // scale to fill the canvas HEIGHT like fitCharacter, but
@@ -9448,7 +9450,7 @@ const World = (() => {
     wpn_sterling: (x, y) => prop('wpn_sterling', 'STERLING CASE', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'sterling', grantAmmo: 60 }),
     wpn_ar7: (x, y) => prop('wpn_ar7', 'AR-7 CASE', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'ar7', grantAmmo: 20 }),
     wpn_laser: (x, y) => prop('wpn_laser', 'LASER GADGET', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'laser', grantAmmo: 8 }),
-    wpn_golden: (x, y) => prop('wpn_golden', 'GOLDEN GUN', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'golden', grantAmmo: 1 }),
+    wpn_golden: (x, y) => prop('wpn_golden', 'GOLDEN GUN', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'golden', grantAmmo: 24 }),
     camera: (x, y) => prop('camera', 'SPY CAMERA', x, y, 0.4, false),
     disguise: (x, y) => prop('disguise', 'DISGUISE KIT', x, y, 0.45, false, { pickup: 'disguise' }),
     book: (x, y) => prop('book', 'OPEN BOOK', x, y, 0.4, false),

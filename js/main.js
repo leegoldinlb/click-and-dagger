@@ -15,7 +15,7 @@ const Game = (() => {
     sterling: { name: 'STERLING SMG',  spr: 'gunSterling', dmg: [8, 14],  cd: 0.11, maxAmmo: 90, auto: true },
     ar7:      { name: 'AR-7',          spr: 'gunAR7',      dmg: [32, 46], cd: 0.55, maxAmmo: 30, auto: false },
     laser:    { name: 'LASER',         spr: 'gunLaser',    dmg: [55, 75], cd: 0.9,  maxAmmo: 12, auto: false },
-    golden:   { name: 'GOLDEN GUN',    spr: 'gunGolden',   dmg: [999, 999], cd: 0.6, maxAmmo: 1, auto: false },
+    golden:   { name: 'GOLDEN GUN',    spr: 'gunGolden',   dmg: [999, 999], cd: 0.6, maxAmmo: 99, auto: false },
   };
   const WEAPON_ORDER = ['walther', 'sterling', 'ar7', 'laser', 'golden'];
 
