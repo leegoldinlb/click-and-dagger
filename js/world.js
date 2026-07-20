@@ -9296,6 +9296,11 @@ const World = (() => {
     doubleSuited: 'assets/sprites/doubleSuited.png?v=1',
     doubleDressed: 'assets/sprites/doubleDressed.png?v=1',
     eiffeltower: 'assets/sprites/eiffeltower.png?v=1',
+    louvrepyramid: 'assets/sprites/louvrepyramid.png?v=1',
+    arcdetriomphe: 'assets/sprites/arcdetriomphe.png?v=1',
+    moulinrouge: 'assets/sprites/moulinrouge.png?v=1',
+    sacrecoeur: 'assets/sprites/sacrecoeur.png?v=1',
+    notredame: 'assets/sprites/notredame.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash' };  // hit-flash white silhouettes
                                                                                           // derived from these — regenerate
