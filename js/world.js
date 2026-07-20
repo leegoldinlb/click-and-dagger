@@ -9738,6 +9738,9 @@ const World = (() => {
       // per-instance solid override (editor's WALK-THROUGH toggle) — every FACT
       // entry sets its own default `solid`, this just lets one placed copy differ
       if (e.solid != null) ent.solid = e.solid;
+      // per-instance scale override (editor's +/- resize) — every FACT entry sets
+      // its own default `scale`, this lets one placed copy be bigger/smaller
+      if (e.scale != null) ent.scale = e.scale;
       ents.push(ent);
     }
     spawn.x = level.spawn.x; spawn.y = level.spawn.y; spawn.a = level.spawn.a;
