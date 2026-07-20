@@ -211,9 +211,19 @@ body.adventure #modeline { color: #b09048; }
   align-items: center;
   text-align: center;
   padding: 20px 60px;
+  overflow-y: auto;
   z-index: 10;
 }
 #overlay.hidden { display: none; }
+#overlay .splashart {
+  max-width: 560px;
+  width: 100%;
+  image-rendering: pixelated;
+  margin-bottom: 22px;
+  border: 1px solid var(--brass-dim);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.55);
+  flex-shrink: 0;
+}
 #overlay h1 {
   font-family: "Courier New", Consolas, "Lucida Console", monospace;
   font-weight: 700;
