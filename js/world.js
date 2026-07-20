@@ -9348,6 +9348,34 @@ const World = (() => {
     g.drawImage(img, (w - dw) / 2, 0, dw, h);
     return c;
   }
+  function fitWeapon(img, w, h) {                           // scale to fill the canvas HEIGHT like fitCharacter, but
+    const c = document.createElement('canvas');              // align on the MUZZLE (topmost opaque pixels) instead of
+    c.width = w; c.height = h;                                // the bounding-box centre — AI-generated weapon art isn't
+    const g = c.getContext('2d');                             // reliably centred on its own barrel (the fist/mag/scope
+    const s = h / img.height;                                 // hangs off one side unevenly), so centering the whole
+    const dw = img.width * s;                                 // silhouette leaves the sights off the crosshair. Every
+                                                                // weapon is posed pointing away from camera, so the first
+                                                                // opaque row from the top is the barrel/emitter tip.
+    const sc = document.createElement('canvas'); sc.width = img.width; sc.height = img.height;
+    const sg = sc.getContext('2d'); sg.drawImage(img, 0, 0);
+    const d = sg.getImageData(0, 0, img.width, img.height).data;
+    let minY = -1;
+    for (let y = 0; y < img.height && minY < 0; y++) {
+      for (let x = 0; x < img.width; x++) { if (d[(y * img.width + x) * 4 + 3] > 8) { minY = y; break; } }
+    }
+    let sumX = 0, n = 0;
+    if (minY >= 0) {
+      const band = Math.min(img.height, minY + Math.max(2, Math.round(img.height * 0.03)));
+      for (let y = minY; y < band; y++) for (let x = 0; x < img.width; x++) {
+        if (d[(y * img.width + x) * 4 + 3] > 8) { sumX += x; n++; }
+      }
+    }
+    const muzzleX = n > 0 ? sumX / n : img.width / 2;
+    g.imageSmoothingEnabled = true;
+    g.drawImage(img, w / 2 - muzzleX * s, 0, dw, h);
+    return c;
+  }
+  const WEAPON_SPRITE_NAMES = new Set(['gun', 'gunSterling', 'gunAR7', 'gunLaser', 'gunGolden']);  // HUD viewmodels — muzzle-aligned, not bbox-centred
   const ART_RES = 256;                                      // shipped PNG art renders at real resolution, not the
                                                                // 64x64 procedural-canvas size — billboards sample at
                                                                // their own texture size now (see engine.js), so there's
@@ -9366,7 +9394,8 @@ const World = (() => {
         return;
       }
       try {
-        SPR[name] = fitCharacter(trimTransparent(img), w, h);
+        const fit = WEAPON_SPRITE_NAMES.has(name) ? fitWeapon : fitCharacter;
+        SPR[name] = fit(trimTransparent(img), w, h);
         if (FLASH_OF[name]) SPR[FLASH_OF[name]] = whiteOf(SPR[name]);
       } catch (e) { console.warn('Failed to apply shipped character art:', path, e); }
     };
