@@ -360,6 +360,10 @@ const Engine = (() => {
         tex: sec.wallTex ? sec.wallTex[i] : null,
         cell: sec.wallCell ? sec.wallCell[i] : null,
         door: sec.wallDoor ? (sec.wallDoor[i] || null) : null,   // door kind (string) or null
+        // an "invisible wall" — still renders as a fully open portal (forced-perspective
+        // vistas need to actually SEE into the neighbour sector) but blocks movement in
+        // moveStep same as a closed door, so the player can't walk through the window
+        block: sec.wallBlock ? !!sec.wallBlock[i] : false,
         texScale: sec.wallTexScale ? (sec.wallTexScale[i] || 1) : 1,  // wall tile size (>1 bigger, <1 smaller)
         // per-wall override for the step surfaces at a height-mismatched portal —
         // the soffit above the opening (neighbour ceiling lower) and the riser below
@@ -725,6 +729,7 @@ const Engine = (() => {
       for (const w of walls) {
         let block = w.next < 0;                                   // solid wall
         if (!block && w.door && !w.open) block = true;            // closed door
+        if (!block && w.block) block = true;                      // invisible wall — open portal, blocked movement
         if (!block && geo.sectors[w.next].floor - fromFloor > step) block = true;  // ledge too tall to climb
         if (!block) continue;
         const A = geo.verts[w.v1], B = geo.verts[w.v2];
