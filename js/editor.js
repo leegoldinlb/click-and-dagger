@@ -1928,7 +1928,7 @@ const Editor = (() => {
     if (!previewOn && (e.code === 'BracketRight' || e.code === 'BracketLeft')) {   // 2D map: cycle the ENT stamp
       cycleEntKind(e.code === 'BracketRight' ? 1 : -1); e.preventDefault(); return;
     }
-    if (!drawMode) return;
+    if (!drawMode || previewOn) return;
     if (e.code === 'Space') { pushUndo(); placeVertex(); e.preventDefault(); }
     else if (e.code === 'KeyI') { pushUndo(); insertVertexOnWall(); e.preventDefault(); }
     else if (e.code === 'Escape') {
