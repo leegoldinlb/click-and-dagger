@@ -591,12 +591,21 @@ const Engine = (() => {
             if (nyc < yTopA[x]) nyc = yTopA[x]; if (nyc > yBotA[x]) nyc = yBotA[x];
             if (nyf > yBotA[x]) nyf = yBotA[x]; if (nyf < yTopA[x]) nyf = yTopA[x];
             for (let y = yTopA[x]; y < (nyc | 0); y++) {             // upper step (neighbour ceiling lower)
-              const v = nycTrue > ycTrue ? (y - ycTrue) / (nycTrue - ycTrue) : 0;
-              const tv = (((((cz - ns.ceil) * v * wisc) % 1) + 1) % 1 * 64 | 0) & 63;
               const idx = y * W + x;
-              let upx = shade(upTx.u32[tv * 64 + texU], wsh);
-              if (wallHL) upx = hlMix(upx);
-              buf[idx] = upx; depth[idx] = zdist;
+              if (sky && ns.sky) {                                   // both sides open sky — a Build-style thin
+                const ang = Math.atan2(rdy, rdx);                     // "border sector" trick to fake a horizon:
+                const skyU = (((ang / TAU) * skyTex.w * 2) % skyTex.w + skyTex.w) % skyTex.w | 0;  // no facade band,
+                const v = clamp(((y - horizon + H * 0.5) / H) * skyTex.h, 0, skyTex.h - 1) | 0;     // just more sky
+                let cpx = skyTex.u32[v * skyTex.w + skyU];
+                if (wallHL) cpx = hlMix(cpx);
+                buf[idx] = cpx; depth[idx] = MAXD;
+              } else {
+                const v = nycTrue > ycTrue ? (y - ycTrue) / (nycTrue - ycTrue) : 0;
+                const tv = (((((cz - ns.ceil) * v * wisc) % 1) + 1) % 1 * 64 | 0) & 63;
+                let upx = shade(upTx.u32[tv * 64 + texU], wsh);
+                if (wallHL) upx = hlMix(upx);
+                buf[idx] = upx; depth[idx] = zdist;
+              }
             }
             for (let y = (nyf | 0) + 1; y <= yBotA[x]; y++) {        // lower step (neighbour floor higher)
               const v = yfTrue > nyfTrue ? (y - nyfTrue) / (yfTrue - nyfTrue) : 0;
