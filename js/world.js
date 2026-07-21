@@ -6329,6 +6329,7 @@ const World = (() => {
     g.fillStyle = '#1c0d0a'; g.fillRect(19, 42, 26, 12);                        // dispenser tray
     g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(20, 43, 24, 1);
   });
+  SPR.vendingmachineTaken = SPR.vendingmachine;   // coin already taken — placeholder until/unless shipped art overrides it
 
   SPR.flowercart = outlined(g => {                                   // wooden street vendor cart, flowers piled high
     g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 60, 20, 3, 0, 0, 7); g.fill();
@@ -7087,6 +7088,7 @@ const World = (() => {
     g.beginPath(); g.moveTo(36, 20); g.lineTo(44, 4); g.stroke();
     g.fillStyle = '#5c4222'; g.fillRect(4, 56, 6, 4); g.fillRect(54, 56, 6, 4);   // stubby legs
   });
+  SPR.tvconsoleOn = SPR.tvconsole;   // picture-on state — placeholder until/unless shipped art overrides it
 
   SPR.lawnmower = outlined(g => {                                     // push reel lawnmower
     g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 58, 16, 3.2, 0, 0, 7); g.fill();
@@ -7927,6 +7929,7 @@ const World = (() => {
     g.fillStyle = '#2a2d33'; g.fillRect(38, 36, 4, 1.4); g.fillRect(38, 40, 4, 1.4); g.fillRect(38, 44, 4, 1.4);
     g.fillStyle = '#c9a227'; g.fillRect(19, 32, 6, 1.4);                    // gold brand plate
   });
+  SPR.safeOpen = SPR.safe;   // door-open state — placeholder until/unless shipped art overrides it
 
   SPR.ciphermachine = outlined(g => {                             // Enigma-esque cipher machine, three rotors + keys
     g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 60, 20, 3, 0, 0, 7); g.fill();
@@ -7984,6 +7987,8 @@ const World = (() => {
     g.strokeStyle = 'rgba(255,255,255,0.2)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(41, 44); g.quadraticCurveTo(35, 48, 37, 52); g.stroke();
     g.fillStyle = '#8a8f98'; g.fillRect(18, 20, 4, 6); g.fillRect(42, 20, 4, 6);
   });
+  SPR.bombRedCut = SPR.bombOpen;    // wrong-wire-cut state — placeholder until/unless shipped art overrides it
+  SPR.bombBlueCut = SPR.bombOpen;   // right-wire-cut state — placeholder until/unless shipped art overrides it
 
   SPR.microfichemachine = outlined(g => {                         // viewer, blank screen — idle state
     g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 60, 20, 3, 0, 0, 7); g.fill();
@@ -9315,6 +9320,22 @@ const World = (() => {
     fabergeegg: 'assets/sprites/fabergeegg.png?v=1',
     agent: 'assets/sprites/agent.png?v=1',
     agentCase: 'assets/sprites/agentCase.png?v=1',
+    headshot: 'assets/sprites/headshot.png?v=1',
+    vendingmachine: 'assets/sprites/vendingmachine.png?v=1',
+    vendingmachineTaken: 'assets/sprites/vendingmachineTaken.png?v=1',
+    bomb: 'assets/sprites/bomb.png?v=1',
+    bombOpen: 'assets/sprites/bombOpen.png?v=1',
+    bombRedCut: 'assets/sprites/bombRedCut.png?v=1',
+    bombBlueCut: 'assets/sprites/bombBlueCut.png?v=1',
+    desk: 'assets/sprites/desk.png?v=1',
+    deskOpen: 'assets/sprites/deskOpen.png?v=1',
+    safe: 'assets/sprites/safe.png?v=1',
+    safeOpen: 'assets/sprites/safeOpen.png?v=1',
+    microfichemachine: 'assets/sprites/microfichemachine.png?v=1',
+    microfichemachineOn: 'assets/sprites/microfichemachineOn.png?v=1',
+    ciphermachine: 'assets/sprites/ciphermachine.png?v=1',
+    tvconsole: 'assets/sprites/tvconsole.png?v=1',
+    tvconsoleOn: 'assets/sprites/tvconsoleOn.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash' };  // hit-flash white silhouettes
                                                                                           // derived from these — regenerate
@@ -9454,7 +9475,9 @@ const World = (() => {
     camera: (x, y) => prop('camera', 'SPY CAMERA', x, y, 0.4, false),
     disguise: (x, y) => prop('disguise', 'DISGUISE KIT', x, y, 0.45, false, { pickup: 'disguise' }),
     book: (x, y) => prop('book', 'OPEN BOOK', x, y, 0.4, false),
-    safe: (x, y) => prop('safe', 'WALL SAFE', x, y, 0.8, true),
+    safe: (x, y) => prop('safe', 'WALL SAFE', x, y, 0.8, true, {
+      open: false, getTex() { return this.open ? SPR.safeOpen : SPR.safe; },
+    }),
     letter: (x, y) => prop('letter', 'CODED LETTER', x, y, 0.32, false),
     telegram: (x, y) => prop('telegram', 'TELEGRAM', x, y, 0.32, false),
     businesscard: (x, y) => prop('businesscard', 'BUSINESS CARD', x, y, 0.26, false),
@@ -9464,8 +9487,8 @@ const World = (() => {
     screwdriver: (x, y) => prop('screwdriver', 'SCREWDRIVER', x, y, 0.3, false),
     pliers: (x, y) => prop('pliers', 'PLIERS', x, y, 0.3, false),
     ciphermachine: (x, y) => prop('ciphermachine', 'CIPHER MACHINE', x, y, 0.8, true),
-    bomb: (x, y) => prop('bomb', 'THE BOMB', x, y, 0.85, true, { casingOpen: false,
-      getTex() { return this.casingOpen ? SPR.bombOpen : SPR.bomb; } }),
+    bomb: (x, y) => prop('bomb', 'THE BOMB', x, y, 0.85, true, { casingOpen: false, cut: null,
+      getTex() { return this.cut === 'blue' ? SPR.bombBlueCut : this.cut === 'red' ? SPR.bombRedCut : this.casingOpen ? SPR.bombOpen : SPR.bomb; } }),
     microfichemachine: (x, y) => prop('microfichemachine', 'MICROFICHE VIEWER', x, y, 0.8, true, { showingArticle: false,
       getTex() { return this.showingArticle ? SPR.microfichemachineOn : SPR.microfichemachine; } }),
     sportscar: (x, y) => prop('sportscar', 'SPORTS CAR', x, y, 1.3, true, {
@@ -9611,7 +9634,9 @@ const World = (() => {
     trafficlight: (x, y) => prop('trafficlight', 'TRAFFIC LIGHT', x, y, 1.0, true),
     watertower: (x, y) => prop('watertower', 'WATER TOWER', x, y, 1.1, true),
     barrier: (x, y) => prop('barrier', 'BARRIER', x, y, 0.7, true),
-    vendingmachine: (x, y) => prop('vendingmachine', 'VENDING MACHINE', x, y, 0.85, true),
+    vendingmachine: (x, y) => prop('vendingmachine', 'VENDING MACHINE', x, y, 0.85, true, {
+      taken: false, getTex() { return this.taken ? SPR.vendingmachineTaken : SPR.vendingmachine; },
+    }),
     flowercart: (x, y) => prop('flowercart', 'FLOWER CART', x, y, 0.85, true),
     // Wave 2 — home
     bed: (x, y) => prop('bed', 'BED', x, y, 1.0, true),
@@ -9659,7 +9684,9 @@ const World = (() => {
     stationwagon: (x, y) => prop('stationwagon', 'STATION WAGON', x, y, 1.3, true),
     mailboxpost: (x, y) => prop('mailboxpost', 'MAILBOX', x, y, 0.6, true),
     bbqgrill: (x, y) => prop('bbqgrill', 'BBQ GRILL', x, y, 0.7, true),
-    tvconsole: (x, y) => prop('tvconsole', 'TV CONSOLE', x, y, 0.9, true),
+    tvconsole: (x, y) => prop('tvconsole', 'TV CONSOLE', x, y, 0.9, true, {
+      on: false, getTex() { return this.on ? SPR.tvconsoleOn : SPR.tvconsole; },
+    }),
     lawnmower: (x, y) => prop('lawnmower', 'LAWNMOWER', x, y, 0.7, true),
     swingset: (x, y) => prop('swingset', 'SWING SET', x, y, 1.15, true),
     picnictable: (x, y) => prop('picnictable', 'PICNIC TABLE', x, y, 1.05, true),

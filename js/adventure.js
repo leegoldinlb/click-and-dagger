@@ -259,6 +259,7 @@ const Adventure = (() => {
       case 'vendingmachine': {
         if (flags.gotMoney) return 'Cigarettes, by the pack. Volkov’s men are chain smokers, to a man.';
         flags.gotMoney = true;
+        e.taken = true;
         addItem('money', 'LOOSE CHANGE');
         return 'Cigarettes, by the pack. On a hunch, you check the coin return — someone left MONEY behind.';
       }
@@ -475,11 +476,17 @@ const Adventure = (() => {
       if (flags.safeOpen) return 'Already emptied, dial spun back to zero.';
       if (!flags.knowsCombo) { Sfx.denied(); return 'Dial-locked. You would need the combination.'; }
       flags.safeOpen = true;
+      e.open = true;
       addItem('lettersoftransit', 'LETTERS OF TRANSIT');
       Sfx.pick();
       return 'You dial 11.22.63. The tumblers fall into place. Inside: a thick envelope, LETTERS OF TRANSIT, signed and stamped.';
     }
     if (e.kind === 'bar') return 'You mix a quick martini. Shaken, given the circumstances. Morale restored; aim unaffected, officially.';
+    if (e.kind === 'tvconsole') {
+      e.on = !e.on;
+      Sfx.pick();
+      return e.on ? 'The picture snaps to life — a rerun flickering through the static.' : 'The picture dies. Better reception elsewhere, probably.';
+    }
     if (['goon', 'brute', 'sniper'].includes(e.kind) && !e.dead) {
       if (selected === 'lettersoftransit' || selected === 'phrase') {
         const geo = World.getGeo();
@@ -560,11 +567,13 @@ const Adventure = (() => {
         if (!e.casingOpen) { Sfx.denied(); return 'Sealed shut. Get the casing off first — you will need a screwdriver.'; }
         if (flags.gaveLetterToZ) {
           flags.bombDefused = true;
+          e.cut = 'blue';
           Sfx.power();
           if (winFn) winFn();
           return 'You cut the blue wire. The world is saved!';
         }
         flags.bombFailed = true;
+        e.cut = 'red';
         Sfx.denied();
         if (loseFn) loseFn();
         return 'You cut the red wire.';
