@@ -337,7 +337,8 @@ const World = (() => {
     {
       "kind": "desk",
       "x": 28.43,
-      "y": 11.5
+      "y": 11.5,
+      "scale": 1.07
     },
     {
       "kind": "bougainvillea",
@@ -372,19 +373,9 @@ const World = (() => {
       "y": 13.57
     },
     {
-      "kind": "microfichemachine",
-      "x": 29.67,
-      "y": 11.64
-    },
-    {
       "kind": "microfiche",
       "x": 23.67,
       "y": 6.94
-    },
-    {
-      "kind": "personnelfile",
-      "x": 30.57,
-      "y": 11.64
     },
     {
       "kind": "brute",
@@ -784,7 +775,7 @@ const World = (() => {
       "kind": "laundrylady",
       "x": 24.98,
       "y": 18.57,
-      "behavior": "wander"
+      "behavior": "stationary"
     },
     {
       "kind": "newsstand",
@@ -895,9 +886,28 @@ const World = (() => {
       "kind": "goon",
       "x": 4.03,
       "y": 2.02
+    },
+    {
+      "kind": "microfichemachine",
+      "x": 29.24,
+      "y": 10.97,
+      "scale": 0.51
+    },
+    {
+      "kind": "personnelfile",
+      "x": 30.5,
+      "y": 10.82,
+      "scale": 0.48
+    },
+    {
+      "kind": "filecab",
+      "x": 28.52,
+      "y": 14.18
     }
   ],
   "blown": false,
+  "musicUndercover": "undercover",
+  "musicCoverBlown": "coverblown",
   "geo": {
     "verts": [
       {
@@ -1831,6 +1841,54 @@ const World = (() => {
       {
         "x": 14.5,
         "y": 1
+      },
+      {
+        "x": 29,
+        "y": 11
+      },
+      {
+        "x": 29.5,
+        "y": 11
+      },
+      {
+        "x": 29.5,
+        "y": 10.5
+      },
+      {
+        "x": 29,
+        "y": 10.5
+      },
+      {
+        "x": 30,
+        "y": 11
+      },
+      {
+        "x": 31,
+        "y": 11
+      },
+      {
+        "x": 30,
+        "y": 10.5
+      },
+      {
+        "x": 31,
+        "y": 10.5
+      },
+      {
+        "x": 29.5,
+        "y": 13
+      },
+      {
+        "x": 30.5,
+        "y": 13
+      },
+      {
+        "x": 30.5,
+        "y": 13.5
+      },
+      {
+        "x": 29.5,
+        "y": 13.5
       }
     ],
     "sectors": [
@@ -1930,14 +1988,14 @@ const World = (() => {
           null,
           "azulejo",
           "brick",
-          null,
-          null,
-          "concretepergola",
+          "azulejo",
           null,
           "concretepergola",
+          "concretepergola",
+          "concretepergola",
+          "concretepergola",
+          "concretepergola",
           "stucco",
-          "stucco",
-          null,
           "stucco",
           "stucco",
           "stucco",
@@ -1945,7 +2003,7 @@ const World = (() => {
           "stucco",
           "stucco",
           "windowshut",
-          null,
+          "stucco",
           "windowshut",
           null,
           "stucco",
@@ -2034,7 +2092,7 @@ const World = (() => {
           null,
           "azulejo",
           null,
-          null,
+          "azulejo",
           "brick",
           null,
           "brick",
@@ -2524,7 +2582,7 @@ const World = (() => {
           81
         ],
         "floor": 0.4,
-        "ceil": 1.6,
+        "ceil": 1.8,
         "floorTex": "carpet",
         "ceilTex": "ceiltile",
         "sky": false,
@@ -2580,10 +2638,16 @@ const World = (() => {
         "loop": [
           82,
           88,
+          233,
+          234,
+          237,
+          238,
           89,
           93,
           92,
           90,
+          242,
+          241,
           97,
           96,
           91,
@@ -2597,16 +2661,49 @@ const World = (() => {
         "win": false,
         "hostile": false,
         "texScale": 1,
+        "wallTex": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "stucco",
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
         "wallStepTex": [
           null,
           null,
+          "brick",
+          "brick",
+          "brick",
+          "brick",
           null,
           "brick",
           null,
           null,
+          "brick"
+        ],
+        "wallStepFloorTex": [
           null,
           null,
+          "brick",
           null,
+          "brick",
+          "brick",
+          null,
+          "brick",
+          null,
+          null,
+          "brick",
           null
         ],
         "parent": -1
@@ -3319,6 +3416,75 @@ const World = (() => {
           "blast",
           null,
           null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          233,
+          236,
+          235,
+          234
+        ],
+        "floor": 0.6,
+        "ceil": 1.1,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "parent": -1
+      },
+      {
+        "loop": [
+          237,
+          239,
+          240,
+          238
+        ],
+        "floor": 0.7,
+        "ceil": 1.5,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          null,
+          "redbanner",
+          null,
+          null
+        ],
+        "parent": -1
+      },
+      {
+        "loop": [
+          242,
+          243,
+          244,
+          241
+        ],
+        "floor": 0.6,
+        "ceil": 1.1,
+        "floorTex": "carpet",
+        "ceilTex": "ceiltile",
+        "sky": false,
+        "win": false,
+        "hostile": false,
+        "texScale": 1,
+        "wallTex": [
+          null,
+          "mainframe",
+          null,
+          null
+        ],
+        "wallTexScale": [
+          1,
+          0.5,
+          1,
+          1
         ],
         "parent": -1
       }
