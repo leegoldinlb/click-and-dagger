@@ -589,16 +589,6 @@ const World = (() => {
       "y": 12.48
     },
     {
-      "kind": "wpn_golden",
-      "x": 27.36,
-      "y": 18.48
-    },
-    {
-      "kind": "wpn_laser",
-      "x": 24.23,
-      "y": 15.61
-    },
-    {
       "kind": "ammo",
       "x": 19.29,
       "y": 11.88
@@ -903,6 +893,61 @@ const World = (() => {
       "kind": "filecab",
       "x": 28.52,
       "y": 14.18
+    },
+    {
+      "kind": "baldini",
+      "x": 14.48,
+      "y": 16.57
+    },
+    {
+      "kind": "tv",
+      "x": 25.33,
+      "y": 0.93
+    },
+    {
+      "kind": "sheetmusic",
+      "x": 12.65,
+      "y": 10.15
+    },
+    {
+      "kind": "wilson",
+      "x": 24.92,
+      "y": 22.98
+    },
+    {
+      "kind": "lao",
+      "x": 27.1,
+      "y": 24.69
+    },
+    {
+      "kind": "disguise",
+      "x": 35.23,
+      "y": 14.88
+    },
+    {
+      "kind": "medkit",
+      "x": 37.46,
+      "y": 15
+    },
+    {
+      "kind": "ammo",
+      "x": 36.35,
+      "y": 15.08
+    },
+    {
+      "kind": "wpn_golden",
+      "x": 29.88,
+      "y": 11.88
+    },
+    {
+      "kind": "wpn_laser",
+      "x": 36.31,
+      "y": 14.58
+    },
+    {
+      "kind": "wpn_ar7",
+      "x": 13.35,
+      "y": 11.04
     }
   ],
   "blown": false,
@@ -2161,7 +2206,7 @@ const World = (() => {
           null,
           null,
           "stucco",
-          null,
+          "sandstone",
           "stucco",
           "stucco",
           null,
