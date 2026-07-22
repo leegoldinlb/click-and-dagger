@@ -23,6 +23,8 @@ const Adventure = (() => {
     // The Patsy (Dealey Plaza)
     gotPackage: false, curtainsUsed: false, coinsReady: false, gotCoins: false,
     gotDrPepper: false, metPatsy: false, patsyComplete: false,
+    // Lao & The Great Baldini (casino)
+    wilsonPlayed: false,
   };
   let verb = 'look';
   let selected = null;            // selected inventory item id
@@ -124,7 +126,7 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
@@ -146,6 +148,21 @@ const Adventure = (() => {
       case 'spy': return e.dead
         ? 'Sunglasses, still on. Some habits outlast the man.'
         : 'A rival operative in a black trench coat and dark glasses, sidearm drawn. Professional courtesy ends here.';
+      case 'lao': return e.dead
+        ? 'The house dealer, folded for good. Nobody was ever going to collect on his markers.'
+        : 'I’m pretty sure he’s cheating. I need to find a way to beat him at his own game.';
+      case 'baldini': return e.dead
+        ? 'The Great Baldini takes his final bow.'
+        : e.sad
+          ? 'He stares at his empty hands, done performing for the night.'
+          : 'Pick a card, any card!';
+      case 'wilson': return e.dead
+        ? 'The piano falls silent for good.'
+        : 'Wilson works the keys without looking up, sunglasses on indoors like it’s a religious observance.';
+      case 'tv': return e.on
+        ? 'The Tonight Show, still going. Johnny’s on a roll.'
+        : 'An old console TV, dark screen reflecting the room back at you.';
+      case 'sheetmusic': return 'Sheet music for “Anything Goes.” Wilson’s kind of song.';
       case 'civilianM': case 'civilianF': return e.dead
         ? 'A local, caught in the crossfire of somebody else’s war. This is on you.'
         : 'A Havana local, minding their own business — which, currently, is more than you can say for yourself.';
@@ -410,6 +427,11 @@ const Adventure = (() => {
         return 'A pair of pliers, well used.';
       case 'ciphermachine': case 'bomb': case 'microfichemachine': case 'sportscar':
         return 'That is bolted down, and staying that way.';
+      case 'sheetmusic':
+        if (inv.some(i => i.id === 'sheetmusic')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('sheetmusic', 'SHEET MUSIC');
+        return 'Sheet music for "Anything Goes." Wilson might appreciate a request.';
       case 'headshot':
         if (inv.some(i => i.id === 'headshot')) return 'You already have it.';
         World.removeEnt(e);
@@ -795,6 +817,53 @@ const Adventure = (() => {
         return 'Coins in, a satisfying clunk, and a cold Dr Pepper rolls out.';
       }
       return 'A vending machine, coin slot waiting.';
+    }
+    if (e.kind === 'tv') {
+      if (e.on) return 'The Tonight Show plays on. You already got what you came for.';
+      e.on = true;
+      addItem('magicianjoke', 'MAGICIAN JOKE');
+      Sfx.power();
+      return 'The picture snaps on. “What’s the one thing a bald magician can’t pull out of his hat? A hare.” You write it down — someone’s getting this joke whether he likes it or not.';
+    }
+    if (e.kind === 'baldini') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'magicianjoke') {
+        if (e.sad) return 'He’s heard enough jokes for one lifetime.';
+        e.sad = true;
+        removeItem('magicianjoke');
+        addItem('trickdeck', 'TRICK DECK');
+        Sfx.pick();
+        return '“What’s the point, I’m a joke. Take my cards, all my cards…” He slides a marked deck across the table, defeated.';
+      }
+      return e.sad ? 'He stares at his empty hands, done performing for the night.' : 'Pick a card, any card!';
+    }
+    if (e.kind === 'lao') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'trickdeck') {
+        if (e.mood !== 'distracted') {
+          Sfx.denied();
+          return '“No dirty tricks!” Lao doesn’t even look up from his own cards.';
+        }
+        e.mood = 'lost';
+        removeItem('trickdeck');
+        addItem('milliondollars', '1 MILLION DOLLARS');
+        Sfx.power();
+        return '“How could I lose? I never lose!” He shoves a stack across the table — a million dollars, give or take.';
+      }
+      return 'I’m pretty sure he’s cheating. I need to find a way to beat him at his own game.';
+    }
+    if (e.kind === 'wilson') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'sheetmusic') {
+        if (flags.wilsonPlayed) return 'He’s already playing your request.';
+        flags.wilsonPlayed = true;
+        removeItem('sheetmusic');
+        const laoEnt = World.ents.find(x => x.kind === 'lao' && !x.dead);
+        if (laoEnt) laoEnt.mood = 'distracted';
+        Sfx.pick();
+        return 'Wilson slides the sheet music onto the piano and launches into “Anything Goes.” Lao looks distracted. Time to make your move.';
+      }
+      return 'Wilson works the keys without looking up.';
     }
     if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman'].includes(e.kind))
       return e.dead ? 'There is nothing left to do here.' : 'They have nothing to do with your mission. Move along.';

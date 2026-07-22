@@ -9442,6 +9442,18 @@ const World = (() => {
   SPR.blackbelt = SPR.brute;
   SPR.soviet = SPR.goon;
   SPR.spy = SPR.sniper;
+  // Casino puzzle cast — Lao (3 moods), The Great Baldini (2), Wilson, and a
+  // TV — none have procedural art of their own, so alias a generic stand-in
+  // as a placeholder until shipped art loads.
+  SPR.lao = SPR.civilianM;
+  SPR.laoDistracted = SPR.civilianM;
+  SPR.laoLost = SPR.civilianM;
+  SPR.baldini = SPR.civilianM;
+  SPR.baldiniSad = SPR.civilianM;
+  SPR.wilson = SPR.civilianM;
+  SPR.tv = SPR.tvconsole;
+  SPR.tvOn = SPR.tvconsole;
+  SPR.sheetmusic = SPR.letter;
 
   // -------------------------------------------------------------------------
   // SHIPPED CHARACTER ART — real PNG assets replacing specific procedural
@@ -9512,6 +9524,15 @@ const World = (() => {
     blackbelt: 'assets/sprites/blackbelt.png?v=1',
     soviet: 'assets/sprites/soviet.png?v=1',
     spy: 'assets/sprites/spy.png?v=1',
+    lao: 'assets/sprites/lao.png?v=1',
+    laoDistracted: 'assets/sprites/laoDistracted.png?v=1',
+    laoLost: 'assets/sprites/laoLost.png?v=1',
+    baldini: 'assets/sprites/baldini.png?v=1',
+    baldiniSad: 'assets/sprites/baldiniSad.png?v=1',
+    wilson: 'assets/sprites/wilson.png?v=1',
+    tv: 'assets/sprites/tv.png?v=1',
+    tvOn: 'assets/sprites/tvOn.png?v=1',
+    sheetmusic: 'assets/sprites/sheetmusic.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
     blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash' };  // hit-flash white silhouettes
@@ -9783,6 +9804,28 @@ const World = (() => {
       behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
       getTex() { return this.dead ? SPR.civilianCorpse : SPR.streetartist; },
     }),
+    // casino puzzle cast: Lao's mood (normal/distracted/lost) and Baldini's mood
+    // (happy/sad) are plain state flags on the entity, same kind-preserving
+    // state-flip trick used for the double's suited/disguised states
+    lao: (x, y, e) => ({
+      kind: 'lao', name: 'LAO', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0, mood: 'normal',
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : this.mood === 'distracted' ? SPR.laoDistracted : this.mood === 'lost' ? SPR.laoLost : SPR.lao; },
+    }),
+    baldini: (x, y, e) => ({
+      kind: 'baldini', name: 'THE GREAT BALDINI', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0, sad: false,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : this.sad ? SPR.baldiniSad : SPR.baldini; },
+    }),
+    wilson: (x, y, e) => ({
+      kind: 'wilson', name: 'WILSON', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.wilson; },
+    }),
+    tv: (x, y) => prop('tv', 'TV', x, y, 0.85, true, {
+      on: false, getTex() { return this.on ? SPR.tvOn : SPR.tv; },
+    }),
+    sheetmusic: (x, y) => prop('sheetmusic', 'SHEET MUSIC', x, y, 0.32, false),
     headshot: (x, y) => prop('headshot', "MATRON'S HEADSHOT", x, y, 0.3, false),
     metroticket: (x, y) => prop('metroticket', 'METRO TICKET', x, y, 0.26, false),
     fabergeegg: (x, y) => prop('fabergeegg', 'FABERGÉ EGG', x, y, 0.55, true),
