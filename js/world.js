@@ -9524,7 +9524,7 @@ const World = (() => {
     blackbelt: 'assets/sprites/blackbelt.png?v=1',
     soviet: 'assets/sprites/soviet.png?v=1',
     spy: 'assets/sprites/spy.png?v=1',
-    lao: 'assets/sprites/lao.png?v=1',
+    lao: 'assets/sprites/lao.png?v=2',
     laoDistracted: 'assets/sprites/laoDistracted.png?v=1',
     laoLost: 'assets/sprites/laoLost.png?v=1',
     baldini: 'assets/sprites/baldini.png?v=1',

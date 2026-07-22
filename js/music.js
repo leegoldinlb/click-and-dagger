@@ -8,6 +8,7 @@ const MUSIC_TRACKS = {
   undercover: [
     { key: 'undercover', name: 'HAVANA' },
     { key: 'undercoverhk', name: 'HONG KONG' },
+    { key: 'undercoverussr', name: 'USSR' },
     { key: 'undercoverny', name: 'NEW YORK' },
     { key: 'undercoverap', name: 'ALPS' },
     { key: 'undercoverme', name: 'MIDDLE EAST' },
@@ -19,6 +20,7 @@ const MUSIC_TRACKS = {
     { key: 'coverblownny', name: 'NEW YORK' },
     { key: 'coverblownap', name: 'ALPS' },
     { key: 'coverblownme', name: 'MIDDLE EAST' },
+    { key: 'coverblownussr', name: 'USSR' },
     { key: 'coverblownparis', name: 'PARIS' },
   ],
 };
