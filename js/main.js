@@ -41,6 +41,11 @@ const Game = (() => {
     brute:  { speed: 1.3, meleeRange: 1.0,  meleeDmg: [12, 20], aggroR: 7, atkCd: 1.1 },
     sniper: { speed: 1.4, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 10, atkCd: 1.3,
               ranged: true, rangedRange: 7, rangedDmg: [10, 16] },
+    // gameplay-identical reskins of goon/brute/sniper — same numbers, different uniform
+    blackbelt: { speed: 1.3, meleeRange: 1.0,  meleeDmg: [12, 20], aggroR: 7, atkCd: 1.1 },
+    soviet:    { speed: 1.7, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 9, atkCd: 0.95 },
+    spy:       { speed: 1.4, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 10, atkCd: 1.3,
+                 ranged: true, rangedRange: 7, rangedDmg: [10, 16] },
     // 005 isn't hostile until "The Truth" is used on him — at that instant shoot()
     // rewrites his kind from 'agent005' to 'boss005', which is what actually pulls
     // him into this table (and out of NO_DAMAGE) — no separate aggro/AI code needed.

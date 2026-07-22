@@ -69,6 +69,9 @@ const Editor = (() => {
     { kind: 'wallclock', name: 'WALL CLOCK', spr: 'wallclock' },
     { kind: 'brute', name: 'BRUTE', spr: 'brute' },
     { kind: 'sniper', name: 'SNIPER', spr: 'sniper' },
+    { kind: 'blackbelt', name: 'BLACKBELT', spr: 'blackbelt' },
+    { kind: 'soviet', name: 'SOVIET SOLDIER', spr: 'soviet' },
+    { kind: 'spy', name: 'ENEMY SPY', spr: 'spy' },
     { kind: 'civilianM', name: 'CIVILIAN (M)', spr: 'civilianM' },
     { kind: 'civilianF', name: 'CIVILIAN (F)', spr: 'civilianF' },
     { kind: 'vendor', name: 'VENDOR', spr: 'vendor' },
@@ -194,7 +197,7 @@ const Editor = (() => {
   ];
   const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
   const WEAPON_KINDS = new Set(['medkit', 'ammo', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden', 'camera', 'disguise']);  // pulled out of PERSONNEL & PROPS into their own WEAPONS & POWER-UPS palette
-  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);
+  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);
   const ITEM_KINDS = new Set(['tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 

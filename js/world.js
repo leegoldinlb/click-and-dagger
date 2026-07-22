@@ -9436,6 +9436,13 @@ const World = (() => {
     } catch (e) { console.warn('Custom art failed to load.', e); }
   })();
 
+  // New enemy kinds (blackbelt/soviet/spy) are gameplay-identical reskins of
+  // brute/goon/sniper — no procedural art of their own, so alias to their
+  // twin's sprite as a placeholder until shipped art loads.
+  SPR.blackbelt = SPR.brute;
+  SPR.soviet = SPR.goon;
+  SPR.spy = SPR.sniper;
+
   // -------------------------------------------------------------------------
   // SHIPPED CHARACTER ART — real PNG assets replacing specific procedural
   // SPR entries by default (distinct from CUSTOM ART above, which is a
@@ -9502,8 +9509,12 @@ const World = (() => {
     ciphermachine: 'assets/sprites/ciphermachine.png?v=2',
     tvconsole: 'assets/sprites/tvconsole.png?v=1',
     tvconsoleOn: 'assets/sprites/tvconsoleOn.png?v=1',
+    blackbelt: 'assets/sprites/blackbelt.png?v=1',
+    soviet: 'assets/sprites/soviet.png?v=1',
+    spy: 'assets/sprites/spy.png?v=1',
   };
-  const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash' };  // hit-flash white silhouettes
+  const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
+    blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash' };  // hit-flash white silhouettes
                                                                                           // derived from these — regenerate
                                                                                           // whenever the base art is replaced
   function isTainted(img) {                                // a canvas holding this image would throw on getImageData —
@@ -9679,6 +9690,23 @@ const World = (() => {
       kind: 'sniper', name: 'SNIPER', x, y, solid: true, scale: 0.8,
       hp: 28, dead: false, aggro: false, atkT: 0, flash: 0,
       getTex() { return this.dead ? SPR.sniperCorpse : (this.flash > 0 ? SPR.sniperFlash : SPR.sniper); },
+    }),
+    // gameplay-identical reskins — same stats as their twin (see HOSTILE in main.js),
+    // just a different uniform for mission variety
+    blackbelt: (x, y) => ({
+      kind: 'blackbelt', name: 'BLACKBELT', x, y, solid: true, scale: 0.92,
+      hp: 90, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.blackbeltFlash : SPR.blackbelt); },
+    }),
+    soviet: (x, y) => ({
+      kind: 'soviet', name: 'SOVIET SOLDIER', x, y, solid: true, scale: 0.82,
+      hp: 45, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.sovietFlash : SPR.soviet); },
+    }),
+    spy: (x, y) => ({
+      kind: 'spy', name: 'ENEMY SPY', x, y, solid: true, scale: 0.8,
+      hp: 28, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.spyFlash : SPR.spy); },
     }),
     // neutral Havana locals: `behavior` is 'wander' (default) or 'stationary', authored per-entity.
     // Low HP — any hit ends them; three dead civilians ends the mission (see main.js).

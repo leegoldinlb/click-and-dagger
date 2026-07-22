@@ -124,7 +124,7 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
@@ -137,6 +137,15 @@ const Adventure = (() => {
       case 'sniper': return e.dead
         ? 'His rifle lies where it fell. It never got the shot it wanted.'
         : 'A marksman under a wide-brim hat, rifle slung and ready. Best not to give him a clean line.';
+      case 'blackbelt': return e.dead
+        ? 'The belt was earned. The fight, less so.'
+        : 'A martial artist in a crisp white gi, black belt cinched tight. No gun — he has never needed one.';
+      case 'soviet': return e.dead
+        ? 'The fur hat rolled clear. The rifle didn\'t get the chance.'
+        : 'A Red Army regular in a heavy greatcoat, rifle held at the ready. Volkov imports his muscle.';
+      case 'spy': return e.dead
+        ? 'Sunglasses, still on. Some habits outlast the man.'
+        : 'A rival operative in a black trench coat and dark glasses, sidearm drawn. Professional courtesy ends here.';
       case 'civilianM': case 'civilianF': return e.dead
         ? 'A local, caught in the crossfire of somebody else’s war. This is on you.'
         : 'A Havana local, minding their own business — which, currently, is more than you can say for yourself.';
@@ -487,7 +496,7 @@ const Adventure = (() => {
       Sfx.pick();
       return e.on ? 'The picture snaps to life — a rerun flickering through the static.' : 'The picture dies. Better reception elsewhere, probably.';
     }
-    if (['goon', 'brute', 'sniper'].includes(e.kind) && !e.dead) {
+    if (['goon', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy'].includes(e.kind) && !e.dead) {
       if (selected === 'lettersoftransit' || selected === 'phrase') {
         const geo = World.getGeo();
         let count = 0;
