@@ -100,8 +100,8 @@ const Game = (() => {
     G.combat = document.pointerLockElement === canvas;
     document.body.classList.toggle('adventure', !G.combat);
     modeEl.textContent = G.combat
-      ? 'COMBAT MODE — F (or right-click) to holster & point-and-click'
-      : 'ADVENTURE MODE — pick a verb, click the world · F (or right-click) to draw your gun';
+      ? 'COMBAT MODE — TAB (or right-click) to holster & point-and-click'
+      : 'ADVENTURE MODE — pick a verb, click the world · TAB (or right-click) to draw your gun';
   }
   document.addEventListener('pointerlockchange', syncMode);
   document.addEventListener('pointerlockerror', syncMode);
@@ -124,7 +124,11 @@ const Game = (() => {
     if (G.combat) document.exitPointerLock();
     else requestCombat();
   }
-  document.addEventListener('contextmenu', e => { e.preventDefault(); toggleMode(); });
+  // Chrome refuses requestPointerLock() when called from a contextmenu handler
+  // (not a valid user gesture) — so the toggle has to fire on mousedown instead;
+  // contextmenu is only used to suppress the native right-click menu.
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('mousedown', e => { if (e.button === 2) toggleMode(); });
   document.getElementById('drawgun').addEventListener('click', requestCombat);
 
   // ---------------------------------------------------------------- input --
@@ -135,7 +139,7 @@ const Game = (() => {
     if (G.started && !G.over) {
       const wi = WEAPON_KEYS.indexOf(e.code);
       if (wi >= 0) switchWeapon(WEAPON_ORDER[wi]);
-      if (e.code === 'KeyF' && !e.repeat) toggleMode();   // faster than right-click for switching combat <-> adventure
+      if (e.code === 'Tab') { e.preventDefault(); if (!e.repeat) toggleMode(); }   // faster than right-click for switching combat <-> adventure
       if ((e.code === 'ControlLeft' || e.code === 'ControlRight') && G.combat) { ctrlDown = true; if (!e.repeat) shoot(); }
     }
   });
