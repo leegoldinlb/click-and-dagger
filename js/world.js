@@ -9578,6 +9578,18 @@ const World = (() => {
     tv: 'assets/sprites/tv.png?v=1',
     tvOn: 'assets/sprites/tvOn.png?v=1',
     sheetmusic: 'assets/sprites/sheetmusic.png?v=1',
+    plant: 'assets/sprites/plant.png?v=1',
+    hedge: 'assets/sprites/hedge.png?v=1',
+    phonebooth: 'assets/sprites/phonebooth.png?v=1',
+    royalpalm: 'assets/sprites/royalpalm.png?v=1',
+    bananaplant: 'assets/sprites/bananaplant.png?v=1',
+    parkbench: 'assets/sprites/parkbench.png?v=1',
+    firehydrant: 'assets/sprites/firehydrant.png?v=1',
+    mailbox: 'assets/sprites/mailbox.png?v=1',
+    streetlamp: 'assets/sprites/streetlamp.png?v=1',
+    bookshelf: 'assets/sprites/bookshelf.png?v=1',
+    radioset: 'assets/sprites/radioset.png?v=1',
+    bar: 'assets/sprites/barcart.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
     blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash' };  // hit-flash white silhouettes

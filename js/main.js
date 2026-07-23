@@ -100,8 +100,8 @@ const Game = (() => {
     G.combat = document.pointerLockElement === canvas;
     document.body.classList.toggle('adventure', !G.combat);
     modeEl.textContent = G.combat
-      ? 'COMBAT MODE — TAB (or right-click) to holster & point-and-click'
-      : 'ADVENTURE MODE — pick a verb, click the world · TAB (or right-click) to draw your gun';
+      ? 'COMBAT MODE — TAB, F, or right-click to holster & point-and-click'
+      : 'ADVENTURE MODE — pick a verb, click the world · TAB, F, or right-click to draw your gun';
   }
   document.addEventListener('pointerlockchange', syncMode);
   document.addEventListener('pointerlockerror', syncMode);
@@ -139,7 +139,7 @@ const Game = (() => {
     if (G.started && !G.over) {
       const wi = WEAPON_KEYS.indexOf(e.code);
       if (wi >= 0) switchWeapon(WEAPON_ORDER[wi]);
-      if (e.code === 'Tab') { e.preventDefault(); if (!e.repeat) toggleMode(); }   // faster than right-click for switching combat <-> adventure
+      if (e.code === 'Tab' || e.code === 'KeyF') { e.preventDefault(); if (!e.repeat) toggleMode(); }   // faster than right-click for switching combat <-> adventure
       if ((e.code === 'ControlLeft' || e.code === 'ControlRight') && G.combat) { ctrlDown = true; if (!e.repeat) shoot(); }
     }
   });
@@ -411,7 +411,7 @@ const Game = (() => {
           Music.setBlown(false);
           Adventure.msg('Glasses, nose, moustache, a tilted fedora — you become nobody in particular. Cover regained.', 4);
         } else {
-          Adventure.msg('A disguise kit. You already look like nobody in particular.');
+          continue;                                          // undercover already — leave the kit for when it's actually needed
         }
       } else {
         G.ammo.walther = Math.min(WEAPONS.walther.maxAmmo, G.ammo.walther + 10);
