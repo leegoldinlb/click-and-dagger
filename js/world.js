@@ -9506,6 +9506,14 @@ const World = (() => {
   SPR.bug = SPR.sedan;
   SPR.fiona = SPR.civilianM;
   SPR.fionaSit = SPR.civilianM;
+  // NY/Havana landmark buildings — also new kinds, no procedural art of their own
+  SPR.empirestate = SPR.eiffeltower;
+  SPR.firehouse = SPR.worldsfair;
+  SPR.unbuilding = SPR.eiffeltower;
+  SPR.chryslerbuilding = SPR.eiffeltower;
+  SPR.cathedral = SPR.notredame;
+  SPR.fort = SPR.sacrecoeur;
+  SPR.capitolio = SPR.notredame;
 
   // -------------------------------------------------------------------------
   // SHIPPED CHARACTER ART — real PNG assets replacing specific procedural
@@ -9606,7 +9614,8 @@ const World = (() => {
     bed: 'assets/sprites/bed.png?v=1',
     diningtable: 'assets/sprites/diningtable.png?v=1',
     guardpost: 'assets/sprites/guardpost.png?v=1',
-    newsstand: 'assets/sprites/newsstand.png?v=1',
+    newsstand: 'assets/sprites/newsstand.png?v=2',
+    glassbooth: 'assets/sprites/glassbooth.png?v=1',
     sofa: 'assets/sprites/sofa.png?v=1',
     armchair: 'assets/sprites/armchair.png?v=1',
     stationwagon: 'assets/sprites/stationwagon.png?v=1',
@@ -9616,6 +9625,13 @@ const World = (() => {
     bug: 'assets/sprites/bug.png?v=1',
     fiona: 'assets/sprites/fiona.png?v=1',
     fionaSit: 'assets/sprites/fionaSit.png?v=1',
+    empirestate: 'assets/sprites/empirestate.png?v=1',
+    firehouse: 'assets/sprites/firehouse.png?v=1',
+    unbuilding: 'assets/sprites/unbuilding.png?v=1',
+    chryslerbuilding: 'assets/sprites/chryslerbuilding.png?v=1',
+    cathedral: 'assets/sprites/cathedral.png?v=1',
+    fort: 'assets/sprites/fort.png?v=1',
+    capitolio: 'assets/sprites/capitolio.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
     blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash' };  // hit-flash white silhouettes
@@ -10000,6 +10016,15 @@ const World = (() => {
     louvrepyramid: (x, y) => prop('louvrepyramid', 'LOUVRE PYRAMID', x, y, 1.3, true),
     moulinrouge: (x, y) => prop('moulinrouge', 'MOULIN ROUGE', x, y, 1.3, true),
     sacrecoeur: (x, y) => prop('sacrecoeur', 'SACRÉ-CŒUR', x, y, 1.6, true),
+    // NYC landmarks
+    empirestate: (x, y) => prop('empirestate', 'EMPIRE STATE BUILDING', x, y, 2.6, true),
+    chryslerbuilding: (x, y) => prop('chryslerbuilding', 'CHRYSLER BUILDING', x, y, 2.4, true),
+    unbuilding: (x, y) => prop('unbuilding', 'U.N. HEADQUARTERS', x, y, 2.0, true),
+    firehouse: (x, y) => prop('firehouse', 'FIREHOUSE', x, y, 1.6, true),
+    // Havana landmarks
+    cathedral: (x, y) => prop('cathedral', 'HAVANA CATHEDRAL', x, y, 1.8, true),
+    capitolio: (x, y) => prop('capitolio', 'EL CAPITOLIO', x, y, 1.8, true),
+    fort: (x, y) => prop('fort', 'EL MORRO', x, y, 1.6, true),
     // Mid-century suburbia wave
     stationwagon: (x, y) => prop('stationwagon', 'STATION WAGON', x, y, 1.3, true),
     mailboxpost: (x, y) => prop('mailboxpost', 'MAILBOX', x, y, 0.6, true),
