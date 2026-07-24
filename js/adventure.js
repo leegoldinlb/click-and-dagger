@@ -159,6 +159,9 @@ const Adventure = (() => {
       case 'wilson': return e.dead
         ? 'The piano falls silent for good.'
         : 'Wilson works the keys without looking up, sunglasses on indoors like it’s a religious observance.';
+      case 'fiona': return e.sitting
+        ? 'Fiona, sitting pretty, thoroughly pleased with herself.'
+        : 'Fiona. Best dog in Havana, possibly the world. She is not part of this mission.';
       case 'tv': return e.on
         ? 'The Tonight Show, still going. Johnny’s on a roll.'
         : 'An old console TV, dark screen reflecting the room back at you.';
@@ -864,6 +867,13 @@ const Adventure = (() => {
         return 'Wilson slides the sheet music onto the piano and launches into “Anything Goes.” Lao looks distracted. Time to make your move.';
       }
       return 'Wilson works the keys without looking up.';
+    }
+    if (e.kind === 'fiona') {
+      Sfx.bark();
+      if (e.sitting) return 'Fiona barks once, then goes back to looking pleased with herself.';
+      e.sitting = true;
+      addItem('love', 'LOVE');
+      return 'Fiona sits, barks once, and looks up at you like you invented dogs. You feel a little better about all this.';
     }
     if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman'].includes(e.kind))
       return e.dead ? 'There is nothing left to do here.' : 'They have nothing to do with your mission. Move along.';

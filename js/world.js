@@ -9499,6 +9499,13 @@ const World = (() => {
   SPR.tv = SPR.tvconsole;
   SPR.tvOn = SPR.tvconsole;
   SPR.sheetmusic = SPR.letter;
+  // Hong Kong/Paris bar stalls and the VW Bug are new prop kinds with no
+  // procedural art of their own either — same placeholder-until-loaded deal.
+  SPR.hongkongbar = SPR.teastall;
+  SPR.parisbar = SPR.bar;
+  SPR.bug = SPR.sedan;
+  SPR.fiona = SPR.civilianM;
+  SPR.fionaSit = SPR.civilianM;
 
   // -------------------------------------------------------------------------
   // SHIPPED CHARACTER ART — real PNG assets replacing specific procedural
@@ -9590,6 +9597,25 @@ const World = (() => {
     bookshelf: 'assets/sprites/bookshelf.png?v=1',
     radioset: 'assets/sprites/radioset.png?v=1',
     bar: 'assets/sprites/barcart.png?v=1',
+    officechair: 'assets/sprites/officechair.png?v=1',
+    sedan: 'assets/sprites/sedan.png?v=1',
+    teastall: 'assets/sprites/teastall.png?v=1',
+    junkboat: 'assets/sprites/junkboat.png?v=1',
+    neonsignboard: 'assets/sprites/neonsignboard.png?v=1',
+    lanternstring: 'assets/sprites/lanternstring.png?v=1',
+    bed: 'assets/sprites/bed.png?v=1',
+    diningtable: 'assets/sprites/diningtable.png?v=1',
+    guardpost: 'assets/sprites/guardpost.png?v=1',
+    newsstand: 'assets/sprites/newsstand.png?v=1',
+    sofa: 'assets/sprites/sofa.png?v=1',
+    armchair: 'assets/sprites/armchair.png?v=1',
+    stationwagon: 'assets/sprites/stationwagon.png?v=1',
+    vespa: 'assets/sprites/vespa.png?v=1',
+    hongkongbar: 'assets/sprites/hongkongbar.png?v=1',
+    parisbar: 'assets/sprites/parisbar.png?v=1',
+    bug: 'assets/sprites/bug.png?v=1',
+    fiona: 'assets/sprites/fiona.png?v=1',
+    fionaSit: 'assets/sprites/fionaSit.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
     blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash' };  // hit-flash white silhouettes
@@ -10021,6 +10047,18 @@ const World = (() => {
     lanternstring: (x, y) => prop('lanternstring', 'PAPER LANTERNS', x, y, 0.9, false),
     teastall: (x, y) => prop('teastall', 'TEA STALL', x, y, 1.0, true),
     birdcage: (x, y) => prop('birdcage', 'BIRD CAGE', x, y, 0.7, false),
+    hongkongbar: (x, y) => prop('hongkongbar', 'HONG KONG BAR', x, y, 1.0, true),
+    parisbar: (x, y) => prop('parisbar', 'PARIS BAR', x, y, 1.0, true),
+    bug: (x, y) => prop('bug', 'VW BUG', x, y, 1.3, true),
+    // Fiona: a real dog, not a mission target — NO_DAMAGE (main.js) keeps her
+    // un-shootable regardless of hp. USE makes her sit (see adventure.js) and
+    // hands over the "love" item exactly once.
+    fiona: (x, y, e) => ({
+      kind: 'fiona', name: 'FIONA', x, y, solid: true, scale: 0.55, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      sitting: false,
+      getTex() { return this.sitting ? SPR.fionaSit : SPR.fiona; },
+    }),
   };
 
   function removeEnt(ent) {
@@ -10073,6 +10111,9 @@ const World = (() => {
       // per-instance scale override (editor's +/- resize) — every FACT entry sets
       // its own default `scale`, this lets one placed copy be bigger/smaller
       if (e.scale != null) ent.scale = e.scale;
+      // per-instance flatten override (editor's M/,/. toggle) — a flattened sprite
+      // renders as a fixed 2D plane at flatAngle instead of a camera-facing billboard
+      if (e.flat) { ent.flat = true; ent.flatAngle = e.flatAngle || 0; }
       ents.push(ent);
     }
     spawn.x = level.spawn.x; spawn.y = level.spawn.y; spawn.a = level.spawn.a;

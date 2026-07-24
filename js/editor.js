@@ -75,6 +75,7 @@ const Editor = (() => {
     { kind: 'lao', name: 'LAO', spr: 'lao' },
     { kind: 'baldini', name: 'THE GREAT BALDINI', spr: 'baldini' },
     { kind: 'wilson', name: 'WILSON', spr: 'wilson' },
+    { kind: 'fiona', name: 'FIONA', spr: 'fiona' },
     { kind: 'tv', name: 'TV', spr: 'tv' },
     { kind: 'sheetmusic', name: 'SHEET MUSIC', spr: 'sheetmusic' },
     { kind: 'civilianM', name: 'CIVILIAN (M)', spr: 'civilianM' },
@@ -90,6 +91,7 @@ const Editor = (() => {
     { kind: 'defector', name: 'THE DEFECTOR', spr: 'defector' },
     { kind: 'agent005', name: 'AGENT 005', spr: 'agent005' },
     { kind: 'sedan', name: 'SEDAN', spr: 'sedan' },
+    { kind: 'bug', name: 'VW BUG', spr: 'bug' },
     { kind: 'motorcycle', name: 'MOTORCYCLE', spr: 'motorcycle' },
     { kind: 'phonebooth', name: 'PHONE BOOTH', spr: 'phonebooth' },
     { kind: 'parkbench', name: 'PARK BENCH', spr: 'parkbench' },
@@ -145,6 +147,7 @@ const Editor = (() => {
     { kind: 'louvrepyramid', name: 'LOUVRE PYRAMID', spr: 'louvrepyramid' },
     { kind: 'moulinrouge', name: 'MOULIN ROUGE', spr: 'moulinrouge' },
     { kind: 'sacrecoeur', name: 'SACRÉ-CŒUR', spr: 'sacrecoeur' },
+    { kind: 'parisbar', name: 'PARIS BAR', spr: 'parisbar' },
     { kind: 'stationwagon', name: 'STATION WAGON', spr: 'stationwagon' },
     { kind: 'mailboxpost', name: 'MAILBOX', spr: 'mailboxpost' },
     { kind: 'bbqgrill', name: 'BBQ GRILL', spr: 'bbqgrill' },
@@ -184,6 +187,7 @@ const Editor = (() => {
     { kind: 'neonsignboard', name: 'NEON SIGNBOARD', spr: 'neonsignboard' },
     { kind: 'lanternstring', name: 'PAPER LANTERNS', spr: 'lanternstring' },
     { kind: 'teastall', name: 'TEA STALL', spr: 'teastall' },
+    { kind: 'hongkongbar', name: 'HONG KONG BAR', spr: 'hongkongbar' },
     { kind: 'birdcage', name: 'BIRD CAGE', spr: 'birdcage' },
     { kind: 'matron', name: 'THE MATRON', spr: 'matron' },
     { kind: 'streetartist', name: 'STREET ARTIST', spr: 'streetartist' },
@@ -202,7 +206,7 @@ const Editor = (() => {
   ];
   const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
   const WEAPON_KINDS = new Set(['medkit', 'ammo', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden', 'camera', 'disguise']);  // pulled out of PERSONNEL & PROPS into their own WEAPONS & POWER-UPS palette
-  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson']);
+  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona']);
   const ITEM_KINDS = new Set(['tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'sheetmusic']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 
@@ -1257,6 +1261,29 @@ const Editor = (() => {
     if (idx >= 0 && lv.ents[idx]) lv.ents[idx].behavior = ent.behavior;
     status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + ent.behavior.toUpperCase());
   }
+  // M: flatten ⇄ billboard toggle on the entity under the crosshair — a
+  // flattened sprite stops turning to face the camera and instead renders as
+  // a fixed 2D plane at flatAngle (see geoRotateEntFlat, below).
+  function geoToggleEntFlat() {
+    const r = pickEntNear();
+    if (!r) { status('LOOK AT AN OBJECT.'); return; }
+    const ent = r.ent, idx = World.ents.indexOf(ent);
+    ent.flat = !ent.flat;
+    if (ent.flat && ent.flatAngle == null) ent.flatAngle = 0;
+    if (idx >= 0 && lv.ents[idx]) { lv.ents[idx].flat = ent.flat; lv.ents[idx].flatAngle = ent.flatAngle; }
+    status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + (ent.flat ? 'FLATTENED  ( , . to rotate )' : 'BILLBOARD'));
+  }
+  // , / . : rotate a flattened entity 45° at a time — no-op (with a hint) on
+  // an ordinary billboard sprite, which has no fixed facing to rotate.
+  function geoRotateEntFlat(dir) {
+    const r = pickEntNear();
+    if (!r) { status('LOOK AT AN OBJECT.'); return; }
+    const ent = r.ent, idx = World.ents.indexOf(ent);
+    if (!ent.flat) { status((ent.name || ent.kind || 'OBJECT').toUpperCase() + " ISN'T FLATTENED — PRESS M FIRST."); return; }
+    ent.flatAngle = ((ent.flatAngle || 0) + dir * Math.PI / 4 + Math.PI * 2) % (Math.PI * 2);
+    if (idx >= 0 && lv.ents[idx]) lv.ents[idx].flatAngle = ent.flatAngle;
+    status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' FACING → ' + Math.round(ent.flatAngle * 180 / Math.PI) + '°');
+  }
   // +/- : grow/shrink the placed entity under the crosshair — lets a landmark
   // prop (or anything else) be scaled up into background scenery, or down to
   // fit a tight spot, independent of that kind's baseline FACT scale.
@@ -1662,6 +1689,9 @@ const Editor = (() => {
     // blocks movement, independent of any sector/wall sculpting
     if (e.code === 'KeyJ') { if (!e.repeat) pushUndo(); geoToggleEntSolid(); e.preventDefault(); return; }
     if (e.code === 'KeyB') { if (!e.repeat) pushUndo(); geoToggleEntWander(); e.preventDefault(); return; }
+    if (e.code === 'KeyM') { if (!e.repeat) pushUndo(); geoToggleEntFlat(); e.preventDefault(); return; }
+    if (e.code === 'Comma') { if (!e.repeat) pushUndo(); geoRotateEntFlat(-1); e.preventDefault(); return; }
+    if (e.code === 'Period') { if (!e.repeat) pushUndo(); geoRotateEntFlat(+1); e.preventDefault(); return; }
     if (e.code === 'Equal' || e.code === 'NumpadAdd') { if (!e.repeat) pushUndo(); geoScaleEnt(+1); e.preventDefault(); return; }
     if (e.code === 'Minus' || e.code === 'NumpadSubtract') { if (!e.repeat) pushUndo(); geoScaleEnt(-1); e.preventDefault(); return; }
     if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyC'].includes(e.code)) {

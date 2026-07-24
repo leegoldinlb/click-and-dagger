@@ -643,6 +643,56 @@ const Engine = (() => {
     vis2.sort((a, b) => b.d - a.d);
     for (const s of vis2) {
       const e = s.e, d = s.d;
+      if (e.flat) {                                       // flattened: a fixed 2D plane at flatAngle, not a
+        const sc = e.dead ? 0.3 : e.scale;                 // camera-facing billboard — projected the same way
+        const ang = e.flatAngle || 0, hw = sc / 2;         // the wall renderer projects a textured wall segment
+        const ddx = Math.cos(ang) * hw, ddy = Math.sin(ang) * hw;
+        // double-sided: try the A→B winding, and if that's back-facing (viewed
+        // from behind), swap to B→A instead of culling — same plane, same
+        // texture, just walked the other way, so the back reads correctly
+        // rather than being invisible or mirrored backwards
+        let Ax = e.x - ddx, Ay = e.y - ddy, Bx = e.x + ddx, By = e.y + ddy;
+        let ad = (Ax - px) * cosA + (Ay - py) * sinA, as_ = (Ax - px) * -sinA + (Ay - py) * cosA;
+        let bd = (Bx - px) * cosA + (By - py) * sinA, bs = (Bx - px) * -sinA + (By - py) * cosA;
+        if (ad < NEAR && bd < NEAR) continue;
+        if ((W / 2 + (as_ / Math.max(ad, NEAR)) * FX) >= (W / 2 + (bs / Math.max(bd, NEAR)) * FX)) {
+          [Ax, Bx] = [Bx, Ax]; [Ay, By] = [By, Ay];
+          [ad, bd] = [bd, ad]; [as_, bs] = [bs, as_];
+        }
+        let ua = 0, ub = sc;
+        if (ad < NEAR) { const t = (NEAR - ad) / (bd - ad); ad = NEAR; as_ += (bs - as_) * t; ua += (ub - ua) * t; }
+        else if (bd < NEAR) { const t = (NEAR - bd) / (ad - bd); bd = NEAR; bs += (as_ - bs) * t; ub += (ua - ub) * t; }
+        const x1 = W / 2 + (as_ / ad) * FX, x2 = W / 2 + (bs / bd) * FX;
+        if (x1 >= x2) continue;                            // degenerate (edge-on) — nothing to draw
+        const fz = geoFloorAtXY(geo, graph, e.x, e.y, e.sector), cz = fz + sc;
+        const yc1 = horizon - (cz - eyeZ) * H / ad, yc2 = horizon - (cz - eyeZ) * H / bd;
+        const yf1 = horizon - (fz - eyeZ) * H / ad, yf2 = horizon - (fz - eyeZ) * H / bd;
+        const iz1 = 1 / ad, iz2 = 1 / bd, uz1 = ua / ad, uz2 = ub / bd;
+        const span = x2 - x1;
+        const xs = Math.max(0, Math.ceil(x1)), xe = Math.min(W - 1, Math.floor(x2));
+        const tex = cacheOf(e.getTex());
+        let drawn = false, minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+        for (let x = xs; x <= xe; x++) {
+          const f = (x - x1) / span;
+          const yTop = yc1 + (yc2 - yc1) * f, yBot = yf1 + (yf2 - yf1) * f;
+          const zdist = 1 / (iz1 + (iz2 - iz1) * f);
+          const u = (uz1 + (uz2 - uz1) * f) * zdist;
+          const texU = clamp(((u / sc) * tex.w) | 0, 0, tex.w - 1);
+          const y0i = Math.max(0, Math.ceil(yTop)), y1i = Math.min(H - 1, Math.floor(yBot));
+          const fog = fogAt(zdist);
+          for (let y = y0i; y <= y1i; y++) {
+            const idx = y * W + x;
+            if (zdist > depth[idx] + 0.05) continue;
+            const texY = clamp((((y - yTop) / (yBot - yTop)) * tex.h) | 0, 0, tex.h - 1);
+            const c = tex.u32[texY * tex.w + texU];
+            if ((c >>> 24) < 128) continue;
+            buf[idx] = shade(c, fog); drawn = true;
+          }
+          if (y0i <= y1i) { if (x < minX) minX = x; if (x > maxX) maxX = x; if (yTop < minY) minY = yTop; if (yBot > maxY) maxY = yBot; }
+        }
+        if (drawn) rects.push({ ent: e, x0: minX, x1: maxX, y0: minY, y1: maxY, dist: (ad + bd) / 2 });
+        continue;
+      }
       const sx = W / 2 + (s.side / d) * FX;
       const sc = e.dead ? 0.3 : e.scale;
       // Read the live vector sector's floor (geoFloorAtXY), not the grid's cached
