@@ -166,6 +166,105 @@ const Adventure = (() => {
         ? 'The Tonight Show, still going. Johnny’s on a roll.'
         : 'An old console TV, dark screen reflecting the room back at you.';
       case 'sheetmusic': return 'Sheet music for “Anything Goes.” Wilson’s kind of song.';
+      case 'nyofficer': return e.dead
+        ? 'An officer down. This gets messy fast.'
+        : 'A beat cop, watching the street. Not your problem, hopefully.';
+      case 'nyfirefighter': return e.dead
+        ? 'A firefighter, gone. New York keeps score.'
+        : 'Off duty, hose coil slung over one shoulder out of habit.';
+      case 'nyconstruction': return e.dead
+        ? 'A hard hat in the gutter. He was just working.'
+        : 'Leaning on a wrench, unbothered by the skyline noise.';
+      case 'nybeatnik': return e.dead
+        ? 'The poetry stops here.'
+        : 'Reading something dense in a coffeehouse voice only he can hear.';
+      case 'nybusinessman': return e.dead
+        ? 'A businessman, permanently off the clock.'
+        : 'Checking his watch, already late for something that doesn’t matter.';
+      case 'nysocialite': return e.dead
+        ? 'The party’s over, for good.'
+        : 'Dressed for a party that isn’t this one.';
+      case 'nypainter': return e.dead
+        ? 'The canvas outlives the artist.'
+        : 'Sketchbook under one arm, paint under every fingernail.';
+      case 'nyoldtimer': return e.dead
+        ? 'An old-timer who’d seen everything except this.'
+        : 'Coffee in hand, coat over his arm, seen it all twice.';
+      case 'meprofessor': return e.dead
+        ? 'A professor with no more lectures to give.'
+        : 'Reading the paper like it owes him an explanation.';
+      case 'mestudent': return e.dead
+        ? 'A student who never made it to class.'
+        : 'Books hugged to her chest, cutting through the crowd.';
+      case 'meelder': return e.dead
+        ? 'An elder, at peace before this. Not after.'
+        : 'Prayer beads moving through his fingers, unhurried.';
+      case 'memother': return e.dead
+        ? 'There is nothing left to do here.'
+        : 'Holding her daughter’s hand, eyes on you a beat too long.';
+      case 'megirl': return e.dead
+        ? 'There is nothing left to do here.'
+        : 'Clutching a doll, half-hidden behind her mother.';
+      case 'mejournalist': return e.dead
+        ? 'A journalist who ran out of deadline.'
+        : 'Newspaper folded under one arm, always working an angle.';
+      case 'mesocialite': return e.dead
+        ? 'The conversation ends here.'
+        : 'Handbag swinging, mid-sentence to someone who isn’t there.';
+      case 'meantiquedealer': return e.dead
+        ? 'The shop just lost its best piece.'
+        : 'Cradling a carved figurine like it’s already sold.';
+      case 'meteacher': return e.dead
+        ? 'A teacher with no more lessons left.'
+        : 'Books stacked in one arm, bag slung over the other shoulder.';
+      case 'memusician': return e.dead
+        ? 'The music stops mid-phrase.'
+        : 'Fingers moving over the strings out of pure habit.';
+      case 'londonmod': return e.dead
+        ? 'The radio plays on. He doesn’t.'
+        : 'Transistor radio held up like a trophy, Union Jack helmet under one arm.';
+      case 'londonmodgirl': return e.dead
+        ? 'Swinging London, minus one.'
+        : 'Go-go boots, a hatbox, and absolutely nowhere to be.';
+      case 'londongangster': return e.dead
+        ? 'One less name in the paper.'
+        : 'Reading about the Krays like it’s a competitor’s earnings report.';
+      case 'londonpensioner': return e.dead
+        ? 'A pensioner who’d earned a quieter end than this.'
+        : 'The Sun under one arm, a toy bus under the other, in no rush at all.';
+      case 'londonartist': return e.dead
+        ? 'The sketchbooks fall closed.'
+        : 'Sketchbooks stacked to the chin, ink-stained fingers.';
+      case 'militiaman': return e.dead
+        ? 'A militiaman, off duty permanently.'
+        : 'Rifle slung, reading yesterday’s headline about the Revolution.';
+      case 'havanaofficial': return e.dead
+        ? 'One less official to report to.'
+        : 'Briefcase in hand, pin on her collar, watching everyone equally.';
+      case 'havanafarmer': return e.dead
+        ? 'A farmer who never made it back to the field.'
+        : 'A basket of fruit balanced on one hip, grinning at nothing in particular.';
+      case 'havanacanecutter': return e.dead
+        ? 'The cane field is short one worker.'
+        : 'Machete at his belt, coiled rope over one shoulder, mid-shift.';
+      case 'havanawriter': return e.dead
+        ? 'The last page stays blank.'
+        : 'Pen in hand, composing something he’ll never finish now.';
+      case 'cosmonaut': return e.dead
+        ? 'One fewer hero of the Soviet Union.'
+        : 'Helmet under one arm, holding a model rocket like a prize.';
+      case 'sovietofficial': return e.dead
+        ? 'One less official to report to.'
+        : 'Briefcase and book in hand, cataloguing the room without looking at it.';
+      case 'sovietcitizen': return e.dead
+        ? 'A citizen, unenrolled from everything now.'
+        : 'Pravda folded under one arm, unimpressed by all of it.';
+      case 'sovietshopper': return e.dead
+        ? 'The groceries never make it home.'
+        : 'String bag of bread and milk, queued for hours to get it.';
+      case 'sovietscientist': return e.dead
+        ? 'The notebook’s last entry goes unfinished.'
+        : 'Pen and notebook in hand, already annotating the day.';
       case 'civilianM': case 'civilianF': return e.dead
         ? 'A local, caught in the crossfire of somebody else’s war. This is on you.'
         : 'A Havana local, minding their own business — which, currently, is more than you can say for yourself.';
@@ -875,7 +974,12 @@ const Adventure = (() => {
       addItem('love', 'LOVE');
       return 'Fiona sits, barks once, and looks up at you like you invented dogs. You feel a little better about all this.';
     }
-    if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman'].includes(e.kind))
+    if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman',
+      'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer',
+      'meprofessor', 'mestudent', 'meelder', 'memother', 'megirl', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician',
+      'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist',
+      'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter',
+      'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist'].includes(e.kind))
       return e.dead ? 'There is nothing left to do here.' : 'They have nothing to do with your mission. Move along.';
     return 'That doesn’t work. And the clock is running.';
   }

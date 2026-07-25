@@ -76,6 +76,39 @@ const Editor = (() => {
     { kind: 'baldini', name: 'THE GREAT BALDINI', spr: 'baldini' },
     { kind: 'wilson', name: 'WILSON', spr: 'wilson' },
     { kind: 'fiona', name: 'FIONA', spr: 'fiona' },
+    { kind: 'nyofficer', name: 'NYPD OFFICER', spr: 'nyofficer' },
+    { kind: 'nyfirefighter', name: 'FIREFIGHTER', spr: 'nyfirefighter' },
+    { kind: 'nyconstruction', name: 'CONSTRUCTION WORKER', spr: 'nyconstruction' },
+    { kind: 'nybeatnik', name: 'BEATNIK', spr: 'nybeatnik' },
+    { kind: 'nybusinessman', name: 'BUSINESSMAN', spr: 'nybusinessman' },
+    { kind: 'nysocialite', name: 'SOCIALITE', spr: 'nysocialite' },
+    { kind: 'nypainter', name: 'PAINTER', spr: 'nypainter' },
+    { kind: 'nyoldtimer', name: 'OLD-TIMER', spr: 'nyoldtimer' },
+    { kind: 'meprofessor', name: 'PROFESSOR', spr: 'meprofessor' },
+    { kind: 'mestudent', name: 'STUDENT', spr: 'mestudent' },
+    { kind: 'meelder', name: 'ELDER', spr: 'meelder' },
+    { kind: 'memother', name: 'MOTHER', spr: 'memother' },
+    { kind: 'megirl', name: 'GIRL', spr: 'megirl' },
+    { kind: 'mejournalist', name: 'JOURNALIST', spr: 'mejournalist' },
+    { kind: 'mesocialite', name: 'SOCIALITE', spr: 'mesocialite' },
+    { kind: 'meantiquedealer', name: 'ANTIQUES DEALER', spr: 'meantiquedealer' },
+    { kind: 'meteacher', name: 'TEACHER', spr: 'meteacher' },
+    { kind: 'memusician', name: 'OUD PLAYER', spr: 'memusician' },
+    { kind: 'londonmod', name: 'MOD', spr: 'londonmod' },
+    { kind: 'londonmodgirl', name: 'MOD GIRL', spr: 'londonmodgirl' },
+    { kind: 'londongangster', name: 'GANGSTER', spr: 'londongangster' },
+    { kind: 'londonpensioner', name: 'PENSIONER', spr: 'londonpensioner' },
+    { kind: 'londonartist', name: 'ART STUDENT', spr: 'londonartist' },
+    { kind: 'militiaman', name: 'MILITIAMAN', spr: 'militiaman' },
+    { kind: 'havanaofficial', name: 'PARTY OFFICIAL', spr: 'havanaofficial' },
+    { kind: 'havanafarmer', name: 'FARMER', spr: 'havanafarmer' },
+    { kind: 'havanacanecutter', name: 'CANE CUTTER', spr: 'havanacanecutter' },
+    { kind: 'havanawriter', name: 'WRITER', spr: 'havanawriter' },
+    { kind: 'cosmonaut', name: 'COSMONAUT', spr: 'cosmonaut' },
+    { kind: 'sovietofficial', name: 'PARTY OFFICIAL', spr: 'sovietofficial' },
+    { kind: 'sovietcitizen', name: 'CITIZEN', spr: 'sovietcitizen' },
+    { kind: 'sovietshopper', name: 'SHOPPER', spr: 'sovietshopper' },
+    { kind: 'sovietscientist', name: 'SCIENTIST', spr: 'sovietscientist' },
     { kind: 'tv', name: 'TV', spr: 'tv' },
     { kind: 'sheetmusic', name: 'SHEET MUSIC', spr: 'sheetmusic' },
     { kind: 'civilianM', name: 'CIVILIAN (M)', spr: 'civilianM' },
@@ -213,7 +246,7 @@ const Editor = (() => {
   ];
   const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
   const WEAPON_KINDS = new Set(['medkit', 'ammo', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden', 'camera', 'disguise']);  // pulled out of PERSONNEL & PROPS into their own WEAPONS & POWER-UPS palette
-  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona']);
+  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'megirl', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
   const ITEM_KINDS = new Set(['tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'sheetmusic']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 

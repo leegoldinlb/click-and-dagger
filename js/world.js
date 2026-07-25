@@ -9514,6 +9514,40 @@ const World = (() => {
   SPR.cathedral = SPR.notredame;
   SPR.fort = SPR.sacrecoeur;
   SPR.capitolio = SPR.notredame;
+  // Regional background civilians — also new kinds, no procedural art of their own
+  SPR.nyofficer = SPR.civilianM;
+  SPR.nyfirefighter = SPR.civilianM;
+  SPR.nyconstruction = SPR.civilianM;
+  SPR.nybeatnik = SPR.civilianM;
+  SPR.nybusinessman = SPR.civilianM;
+  SPR.nysocialite = SPR.civilianF;
+  SPR.nypainter = SPR.civilianF;
+  SPR.nyoldtimer = SPR.civilianM;
+  SPR.meprofessor = SPR.civilianM;
+  SPR.mestudent = SPR.civilianF;
+  SPR.meelder = SPR.civilianM;
+  SPR.memother = SPR.civilianF;
+  SPR.megirl = SPR.civilianF;
+  SPR.mejournalist = SPR.civilianM;
+  SPR.mesocialite = SPR.civilianF;
+  SPR.meantiquedealer = SPR.civilianM;
+  SPR.meteacher = SPR.civilianF;
+  SPR.memusician = SPR.civilianM;
+  SPR.londonmod = SPR.civilianM;
+  SPR.londonmodgirl = SPR.civilianF;
+  SPR.londongangster = SPR.civilianM;
+  SPR.londonpensioner = SPR.civilianM;
+  SPR.londonartist = SPR.civilianF;
+  SPR.militiaman = SPR.civilianM;
+  SPR.havanaofficial = SPR.civilianF;
+  SPR.havanafarmer = SPR.civilianM;
+  SPR.havanacanecutter = SPR.civilianM;
+  SPR.havanawriter = SPR.civilianM;
+  SPR.cosmonaut = SPR.civilianM;
+  SPR.sovietofficial = SPR.civilianF;
+  SPR.sovietcitizen = SPR.civilianM;
+  SPR.sovietshopper = SPR.civilianF;
+  SPR.sovietscientist = SPR.civilianM;
 
   // -------------------------------------------------------------------------
   // SHIPPED CHARACTER ART — real PNG assets replacing specific procedural
@@ -9632,6 +9666,39 @@ const World = (() => {
     cathedral: 'assets/sprites/cathedral.png?v=1',
     fort: 'assets/sprites/fort.png?v=1',
     capitolio: 'assets/sprites/capitolio.png?v=1',
+    nyofficer: 'assets/sprites/nyofficer.png?v=1',
+    nyfirefighter: 'assets/sprites/nyfirefighter.png?v=1',
+    nyconstruction: 'assets/sprites/nyconstruction.png?v=1',
+    nybeatnik: 'assets/sprites/nybeatnik.png?v=1',
+    nybusinessman: 'assets/sprites/nybusinessman.png?v=1',
+    nysocialite: 'assets/sprites/nysocialite.png?v=1',
+    nypainter: 'assets/sprites/nypainter.png?v=1',
+    nyoldtimer: 'assets/sprites/nyoldtimer.png?v=1',
+    meprofessor: 'assets/sprites/meprofessor.png?v=1',
+    mestudent: 'assets/sprites/mestudent.png?v=1',
+    meelder: 'assets/sprites/meelder.png?v=1',
+    memother: 'assets/sprites/memother.png?v=1',
+    megirl: 'assets/sprites/megirl.png?v=1',
+    mejournalist: 'assets/sprites/mejournalist.png?v=1',
+    mesocialite: 'assets/sprites/mesocialite.png?v=1',
+    meantiquedealer: 'assets/sprites/meantiquedealer.png?v=1',
+    meteacher: 'assets/sprites/meteacher.png?v=1',
+    memusician: 'assets/sprites/memusician.png?v=1',
+    londonmod: 'assets/sprites/londonmod.png?v=1',
+    londonmodgirl: 'assets/sprites/londonmodgirl.png?v=1',
+    londongangster: 'assets/sprites/londongangster.png?v=1',
+    londonpensioner: 'assets/sprites/londonpensioner.png?v=1',
+    londonartist: 'assets/sprites/londonartist.png?v=1',
+    militiaman: 'assets/sprites/militiaman.png?v=1',
+    havanaofficial: 'assets/sprites/havanaofficial.png?v=1',
+    havanafarmer: 'assets/sprites/havanafarmer.png?v=1',
+    havanacanecutter: 'assets/sprites/havanacanecutter.png?v=1',
+    havanawriter: 'assets/sprites/havanawriter.png?v=1',
+    cosmonaut: 'assets/sprites/cosmonaut.png?v=1',
+    sovietofficial: 'assets/sprites/sovietofficial.png?v=1',
+    sovietcitizen: 'assets/sprites/sovietcitizen.png?v=1',
+    sovietshopper: 'assets/sprites/sovietshopper.png?v=1',
+    sovietscientist: 'assets/sprites/sovietscientist.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
     blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash' };  // hit-flash white silhouettes
@@ -10083,6 +10150,173 @@ const World = (() => {
       behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
       sitting: false,
       getTex() { return this.sitting ? SPR.fionaSit : SPR.fiona; },
+    }),
+    // Regional background civilians (NYC, Middle East, London, Havana, USSR)
+    // — same wander/stationary NPC pattern as the Havana civilian roster
+    nyofficer: (x, y, e) => ({
+      kind: 'nyofficer', name: 'NYPD OFFICER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.nyofficer; },
+    }),
+    nyfirefighter: (x, y, e) => ({
+      kind: 'nyfirefighter', name: 'FIREFIGHTER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.nyfirefighter; },
+    }),
+    nyconstruction: (x, y, e) => ({
+      kind: 'nyconstruction', name: 'CONSTRUCTION WORKER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.nyconstruction; },
+    }),
+    nybeatnik: (x, y, e) => ({
+      kind: 'nybeatnik', name: 'BEATNIK', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.nybeatnik; },
+    }),
+    nybusinessman: (x, y, e) => ({
+      kind: 'nybusinessman', name: 'BUSINESSMAN', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.nybusinessman; },
+    }),
+    nysocialite: (x, y, e) => ({
+      kind: 'nysocialite', name: 'SOCIALITE', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.nysocialite; },
+    }),
+    nypainter: (x, y, e) => ({
+      kind: 'nypainter', name: 'PAINTER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.nypainter; },
+    }),
+    nyoldtimer: (x, y, e) => ({
+      kind: 'nyoldtimer', name: 'OLD-TIMER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.nyoldtimer; },
+    }),
+    meprofessor: (x, y, e) => ({
+      kind: 'meprofessor', name: 'PROFESSOR', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.meprofessor; },
+    }),
+    mestudent: (x, y, e) => ({
+      kind: 'mestudent', name: 'STUDENT', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.mestudent; },
+    }),
+    meelder: (x, y, e) => ({
+      kind: 'meelder', name: 'ELDER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.meelder; },
+    }),
+    memother: (x, y, e) => ({
+      kind: 'memother', name: 'MOTHER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.memother; },
+    }),
+    megirl: (x, y, e) => ({
+      kind: 'megirl', name: 'GIRL', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.megirl; },
+    }),
+    mejournalist: (x, y, e) => ({
+      kind: 'mejournalist', name: 'JOURNALIST', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.mejournalist; },
+    }),
+    mesocialite: (x, y, e) => ({
+      kind: 'mesocialite', name: 'SOCIALITE', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.mesocialite; },
+    }),
+    meantiquedealer: (x, y, e) => ({
+      kind: 'meantiquedealer', name: 'ANTIQUES DEALER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.meantiquedealer; },
+    }),
+    meteacher: (x, y, e) => ({
+      kind: 'meteacher', name: 'TEACHER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.meteacher; },
+    }),
+    memusician: (x, y, e) => ({
+      kind: 'memusician', name: 'OUD PLAYER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.memusician; },
+    }),
+    londonmod: (x, y, e) => ({
+      kind: 'londonmod', name: 'MOD', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.londonmod; },
+    }),
+    londonmodgirl: (x, y, e) => ({
+      kind: 'londonmodgirl', name: 'MOD GIRL', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.londonmodgirl; },
+    }),
+    londongangster: (x, y, e) => ({
+      kind: 'londongangster', name: 'GANGSTER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.londongangster; },
+    }),
+    londonpensioner: (x, y, e) => ({
+      kind: 'londonpensioner', name: 'PENSIONER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.londonpensioner; },
+    }),
+    londonartist: (x, y, e) => ({
+      kind: 'londonartist', name: 'ART STUDENT', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.londonartist; },
+    }),
+    militiaman: (x, y, e) => ({
+      kind: 'militiaman', name: 'MILITIAMAN', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.militiaman; },
+    }),
+    havanaofficial: (x, y, e) => ({
+      kind: 'havanaofficial', name: 'PARTY OFFICIAL', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.havanaofficial; },
+    }),
+    havanafarmer: (x, y, e) => ({
+      kind: 'havanafarmer', name: 'FARMER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.havanafarmer; },
+    }),
+    havanacanecutter: (x, y, e) => ({
+      kind: 'havanacanecutter', name: 'CANE CUTTER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.havanacanecutter; },
+    }),
+    havanawriter: (x, y, e) => ({
+      kind: 'havanawriter', name: 'WRITER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.havanawriter; },
+    }),
+    cosmonaut: (x, y, e) => ({
+      kind: 'cosmonaut', name: 'COSMONAUT', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.cosmonaut; },
+    }),
+    sovietofficial: (x, y, e) => ({
+      kind: 'sovietofficial', name: 'PARTY OFFICIAL', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.sovietofficial; },
+    }),
+    sovietcitizen: (x, y, e) => ({
+      kind: 'sovietcitizen', name: 'CITIZEN', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.sovietcitizen; },
+    }),
+    sovietshopper: (x, y, e) => ({
+      kind: 'sovietshopper', name: 'SHOPPER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.sovietshopper; },
+    }),
+    sovietscientist: (x, y, e) => ({
+      kind: 'sovietscientist', name: 'SCIENTIST', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.sovietscientist; },
     }),
   };
 
