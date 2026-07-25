@@ -167,6 +167,7 @@ input[type="number"] { width: 52px; }
   margin-top: 8px; font-size: 11px; letter-spacing: 1px; color: var(--parchment-dim); line-height: 1.6;
 }
 #drawhelp b { color: var(--gold-bright); }
+#drawhelp a, #pcontrols a { color: var(--gold-bright); }
 #viewhint { color: #8a7a58; font-size: 11px; letter-spacing: 1px; }
 #gridscroll {
   display: inline-block;
@@ -243,6 +244,16 @@ input[type="number"] { width: 52px; }
   color: var(--parchment-dim);
 }
 #status { color: var(--gold-bright); }
+
+#helplink {
+  position: fixed; right: 16px; bottom: 14px; z-index: 20;
+  padding: 5px 12px;
+  background: linear-gradient(160deg, var(--panel-hi), var(--panel-lo));
+  border: 2px solid var(--brass-dim);
+  box-shadow: inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo);
+  color: var(--gold); text-decoration: none; font-size: 11px; letter-spacing: 1px;
+}
+#helplink:hover { color: var(--gold-bright); border-color: var(--brass); }
 
 #checks { list-style: none; font-size: 11px; letter-spacing: 0.5px; line-height: 1.9; }
 #checks .ok { color: var(--green-bright); }

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>HELP &mdash; LAIR ARCHITECT</title>
+<style>
+  :root {
+    --ink: #120c07;
+    --panel: #4a3a20;
+    --panel-hi: #6b5430;
+    --panel-lo: #2a2010;
+    --panel-deep: #1c150c;
+    --bevel-hi: rgba(255, 232, 178, 0.4);
+    --bevel-lo: rgba(0, 0, 0, 0.65);
+    --brass: #9a7a3a;
+    --brass-dim: #6a5326;
+    --gold: #e0b04a;
+    --gold-bright: #ffdb7e;
+    --parchment: #ecdfbc;
+    --parchment-dim: #b7a97e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(ellipse at 50% 0%, #2a2013 0%, #140e08 55%, #0a0704 100%);
+    color: var(--parchment);
+    font-family: "Courier New", Consolas, "Lucida Console", monospace;
+    padding: 24px;
+  }
+  #wrap { max-width: 900px; margin: 0 auto; }
+  header {
+    display: flex; align-items: baseline; gap: 16px; padding: 10px 14px; margin-bottom: 18px;
+    background: linear-gradient(160deg, var(--panel-hi), var(--panel) 55%, var(--panel-lo));
+    border: 3px solid var(--brass-dim);
+    box-shadow: inset 2px 2px 0 var(--bevel-hi), inset -2px -2px 0 var(--bevel-lo);
+  }
+  header h1 { font-size: 22px; letter-spacing: 4px; color: var(--gold-bright); text-shadow: 1px 1px 0 #000; }
+  header .sub { font-size: 11px; letter-spacing: 1px; color: var(--parchment-dim); }
+  header a.back { margin-left: auto; color: var(--gold); text-decoration: none; font-size: 12px; letter-spacing: 1px; white-space: nowrap; }
+  header a.back:hover { color: var(--gold-bright); }
+  section {
+    margin-bottom: 16px; padding: 14px 18px;
+    background: linear-gradient(160deg, var(--panel-hi), var(--panel-lo));
+    border: 2px solid var(--brass-dim);
+    box-shadow: inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo);
+  }
+  section h2 {
+    font-size: 14px; letter-spacing: 2px; color: var(--gold-bright); text-shadow: 1px 1px 0 #000;
+    margin: 0 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--brass-dim);
+  }
+  dl { margin: 0; }
+  dt { color: var(--gold); font-size: 12px; letter-spacing: 0.5px; margin-top: 8px; }
+  dt:first-child { margin-top: 0; }
+  dd { margin: 2px 0 0 0; font-size: 12px; line-height: 1.6; color: var(--parchment-dim); }
+  kbd {
+    display: inline-block; padding: 1px 6px; margin: 0 1px;
+    background: var(--panel-deep); border: 1px solid var(--brass); border-radius: 3px;
+    color: var(--gold-bright); font-size: 11px; font-family: inherit;
+  }
+  p.lead { font-size: 12px; line-height: 1.6; color: var(--parchment-dim); margin: 0 0 10px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <header>
+    <h1>HELP</h1>
+    <span class="sub">LAIR ARCHITECT &mdash; MISSION CONSTRUCTION BUREAU</span>
+    <a class="back" href="editor.html">&larr; BACK TO THE EDITOR</a>
+  </header>
+
+  <section>
+    <h2>PALETTE &amp; PLACING OBJECTS</h2>
+    <dl>
+      <dt><kbd>[</kbd> <kbd>]</kbd></dt>
+      <dd>Cycle which wall/door tile, person, prop, or item is currently selected for placing.</dd>
+      <dt>Click (2D map)</dt>
+      <dd>Place the selected tile/person/prop/item at that cell, or paint if dragging.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>SECTOR HEIGHT (2D map, grid tools)</h2>
+    <p class="lead">Dial a FLOOR and/or CEILING height, then RAISE/LOWER to brush cells or FILL to flood a whole room.
+    Eye sits 0.5 above the floor; walls block steps taller than 0.5. Right-click with a height tool reverts a cell to its material default.</p>
+  </section>
+
+  <section>
+    <h2>TEXTURES (2D map, grid tools)</h2>
+    <p class="lead">Pick a TARGET (floor/wall or ceiling), click a texture, then paint cells to retexture them &mdash;
+    independent of height and material. Right-click reverts a cell's texture. A cyan-bordered corner marks a custom ceiling.</p>
+  </section>
+
+  <section>
+    <h2>DRAW MODE (vector sectors)</h2>
+    <p class="lead">This is a vector map. Click (or Space) drops wall vertices; close the loop on the first point to make a sector.</p>
+    <dl>
+      <dt><kbd>Space</kbd> / Click</dt><dd>Drop a wall vertex.</dd>
+      <dt>Drag a vertex</dt><dd>Move it.</dd>
+      <dt><kbd>I</kbd></dt><dd>Insert a vertex on a wall.</dd>
+      <dt><kbd>DEL</kbd></dt><dd>Remove the selected vertex/sector.</dd>
+      <dt><kbd>Ctrl</kbd>+<kbd>Z</kbd></dt><dd>Undo.</dd>
+      <dt>Scroll</dt><dd>Pan. <kbd>Ctrl</kbd>+Scroll zooms. Middle-drag also pans.</dd>
+      <dt>Colors</dt><dd>White = solid wall, red = sector wall.</dd>
+      <dt>PREVIEW CAM tool</dt><dd>Sets where 3D PREVIEW starts &mdash; click to place (cyan marker), right-click to clear.
+      Exiting 3D preview always remembers where you last stood, too.</dd>
+    </dl>
+    <p class="lead">Pick a person/prop from the palette, then click to place it. Set floor/ceiling/textures/sky/win/doors from inside 3D PREVIEW.</p>
+  </section>
+
+  <section>
+    <h2>3D PREVIEW &mdash; VECTOR MAP (a map with drawn sectors)</h2>
+    <dl>
+      <dt><kbd>WASD</kbd></dt><dd>Move.</dd>
+      <dt><kbd>Space</kbd> / <kbd>C</kbd></dt><dd>Fly up/down.</dd>
+      <dt>Arrows / Drag</dt><dd>Look around.</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Back to the 2D map.</dd>
+    </dl>
+    <dt style="margin-top:14px; color:var(--gold-bright)">SECTOR (aim at a wall/floor/ceiling)</dt>
+    <dl>
+      <dt><kbd>PgUp</kbd> / <kbd>PgDn</kbd></dt><dd>Raise/lower the floor (<kbd>Shift</kbd> = ceiling).</dd>
+      <dt><kbd>[</kbd> <kbd>]</kbd> / Scroll / <kbd>\</kbd></dt>
+      <dd>Cycle texture &mdash; the wall if aiming close, else the floor/ceiling (<kbd>Shift</kbd> = ceiling; on a stepped wall, <kbd>Shift</kbd> picks the SOFFIT over the RISER).</dd>
+      <dt><kbd>T</kbd></dt><dd>Cycle tile size.</dd>
+      <dt><kbd>K</kbd></dt><dd>Toggle sky (<kbd>Shift</kbd>+<kbd>K</kbd> picks which sky).</dd>
+      <dt><kbd>G</kbd></dt><dd>Toggle win trigger.</dd>
+      <dt><kbd>N</kbd></dt><dd>Toggle hostile area.</dd>
+      <dt><kbd>F</kbd></dt><dd>Cycle door/interactive-wall kind.</dd>
+      <dt><kbd>H</kbd></dt><dd>Solid column &harr; walkable.</dd>
+      <dt><kbd>P</kbd></dt><dd>Mount/cycle a sprite flat on the wall, poster-style.</dd>
+      <dt><kbd>I</kbd></dt><dd>Toggle invisible wall (open portal, but blocks movement).</dd>
+    </dl>
+    <dt style="margin-top:14px; color:var(--gold-bright)">OBJECT (aim at a placed person/prop)</dt>
+    <dl>
+      <dt><kbd>J</kbd></dt><dd>Solid &harr; walk-through.</dd>
+      <dt><kbd>B</kbd></dt><dd>Wander &harr; stationary (characters only).</dd>
+      <dt><kbd>M</kbd></dt><dd>Flatten &harr; billboard &mdash; a flattened sprite stops turning to face you and becomes a fixed 2D plane, visible from both sides.</dd>
+      <dt><kbd>,</kbd> <kbd>.</kbd></dt><dd>Rotate a flattened object 45&deg; at a time.</dd>
+      <dt><kbd>PgUp</kbd> / <kbd>PgDn</kbd></dt><dd>Raise/lower the object &mdash; a purely visual offset from its floor (doesn't affect collision).</dd>
+      <dt><kbd>+</kbd> / <kbd>-</kbd></dt><dd>Scale the object up/down.</dd>
+    </dl>
+    <dt style="margin-top:14px; color:var(--gold-bright)">FAVORITES &amp; MISC</dt>
+    <dl>
+      <dt><kbd>1</kbd>-<kbd>9</kbd> / <kbd>0</kbd></dt><dd>Apply a saved texture favorite (<kbd>Shift</kbd> = soffit).</dd>
+      <dt><kbd>Ctrl</kbd>+<kbd>1</kbd>-<kbd>9</kbd>/<kbd>0</kbd></dt><dd>Save the current texture as that favorite.</dd>
+    </dl>
+    <p class="lead" style="margin-top:10px">Cyan glow marks the surface you're about to edit.</p>
+  </section>
+
+  <section>
+    <h2>3D PREVIEW &mdash; GRID MAP (legacy levels with no drawn sectors)</h2>
+    <p class="lead">A quick walkthrough compiled from the 2D grid &mdash; it isn't sculptable in 3D. Use DRAW SECTORS to convert it,
+    or keep editing heights/textures back on the 2D map.</p>
+    <dl>
+      <dt><kbd>WASD</kbd></dt><dd>Move (collides with walls).</dd>
+      <dt><kbd>Space</kbd> / <kbd>C</kbd></dt><dd>Fly up/down.</dd>
+      <dt><kbd>J</kbd></dt><dd>Object solid &harr; walk-through.</dd>
+      <dt><kbd>B</kbd></dt><dd>Character wander &harr; stationary.</dd>
+      <dt><kbd>PgUp</kbd> / <kbd>PgDn</kbd></dt><dd>Raise/lower an aimed-at object (same as vector mode).</dd>
+      <dt><kbd>+</kbd> / <kbd>-</kbd></dt><dd>Scale object.</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Back to the 2D map.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>TEXTURE PALETTE POPUP</h2>
+    <p class="lead">Click a texture to apply it. <kbd>Esc</kbd> cancels. Hold <kbd>Shift</kbd> while pressing <kbd>\</kbd> to open it targeting the soffit over a riser.</p>
+  </section>
+
+  <section>
+    <h2>FILE</h2>
+    <dl>
+      <dt>SAVE TO BROWSER</dt><dd>Keeps your work in this browser's local storage.</dd>
+      <dt>SAVE &amp; PLAY</dt><dd>Saves, then opens the mission in the game.</dd>
+      <dt>EXPORT .JSON / IMPORT .JSON</dt><dd>Move a mission file to/from disk.</dd>
+      <dt>LOAD PLAZA VIEJA</dt><dd>Loads the shipped default mission.</dd>
+      <dt>NEW BLANK MAP</dt><dd>Starts a fresh, empty map at the size set under MAP SIZE.</dd>
+    </dl>
+  </section>
+</div>
+</body>
+</html>

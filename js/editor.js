@@ -1291,6 +1291,19 @@ const Editor = (() => {
     if (idx >= 0 && lv.ents[idx]) lv.ents[idx].flatAngle = ent.flatAngle;
     status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' FACING → ' + Math.round(ent.flatAngle * 180 / Math.PI) + '°');
   }
+  // PgUp/PgDn : raise/lower the placed entity under the crosshair — a purely
+  // visual z-offset from its floor (doesn't affect collision), so a lamp can
+  // hang, a sign can sit higher on a wall, etc. Falls through to the sector
+  // floor/ceiling raise (vector mode only) when nothing's under the crosshair.
+  function geoAdjustEntHeight(dir) {
+    const r = pickEntNear();
+    if (!r) return false;
+    const ent = r.ent, idx = World.ents.indexOf(ent);
+    ent.zOff = Math.round(((ent.zOff || 0) + dir * 0.1) * 100) / 100;
+    if (idx >= 0 && lv.ents[idx]) lv.ents[idx].zOff = ent.zOff;
+    status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' HEIGHT → ' + ent.zOff.toFixed(2));
+    return true;
+  }
   // +/- : grow/shrink the placed entity under the crosshair — lets a landmark
   // prop (or anything else) be scaled up into background scenery, or down to
   // fit a tight spot, independent of that kind's baseline FACT scale.
@@ -1632,8 +1645,8 @@ const Editor = (() => {
     b.classList.add('active'); b.innerHTML = '&#9638; MAP EDITOR';
     document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
     document.getElementById('pcontrols').innerHTML = previewCompiled
-      ? '<b>WASD</b> move (collides) &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D, or edit the 2D map &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>B</b> character wander ⇄ stationary &nbsp;·&nbsp; <b>+</b>/<b>-</b> scale object &nbsp;·&nbsp; <b>ESC</b> map'
-      : '<b>WASD</b> move &nbsp;·&nbsp; <b>SPACE</b>/<b>C</b> fly up/down &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; sector: <b>PgUp</b>/<b>PgDn</b> floor (Shift ceil) &nbsp;·&nbsp; <b>[</b> <b>]</b> / <b>scroll</b> / <b>\\</b> tex — wall if aiming close, else floor (Shift ceil; on a stepped wall Shift picks the SOFFIT over the RISER) &nbsp;·&nbsp; <b>T</b> tile size &nbsp;·&nbsp; <b>K</b> sky (<b>Shift</b>+<b>K</b> which sky) &nbsp;·&nbsp; <b>G</b> win &nbsp;·&nbsp; <b>N</b> hostile area &nbsp;·&nbsp; <b>F</b> door &nbsp;·&nbsp; <b>H</b> solid column ⇄ walkable &nbsp;·&nbsp; <b>P</b> mount a sprite on a wall (poster) &nbsp;·&nbsp; <b>J</b> object solid ⇄ walk-through &nbsp;·&nbsp; <b>B</b> character wander ⇄ stationary &nbsp;·&nbsp; <b>+</b>/<b>-</b> scale object &nbsp;·&nbsp; <b>1</b>-<b>9</b>/<b>0</b> apply favorite (Shift = soffit) &nbsp;·&nbsp; <b>Ctrl</b>+<b>1</b>-<b>9</b>/<b>0</b> save favorite &nbsp;·&nbsp; <b>ESC</b> map';
+      ? '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D &nbsp;·&nbsp; <b>ESC</b> map &nbsp;·&nbsp; full controls: <a href="help.html" target="_blank">HELP</a>'
+      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; <b>ESC</b> map &nbsp;·&nbsp; full controls: <a href="help.html" target="_blank">HELP</a>';
     document.getElementById('favbar').style.display = previewCompiled ? 'none' : 'flex';
     renderFavbar();
     previewOn = true; plast = performance.now();
@@ -1672,8 +1685,6 @@ const Editor = (() => {
     if (!previewCompiled) {
       const sh = e.shiftKey;
       if (e.code === 'Backslash') { openTexPalette(sh); e.preventDefault(); return; }
-      if (e.code === 'PageUp') { if (!e.repeat) pushUndo(); geoRaise(+1, sh); e.preventDefault(); return; }
-      if (e.code === 'PageDown') { if (!e.repeat) pushUndo(); geoRaise(-1, sh); e.preventDefault(); return; }
       if (e.code === 'BracketRight') { if (!e.repeat) pushUndo(); cycleTex(+1, sh); e.preventDefault(); return; }
       if (e.code === 'BracketLeft') { if (!e.repeat) pushUndo(); cycleTex(-1, sh); e.preventDefault(); return; }
       if (e.code === 'KeyT') {
@@ -1699,6 +1710,12 @@ const Editor = (() => {
     if (e.code === 'KeyM') { if (!e.repeat) pushUndo(); geoToggleEntFlat(); e.preventDefault(); return; }
     if (e.code === 'Comma') { if (!e.repeat) pushUndo(); geoRotateEntFlat(-1); e.preventDefault(); return; }
     if (e.code === 'Period') { if (!e.repeat) pushUndo(); geoRotateEntFlat(+1); e.preventDefault(); return; }
+    if (e.code === 'PageUp' || e.code === 'PageDown') {
+      const dir = e.code === 'PageUp' ? 1 : -1;
+      if (!e.repeat) pushUndo();
+      if (!geoAdjustEntHeight(dir) && !previewCompiled) geoRaise(dir, e.shiftKey);
+      e.preventDefault(); return;
+    }
     if (e.code === 'Equal' || e.code === 'NumpadAdd') { if (!e.repeat) pushUndo(); geoScaleEnt(+1); e.preventDefault(); return; }
     if (e.code === 'Minus' || e.code === 'NumpadSubtract') { if (!e.repeat) pushUndo(); geoScaleEnt(-1); e.preventDefault(); return; }
     if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyC'].includes(e.code)) {

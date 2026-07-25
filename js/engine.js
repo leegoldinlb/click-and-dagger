@@ -664,7 +664,7 @@ const Engine = (() => {
         else if (bd < NEAR) { const t = (NEAR - bd) / (ad - bd); bd = NEAR; bs += (as_ - bs) * t; ub += (ua - ub) * t; }
         const x1 = W / 2 + (as_ / ad) * FX, x2 = W / 2 + (bs / bd) * FX;
         if (x1 >= x2) continue;                            // degenerate (edge-on) — nothing to draw
-        const fz = geoFloorAtXY(geo, graph, e.x, e.y, e.sector), cz = fz + sc;
+        const fz = geoFloorAtXY(geo, graph, e.x, e.y, e.sector) + (e.zOff || 0), cz = fz + sc;
         const yc1 = horizon - (cz - eyeZ) * H / ad, yc2 = horizon - (cz - eyeZ) * H / bd;
         const yf1 = horizon - (fz - eyeZ) * H / ad, yf2 = horizon - (fz - eyeZ) * H / bd;
         const iz1 = 1 / ad, iz2 = 1 / bd, uz1 = ua / ad, uz2 = ub / bd;
@@ -700,7 +700,7 @@ const Engine = (() => {
       // 3D preview mutates geo.sectors[s].floor in place) without ever touching the
       // grid, so the grid lookup goes stale and sprites stop tracking the terrain
       // they're standing on: the floor visibly moves under them, they don't.
-      const baseY = horizon - (geoFloorAtXY(geo, graph, e.x, e.y, e.sector) - eyeZ) * H / d;
+      const baseY = horizon - (geoFloorAtXY(geo, graph, e.x, e.y, e.sector) + (e.zOff || 0) - eyeZ) * H / d;
       const hgt = (H / d) * sc, wdt = hgt, top = baseY - hgt, left = sx - wdt / 2;
       const x0 = Math.max(0, Math.ceil(left)), x1 = Math.min(W - 1, Math.floor(left + wdt));
       const y0i = Math.max(0, Math.ceil(top)), y1i = Math.min(H - 1, Math.floor(baseY));

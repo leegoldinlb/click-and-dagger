@@ -10139,6 +10139,9 @@ const World = (() => {
       // per-instance flatten override (editor's M/,/. toggle) — a flattened sprite
       // renders as a fixed 2D plane at flatAngle instead of a camera-facing billboard
       if (e.flat) { ent.flat = true; ent.flatAngle = e.flatAngle || 0; }
+      // per-instance vertical offset (editor's PgUp/PgDn-over-a-sprite) — purely
+      // visual, lets one placed copy hang/sit higher or lower than its floor
+      if (e.zOff) ent.zOff = e.zOff;
       ents.push(ent);
     }
     spawn.x = level.spawn.x; spawn.y = level.spawn.y; spawn.a = level.spawn.a;
