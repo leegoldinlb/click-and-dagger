@@ -88,7 +88,6 @@ const Editor = (() => {
     { kind: 'mestudent', name: 'STUDENT', spr: 'mestudent' },
     { kind: 'meelder', name: 'ELDER', spr: 'meelder' },
     { kind: 'memother', name: 'MOTHER', spr: 'memother' },
-    { kind: 'megirl', name: 'GIRL', spr: 'megirl' },
     { kind: 'mejournalist', name: 'JOURNALIST', spr: 'mejournalist' },
     { kind: 'mesocialite', name: 'SOCIALITE', spr: 'mesocialite' },
     { kind: 'meantiquedealer', name: 'ANTIQUES DEALER', spr: 'meantiquedealer' },
@@ -246,7 +245,7 @@ const Editor = (() => {
   ];
   const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
   const WEAPON_KINDS = new Set(['medkit', 'ammo', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden', 'camera', 'disguise']);  // pulled out of PERSONNEL & PROPS into their own WEAPONS & POWER-UPS palette
-  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'megirl', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
+  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
   const ITEM_KINDS = new Set(['tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'sheetmusic']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 
@@ -1337,6 +1336,30 @@ const Editor = (() => {
     status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' HEIGHT → ' + ent.zOff.toFixed(2));
     return true;
   }
+  // [ / ] : cycle the placed entity under the crosshair through every placeable
+  // kind (same list/order as the palette's [ ]-cycle for what you're ABOUT to
+  // place) — swaps it in place for a different sprite, same position. Falls
+  // through to the wall/floor texture cycle (vector mode only) when nothing's
+  // under the crosshair.
+  function geoCycleEntSprite(dir) {
+    const r = pickEntNear();
+    if (!r) return false;
+    const ent = r.ent, idx = World.ents.indexOf(ent);
+    if (idx < 0) return true;
+    const i = ENTS.findIndex(e2 => e2.kind === ent.kind);
+    const next = ((i < 0 ? -dir : i) + dir + ENTS.length) % ENTS.length;
+    const spec = ENTS[next];
+    if (!World.FACT[spec.kind]) return true;
+    const newEnt = World.FACT[spec.kind](ent.x, ent.y, ent);
+    if (ent.solid != null) newEnt.solid = ent.solid;
+    if (ent.scale != null) newEnt.scale = ent.scale;
+    if (ent.flat) { newEnt.flat = true; newEnt.flatAngle = ent.flatAngle || 0; }
+    if (ent.zOff) newEnt.zOff = ent.zOff;
+    World.ents[idx] = newEnt;
+    if (lv.ents[idx]) lv.ents[idx].kind = spec.kind;
+    status(spec.name.toUpperCase() + ' (' + (next + 1) + '/' + ENTS.length + ')');
+    return true;
+  }
   // +/- : grow/shrink the placed entity under the crosshair — lets a landmark
   // prop (or anything else) be scaled up into background scenery, or down to
   // fit a tight spot, independent of that kind's baseline FACT scale.
@@ -1718,8 +1741,6 @@ const Editor = (() => {
     if (!previewCompiled) {
       const sh = e.shiftKey;
       if (e.code === 'Backslash') { openTexPalette(sh); e.preventDefault(); return; }
-      if (e.code === 'BracketRight') { if (!e.repeat) pushUndo(); cycleTex(+1, sh); e.preventDefault(); return; }
-      if (e.code === 'BracketLeft') { if (!e.repeat) pushUndo(); cycleTex(-1, sh); e.preventDefault(); return; }
       if (e.code === 'KeyT') {
         if (!e.repeat) pushUndo();
         const wallHit = !sh && pickGeoWall();                 // close-range wall in view → scale IT, not the floor
@@ -1747,6 +1768,12 @@ const Editor = (() => {
       const dir = e.code === 'PageUp' ? 1 : -1;
       if (!e.repeat) pushUndo();
       if (!geoAdjustEntHeight(dir) && !previewCompiled) geoRaise(dir, e.shiftKey);
+      e.preventDefault(); return;
+    }
+    if (e.code === 'BracketRight' || e.code === 'BracketLeft') {
+      const dir = e.code === 'BracketRight' ? 1 : -1;
+      if (!e.repeat) pushUndo();
+      if (!geoCycleEntSprite(dir) && !previewCompiled) cycleTex(dir, e.shiftKey);
       e.preventDefault(); return;
     }
     if (e.code === 'Equal' || e.code === 'NumpadAdd') { if (!e.repeat) pushUndo(); geoScaleEnt(+1); e.preventDefault(); return; }

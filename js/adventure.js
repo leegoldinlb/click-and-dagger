@@ -202,9 +202,6 @@ const Adventure = (() => {
       case 'memother': return e.dead
         ? 'There is nothing left to do here.'
         : 'Holding her daughter’s hand, eyes on you a beat too long.';
-      case 'megirl': return e.dead
-        ? 'There is nothing left to do here.'
-        : 'Clutching a doll, half-hidden behind her mother.';
       case 'mejournalist': return e.dead
         ? 'A journalist who ran out of deadline.'
         : 'Newspaper folded under one arm, always working an angle.';
@@ -976,7 +973,7 @@ const Adventure = (() => {
     }
     if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman',
       'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer',
-      'meprofessor', 'mestudent', 'meelder', 'memother', 'megirl', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician',
+      'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician',
       'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist',
       'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter',
       'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist'].includes(e.kind))

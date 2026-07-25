@@ -52,7 +52,7 @@ const Game = (() => {
     boss005: { speed: 1.3, meleeRange: 1.0, meleeDmg: [10, 18], aggroR: 14, atkCd: 0.45,
                ranged: true, rangedRange: 8, rangedDmg: [9, 16] },
   };
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'megirl', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
   const totalHostiles = World.ents.filter(e => HOSTILE[e.kind]).length;
   // Quest-critical kinds never take damage — destroying 004's body, the vacuum
   // tube, or Volkov's desk could strand the puzzle chain with no way to recover.
@@ -65,7 +65,7 @@ const Game = (() => {
   const NO_DAMAGE = new Set(['agent', 'tube', 'desk', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden',
     'agent005', 'ciphermachine', 'bomb', 'microfichemachine',
     'fiona',    // this ain't that kind of game — Fiona the dog can never be hurt
-    'memother', 'megirl']);  // nor children — the mother/daughter pair is always off-limits
+    'memother']);  // nor children — the mother/daughter pair (one sprite) is always off-limits
 
   const keys = {};
   const mouse = { x: -1, y: -1 };            // internal canvas coords

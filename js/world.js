@@ -4487,6 +4487,47 @@ const World = (() => {
     bevel(g, 0, 0, 64, 64, 'rgba(255,230,180,0.14)', 'rgba(0,0,0,0.35)');
   });
 
+  // ---- Tehran: Persian window textures ----
+  FLOOR.orosiwindow = cnv(g => {                        // orosi — colored-glass wooden lattice window
+    vgrad(g, 0, 0, 64, 64, '#c9a868', '#a3824a');
+    stains(g, 6, ['#a3824a', '#8a6c3c']);
+    g.fillStyle = 'rgba(20,16,10,0.7)'; g.fillRect(10, 8, 44, 46);           // recessed frame
+    const panes = [['#2a5f8a', 12, 10], ['#b8542e', 30, 10], ['#4a8a5c', 12, 28], ['#c9a227', 30, 28], ['#7a4a8a', 12, 46 - 1.5], ['#2a5f8a', 30, 46 - 1.5]];
+    for (const [col, px, py] of panes) {
+      g.fillStyle = col; g.fillRect(px, py, 16, 16);
+      g.fillStyle = 'rgba(255,255,255,0.18)'; g.fillRect(px + 1, py + 1, 6, 6);
+    }
+    g.strokeStyle = '#e8dcc0'; g.lineWidth = 1.6;                            // carved wood lattice dividers
+    g.beginPath();
+    g.moveTo(10, 8 + 15.3); g.lineTo(54, 8 + 15.3); g.moveTo(10, 8 + 30.6); g.lineTo(54, 8 + 30.6);
+    g.moveTo(10 + 14.6, 8); g.lineTo(10 + 14.6, 54); g.moveTo(10 + 29.2, 8); g.lineTo(10 + 29.2, 54);
+    g.stroke();
+    g.strokeStyle = '#c9a227'; g.lineWidth = 2.4; g.strokeRect(9, 7, 46, 47); // gilded outer frame
+    bevel(g, 9, 7, 46, 47, 'rgba(255,240,200,0.22)', 'rgba(0,0,0,0.35)');
+    speck(g, 30, 'rgba(0,0,0,0.08)');
+  });
+
+  FLOOR.tehranbalcony = cnv(g => {                       // 1960s Tehran apartment window, iron balcony over patterned tile
+    vgrad(g, 0, 0, 64, 64, '#d8cdb0', '#b8ac8c');
+    stains(g, 6, ['#b8ac8c', '#9c9074']);
+    g.fillStyle = 'rgba(20,22,22,0.65)'; g.fillRect(14, 6, 36, 30);           // window recess
+    const gl = g.createLinearGradient(16, 8, 48, 34);
+    gl.addColorStop(0, '#3a4a52'); gl.addColorStop(1, '#161e22');
+    g.fillStyle = gl; g.fillRect(16, 8, 32, 26);
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1.4;
+    g.beginPath(); g.moveTo(32, 8); g.lineTo(32, 34); g.moveTo(16, 21); g.lineTo(48, 21); g.stroke();
+    g.strokeStyle = '#2a2018'; g.lineWidth = 2.2; g.lineCap = 'round';        // iron balcony rail
+    g.beginPath(); g.moveTo(10, 40); g.lineTo(54, 40); g.stroke();
+    for (let x = 12; x <= 52; x += 5) { g.lineWidth = 1.4; g.beginPath(); g.moveTo(x, 35); g.lineTo(x, 40); g.stroke(); }
+    g.lineWidth = 1; g.beginPath(); g.moveTo(10, 35); g.quadraticCurveTo(32, 30, 54, 35); g.stroke();
+    const tile = ['#2a5f8a', '#c9a227', '#b8542e'];                          // patterned tile band below the sill
+    for (let x = 4; x < 60; x += 8) { g.fillStyle = tile[((x / 8) | 0) % 3]; g.fillRect(x, 43, 7, 6); }
+    g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 0.6;
+    for (let x = 4; x < 60; x += 8) g.strokeRect(x, 43, 7, 6);
+    speck(g, 40, 'rgba(0,0,0,0.08)');
+    g.fillStyle = 'rgba(0,0,0,0.1)'; g.fillRect(0, 59, 64, 5);
+  });
+
   FLOOR.kilim = cnv(g => {                               // woven kilim rug — chevron bands, warm reds/oranges
     vgrad(g, 0, 0, 64, 64, '#a8331e', '#7a2012');
     const bands = [[0, 10, '#e8a840'], [10, 20, '#3a2416'], [20, 26, '#c9c0a0'], [26, 36, '#7a2012'], [36, 42, '#c9c0a0'], [42, 52, '#3a2416'], [52, 64, '#e8a840']];
@@ -4765,6 +4806,44 @@ const World = (() => {
     bevel(g, 0, 0, 64, 64, 'rgba(255,220,200,0.08)', 'rgba(20,8,4,0.3)');
   });
 
+  FLOOR.nybaywindow = cnv(g => {                        // brownstone bay window with a cast-iron fire escape
+    vgrad(g, 0, 0, 64, 64, '#8a5240', '#5c3226');
+    stains(g, 5, ['#6a3c2c', '#4a2418']);
+    g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(13, 6, 38, 32);              // recessed reveal, three-part bay
+    const gl = g.createLinearGradient(15, 8, 49, 36);
+    gl.addColorStop(0, '#3a4a52'); gl.addColorStop(0.5, '#26343a'); gl.addColorStop(1, '#161e22');
+    g.fillStyle = gl; g.fillRect(15, 8, 34, 28);
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1.4;
+    g.beginPath(); g.moveTo(26.3, 8); g.lineTo(26.3, 36); g.moveTo(37.7, 8); g.lineTo(37.7, 36); g.moveTo(15, 22); g.lineTo(49, 22); g.stroke();
+    g.strokeStyle = '#e8dcc8'; g.lineWidth = 1.2; g.strokeRect(13, 6, 38, 32); // painted stone trim
+    g.strokeStyle = '#241e18'; g.lineWidth = 2; g.lineCap = 'round';          // fire-escape rail + ladder rungs
+    g.beginPath(); g.moveTo(8, 42); g.lineTo(56, 42); g.stroke();
+    for (let x = 10; x <= 54; x += 6) { g.lineWidth = 1.4; g.beginPath(); g.moveTo(x, 38); g.lineTo(x, 42); g.stroke(); }
+    g.lineWidth = 2.2; g.beginPath(); g.moveTo(30, 42); g.lineTo(30, 58); g.moveTo(34, 42); g.lineTo(34, 58); g.stroke();
+    g.lineWidth = 1.4; for (let y = 46; y <= 58; y += 4) { g.beginPath(); g.moveTo(30, y); g.lineTo(34, y); g.stroke(); }
+    speck(g, 45, 'rgba(20,8,4,0.15)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,220,200,0.08)', 'rgba(20,8,4,0.3)');
+  });
+
+  FLOOR.nyacwindow = cnv(g => {                          // brick tenement window with a window-unit A/C
+    vgrad(g, 0, 0, 64, 64, '#7c4838', '#4c2a20');
+    stains(g, 5, ['#5c342a', '#3c2018']);
+    g.strokeStyle = 'rgba(20,8,4,0.35)'; g.lineWidth = 1;                     // coursed brick around the opening
+    for (let y = 0; y < 64; y += 6) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.fillStyle = 'rgba(0,0,0,0.2)'; g.fillRect(13, 8, 38, 28);
+    const gl = g.createLinearGradient(15, 10, 49, 34);
+    gl.addColorStop(0, '#343c34'); gl.addColorStop(1, '#161a16');
+    g.fillStyle = gl; g.fillRect(15, 10, 34, 22);
+    g.fillStyle = '#9ca094'; g.fillRect(15, 32, 34, 9);                      // A/C unit body
+    bevel(g, 15, 32, 34, 9, 'rgba(255,255,255,0.2)', 'rgba(0,0,0,0.4)');
+    g.strokeStyle = 'rgba(50,54,48,0.6)'; g.lineWidth = 0.6;
+    for (let x = 17; x < 47; x += 1.6) { g.beginPath(); g.moveTo(x, 34); g.lineTo(x, 39); g.stroke(); }
+    g.fillStyle = 'rgba(120,60,30,0.45)'; g.fillRect(15, 41, 34, 3);          // rust streak under the unit
+    g.strokeStyle = '#3a2a20'; g.lineWidth = 2; g.strokeRect(13, 8, 38, 28);  // wood frame
+    speck(g, 50, 'rgba(20,8,4,0.15)');
+    g.fillStyle = 'rgba(0,0,0,0.1)'; g.fillRect(0, 59, 64, 5);
+  });
+
   FLOOR.delitile = cnv(g => {                            // deli/pizzeria checker floor, red & white
     const sq = 16;
     for (let ty = 0; ty < 4; ty++) for (let tx = 0; tx < 4; tx++) {
@@ -4946,6 +5025,40 @@ const World = (() => {
     speck(g, 30, 'rgba(255,255,255,0.04)');
   });
 
+  FLOOR.hkaircon = cnv(g => {                            // window buried behind a rust-streaked A/C unit
+    vgrad(g, 0, 0, 64, 64, '#8c8674', '#5c584a');
+    stains(g, 6, ['#726c5a', '#4c4838']);
+    g.fillStyle = 'rgba(20,20,18,0.7)'; g.fillRect(8, 6, 48, 22);             // dark window recess, mostly hidden
+    const gl = g.createLinearGradient(10, 8, 54, 26);
+    gl.addColorStop(0, '#343c38'); gl.addColorStop(1, '#161a16');
+    g.fillStyle = gl; g.fillRect(10, 8, 44, 16);
+    g.fillStyle = '#aab0a2'; g.fillRect(6, 26, 52, 20);                      // big projecting A/C box
+    bevel(g, 6, 26, 52, 20, 'rgba(255,255,255,0.22)', 'rgba(0,0,0,0.4)');
+    g.strokeStyle = 'rgba(60,64,56,0.6)'; g.lineWidth = 0.6;
+    for (let x = 9; x < 55; x += 1.6) { g.beginPath(); g.moveTo(x, 29); g.lineTo(x, 43); g.stroke(); }
+    g.fillStyle = 'rgba(140,70,30,0.55)'; g.fillRect(6, 46, 52, 4);           // rust bleeding down the wall
+    g.fillStyle = 'rgba(140,70,30,0.3)';
+    for (let x = 10; x < 58; x += 9) g.fillRect(x, 50, 2, 6 + Math.random() * 5);
+    speck(g, 40, 'rgba(20,18,14,0.14)');
+  });
+
+  FLOOR.hkneonwindow = cnv(g => {                        // cluttered apartment window, warm neon glow from outside
+    vgrad(g, 0, 0, 64, 64, '#8c8674', '#5c584a');
+    stains(g, 6, ['#726c5a', '#4c4838']);
+    g.fillStyle = 'rgba(20,20,18,0.7)'; g.fillRect(10, 6, 44, 40);
+    const gl = g.createLinearGradient(12, 8, 52, 44);
+    gl.addColorStop(0, '#5a3a4a'); gl.addColorStop(0.5, '#3a2438'); gl.addColorStop(1, '#181420');
+    g.fillStyle = gl; g.fillRect(12, 8, 40, 34);                             // magenta/cyan neon bleed on the glass
+    g.fillStyle = 'rgba(255,60,140,0.28)'; g.fillRect(12, 8, 14, 34);
+    g.fillStyle = 'rgba(60,220,220,0.18)'; g.fillRect(38, 8, 14, 34);
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1.2;                    // security bars, close-set
+    for (let x = 16; x < 52; x += 6) { g.beginPath(); g.moveTo(x, 8); g.lineTo(x, 42); g.stroke(); }
+    g.fillStyle = 'rgba(30,26,22,0.85)'; g.fillRect(12, 40, 40, 4);           // A/C drip ledge clutter
+    g.fillStyle = '#6a6458'; g.fillRect(14, 36, 8, 5); g.fillRect(30, 37, 7, 4);  // potted junk on the sill
+    g.strokeStyle = '#2a2622'; g.lineWidth = 2; g.strokeRect(10, 6, 44, 40);
+    speck(g, 35, 'rgba(20,18,14,0.14)');
+  });
+
   // ---------------------------------------------------------------------------
   // MID-CENTURY SUBURBIA textures — pastel clapboard siding, a white picket
   // fence, shag carpet, checkerboard kitchen linoleum, dark walnut rec-room
@@ -5102,6 +5215,61 @@ const World = (() => {
     for (let ty = 0; ty < 8; ty++) for (let tx = 0; tx < 4; tx++) g.fillRect(tx * 16 + 1, ty * 8 + 1, 6, 2);
     speck(g, 55, 'rgba(20,10,5,0.14)'); speck(g, 25, 'rgba(255,230,210,0.06)');
     bevel(g, 0, 0, 64, 64, 'rgba(255,220,200,0.08)', 'rgba(20,8,5,0.3)');
+  });
+
+  // 1901 red-brick warehouse facade with tall round-arched windows — the
+  // distinctive Dealey Plaza book depository look (see The Double/The Patsy)
+  FLOOR.depositorywindow = cnv(g => {                   // elevation window, round-arched brick surround
+    vgrad(g, 0, 0, 64, 64, '#9a5040', '#6e332a');
+    g.strokeStyle = 'rgba(30,15,10,0.4)'; g.lineWidth = 1;
+    for (let ty = 0; ty < 8; ty++) {
+      const y = ty * 8, off = (ty % 2) * 8;
+      g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke();
+      for (let x = -8 + off; x < 64; x += 16) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 8); g.stroke(); }
+    }
+    g.fillStyle = 'rgba(0,0,0,0.2)'; g.beginPath();                          // arched recess
+    g.moveTo(14, 44); g.lineTo(14, 22); g.quadraticCurveTo(14, 6, 32, 6); g.quadraticCurveTo(50, 6, 50, 22); g.lineTo(50, 44); g.closePath(); g.fill();
+    const gl = g.createLinearGradient(16, 8, 48, 42);
+    gl.addColorStop(0, '#2c2822'); gl.addColorStop(1, '#0e0c0a');
+    g.fillStyle = gl; g.beginPath();
+    g.moveTo(17, 42); g.lineTo(17, 23); g.quadraticCurveTo(17, 10, 32, 10); g.quadraticCurveTo(47, 10, 47, 23); g.lineTo(47, 42); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.45)'; g.lineWidth = 1.4;                   // multi-pane mullions, industrial sash
+    for (let x = 22; x < 47; x += 8.5) { g.beginPath(); g.moveTo(x, 12); g.lineTo(x, 42); g.stroke(); }
+    for (let y = 18; y < 42; y += 9) { g.beginPath(); g.moveTo(17, y); g.lineTo(47, y); g.stroke(); }
+    g.strokeStyle = '#caa888'; g.lineWidth = 1.6;                            // limestone arch trim
+    g.beginPath(); g.moveTo(13, 44); g.lineTo(13, 21); g.quadraticCurveTo(13, 5, 32, 5); g.quadraticCurveTo(51, 5, 51, 21); g.lineTo(51, 44); g.stroke();
+    g.fillStyle = '#8a5a44'; g.fillRect(11, 44, 42, 4);                      // brick sill
+    bevel(g, 11, 44, 42, 4, 'rgba(255,220,200,0.2)', 'rgba(0,0,0,0.3)');
+    speck(g, 50, 'rgba(20,10,5,0.14)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,220,200,0.06)', 'rgba(20,8,5,0.3)');
+  });
+
+  FLOOR.depositorycorner = cnv(g => {                   // upper-corner elevation: two arched windows meeting at the brick pier
+    vgrad(g, 0, 0, 64, 64, '#9a5040', '#6e332a');
+    g.strokeStyle = 'rgba(30,15,10,0.4)'; g.lineWidth = 1;
+    for (let ty = 0; ty < 8; ty++) {
+      const y = ty * 8, off = (ty % 2) * 8;
+      g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke();
+      for (let x = -8 + off; x < 64; x += 16) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 8); g.stroke(); }
+    }
+    const arch = (x0) => {
+      g.fillStyle = 'rgba(0,0,0,0.2)'; g.beginPath();
+      g.moveTo(x0, 40); g.lineTo(x0, 20); g.quadraticCurveTo(x0, 8, x0 + 9, 8); g.quadraticCurveTo(x0 + 18, 8, x0 + 18, 20); g.lineTo(x0 + 18, 40); g.closePath(); g.fill();
+      const gl = g.createLinearGradient(x0, 10, x0 + 18, 38);
+      gl.addColorStop(0, '#241f1a'); gl.addColorStop(1, '#0a0908');
+      g.fillStyle = gl; g.beginPath();
+      g.moveTo(x0 + 1.5, 38); g.lineTo(x0 + 1.5, 21); g.quadraticCurveTo(x0 + 1.5, 11, x0 + 9, 11); g.quadraticCurveTo(x0 + 16.5, 11, x0 + 16.5, 21); g.lineTo(x0 + 16.5, 38); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(x0 + 9, 11); g.lineTo(x0 + 9, 38); g.moveTo(x0 + 2, 26); g.lineTo(x0 + 16, 26); g.stroke();
+      g.strokeStyle = '#caa888'; g.lineWidth = 1.4;
+      g.beginPath(); g.moveTo(x0, 40); g.lineTo(x0, 19); g.quadraticCurveTo(x0, 7, x0 + 9, 7); g.quadraticCurveTo(x0 + 18, 7, x0 + 18, 19); g.lineTo(x0 + 18, 40); g.stroke();
+    };
+    arch(3); arch(43);
+    g.fillStyle = 'rgba(60,26,18,0.3)'; g.fillRect(28, 6, 8, 44);            // brick pier between the two windows
+    g.strokeStyle = 'rgba(30,15,10,0.4)'; g.lineWidth = 1;
+    for (let y = 6; y < 50; y += 4) { g.beginPath(); g.moveTo(28, y); g.lineTo(36, y); g.stroke(); }
+    speck(g, 50, 'rgba(20,10,5,0.14)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,220,200,0.06)', 'rgba(20,8,5,0.3)');
   });
 
   FLOOR.concretepergola = cnv(g => {                    // pale poured-concrete colonnade, fluted columns
@@ -5264,16 +5432,16 @@ const World = (() => {
     'terrazzo', 'rooftile', 'mural', 'sandbag', 'rope', 'windowrow', 'balconywin', 'shopfront',
     'doorwood', 'doorarch', 'doubledoor', 'windowbars', 'windowshut',
     'rockwall', 'mossyrock', 'pond', 'wetstone',
-    'sandstone', 'zellige', 'mashrabiya', 'kilim', 'sandfloor',
+    'sandstone', 'zellige', 'mashrabiya', 'kilim', 'sandfloor', 'orosiwindow', 'tehranbalcony',
     'haussmann', 'wroughtiron', 'opart', 'toile', 'zincroof',
     'cafeawning', 'riverstone', 'gildedceiling', 'bouquiniste',
     'haussmannwindow', 'mansardwindow', 'parisshutters', 'parisshopfront',
-    'subwaytile', 'brownstone', 'delitile', 'skyscraperglass', 'marquee',
+    'subwaytile', 'brownstone', 'delitile', 'skyscraperglass', 'marquee', 'nybaywindow', 'nyacwindow',
     'neonsign', 'bambooscaffold', 'hongkongtile', 'junkwood', 'tenementwall',
-    'hkgrillewindow', 'hklaundrypole', 'hkrollshutter', 'hkwireclutter',
+    'hkgrillewindow', 'hklaundrypole', 'hkrollshutter', 'hkwireclutter', 'hkaircon', 'hkneonwindow',
     'clapboard', 'picketfence', 'shagcarpet', 'linoleum', 'woodpaneling',
     'concreteblock', 'redbanner', 'domemosaic', 'parquet', 'muralsoviet',
-    'warehousebrick', 'concretepergola', 'lawngrass', 'roadway', 'sidewalk',
+    'warehousebrick', 'depositorywindow', 'depositorycorner', 'concretepergola', 'lawngrass', 'roadway', 'sidewalk',
     'radio', 'blast', 'mainframe', 'poster'];
   const WALLTX = { 1: 'teak', 2: 'lair', 3: 'blast', 4: 'radio', 5: 'mainframe', 6: 'poster' };
   const wallTexName = (x, y) => {
@@ -9527,7 +9695,6 @@ const World = (() => {
   SPR.mestudent = SPR.civilianF;
   SPR.meelder = SPR.civilianM;
   SPR.memother = SPR.civilianF;
-  SPR.megirl = SPR.civilianF;
   SPR.mejournalist = SPR.civilianM;
   SPR.mesocialite = SPR.civilianF;
   SPR.meantiquedealer = SPR.civilianM;
@@ -9678,7 +9845,6 @@ const World = (() => {
     mestudent: 'assets/sprites/mestudent.png?v=1',
     meelder: 'assets/sprites/meelder.png?v=1',
     memother: 'assets/sprites/memother.png?v=1',
-    megirl: 'assets/sprites/megirl.png?v=1',
     mejournalist: 'assets/sprites/mejournalist.png?v=1',
     mesocialite: 'assets/sprites/mesocialite.png?v=1',
     meantiquedealer: 'assets/sprites/meantiquedealer.png?v=1',
@@ -10208,15 +10374,11 @@ const World = (() => {
       behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
       getTex() { return this.dead ? SPR.civilianCorpse : SPR.meelder; },
     }),
+    // Mother and daughter are one sprite/one entity, not two — always indestructible (see NO_DAMAGE, main.js)
     memother: (x, y, e) => ({
-      kind: 'memother', name: 'MOTHER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      kind: 'memother', name: 'MOTHER & DAUGHTER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
       behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
       getTex() { return this.dead ? SPR.civilianCorpse : SPR.memother; },
-    }),
-    megirl: (x, y, e) => ({
-      kind: 'megirl', name: 'GIRL', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
-      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
-      getTex() { return this.dead ? SPR.civilianCorpse : SPR.megirl; },
     }),
     mejournalist: (x, y, e) => ({
       kind: 'mejournalist', name: 'JOURNALIST', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
@@ -10417,7 +10579,7 @@ const World = (() => {
     T, CH, SURF, get, set, isSolid, winAt, charAt, surfAt, floorZAt,
     setFloorZ, setCeilZ, setSurfTex, setCeilTex, setFloorSlope, compileGeo, getGeo,
     TEX, SPR, FLOOR, SKY, SKIES, SKYNAMES, TX, TXNAMES, wallTex, wallTexName, WALLTX,
-    ents, removeEnt, setPowered, spawnFx, FX_LIFE,
+    ents, removeEnt, setPowered, spawnFx, FX_LIFE, FACT,
     spawn, load, defaultLevel, get isCustom() { return isCustom; }, get geoRev() { return geoRev; },
     get startBlown() { return startBlown; },
     get musicUndercover() { return musicUndercover; },
