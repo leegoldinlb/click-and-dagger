@@ -967,12 +967,15 @@ const Editor = (() => {
   });
 
   document.getElementById('export').addEventListener('click', () => {
+    const name = prompt('Export filename:', 'click-and-dagger-mission');
+    if (name === null) return;                                    // cancelled
+    const clean = (name.trim() || 'click-and-dagger-mission').replace(/[^a-z0-9\-_. ]/gi, '').replace(/\.json$/i, '');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(toLevel(), null, 1)], { type: 'application/json' }));
-    a.download = 'click-and-dagger-mission.json';
+    a.download = clean + '.json';
     a.click();
     URL.revokeObjectURL(a.href);
-    status('EXPORTED.');
+    status('EXPORTED ' + a.download.toUpperCase() + '.');
   });
 
   document.getElementById('import').addEventListener('click', () => document.getElementById('filein').click());
@@ -1011,6 +1014,73 @@ const Editor = (() => {
       status('IMPORTED PLAZA VIEJA — ' + geo.sectors.length + ' SECTORS.');
     } catch (err) { status('IMPORT FAILED: ' + String(err.message || err).toUpperCase()); }
   });
+
+  // ---- episode: 8 fixed level slots, played in succession (win → next filled slot) ----
+  const EPISODE_KEY = 'cloakclick.episode';
+  const EPISODE_SIZE = 8;
+  function loadEpisodeSlots() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(EPISODE_KEY) || '[]');
+      const slots = new Array(EPISODE_SIZE).fill(null);
+      for (let i = 0; i < EPISODE_SIZE; i++) if (raw[i]) slots[i] = raw[i];
+      return slots;
+    } catch (e) { return new Array(EPISODE_SIZE).fill(null); }
+  }
+  let episodeSlots = loadEpisodeSlots();
+  let selectedSlot = 0;
+  function saveEpisodeSlots() { localStorage.setItem(EPISODE_KEY, JSON.stringify(episodeSlots)); }
+
+  const episodeSlotsEl = document.getElementById('episodeSlots');
+  const episodeBtns = [];
+  for (let i = 0; i < EPISODE_SIZE; i++) {
+    const b = document.createElement('button');
+    b.className = 'tool';
+    b.textContent = 'SLOT ' + (i + 1);
+    b.addEventListener('click', () => { selectedSlot = i; renderEpisodeSlots(); });
+    episodeSlotsEl.appendChild(b);
+    episodeBtns.push(b);
+  }
+  function renderEpisodeSlots() {
+    episodeBtns.forEach((b, i) => {
+      b.classList.toggle('sel', i === selectedSlot);
+      b.classList.toggle('filled', !!episodeSlots[i]);
+    });
+  }
+  renderEpisodeSlots();
+
+  document.getElementById('episodeLoad').addEventListener('click', () => {
+    const lvl = episodeSlots[selectedSlot];
+    if (!lvl) { status('SLOT ' + (selectedSlot + 1) + ' IS EMPTY.'); return; }
+    fromLevel(lvl);
+    if (lvl.geo && lvl.geo.sectors && lvl.geo.sectors.length) {
+      status('LOADED SLOT ' + (selectedSlot + 1) + ' — ' + geo.sectors.length + ' SECTORS.');
+      return;
+    }
+    try {
+      World.load(toLevel());
+      const cg = World.compileGeo();
+      geo.verts = cg.verts; geo.sectors = cg.sectors; draft = [];
+      render();
+      status('LOADED SLOT ' + (selectedSlot + 1) + ' — ' + geo.sectors.length + ' SECTORS.');
+    } catch (err) { status('LOAD FAILED: ' + String(err.message || err).toUpperCase()); }
+  });
+  document.getElementById('episodeSave').addEventListener('click', () => {
+    episodeSlots[selectedSlot] = toLevel();
+    saveEpisodeSlots();
+    renderEpisodeSlots();
+    status('MAP SAVED TO SLOT ' + (selectedSlot + 1) + '.');
+  });
+  document.getElementById('episodeClear').addEventListener('click', () => {
+    episodeSlots[selectedSlot] = null;
+    saveEpisodeSlots();
+    renderEpisodeSlots();
+    status('SLOT ' + (selectedSlot + 1) + ' CLEARED.');
+  });
+  document.getElementById('episodePlay').addEventListener('click', () => {
+    if (!episodeSlots[0]) { status('SLOT 1 IS EMPTY — SAVE A MAP THERE FIRST.'); return; }
+    window.open('index.html?episode=1', '_blank');
+  });
+
   document.getElementById('startblown').addEventListener('change', e => { lv.blown = e.target.checked; });
   (function initMusicPals() {
     const ucSel = document.getElementById('musicUndercover'), cbSel = document.getElementById('musicCoverBlown');

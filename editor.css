@@ -124,6 +124,7 @@ aside h2:first-child { margin-top: 0; }
   box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo);
 }
 .tool canvas { image-rendering: pixelated; background: var(--panel-deep); }
+.tool.filled:not(.sel) { border-color: #4a7a4a; color: #a8d8a8; }
 
 .row { margin-top: 10px; font-size: 11px; letter-spacing: 1px; color: var(--parchment-dim); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
@@ -260,7 +261,7 @@ input[type="number"] { width: 52px; }
 #checks .bad { color: #ff9a52; }
 #checks .info { color: var(--parchment-dim); }
 
-#filebtns { display: flex; flex-direction: column; gap: 6px; }
+#filebtns, #episodebtns { display: flex; flex-direction: column; gap: 6px; }
 button {
   font-family: inherit;
   font-size: 12px;

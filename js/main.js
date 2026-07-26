@@ -454,13 +454,15 @@ const Game = (() => {
   }
 
   // ------------------------------------------------------------- end game --
-  function endOverlay(title, cls, body, btn) {
+  function endOverlay(title, cls, body, btn, onClick) {
     overlay.innerHTML =
       '<h1 class="' + cls + '">' + title + '</h1>' +
       '<p class="story">' + body + '</p>' +
       '<button id="againbtn">' + btn + '</button>';
     overlay.classList.remove('hidden');
-    document.getElementById('againbtn').onclick = () => location.reload();
+    // reloading the same URL re-runs the exact same boot logic (world.js), so it's
+    // also the correct "retry" for a failed episode level — only win() overrides this
+    document.getElementById('againbtn').onclick = onClick || (() => location.reload());
   }
 
   function die() {
@@ -510,11 +512,26 @@ const Game = (() => {
     Sfx.win();
     Music.stop();
     const secs = Math.round((performance.now() - G.t0) / 1000);
+    const stats = 'ENEMIES NEUTRALIZED: ' + G.kills + ' / ' + totalHostiles + ' &nbsp;·&nbsp; TIME: ' + secs + 's<br>';
+    if (World.isEpisode) {
+      const next = World.episodeSlot + 1;
+      if (World.episodeHasNext) {
+        endOverlay('MISSION COMPLETE', 'win',
+          stats + 'London sends its regards. The next assignment is already waiting.',
+          '[ NEXT MISSION: ' + next + ' OF ' + World.episodeTotal + ' ▶ ]',
+          () => { location.href = 'index.html?episode=' + next; });
+      } else {
+        endOverlay('EPISODE COMPLETE', 'win',
+          stats + 'The launch pulls away from the dock. On the malecón, Volkov screams into a red telephone. London sends its regards — the episode is over.',
+          '[ BACK TO START ]',
+          () => { location.href = 'index.html'; });
+      }
+      return;
+    }
     endOverlay('MISSION COMPLETE', 'win',
       'The launch pulls away from the dock into Havana bay. On the malecón, Volkov screams into a red telephone.<br><br>' +
-      'ENEMIES NEUTRALIZED: ' + G.kills + ' / ' + totalHostiles + ' &nbsp;·&nbsp; TIME: ' + secs + 's<br>' +
-      'London sends its regards.',
-      '[ NEXT MISSION (IDENTICAL) ]');
+      stats + 'London sends its regards.',
+      '[ PLAY AGAIN ]');
   }
 
   // ----------------------------------------------------------------- loop --
@@ -541,7 +558,13 @@ const Game = (() => {
     Adventure.msg('Reach the DOCK. The harbour gate will not open politely.', 6);
   });
 
-  if (World.isCustom) document.getElementById('customtag').style.display = 'block';
+  if (World.isEpisode) {
+    const tag = document.getElementById('episodetag');
+    tag.textContent = '▶ MISSION ' + World.episodeSlot + ' OF ' + World.episodeTotal + ' ◀';
+    tag.style.display = 'block';
+  } else if (World.isCustom) {
+    document.getElementById('customtag').style.display = 'block';
+  }
   Adventure.setWinTrigger(win);   // lets a puzzle payoff (e.g. the sports car + keys) end the mission directly
   Adventure.setLoseTrigger(dieBomb);   // cutting the wrong wire on the bomb ends it too
   Adventure.setBlowTrigger(blowCover);   // getting caught red-handed (e.g. lifting the Fabergé egg) blows cover directly

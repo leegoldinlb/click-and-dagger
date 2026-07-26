@@ -10763,10 +10763,25 @@ const World = (() => {
     geoRev++;                                     // new geometry → callers recompile
   }
 
-  // Boot: ?level=custom loads the editor's level from localStorage
+  // Boot: ?level=custom loads the editor's level from localStorage; ?episode=N
+  // loads slot N (1-based) of the 8-slot episode saved by the editor's EPISODE
+  // panel, and remembers which slot/how-many-total so main.js's win() can
+  // advance to the next filled slot instead of just replaying the same level.
+  const EPISODE_SIZE = 8;
   let boot = defaultLevel();
+  let episodeSlot = 0, episodeTotal = EPISODE_SIZE, episodeHasNext = false;
   try {
-    if (new URLSearchParams(location.search).get('level') === 'custom') {
+    const params = new URLSearchParams(location.search);
+    const epParam = parseInt(params.get('episode'), 10);
+    if (epParam >= 1 && epParam <= EPISODE_SIZE) {
+      const slots = JSON.parse(localStorage.getItem('cloakclick.episode') || '[]');
+      if (slots[epParam - 1]) {
+        boot = slots[epParam - 1];
+        isCustom = true;
+        episodeSlot = epParam;
+        episodeHasNext = !!slots[epParam];               // slots[epParam] is the NEXT 1-based slot (0-based index)
+      }
+    } else if (params.get('level') === 'custom') {
       const raw = localStorage.getItem('cloakclick.custom');
       if (raw) { boot = JSON.parse(raw); isCustom = true; }
     }
@@ -10779,6 +10794,10 @@ const World = (() => {
     TEX, SPR, FLOOR, SKY, SKIES, SKYNAMES, TX, TXNAMES, wallTex, wallTexName, WALLTX,
     ents, removeEnt, setPowered, spawnFx, FX_LIFE, FACT,
     spawn, load, defaultLevel, get isCustom() { return isCustom; }, get geoRev() { return geoRev; },
+    get isEpisode() { return episodeSlot > 0; },
+    get episodeSlot() { return episodeSlot; },
+    get episodeTotal() { return episodeTotal; },
+    get episodeHasNext() { return episodeHasNext; },
     get startBlown() { return startBlown; },
     get musicUndercover() { return musicUndercover; },
     get musicCoverBlown() { return musicCoverBlown; },
