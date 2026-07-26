@@ -72,6 +72,9 @@ const Editor = (() => {
     { kind: 'blackbelt', name: 'BLACKBELT', spr: 'blackbelt' },
     { kind: 'soviet', name: 'SOVIET SOLDIER', spr: 'soviet' },
     { kind: 'spy', name: 'ENEMY SPY', spr: 'spy' },
+    { kind: 'iransoldier', name: 'IRANIAN SOLDIER', spr: 'iransoldier' },
+    { kind: 'hkcop', name: 'COLONIAL POLICEMAN', spr: 'hkcop' },
+    { kind: 'elpresidente', name: 'EL PRESIDENTE', spr: 'elpresidente' },
     { kind: 'lao', name: 'LAO', spr: 'lao' },
     { kind: 'baldini', name: 'THE GREAT BALDINI', spr: 'baldini' },
     { kind: 'wilson', name: 'WILSON', spr: 'wilson' },
@@ -173,6 +176,14 @@ const Editor = (() => {
     { kind: 'tehranbooksign3', name: 'KITABFOROOSHI SIGN (3)', spr: 'tehranbooksign3' },
     { kind: 'tehranphonesign', name: 'PHONE BOOTH SIGN', spr: 'tehranphonesign' },
     { kind: 'tehranbusstopsign', name: 'BUS STOP SIGN', spr: 'tehranbusstopsign' },
+    { kind: 'visittehran', name: 'VISIT TEHRAN POSTER', spr: 'visittehran' },
+    { kind: 'visitparis', name: 'VISIT PARIS POSTER', spr: 'visitparis' },
+    { kind: 'visitcuba', name: 'VISIT CUBA POSTER', spr: 'visitcuba' },
+    { kind: 'visitnewyork', name: 'VISIT NEW YORK POSTER', spr: 'visitnewyork' },
+    { kind: 'visithongkong', name: 'VISIT HONG KONG POSTER', spr: 'visithongkong' },
+    { kind: 'visitdallas', name: 'VISIT DALLAS POSTER', spr: 'visitdallas' },
+    { kind: 'visitmoscow', name: 'VISIT MOSCOW POSTER', spr: 'visitmoscow' },
+    { kind: 'visitlondon', name: 'VISIT LONDON POSTER', spr: 'visitlondon' },
     { kind: 'tv', name: 'TV', spr: 'tv' },
     { kind: 'sheetmusic', name: 'SHEET MUSIC', spr: 'sheetmusic' },
     { kind: 'civilianM', name: 'CIVILIAN (M)', spr: 'civilianM' },
@@ -308,7 +319,7 @@ const Editor = (() => {
     { kind: 'curtainrods', name: 'CURTAIN RODS', spr: 'curtainrods' },
     { kind: 'suitrack', name: 'GARMENT RACK', spr: 'suitrack' },
   ];
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
   const WEAPON_KINDS = new Set(['medkit', 'ammo', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden', 'camera', 'disguise']);  // pulled out of PERSONNEL & PROPS into their own WEAPONS & POWER-UPS palette
   const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
   const ITEM_KINDS = new Set(['tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'sheetmusic']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
@@ -967,7 +978,8 @@ const Editor = (() => {
   });
 
   document.getElementById('export').addEventListener('click', () => {
-    const name = prompt('Export filename:', 'click-and-dagger-mission');
+    const suggested = document.getElementById('missionName').value.trim() || 'click-and-dagger-mission';
+    const name = prompt('Export filename:', suggested);
     if (name === null) return;                                    // cancelled
     const clean = (name.trim() || 'click-and-dagger-mission').replace(/[^a-z0-9\-_. ]/gi, '').replace(/\.json$/i, '');
     const a = document.createElement('a');
@@ -989,6 +1001,7 @@ const Editor = (() => {
         if (!Number.isInteger(j.w) || !Number.isInteger(j.h) || !Array.isArray(j.map) ||
             !Array.isArray(j.ents) || !j.spawn) throw new Error('not a mission file');
         fromLevel(j);
+        document.getElementById('missionName').value = f.name.replace(/\.json$/i, '');
         status('IMPORTED ' + f.name.toUpperCase() + '.');
       } catch (err) {
         status('IMPORT FAILED: ' + err.message.toUpperCase());
@@ -1001,6 +1014,7 @@ const Editor = (() => {
   document.getElementById('loaddefault').addEventListener('click', () => {
     const d = World.defaultLevel();
     fromLevel(d);
+    document.getElementById('missionName').value = 'Plaza Vieja';
     if (d.geo && d.geo.sectors && d.geo.sectors.length) {         // authored vector mission → load its geo verbatim
       status('LOADED PLAZA VIEJA — ' + geo.sectors.length + ' SECTORS.');
       return;
@@ -1031,6 +1045,7 @@ const Editor = (() => {
   function saveEpisodeSlots() { localStorage.setItem(EPISODE_KEY, JSON.stringify(episodeSlots)); }
 
   const episodeSlotsEl = document.getElementById('episodeSlots');
+  const missionNameEl = document.getElementById('missionName');
   const episodeBtns = [];
   for (let i = 0; i < EPISODE_SIZE; i++) {
     const b = document.createElement('button');
@@ -1042,8 +1057,11 @@ const Editor = (() => {
   }
   function renderEpisodeSlots() {
     episodeBtns.forEach((b, i) => {
+      const lvl = episodeSlots[i];
+      b.textContent = lvl && lvl.name ? lvl.name.slice(0, 14) : 'SLOT ' + (i + 1);
+      b.title = lvl && lvl.name ? lvl.name : '';
       b.classList.toggle('sel', i === selectedSlot);
-      b.classList.toggle('filled', !!episodeSlots[i]);
+      b.classList.toggle('filled', !!lvl);
     });
   }
   renderEpisodeSlots();
@@ -1052,6 +1070,7 @@ const Editor = (() => {
     const lvl = episodeSlots[selectedSlot];
     if (!lvl) { status('SLOT ' + (selectedSlot + 1) + ' IS EMPTY.'); return; }
     fromLevel(lvl);
+    missionNameEl.value = lvl.name || '';
     if (lvl.geo && lvl.geo.sectors && lvl.geo.sectors.length) {
       status('LOADED SLOT ' + (selectedSlot + 1) + ' — ' + geo.sectors.length + ' SECTORS.');
       return;
@@ -1065,10 +1084,19 @@ const Editor = (() => {
     } catch (err) { status('LOAD FAILED: ' + String(err.message || err).toUpperCase()); }
   });
   document.getElementById('episodeSave').addEventListener('click', () => {
-    episodeSlots[selectedSlot] = toLevel();
+    let name = missionNameEl.value.trim();
+    if (!name) {
+      name = prompt('Name this mission:', 'Mission ' + (selectedSlot + 1));
+      if (name === null) return;                                  // cancelled
+      name = name.trim() || 'Mission ' + (selectedSlot + 1);
+      missionNameEl.value = name;
+    }
+    const lvl = toLevel();
+    lvl.name = name;
+    episodeSlots[selectedSlot] = lvl;
     saveEpisodeSlots();
     renderEpisodeSlots();
-    status('MAP SAVED TO SLOT ' + (selectedSlot + 1) + '.');
+    status('SAVED "' + name.toUpperCase() + '" TO SLOT ' + (selectedSlot + 1) + '.');
   });
   document.getElementById('episodeClear').addEventListener('click', () => {
     episodeSlots[selectedSlot] = null;
@@ -1094,6 +1122,7 @@ const Editor = (() => {
     const w = Math.max(8, Math.min(48, parseInt(document.getElementById('mw').value) || 24));
     const h = Math.max(8, Math.min(48, parseInt(document.getElementById('mh').value) || 24));
     fromLevel(blankLevel(w, h));
+    document.getElementById('missionName').value = '';
     status('NEW ' + w + '×' + h + ' MAP.');
   });
 

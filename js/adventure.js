@@ -126,7 +126,7 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'iransoldier', 'hkcop', 'elpresidente', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'nyofficer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
@@ -148,6 +148,15 @@ const Adventure = (() => {
       case 'spy': return e.dead
         ? 'Sunglasses, still on. Some habits outlast the man.'
         : 'A rival operative in a black trench coat and dark glasses, sidearm drawn. Professional courtesy ends here.';
+      case 'iransoldier': return e.dead
+        ? 'The rifle sling still loops his arm. It never got the shot off.'
+        : 'A regular in a peaked cap, rifle and bayonet held at the ready. Not undercover about it.';
+      case 'hkcop': return e.dead
+        ? 'A revolver and a baton, both idle now.'
+        : 'A colonial officer in khaki, revolver drawn and a baton on his belt. He does not ask twice.';
+      case 'elpresidente': return e.dead
+        ? 'The sash lies in the dirt, medals face-down. So much for the regime.'
+        : 'El Presidente himself — sash, sword, and a fistful of gold braid. He did not get this far by fighting fair.';
       case 'lao': return e.dead
         ? 'The house dealer, folded for good. Nobody was ever going to collect on his markers.'
         : 'I’m pretty sure he’s cheating. I need to find a way to beat him at his own game.';
@@ -168,7 +177,7 @@ const Adventure = (() => {
       case 'sheetmusic': return 'Sheet music for “Anything Goes.” Wilson’s kind of song.';
       case 'nyofficer': return e.dead
         ? 'An officer down. This gets messy fast.'
-        : 'A beat cop, watching the street. Not your problem, hopefully.';
+        : 'An NYPD officer, hand already on his sidearm. He has made you.';
       case 'nyfirefighter': return e.dead
         ? 'A firefighter, gone. New York keeps score.'
         : 'Off duty, hose coil slung over one shoulder out of habit.';
@@ -276,7 +285,7 @@ const Adventure = (() => {
         : 'A tourist in a loud shirt, photographing everything except the one thing that matters. Sunglasses hide poor judgment.';
       case 'officer': return e.dead
         ? 'A police officer, down. This complicates your exit considerably, and it’s on you.'
-        : 'A Cuban police officer on his beat. Best he never clocks what you’re actually doing here.';
+        : 'A Cuban police officer, nightstick out. He has already clocked you.';
       case 'fisherman': return e.dead
         ? 'His net never made it back to the water. This is on you.'
         : 'A dockworker with a coil of net over one shoulder, weathered by salt and long shifts.';
@@ -971,8 +980,8 @@ const Adventure = (() => {
       addItem('love', 'LOVE');
       return 'Fiona sits, barks once, and looks up at you like you invented dogs. You feel a little better about all this.';
     }
-    if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman',
-      'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer',
+    if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman',
+      'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer',
       'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician',
       'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist',
       'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter',

@@ -128,7 +128,7 @@ aside h2:first-child { margin-top: 0; }
 
 .row { margin-top: 10px; font-size: 11px; letter-spacing: 1px; color: var(--parchment-dim); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
-select, input[type="number"] {
+select, input[type="number"], input[type="text"] {
   font-family: inherit;
   font-size: 12px;
   background: linear-gradient(160deg, var(--panel-hi), var(--panel-lo));

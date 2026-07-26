@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>LAIR ARCHITECT &mdash; CLICK &amp; DAGGER</title>
-<link rel="stylesheet" href="editor.css?v=13">
+<link rel="stylesheet" href="editor.css?v=14">
 </head>
 <body>
 <div id="wrap">
@@ -126,6 +126,10 @@
       </div>
       <h2>EPISODE (8 LEVELS)</h2>
       <p class="hint">Pick a slot, then LOAD it to edit or SAVE the current map into it. PLAY runs the episode from slot 1, advancing to the next filled slot on each win.</p>
+      <div class="row">
+        <label>MISSION NAME</label>
+        <input id="missionName" type="text" placeholder="unnamed" style="flex:1">
+      </div>
       <div id="episodeSlots" class="tools"></div>
       <div id="episodebtns">
         <button id="episodeLoad">LOAD SLOT</button>
@@ -139,8 +143,8 @@
 <input type="file" id="filein" accept=".json,application/json" hidden>
 <a id="helplink" href="help.html" target="_blank">? HELP</a>
 <script src="js/music.js?v=1"></script>
-<script src="js/world.js?v=118"></script>
+<script src="js/world.js?v=121"></script>
 <script src="js/engine.js?v=48"></script>
-<script src="js/editor.js?v=87"></script>
+<script src="js/editor.js?v=90"></script>
 </body>
 </html>

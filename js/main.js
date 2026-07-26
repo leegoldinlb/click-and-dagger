@@ -51,8 +51,17 @@ const Game = (() => {
     // him into this table (and out of NO_DAMAGE) — no separate aggro/AI code needed.
     boss005: { speed: 1.3, meleeRange: 1.0, meleeDmg: [10, 18], aggroR: 14, atkCd: 0.45,
                ranged: true, rangedRange: 8, rangedDmg: [9, 16] },
+    // reskins/new regulars — same melee-rifle-henchman shape as goon/soviet
+    iransoldier: { speed: 1.7, meleeRange: 0.85, meleeDmg: [7, 13], aggroR: 9, atkCd: 0.95 },
+    officer:     { speed: 1.7, meleeRange: 0.85, meleeDmg: [7, 13], aggroR: 9, atkCd: 0.95 },
+    nyofficer:   { speed: 1.7, meleeRange: 0.85, meleeDmg: [7, 13], aggroR: 9, atkCd: 0.95 },
+    // sidearm-drawn ranged henchman, same shape as spy/sniper
+    hkcop: { speed: 1.4, meleeRange: 0.85, meleeDmg: [7, 13], aggroR: 10, atkCd: 1.3,
+             ranged: true, rangedRange: 7, rangedDmg: [10, 16] },
+    // El Presidente: a boss — hits harder and closes faster than a regular henchman
+    elpresidente: { speed: 1.4, meleeRange: 1.1, meleeDmg: [16, 26], aggroR: 12, atkCd: 0.75 },
   };
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
   const totalHostiles = World.ents.filter(e => HOSTILE[e.kind]).length;
   // Quest-critical kinds never take damage — destroying 004's body, the vacuum
   // tube, or Volkov's desk could strand the puzzle chain with no way to recover.

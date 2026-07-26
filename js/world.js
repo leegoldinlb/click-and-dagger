@@ -9715,6 +9715,17 @@ const World = (() => {
   SPR.sovietcitizen = SPR.civilianM;
   SPR.sovietshopper = SPR.civilianF;
   SPR.sovietscientist = SPR.civilianM;
+  SPR.iransoldier = SPR.soviet;
+  SPR.hkcop = SPR.spy;
+  SPR.elpresidente = SPR.brute;
+  SPR.visittehran = SPR.desk;
+  SPR.visitparis = SPR.desk;
+  SPR.visitcuba = SPR.desk;
+  SPR.visitnewyork = SPR.desk;
+  SPR.visithongkong = SPR.desk;
+  SPR.visitdallas = SPR.desk;
+  SPR.visitmoscow = SPR.desk;
+  SPR.visitlondon = SPR.desk;
   // City signage/billboard props, cropped from regional prop sheets
   SPR.havanarumbillboard = SPR.desk;
   SPR.havanafloriditasign = SPR.desk;
@@ -9996,9 +10007,22 @@ const World = (() => {
     tehranbooksign3: 'assets/sprites/tehranbooksign3.png?v=1',
     tehranphonesign: 'assets/sprites/tehranphonesign.png?v=1',
     tehranbusstopsign: 'assets/sprites/tehranbusstopsign.png?v=1',
+    iransoldier: 'assets/sprites/iransoldier.png?v=1',
+    hkcop: 'assets/sprites/hkcop.png?v=1',
+    elpresidente: 'assets/sprites/elpresidente.png?v=1',
+    visittehran: 'assets/sprites/visittehran.png?v=1',
+    visitparis: 'assets/sprites/visitparis.png?v=1',
+    visitcuba: 'assets/sprites/visitcuba.png?v=1',
+    visitnewyork: 'assets/sprites/visitnewyork.png?v=1',
+    visithongkong: 'assets/sprites/visithongkong.png?v=1',
+    visitdallas: 'assets/sprites/visitdallas.png?v=1',
+    visitmoscow: 'assets/sprites/visitmoscow.png?v=1',
+    visitlondon: 'assets/sprites/visitlondon.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
-    blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash' };  // hit-flash white silhouettes
+    blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash',
+    iransoldier: 'iransoldierFlash', hkcop: 'hkcopFlash', elpresidente: 'elpresidenteFlash',
+    nyofficer: 'nyofficerFlash', officer: 'officerFlash' };  // hit-flash white silhouettes
                                                                                           // derived from these — regenerate
                                                                                           // whenever the base art is replaced
   function isTainted(img) {                                // a canvas holding this image would throw on getImageData —
@@ -10192,6 +10216,23 @@ const World = (() => {
       hp: 28, dead: false, aggro: false, atkT: 0, flash: 0,
       getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.spyFlash : SPR.spy); },
     }),
+    iransoldier: (x, y) => ({
+      kind: 'iransoldier', name: 'IRANIAN SOLDIER', x, y, solid: true, scale: 0.82,
+      hp: 45, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.iransoldierFlash : SPR.iransoldier); },
+    }),
+    hkcop: (x, y) => ({
+      kind: 'hkcop', name: 'COLONIAL POLICEMAN', x, y, solid: true, scale: 0.8,
+      hp: 28, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.hkcopFlash : SPR.hkcop); },
+    }),
+    // El Presidente: a boss-tier hostile, meant to hit noticeably harder and
+    // soak more damage than the regular henchmen — see HOSTILE in main.js
+    elpresidente: (x, y) => ({
+      kind: 'elpresidente', name: 'EL PRESIDENTE', x, y, solid: true, scale: 0.9,
+      hp: 150, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.elpresidenteFlash : SPR.elpresidente); },
+    }),
     // neutral Havana locals: `behavior` is 'wander' (default) or 'stationary', authored per-entity.
     // Low HP — any hit ends them; three dead civilians ends the mission (see main.js).
     civilianM: (x, y, e) => ({
@@ -10219,10 +10260,10 @@ const World = (() => {
       behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
       getTex() { return this.dead ? SPR.civilianCorpse : SPR.tourist; },
     }),
-    officer: (x, y, e) => ({
-      kind: 'officer', name: 'POLICE OFFICER', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
-      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
-      getTex() { return this.dead ? SPR.civilianCorpse : SPR.officer; },
+    officer: (x, y) => ({
+      kind: 'officer', name: 'POLICE OFFICER', x, y, solid: true, scale: 0.8,
+      hp: 45, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.officerFlash : SPR.officer); },
     }),
     fisherman: (x, y, e) => ({
       kind: 'fisherman', name: 'FISHERMAN', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
@@ -10450,10 +10491,10 @@ const World = (() => {
     }),
     // Regional background civilians (NYC, Middle East, London, Havana, USSR)
     // — same wander/stationary NPC pattern as the Havana civilian roster
-    nyofficer: (x, y, e) => ({
-      kind: 'nyofficer', name: 'NYPD OFFICER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
-      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
-      getTex() { return this.dead ? SPR.civilianCorpse : SPR.nyofficer; },
+    nyofficer: (x, y) => ({
+      kind: 'nyofficer', name: 'NYPD OFFICER', x, y, solid: true, scale: 0.85,
+      hp: 45, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.nyofficerFlash : SPR.nyofficer); },
     }),
     nyfirefighter: (x, y, e) => ({
       kind: 'nyfirefighter', name: 'FIREFIGHTER', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
@@ -10678,6 +10719,15 @@ const World = (() => {
     tehranbooksign3: (x, y) => prop('tehranbooksign3', 'KITABFOROOSHI SIGN (3)', x, y, 0.5, false),
     tehranphonesign: (x, y) => prop('tehranphonesign', 'PHONE BOOTH SIGN', x, y, 0.65, false),
     tehranbusstopsign: (x, y) => prop('tehranbusstopsign', 'BUS STOP SIGN', x, y, 0.65, false),
+    // "VISIT [CITY]" travel posters — one per region, framed and ready to hang
+    visittehran: (x, y) => prop('visittehran', 'VISIT TEHRAN POSTER', x, y, 0.9, false),
+    visitparis: (x, y) => prop('visitparis', 'VISIT PARIS POSTER', x, y, 0.9, false),
+    visitcuba: (x, y) => prop('visitcuba', 'VISIT CUBA POSTER', x, y, 0.9, false),
+    visitnewyork: (x, y) => prop('visitnewyork', 'VISIT NEW YORK POSTER', x, y, 0.9, false),
+    visithongkong: (x, y) => prop('visithongkong', 'VISIT HONG KONG POSTER', x, y, 0.9, false),
+    visitdallas: (x, y) => prop('visitdallas', 'VISIT DALLAS POSTER', x, y, 0.9, false),
+    visitmoscow: (x, y) => prop('visitmoscow', 'VISIT MOSCOW POSTER', x, y, 0.9, false),
+    visitlondon: (x, y) => prop('visitlondon', 'VISIT LONDON POSTER', x, y, 0.9, false),
   };
 
   function removeEnt(ent) {
