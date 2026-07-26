@@ -9739,6 +9739,24 @@ const World = (() => {
   SPR.visitdallas = SPR.desk;
   SPR.visitmoscow = SPR.desk;
   SPR.visitlondon = SPR.desk;
+  SPR.doorred = SPR.desk;
+  SPR.doorelevatorplain = SPR.desk;
+  SPR.doortehranarch = SPR.desk;
+  SPR.doorbluepaneled = SPR.desk;
+  SPR.doornavyornate = SPR.desk;
+  SPR.doorbrowntransom1 = SPR.desk;
+  SPR.doornavyarched = SPR.desk;
+  SPR.doorblackplain = SPR.desk;
+  SPR.doorsaloon = SPR.desk;
+  SPR.doorbankelevator = SPR.desk;
+  SPR.doorhavanashutter = SPR.desk;
+  SPR.doorbrowntransom2 = SPR.desk;
+  SPR.doorbrowntransom3 = SPR.desk;
+  SPR.doorbrowntransom4 = SPR.desk;
+  SPR.doormoscoweagle = SPR.desk;
+  SPR.doorsecuritygray = SPR.desk;
+  SPR.doorlondon10 = SPR.desk;
+  SPR.doordiamondglass = SPR.desk;
   // City signage/billboard props, cropped from regional prop sheets
   SPR.havanarumbillboard = SPR.desk;
   SPR.havanafloriditasign = SPR.desk;
@@ -10031,6 +10049,24 @@ const World = (() => {
     visitdallas: 'assets/sprites/visitdallas.png?v=1',
     visitmoscow: 'assets/sprites/visitmoscow.png?v=1',
     visitlondon: 'assets/sprites/visitlondon.png?v=1',
+    doorred: 'assets/sprites/doorred.png?v=1',
+    doorelevatorplain: 'assets/sprites/doorelevatorplain.png?v=1',
+    doortehranarch: 'assets/sprites/doortehranarch.png?v=1',
+    doorbluepaneled: 'assets/sprites/doorbluepaneled.png?v=1',
+    doornavyornate: 'assets/sprites/doornavyornate.png?v=1',
+    doorbrowntransom1: 'assets/sprites/doorbrowntransom1.png?v=1',
+    doornavyarched: 'assets/sprites/doornavyarched.png?v=1',
+    doorblackplain: 'assets/sprites/doorblackplain.png?v=1',
+    doorsaloon: 'assets/sprites/doorsaloon.png?v=1',
+    doorbankelevator: 'assets/sprites/doorbankelevator.png?v=1',
+    doorhavanashutter: 'assets/sprites/doorhavanashutter.png?v=1',
+    doorbrowntransom2: 'assets/sprites/doorbrowntransom2.png?v=1',
+    doorbrowntransom3: 'assets/sprites/doorbrowntransom3.png?v=1',
+    doorbrowntransom4: 'assets/sprites/doorbrowntransom4.png?v=1',
+    doormoscoweagle: 'assets/sprites/doormoscoweagle.png?v=1',
+    doorsecuritygray: 'assets/sprites/doorsecuritygray.png?v=1',
+    doorlondon10: 'assets/sprites/doorlondon10.png?v=1',
+    doordiamondglass: 'assets/sprites/doordiamondglass.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
     blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash',
@@ -10741,6 +10777,26 @@ const World = (() => {
     visitdallas: (x, y) => prop('visitdallas', 'VISIT DALLAS POSTER', x, y, 0.9, false),
     visitmoscow: (x, y) => prop('visitmoscow', 'VISIT MOSCOW POSTER', x, y, 0.9, false),
     visitlondon: (x, y) => prop('visitlondon', 'VISIT LONDON POSTER', x, y, 0.9, false),
+    // door sprites — decorative building fronts, not functional (still walk-through);
+    // flatten one onto a wall (M key) to dress up an entrance or storefront
+    doorred: (x, y) => prop('doorred', 'RED PANELED DOOR', x, y, 1.0, false),
+    doorelevatorplain: (x, y) => prop('doorelevatorplain', 'ELEVATOR DOOR', x, y, 1.0, false),
+    doortehranarch: (x, y) => prop('doortehranarch', 'TILED ARCHWAY DOOR', x, y, 1.0, false),
+    doorbluepaneled: (x, y) => prop('doorbluepaneled', 'BLUE PANELED DOOR', x, y, 1.0, false),
+    doornavyornate: (x, y) => prop('doornavyornate', 'NAVY ORNATE DOOR', x, y, 1.0, false),
+    doorbrowntransom1: (x, y) => prop('doorbrowntransom1', 'BROWNSTONE DOOR (1)', x, y, 1.0, false),
+    doornavyarched: (x, y) => prop('doornavyarched', 'NAVY ARCHED DOOR', x, y, 1.0, false),
+    doorblackplain: (x, y) => prop('doorblackplain', 'BLACK PANELED DOOR', x, y, 1.0, false),
+    doorsaloon: (x, y) => prop('doorsaloon', 'SALOON DOORS', x, y, 1.0, false),
+    doorbankelevator: (x, y) => prop('doorbankelevator', 'BANK ELEVATOR DOOR', x, y, 1.0, false),
+    doorhavanashutter: (x, y) => prop('doorhavanashutter', 'WEATHERED SHUTTER DOOR', x, y, 1.0, false),
+    doorbrowntransom2: (x, y) => prop('doorbrowntransom2', 'BROWNSTONE DOOR (2)', x, y, 1.0, false),
+    doorbrowntransom3: (x, y) => prop('doorbrowntransom3', 'BROWNSTONE DOOR (3)', x, y, 1.0, false),
+    doorbrowntransom4: (x, y) => prop('doorbrowntransom4', 'BROWNSTONE DOOR (4)', x, y, 1.0, false),
+    doormoscoweagle: (x, y) => prop('doormoscoweagle', 'STONE EAGLE ENTRY DOOR', x, y, 1.0, false),
+    doorsecuritygray: (x, y) => prop('doorsecuritygray', 'GRAY SECURITY DOOR', x, y, 1.0, false),
+    doorlondon10: (x, y) => prop('doorlondon10', 'LONDON NO. 10 DOOR', x, y, 1.0, false),
+    doordiamondglass: (x, y) => prop('doordiamondglass', 'DIAMOND-GLASS DOOR', x, y, 1.0, false),
   };
 
   function removeEnt(ent) {
