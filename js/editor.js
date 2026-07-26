@@ -349,6 +349,8 @@ const Editor = (() => {
   const gcur = { x: 0, y: 0, vi: -1 };                          // snapped world cursor + snapped-vertex index
   let hoverEdge = null;                                         // {s, i} hovered wall for I-insert
   let draggingVert = -1;                                        // vertex index being dragged, or -1
+  let draggingEnt = null;                                       // placed entity object being dragged, or null (vector map)
+  let draggingGridEnt = null;                                   // same, for the legacy grid map
   let painting = false;
   let hover = null;
   let cellPx = 28;
@@ -415,7 +417,7 @@ const Editor = (() => {
       wallStepTex: s.wallStepTex ? s.wallStepTex.slice() : null,
       wallStepFloorTex: s.wallStepFloorTex ? s.wallStepFloorTex.slice() : null,
       wallDecal: s.wallDecal ? s.wallDecal.slice() : null,
-      solid: !!s.solid,
+      solid: !!s.solid, missionLink: s.missionLink || null,
     })) : [];
     draft = [];
     document.getElementById('mw').value = lv.w;
@@ -464,7 +466,7 @@ const Editor = (() => {
           wallStepTex: (s.wallStepTex && s.wallStepTex.some(Boolean)) ? s.wallStepTex.slice() : undefined,
           wallStepFloorTex: (s.wallStepFloorTex && s.wallStepFloorTex.some(Boolean)) ? s.wallStepFloorTex.slice() : undefined,
           wallDecal: (s.wallDecal && s.wallDecal.some(Boolean)) ? s.wallDecal.slice() : undefined,
-          parent: s.parent, solid: s.solid || undefined })),
+          parent: s.parent, solid: s.solid || undefined, missionLink: s.missionLink || undefined })),
       };
       out.v = Math.max(out.v, 5);
     }
@@ -813,6 +815,13 @@ const Editor = (() => {
         status('PREVIEW CAM SET AT ' + previewCam.x + ', ' + previewCam.y + ' — switch to 3D PREVIEW to land there.');
         return;
       }
+      // click-and-drag a placed entity to reposition it — takes priority over
+      // stamping a new one or dragging a vertex, except while mid-draft (drawing
+      // a sector) or when a tool that gives clicks their own meaning is armed
+      if (draft.length === 0 && tool.t !== 'spawn' && tool.t !== 'erase') {
+        const hit = entAtWorld(w.x, w.y);
+        if (hit) { pushUndo(); draggingEnt = hit; return; }
+      }
       if (tool.t === 'ent') {
         pushUndo();
         const placedName = (ENTS.find(e => e.kind === tool.v) || {}).name || tool.v;
@@ -849,6 +858,13 @@ const Editor = (() => {
       else erase(c.x, c.y);
       return;
     }
+    // click-and-drag a placed entity to a different cell — takes priority over
+    // stamping a new one on top of it (tools that give clicks their own
+    // meaning, like erase, keep their normal behavior)
+    if (tool.t !== 'erase' && tool.t !== 'height' && tool.t !== 'hfill' && tool.t !== 'tex') {
+      const hit = entsAt(c.x, c.y)[0];
+      if (hit) { pushUndo(); draggingGridEnt = hit; return; }
+    }
     pushUndo();
     if (rectMode && rectEligible()) { rectStart = { x: c.x, y: c.y }; hover = c; render(); return; }
     painting = true;
@@ -859,6 +875,7 @@ const Editor = (() => {
     const c = cellFromEvent(e);
     hover = c;
     if (c) {
+      if (draggingGridEnt) { draggingGridEnt.x = c.x + 0.5; draggingGridEnt.y = c.y + 0.5; render(); return; }
       const eh = effH(c.x, c.y);
       coordsEl.textContent = 'CELL ' + c.x + ',' + c.y +
         (eh ? ' · F ' + eh.f.toFixed(1) + ' C ' + eh.c.toFixed(1) + (eh.custom ? '*' : '') : ' · WALL') +
@@ -871,6 +888,8 @@ const Editor = (() => {
   });
   window.addEventListener('mouseup', () => {
     painting = false;
+    if (draggingEnt) { draggingEnt = null; render(); status('ENTITY MOVED.'); }
+    if (draggingGridEnt) { draggingGridEnt = null; render(); status('ENTITY MOVED.'); }
     if (draggingVert >= 0) { draggingVert = -1; rebuildParents(); render(); status('VERTEX MOVED.'); }
     if (rectStart) {
       const end = hover || rectStart;
@@ -1295,6 +1314,18 @@ const Editor = (() => {
     const sec = geo.sectors[s]; sec.hostile = !sec.hostile;
     status('SECTOR ' + (s + 1) + ' HOSTILE AREA ' + (sec.hostile ? 'ON' : 'OFF'));
   }
+  // Hub airport: cycle the looked-at sector's mission link — walking into a
+  // sector tagged this way (main.js) leaves the hub and boots that city's
+  // shipped mission (see missions/*.json + js/missions.js). Mount the
+  // matching VISIT poster over the doorway with P (see DECAL_KINDS below).
+  const MISSION_CITIES = [null, 'hub', 'tehran', 'paris', 'cuba', 'newyork', 'hongkong', 'dallas', 'moscow', 'london'];
+  function geoMissionLink() {
+    const s = pickGeoSector(); if (s < 0) { status('LOOK AT A SECTOR.'); return; }
+    const sec = geo.sectors[s];
+    let i = MISSION_CITIES.indexOf(sec.missionLink || null); if (i < 0) i = 0;
+    sec.missionLink = MISSION_CITIES[(i + 1) % MISSION_CITIES.length];
+    status('SECTOR ' + (s + 1) + ' MISSION LINK → ' + (sec.missionLink ? sec.missionLink.toUpperCase() : 'NONE'));
+  }
   // toggle a nested shape between a solid mass (column/pillar — no floor/ceiling,
   // blocks movement and sight, textured on its outward face) and a proper walkable
   // sector — the classic Build-engine "hole becomes a sector" conversion.
@@ -1419,7 +1450,8 @@ const Editor = (() => {
   const DECAL_KINDS = [null, 'wallmap', 'corkboard', 'wallclock', 'telegram', 'personnelfile', 'businesscard', 'letter',
     'decalHavanaTravel', 'decalWantedSpanish', 'decalRugWall', 'decalBrassPlaque', 'decalGalleryPoster', 'decalMetroMap',
     'decalFamilyPhoto', 'decalForSale', 'decalPropagandaPoster', 'decalPravda', 'decalWantedTreason', 'decalCampaignPoster',
-    'decalBroadwayPoster', 'decalSubwayMap', 'decalCouplets', 'decalKungFuPoster'];
+    'decalBroadwayPoster', 'decalSubwayMap', 'decalCouplets', 'decalKungFuPoster',
+    'visittehran', 'visitparis', 'visitcuba', 'visitnewyork', 'visithongkong', 'visitdallas', 'visitmoscow', 'visitlondon'];
   function geoWallDecal() {
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
     const sec = geo.sectors[hit.s];
@@ -1914,6 +1946,7 @@ const Editor = (() => {
       if (e.code === 'KeyK') { if (!e.repeat) pushUndo(); if (sh) geoSkyTex(); else geoSky(); e.preventDefault(); return; }
       if (e.code === 'KeyG') { if (!e.repeat) pushUndo(); geoWin(); e.preventDefault(); return; }
       if (e.code === 'KeyN') { if (!e.repeat) pushUndo(); geoHostile(); e.preventDefault(); return; }
+      if (e.code === 'KeyL') { if (!e.repeat) pushUndo(); geoMissionLink(); e.preventDefault(); return; }
       if (e.code === 'KeyF') { if (!e.repeat) pushUndo(); geoDoor(); e.preventDefault(); return; }
       if (e.code === 'KeyH') { if (!e.repeat) pushUndo(); geoToggleSolid(); e.preventDefault(); return; }
       if (e.code === 'KeyP') { if (!e.repeat) pushUndo(); geoWallDecal(); e.preventDefault(); return; }   // mount/cycle a sprite on the wall, poster-style
@@ -2040,7 +2073,7 @@ const Editor = (() => {
   function closeSector() {
     const loop = draft.slice();
     if (polyArea(loop) < 0) loop.reverse();                    // normalise to CCW
-    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, skyTex: null, win: false, hostile: false, texScale: 1, wallDoor: null, wallBlock: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false };
+    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, skyTex: null, win: false, hostile: false, texScale: 1, wallDoor: null, wallBlock: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false, missionLink: null };
     const c = centroid(loop);
     for (let s = 0; s < geo.sectors.length; s++)
       if (pointInLoop(c.x, c.y, geo.sectors[s].loop)) { sec.parent = s; break; }  // nested → sub-sector
@@ -2074,6 +2107,10 @@ const Editor = (() => {
 
   function updateDrawHover(e) {
     const w = worldFromEvent(e);
+    if (draggingEnt) {                                // move the dragged entity, free placement (not grid-snapped)
+      draggingEnt.x = +w.x.toFixed(2); draggingEnt.y = +w.y.toFixed(2);
+      render(); return;
+    }
     if (draggingVert >= 0) {                          // move the dragged vertex, snapped to the half-grid
       geo.verts[draggingVert].x = Math.round(w.x * 2) / 2;
       geo.verts[draggingVert].y = Math.round(w.y * 2) / 2;

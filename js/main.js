@@ -435,6 +435,19 @@ const Game = (() => {
     const cs = Engine.localSector(geo, graph, p.x, p.y, p.sector);
     if (cs >= 0 && geo.sectors[cs].hostile && blowCover()) Adventure.msg('You’ve wandered into hostile territory. Cover’s blown.', 4);
     if (cs >= 0 && geo.sectors[cs].win) win();
+    if (cs >= 0 && geo.sectors[cs].missionLink && !G.transitioning) enterGate(geo.sectors[cs].missionLink);
+  }
+
+  // Hub airport: walking into a gate sector either boots that city's shipped
+  // mission or, if it hasn't been authored yet, just says so and lets you
+  // keep browsing — see missions/*.json + js/missions.js.
+  function enterGate(city) {
+    if (World.hasMission(city)) {
+      G.transitioning = true;
+      location.href = 'index.html?mission=' + city;
+    } else {
+      Adventure.msg(city.toUpperCase() + ' — MISSION COMING SOON.', 3);
+    }
   }
 
   // ------------------------------------------------------------------ hud --
@@ -480,7 +493,7 @@ const Game = (() => {
     document.exitPointerLock();
     Music.stop();
     endOverlay('MISSION FAILED', '',
-      'Volkov’s men stand over you in the plaza while a trio plays on, unbothered.',
+      'Someone was always going to be waiting. This time, it was them.',
       '[ INSERT NEXT AGENT ]');
   }
 
@@ -490,7 +503,7 @@ const Game = (() => {
     document.exitPointerLock();
     Music.stop();
     endOverlay('MISSION FAILED', '',
-      'Three bodies in the plaza that were never on Volkov’s payroll. London does not send its regards.',
+      'Three bodies that were never supposed to be part of this. London does not send its regards.',
       '[ INSERT NEXT AGENT ]');
   }
 
@@ -531,14 +544,14 @@ const Game = (() => {
           () => { location.href = 'index.html?episode=' + next; });
       } else {
         endOverlay('EPISODE COMPLETE', 'win',
-          stats + 'The launch pulls away from the dock. On the malecón, Volkov screams into a red telephone. London sends its regards — the episode is over.',
+          stats + 'The last gate closes behind you. London sends its regards — the episode is over.',
           '[ BACK TO START ]',
           () => { location.href = 'index.html'; });
       }
       return;
     }
     endOverlay('MISSION COMPLETE', 'win',
-      'The launch pulls away from the dock into Havana bay. On the malecón, Volkov screams into a red telephone.<br><br>' +
+      'The extraction goes clean. Somewhere, the people who sent you exhale.<br><br>' +
       stats + 'London sends its regards.',
       '[ PLAY AGAIN ]');
   }
@@ -564,14 +577,14 @@ const Game = (() => {
     G.t0 = performance.now();
     overlay.classList.add('hidden');
     // start holstered — drawing happens automatically: pick a weapon (1-5) or fire on empty ground
-    Adventure.msg('Reach the DOCK. The harbour gate will not open politely.', 6);
+    Adventure.msg('Eyes open. Cover’s thin and the clock is already running.', 5);
   });
 
   if (World.isEpisode) {
     const tag = document.getElementById('episodetag');
     tag.textContent = '▶ MISSION ' + World.episodeSlot + ' OF ' + World.episodeTotal + ' ◀';
     tag.style.display = 'block';
-  } else if (World.isCustom) {
+  } else if (World.isCustom && !World.currentMission) {   // shipped city/hub missions aren't "custom" — only a local editor level is
     document.getElementById('customtag').style.display = 'block';
   }
   Adventure.setWinTrigger(win);   // lets a puzzle payoff (e.g. the sports car + keys) end the mission directly

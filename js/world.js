@@ -13,7 +13,8 @@
 const World = (() => {
   const T = { NONE: 0, TEAK: 1, LAIR: 2, EXIT: 3, RADIO: 4, MAINFRAME: 5, POSTER: 6 };
   const CH = { '#': 1, '%': 2, 'E': 3, 'C': 4, 'F': 5, 'P': 6,
-               '.': 0, 'w': 0, 'o': 0, 'r': 0, 'l': 0, 'p': 0 };
+               '.': 0, 'w': 0, 'o': 0, 'r': 0, 'l': 0, 'p': 0,
+               '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0 };
 
   // Sector definitions per floor char. f/c are floor/ceiling height in world
   // units (default room is floor 0 → ceiling 1; the eye sits 0.5 above floor).
@@ -24,6 +25,18 @@ const World = (() => {
     'l': { f: 0.0,  c: 0.55, ft: 'carpet',   ct: 'vent',     sky: false, win: false },
     'o': { f: 0.0,  c: 3.2,  ft: 'ground',   ct: null,       sky: true,  win: false },
     'w': { f: 0.18, c: 3.2,  ft: 'helipad',  ct: null,       sky: true,  win: true  },
+    // hub-airport gate alcove floors — each city gets its own floor texture so
+    // compileGeo (keyed on floor/ceil/tex/sky/win) always splits it into its
+    // own sector, even though the gate opens straight onto the concourse with
+    // no wall between them. See missions/hub.json + MISSION_CITIES (editor.js).
+    '1': { f: 0.0, c: 1.2, ft: 'kilim',        ct: 'ceiltile', sky: false, win: false },  // tehran
+    '2': { f: 0.0, c: 1.2, ft: 'parquet',      ct: 'ceiltile', sky: false, win: false },  // paris
+    '3': { f: 0.0, c: 1.2, ft: 'azulejo',      ct: 'ceiltile', sky: false, win: false },  // cuba
+    '4': { f: 0.0, c: 1.2, ft: 'delitile',     ct: 'ceiltile', sky: false, win: false },  // newyork
+    '5': { f: 0.0, c: 1.2, ft: 'hongkongtile', ct: 'ceiltile', sky: false, win: false },  // hongkong
+    '6': { f: 0.0, c: 1.2, ft: 'limestone',    ct: 'ceiltile', sky: false, win: false },  // dallas
+    '7': { f: 0.0, c: 1.2, ft: 'domemosaic',   ct: 'ceiltile', sky: false, win: false },  // moscow
+    '8': { f: 0.0, c: 1.2, ft: 'cork',         ct: 'ceiltile', sky: false, win: false },  // london
   };
 
   // ---------------------------------------------------------------------------
@@ -10804,7 +10817,7 @@ const World = (() => {
         wallStepTex: s.wallStepTex ? s.wallStepTex.slice() : undefined,
         wallStepFloorTex: s.wallStepFloorTex ? s.wallStepFloorTex.slice() : undefined,
         wallDecal: s.wallDecal ? s.wallDecal.slice() : undefined,
-        parent: s.parent == null ? -1 : s.parent, solid: !!s.solid,
+        parent: s.parent == null ? -1 : s.parent, solid: !!s.solid, missionLink: s.missionLink || null,
       })),
     } : null;
     startBlown = !!level.blown;
@@ -10813,17 +10826,29 @@ const World = (() => {
     geoRev++;                                     // new geometry → callers recompile
   }
 
-  // Boot: ?level=custom loads the editor's level from localStorage; ?episode=N
-  // loads slot N (1-based) of the 8-slot episode saved by the editor's EPISODE
-  // panel, and remembers which slot/how-many-total so main.js's win() can
-  // advance to the next filled slot instead of just replaying the same level.
+  // Shipped city missions (js/missions.js, built from missions/*.json by
+  // tools/build-missions.js) — the hub airport is MISSIONS.hub, each city is
+  // keyed by the id used in editor.js's MISSION_CITIES / a gate sector's
+  // missionLink. Guarded since js/missions.js may not be present/loaded.
+  function hasMission(id) { return typeof MISSIONS !== 'undefined' && !!MISSIONS[id]; }
+
+  // Boot: ?mission=<city> loads a shipped city mission (or the hub, ?mission=hub);
+  // ?level=custom loads the editor's level from localStorage; ?episode=N loads
+  // slot N (1-based) of the 8-slot episode saved by the editor's EPISODE panel,
+  // remembering which slot/how-many-total so main.js's win() can advance to the
+  // next filled slot instead of just replaying the same level. With no params
+  // at all, the hub airport is the front door if it's been shipped yet.
   const EPISODE_SIZE = 8;
-  let boot = defaultLevel();
+  let boot = hasMission('hub') ? MISSIONS.hub : defaultLevel();
   let episodeSlot = 0, episodeTotal = EPISODE_SIZE, episodeHasNext = false;
+  let currentMission = hasMission('hub') ? 'hub' : null;
   try {
     const params = new URLSearchParams(location.search);
     const epParam = parseInt(params.get('episode'), 10);
-    if (epParam >= 1 && epParam <= EPISODE_SIZE) {
+    const missionParam = params.get('mission');
+    if (missionParam && hasMission(missionParam)) {
+      boot = MISSIONS[missionParam]; isCustom = true; currentMission = missionParam;
+    } else if (epParam >= 1 && epParam <= EPISODE_SIZE) {
       const slots = JSON.parse(localStorage.getItem('cloakclick.episode') || '[]');
       if (slots[epParam - 1]) {
         boot = slots[epParam - 1];
@@ -10833,7 +10858,7 @@ const World = (() => {
       }
     } else if (params.get('level') === 'custom') {
       const raw = localStorage.getItem('cloakclick.custom');
-      if (raw) { boot = JSON.parse(raw); isCustom = true; }
+      if (raw) { boot = JSON.parse(raw); isCustom = true; currentMission = null; }
     }
   } catch (e) { console.warn('Custom level failed to load, using default.', e); }
   load(boot);
@@ -10848,6 +10873,7 @@ const World = (() => {
     get episodeSlot() { return episodeSlot; },
     get episodeTotal() { return episodeTotal; },
     get episodeHasNext() { return episodeHasNext; },
+    hasMission, get currentMission() { return currentMission; },
     get startBlown() { return startBlown; },
     get musicUndercover() { return musicUndercover; },
     get musicCoverBlown() { return musicCoverBlown; },
