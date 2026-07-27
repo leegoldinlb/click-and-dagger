@@ -106,13 +106,18 @@
   },
   {
    "kind": "headshot",
-   "x": 36,
-   "y": 35.74
+   "x": 35.98,
+   "y": 35.77,
+   "flat": true,
+   "flatAngle": 1.5707963267948966,
+   "scale": 0.35,
+   "zOff": 0.3
   },
   {
    "kind": "fabergeegg",
    "x": 30.51,
-   "y": 1.06
+   "y": 1.06,
+   "zOff": 0
   },
   {
    "kind": "tourist",
@@ -130,7 +135,7 @@
    "kind": "fisherman",
    "x": 27.51,
    "y": 10.83,
-   "behavior": "wander"
+   "behavior": "stationary"
   },
   {
    "kind": "fiona",
@@ -241,6 +246,34 @@
    "kind": "ammo",
    "x": 24.96,
    "y": 26.04
+  },
+  {
+   "kind": "pariscafesign",
+   "x": 28.5,
+   "y": 9.01,
+   "flat": true,
+   "flatAngle": 0,
+   "scale": 2.94,
+   "zOff": 1.5
+  },
+  {
+   "kind": "officer",
+   "x": 30.18,
+   "y": 9.5
+  },
+  {
+   "kind": "officer",
+   "x": 29.21,
+   "y": 15.56
+  },
+  {
+   "kind": "parisposter2",
+   "x": 31.47,
+   "y": 3,
+   "flat": true,
+   "flatAngle": 4.71238898038469,
+   "zOff": 0.1,
+   "scale": 1.33
   }
  ],
  "blown": false,
@@ -338,11 +371,11 @@
    },
    {
     "x": 34,
-    "y": 3
+    "y": 3.5
    },
    {
     "x": 35,
-    "y": 3
+    "y": 3.5
    },
    {
     "x": 34,
@@ -675,6 +708,54 @@
    {
     "x": 26,
     "y": 21.5
+   },
+   {
+    "x": 36.5,
+    "y": 5
+   },
+   {
+    "x": 39,
+    "y": 7
+   },
+   {
+    "x": 33,
+    "y": 3
+   },
+   {
+    "x": 33,
+    "y": 1
+   },
+   {
+    "x": 34,
+    "y": 0.5
+   },
+   {
+    "x": 42,
+    "y": 0.5
+   },
+   {
+    "x": 42,
+    "y": 2.5
+   },
+   {
+    "x": 35.5,
+    "y": 2.5
+   },
+   {
+    "x": 31.5,
+    "y": 2.5
+   },
+   {
+    "x": 31.5,
+    "y": 3.5
+   },
+   {
+    "x": 33,
+    "y": 1.5
+   },
+   {
+    "x": 33,
+    "y": 2.5
    }
   ],
   "sectors": [
@@ -752,7 +833,10 @@
      false,
      true,
      false,
-     false
+     false,
+     null,
+     null,
+     true
     ],
     "wallTex": [
      "balconywin",
@@ -762,10 +846,10 @@
      "haussmannwindow",
      "balconywin",
      "balconywin",
-     null,
-     "balconywin",
-     "balconywin",
-     "depositorywindow",
+     "parisshutters",
+     "brick",
+     "brick",
+     "brick",
      "depositorywindow",
      null,
      "depositorywindow",
@@ -806,6 +890,13 @@
      null,
      null,
      null,
+     "brick",
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     null,
      "brick"
     ],
     "wallStepFloorTex": [
@@ -815,7 +906,7 @@
      null,
      null,
      null,
-     null,
+     "haussmannwindow",
      "riverstone",
      null,
      null,
@@ -855,7 +946,7 @@
     "floorTex": "carpet",
     "ceilTex": "ceiltile",
     "sky": true,
-    "skyTex": "parisnight",
+    "skyTex": "starrynight",
     "win": false,
     "hostile": false,
     "texScale": 1,
@@ -883,7 +974,7 @@
     "floorTex": "water",
     "ceilTex": "ceiltile",
     "sky": true,
-    "skyTex": "parisnight",
+    "skyTex": "starrynight",
     "win": false,
     "hostile": false,
     "texScale": 1,
@@ -927,6 +1018,7 @@
     "floorTex": "carpet",
     "ceilTex": "ceiltile",
     "sky": false,
+    "skyTex": "parisnight",
     "win": false,
     "hostile": false,
     "texScale": 1,
@@ -1138,17 +1230,43 @@
      74,
      75,
      76,
+     115,
+     116,
      77,
      71
     ],
     "floor": 0,
-    "ceil": 1,
+    "ceil": 1.6,
     "floorTex": "carpet",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallStepTex": [
+     null,
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     null
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     null
+    ],
     "parent": -1
    },
    {
@@ -1158,7 +1276,7 @@
      79,
      75
     ],
-    "floor": 0,
+    "floor": 0.3,
     "ceil": 1,
     "floorTex": "carpet",
     "ceilTex": "ceiltile",
@@ -1222,7 +1340,7 @@
     "floorTex": "carpet",
     "ceilTex": "helipad",
     "sky": true,
-    "skyTex": "parisnight",
+    "skyTex": "starrynight",
     "win": false,
     "hostile": false,
     "texScale": 1,
@@ -1248,7 +1366,7 @@
     "floorTex": "water",
     "ceilTex": "ground",
     "sky": true,
-    "skyTex": "parisnight",
+    "skyTex": "starrynight",
     "win": false,
     "hostile": false,
     "texScale": 1,
@@ -1294,6 +1412,94 @@
      null,
      null
     ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     28,
+     107,
+     108,
+     56
+    ],
+    "floor": 2,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "skyTex": "parisnight",
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     null,
+     "mansardwindow",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     22,
+     109,
+     118,
+     117,
+     110,
+     111,
+     112,
+     113,
+     114,
+     23
+    ],
+    "floor": 0,
+    "ceil": 1.4,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": true,
+    "texScale": 1,
+    "wallStepTex": [
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     118,
+     116,
+     115,
+     117
+    ],
+    "floor": 0.4,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
     "parent": -1
    }
   ]
