@@ -11036,6 +11036,7 @@ const World = (() => {
     get episodeTotal() { return episodeTotal; },
     get episodeHasNext() { return episodeHasNext; },
     hasMission, get currentMission() { return currentMission; },
+    get bootLevel() { return boot; },   // the exact level JSON this session booted with — see main.js's "EDIT THIS LEVEL"
     get startBlown() { return startBlown; },
     get musicUndercover() { return musicUndercover; },
     get musicCoverBlown() { return musicCoverBlown; },

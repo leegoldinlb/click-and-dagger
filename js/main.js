@@ -550,10 +550,18 @@ const Game = (() => {
       }
       return;
     }
-    endOverlay('MISSION COMPLETE', 'win',
-      'The extraction goes clean. Somewhere, the people who sent you exhale.<br><br>' +
-      stats + 'London sends its regards.',
-      '[ PLAY AGAIN ]');
+    if (World.hasMission('hub') && World.currentMission !== 'hub') {
+      endOverlay('MISSION COMPLETE', 'win',
+        'The extraction goes clean. Somewhere, the people who sent you exhale.<br><br>' +
+        stats + 'London sends its regards.',
+        '[ BACK TO THE AIRPORT ]',
+        () => { location.href = 'index.html?mission=hub'; });
+    } else {
+      endOverlay('MISSION COMPLETE', 'win',
+        'The extraction goes clean. Somewhere, the people who sent you exhale.<br><br>' +
+        stats + 'London sends its regards.',
+        '[ PLAY AGAIN ]');
+    }
   }
 
   // ----------------------------------------------------------------- loop --
@@ -578,6 +586,17 @@ const Game = (() => {
     overlay.classList.add('hidden');
     // start holstered — drawing happens automatically: pick a weapon (1-5) or fire on empty ground
     Adventure.msg('Eyes open. Cover’s thin and the clock is already running.', 5);
+  });
+
+  // Jump into LAIR ARCHITECT with the level currently being played already
+  // loaded — same localStorage key/shape the editor's own "SAVE TO BROWSER"
+  // uses, so it lands exactly like reopening a saved local level. Uses the
+  // level as it was BOOTED (World.bootLevel), not the live in-session state
+  // (opened doors, moved civilians, etc.) — this is for editing the design,
+  // not resuming a playthrough.
+  document.getElementById('editlink').addEventListener('click', () => {
+    try { localStorage.setItem('cloakclick.custom', JSON.stringify(World.bootLevel)); }
+    catch (e) { console.warn('Could not hand the level to the editor:', e); }
   });
 
   if (World.isEpisode) {

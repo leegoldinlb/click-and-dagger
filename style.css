@@ -268,3 +268,13 @@ body.adventure #modeline { color: #b09048; }
 }
 #editorlink:hover { color: var(--gold-bright); border-color: var(--gold-bright); }
 #customtag { color: #d97a3a; }
+
+#editlink {
+  position: fixed; right: 16px; bottom: 14px; z-index: 20;
+  padding: 5px 12px;
+  background: linear-gradient(160deg, var(--panel-hi), var(--panel-lo));
+  border: 2px solid var(--brass-dim);
+  box-shadow: inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo);
+  color: var(--gold); text-decoration: none; font-size: 11px; letter-spacing: 1px;
+}
+#editlink:hover { color: var(--gold-bright); border-color: var(--brass); }
