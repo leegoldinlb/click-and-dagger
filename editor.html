@@ -62,6 +62,7 @@
         <button id="viewtoggle">&#9633; 3D PREVIEW</button>
         <button id="rectbtn" hidden>&#9646;&#9646; RECT FILL</button>
         <button id="drawbtn" hidden>&#9998; DRAW SECTORS</button>
+        <button id="selectbtn">&#9671; SELECT SECTOR(S)</button>
         <span id="viewhint">Draw sectors &middot; place agents &middot; preview in 3D</span>
       </div>
       <div id="preview3d" hidden>
@@ -83,6 +84,27 @@
     </main>
 
     <aside id="side">
+      <h2>SECTOR EDIT</h2>
+      <div id="sectorEdit" hidden>
+        <p class="hint" id="sectorEditLabel">CLICK A SECTOR TO SELECT.</p>
+        <div class="row">
+          <label>FLOOR</label>
+          <input id="secFloor" type="number" step="0.1">
+        </div>
+        <div class="row">
+          <label>CEIL</label>
+          <input id="secCeil" type="number" step="0.1">
+        </div>
+        <div class="row">
+          <label>FLOOR TEX</label>
+          <select id="secFloorTex"></select>
+        </div>
+        <div class="row">
+          <label>CEIL TEX</label>
+          <select id="secCeilTex"></select>
+        </div>
+        <div class="row"><button id="secSolid">TOGGLE SOLID / WALKTHROUGH</button></div>
+      </div>
       <h2>SPECIAL</h2>
       <div id="specials" class="tools"></div>
       <div class="row">
@@ -146,6 +168,6 @@
 <script src="js/missions.js?v=2"></script>
 <script src="js/world.js?v=126"></script>
 <script src="js/engine.js?v=49"></script>
-<script src="js/editor.js?v=95"></script>
+<script src="js/editor.js?v=97"></script>
 </body>
 </html>

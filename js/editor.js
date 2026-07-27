@@ -375,6 +375,8 @@ const Editor = (() => {
   const geo = { verts: [], sectors: [] };
   let drawMode = false;
   let draft = [];                                               // vertex indices of the sector being drawn
+  let selectMode = false;                                       // 2D SELECT SECTOR(S) tool
+  let selSectors = [];                                          // indices into geo.sectors, current 2D selection
   const gcur = { x: 0, y: 0, vi: -1 };                          // snapped world cursor + snapped-vertex index
   let hoverEdge = null;                                         // {s, i} hovered wall for I-insert
   let draggingVert = -1;                                        // vertex index being dragged, or -1
@@ -829,13 +831,45 @@ const Editor = (() => {
   }
 
   cvs.addEventListener('mousedown', e => {
+    if (selectMode && !previewOn) {                  // 2D: click to select sector(s) for the SECTOR EDIT panel
+      if (e.button === 2) {                          // right-click: reset out of SELECT mode to plain idle
+        selSectors = []; selectMode = false;
+        document.getElementById('selectbtn').classList.remove('active');
+        updateSectorPanel(); render();
+        status('RESET TO IDLE — click to draw, or use SELECT SECTOR(S).');
+        return;
+      }
+      const w = worldFromEvent(e);
+      let best = -1, ba = Infinity;
+      for (let s = 0; s < geo.sectors.length; s++) {
+        if (!pointInLoop(w.x, w.y, geo.sectors[s].loop)) continue;
+        const a = Math.abs(polyArea(geo.sectors[s].loop));
+        if (a < ba) { ba = a; best = s; }
+      }
+      if (best < 0) { if (!e.shiftKey) selSectors = []; }
+      else if (e.shiftKey) {
+        const i = selSectors.indexOf(best);
+        if (i >= 0) selSectors.splice(i, 1); else selSectors.push(best);
+      } else selSectors = [best];
+      updateSectorPanel();
+      render();
+      return;
+    }
     if (drawMode) {                                  // vector map: place vertex / entity / spawn
       const w = worldFromEvent(e);
-      if (e.button === 2) {                          // right-click: delete an entity, else cancel a draft
-        if (tool.t === 'campos') { previewCam = null; render(); status('PREVIEW CAM CLEARED — 3D preview will use the default start again.'); return; }
-        const hit = entAtWorld(w.x, w.y);
-        if (hit) { pushUndo(); lv.ents.splice(lv.ents.indexOf(hit), 1); render(); }
-        else cancelDraft();
+      if (e.button === 2) {                          // right-click: always reset to the neutral idle state —
+        // deletes an entity under the cursor (if any), clears any armed tool (campos,
+        // ent, spawn, erase, …) so it stops being "sticky", cancels an in-progress
+        // draft, and drops back to plain draw/select-ready idle.
+        const wasCampos = tool.t === 'campos';
+        if (wasCampos) previewCam = null;
+        const hit = tool.t !== 'campos' ? entAtWorld(w.x, w.y) : null;
+        if (hit) { pushUndo(); lv.ents.splice(lv.ents.indexOf(hit), 1); }
+        draft = [];
+        tool = { t: 'tile', v: '#' };
+        document.querySelectorAll('.tool.sel').forEach(b => b.classList.remove('sel'));
+        render();
+        status(wasCampos ? 'PREVIEW CAM CLEARED — TOOL RESET.' : hit ? 'ENTITY DELETED — TOOL RESET.' : 'RESET TO IDLE — click to draw, or use SELECT SECTOR(S).');
         return;
       }
       if (tool.t === 'campos') {                     // 3D-preview starting viewpoint — not level data, no undo needed
@@ -2188,6 +2222,15 @@ const Editor = (() => {
       g.strokeStyle = '#7fe0d8'; g.lineWidth = 4;
       g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
     }
+    if (selSectors.length) {                                   // SELECT tool: highlight chosen sector(s)
+      g.fillStyle = 'rgba(255,215,94,0.25)'; g.strokeStyle = '#ffd75e'; g.lineWidth = 3;
+      for (const s of selSectors) {
+        const sec = geo.sectors[s]; if (!sec) continue;
+        g.beginPath();
+        for (let i = 0; i < sec.loop.length; i++) { const v = geo.verts[sec.loop[i]]; i ? g.lineTo(v.x * c, v.y * c) : g.moveTo(v.x * c, v.y * c); }
+        g.closePath(); g.fill(); g.stroke();
+      }
+    }
     g.fillStyle = '#ffd75e';                                   // vertices
     for (const v of geo.verts) { g.beginPath(); g.arc(v.x * c, v.y * c, 2.5, 0, 7); g.fill(); }
     if (draft.length) {                                        // draft polyline + rubber band
@@ -2223,6 +2266,7 @@ const Editor = (() => {
     lv.stex = s.stex; lv.ctex = s.ctex; lv.fsx = s.fsx; lv.fsy = s.fsy;
     lv.spawn = s.spawn; lv.ents = s.ents;
     geo.verts = s.geo.verts; geo.sectors = s.geo.sectors; draft = s.draft;
+    selSectors = []; updateSectorPanel();
     fitCanvas();
     if (previewOn) { if (usePortal) portalGraph = Engine.buildGraph(geo); else World.load(toLevel()); }
     render(); status('UNDO.');
@@ -2257,6 +2301,7 @@ const Editor = (() => {
     geo.sectors = geo.sectors.filter(sec => sec.loop.length >= 3);
     reindexAfterRemoved(vi);
     pruneVerts(); rebuildParents();
+    selSectors = []; updateSectorPanel();
   }
   function deleteSectorAt(x, y) {
     let best = -1, ba = Infinity;
@@ -2264,8 +2309,70 @@ const Editor = (() => {
       if (pointInLoop(x, y, geo.sectors[s].loop)) { const a = Math.abs(polyArea(geo.sectors[s].loop)); if (a < ba) { ba = a; best = s; } }
     if (best < 0) return false;
     geo.sectors.splice(best, 1); pruneVerts(); rebuildParents();
+    selSectors = []; updateSectorPanel();
     return true;
   }
+
+  // ---- 2D SELECT SECTOR(S) tool: click sectors in the top-down view, then edit
+  // floor/ceiling height, floor/ceiling texture, and solid/walkthrough here — no
+  // need to enter 3D preview and aim the camera for basic sector edits.
+  function sectorPanelEls() {
+    return {
+      panel: document.getElementById('sectorEdit'),
+      label: document.getElementById('sectorEditLabel'),
+      floor: document.getElementById('secFloor'),
+      ceil: document.getElementById('secCeil'),
+      floorTex: document.getElementById('secFloorTex'),
+      ceilTex: document.getElementById('secCeilTex'),
+      solid: document.getElementById('secSolid'),
+    };
+  }
+  function updateSectorPanel() {
+    const el = sectorPanelEls();
+    if (!el.panel) return;
+    el.panel.hidden = !selectMode;
+    if (!selectMode) return;
+    if (!selSectors.length) { el.label.textContent = 'CLICK A SECTOR TO SELECT.'; return; }
+    el.label.textContent = selSectors.length + ' SECTOR' + (selSectors.length > 1 ? 'S' : '') + ' SELECTED';
+    const first = geo.sectors[selSectors[0]];
+    el.floor.value = first.floor.toFixed(1);
+    el.ceil.value = first.ceil.toFixed(1);
+    el.floorTex.value = first.floorTex;
+    el.ceilTex.value = first.ceilTex;
+    el.solid.disabled = !selSectors.every(s => geo.sectors[s].parent >= 0);
+  }
+  function applyToSelected(fn) {
+    if (!selSectors.length) return;
+    pushUndo();
+    selSectors.forEach(s => fn(geo.sectors[s]));
+    render();
+  }
+  (function initSectorPanel() {
+    const el = sectorPanelEls();
+    if (!el.panel) return;
+    World.TXNAMES.forEach(n => {
+      el.floorTex.appendChild(new Option(n.toUpperCase(), n));
+      el.ceilTex.appendChild(new Option(n.toUpperCase(), n));
+    });
+    el.floor.onchange = () => applyToSelected(sec => { sec.floor = Math.max(-6, Math.min(sec.ceil - 0.2, +(parseFloat(el.floor.value) || 0).toFixed(3))); updateSectorPanel(); });
+    el.ceil.onchange = () => applyToSelected(sec => { sec.ceil = Math.max(sec.floor + 0.2, Math.min(12, +(parseFloat(el.ceil.value) || 0).toFixed(3))); updateSectorPanel(); });
+    el.floorTex.onchange = () => applyToSelected(sec => { sec.floorTex = el.floorTex.value; });
+    el.ceilTex.onchange = () => applyToSelected(sec => { sec.ceilTex = el.ceilTex.value; });
+    el.solid.onclick = () => {
+      applyToSelected(sec => { if (sec.parent >= 0) sec.solid = !sec.solid; });
+      portalGraph = Engine.buildGraph(geo);
+      status('TOGGLED SOLID ON ' + selSectors.length + ' SECTOR' + (selSectors.length > 1 ? 'S' : '') + '.');
+    };
+  })();
+  document.getElementById('selectbtn').onclick = () => {
+    selectMode = !selectMode;
+    document.getElementById('selectbtn').classList.toggle('active', selectMode);
+    if (selectMode) { draft = []; if (previewOn) exitPreview(); }
+    else { selSectors = []; }
+    updateSectorPanel();
+    status(selectMode ? 'SELECT MODE — click a sector, shift-click to add more.' : 'SELECT MODE OFF.');
+    render();
+  };
   function handleDelete() {
     if (drawMode) {
       if (draft.length) { pushUndo(); draft.pop(); status('REMOVED LAST VERTEX.'); render(); }
