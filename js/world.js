@@ -5328,21 +5328,36 @@ const World = (() => {
 
   // ---- parallax sky (wide; sampled by view angle): warm Havana afternoon ----
   const SKY = cnv(g => {
+    // deep zenith blue → pale atmospheric haze at the horizon (Rayleigh-scatter feel,
+    // more color stops than a flat 2-tone gradient reads as noticeably more "real")
     const grd = g.createLinearGradient(0, 0, 0, 96);
-    grd.addColorStop(0, '#3f7fb8'); grd.addColorStop(0.5, '#8fb8d6'); grd.addColorStop(0.78, '#f0d0a0'); grd.addColorStop(1, '#e8a86a');
+    grd.addColorStop(0, '#2f6bab'); grd.addColorStop(0.35, '#4a86bf'); grd.addColorStop(0.62, '#86b4d6');
+    grd.addColorStop(0.82, '#c9dbe6'); grd.addColorStop(0.94, '#e8d9b8'); grd.addColorStop(1, '#e0ac72');
     g.fillStyle = grd; g.fillRect(0, 0, 256, 96);
-    g.fillStyle = 'rgba(255,246,214,0.95)';           // low tropical sun
-    g.beginPath(); g.arc(48, 40, 13, 0, 7); g.fill();
-    g.fillStyle = 'rgba(255,255,255,0.28)';           // fat cumulus clouds
-    [[110, 22, 24], [175, 30, 30], [228, 18, 20], [26, 30, 18]].forEach(([x, y, r]) => {
-      g.beginPath(); g.arc(x, y, r, 0, 7); g.arc(x + r, y + 4, r * 0.7, 0, 7); g.arc(x - r, y + 5, r * 0.6, 0, 7); g.fill();
+    // low tropical sun with a soft radial glow instead of a flat disc
+    const sunG = g.createRadialGradient(48, 40, 0, 48, 40, 26);
+    sunG.addColorStop(0, 'rgba(255,252,232,0.95)'); sunG.addColorStop(0.35, 'rgba(255,246,214,0.6)'); sunG.addColorStop(1, 'rgba(255,246,214,0)');
+    g.fillStyle = sunG; g.beginPath(); g.arc(48, 40, 26, 0, 7); g.fill();
+    g.fillStyle = 'rgba(255,252,236,0.95)'; g.beginPath(); g.arc(48, 40, 12, 0, 7); g.fill();
+    // fat cumulus clouds, varied size/opacity/altitude so they don't read as a stamped repeat
+    [[110, 20, 24, 0.3], [175, 32, 29, 0.22], [228, 16, 19, 0.32], [22, 32, 16, 0.24], [150, 12, 12, 0.18]].forEach(([x, y, r, al]) => {
+      g.fillStyle = `rgba(255,255,255,${al})`;
+      g.beginPath(); g.arc(x, y, r, 0, 7); g.arc(x + r * 0.9, y + r * 0.18, r * 0.7, 0, 7);
+      g.arc(x - r * 0.85, y + r * 0.22, r * 0.6, 0, 7); g.arc(x + r * 0.2, y - r * 0.35, r * 0.55, 0, 7); g.fill();
+      g.fillStyle = `rgba(255,255,255,${al * 0.5})`;                    // soft underside shadow-lit fringe
+      g.beginPath(); g.arc(x, y + r * 0.4, r * 0.9, 0, 7); g.fill();
     });
-    // the sea, and a low Havana skyline / Morro along the horizon
-    g.fillStyle = '#4a7fa0'; g.fillRect(0, 78, 256, 18);
-    g.fillStyle = 'rgba(255,255,255,0.15)'; for (let i = 0; i < 60; i++) g.fillRect((Math.random() * 256) | 0, 79 + ((Math.random() * 15) | 0), 2, 1);
-    g.fillStyle = '#caa878';
+    // hazy sea with a sun-glitter path, then a low Havana skyline / Morro along the horizon
+    const seaG = g.createLinearGradient(0, 78, 0, 96);
+    seaG.addColorStop(0, '#5c93b4'); seaG.addColorStop(1, '#3d6f8f');
+    g.fillStyle = seaG; g.fillRect(0, 78, 256, 18);
+    g.fillStyle = 'rgba(255,244,214,0.35)';                             // sun glitter, denser near the sun's column
+    for (let i = 0; i < 50; i++) { const x = 30 + Math.random() * 40, y = 79 + Math.random() * 15; g.fillRect(x, y, 1 + Math.random(), 1); }
+    g.fillStyle = 'rgba(255,255,255,0.14)'; for (let i = 0; i < 50; i++) g.fillRect((Math.random() * 256) | 0, 79 + ((Math.random() * 15) | 0), 2, 1);
+    g.fillStyle = '#c2a06e';
     for (let x = 0; x <= 256; x += 8) { const h = 70 + ((x * 7) % 11) - (x % 40 === 0 ? 9 : 0); g.fillRect(x, h, 8, 78 - h); }
-    g.fillStyle = '#7a5a38'; g.fillRect(120, 60, 6, 18); g.fillRect(118, 56, 10, 5);   // a distant tower (El Morro-ish)
+    g.fillStyle = 'rgba(120,90,50,0.4)'; for (let x = 0; x <= 256; x += 8) { const h = 70 + ((x * 7) % 11) - (x % 40 === 0 ? 9 : 0); g.fillRect(x, h, 8, 1.5); }  // roofline shadow
+    g.fillStyle = '#6e5030'; g.fillRect(120, 60, 6, 18); g.fillRect(118, 56, 10, 5);   // a distant tower (El Morro-ish)
   }, 256, 96);
 
   // ---- a second parallax sky, selectable per sector: a Paris night ----
@@ -5411,18 +5426,75 @@ const World = (() => {
 
   // ---- a fourth parallax sky: a plain starry night, no skyline ----
   const SKY_STARRYNIGHT = cnv(g => {
+    // deep zenith → a faint warm glow near the horizon (skyglow/airglow, not pitch black
+    // top-to-bottom — reads far less like a flat gradient stripe)
     const grd = g.createLinearGradient(0, 0, 0, 96);
-    grd.addColorStop(0, '#050810'); grd.addColorStop(0.6, '#0c1428'); grd.addColorStop(1, '#182238');
+    grd.addColorStop(0, '#040611'); grd.addColorStop(0.45, '#0a1226'); grd.addColorStop(0.75, '#141f38');
+    grd.addColorStop(0.92, '#26304a'); grd.addColorStop(1, '#3a3f52');
     g.fillStyle = grd; g.fillRect(0, 0, 256, 96);
-    g.fillStyle = 'rgba(255,255,255,0.9)';
-    for (let i = 0; i < 140; i++) { const x = Math.random() * 256, y = Math.random() * 96; g.globalAlpha = 0.25 + Math.random() * 0.65; g.fillRect(x, y, 1, 1); }
+    // moon with a soft glow, off-center
+    const moonG = g.createRadialGradient(196, 20, 0, 196, 20, 22);
+    moonG.addColorStop(0, 'rgba(232,236,244,0.5)'); moonG.addColorStop(0.4, 'rgba(232,236,244,0.18)'); moonG.addColorStop(1, 'rgba(232,236,244,0)');
+    g.fillStyle = moonG; g.beginPath(); g.arc(196, 20, 22, 0, 7); g.fill();
+    g.fillStyle = 'rgba(238,240,232,0.95)'; g.beginPath(); g.arc(196, 20, 8, 0, 7); g.fill();
+    g.fillStyle = 'rgba(200,204,196,0.35)';                                       // a couple of soft crater shadows
+    g.beginPath(); g.arc(193, 17, 1.6, 0, 7); g.fill(); g.beginPath(); g.arc(198, 23, 1.1, 0, 7); g.fill();
+    // faint diagonal Milky Way haze band, low opacity so it doesn't compete with stars
+    g.save(); g.globalAlpha = 0.05; g.fillStyle = '#cfe0ff';
+    for (let i = 0; i < 90; i++) { const t = Math.random(), x = t * 256, y = 10 + t * 30 + (Math.random() - 0.5) * 26; g.fillRect(x, y, 1.6, 1.6); }
+    g.restore();
+    // starfield: most stars tiny/dim, a handful bright with a soft cross-glow twinkle
+    for (let i = 0; i < 150; i++) {
+      const x = Math.random() * 256, y = Math.random() * 88;
+      const b = Math.random();
+      g.globalAlpha = 0.2 + b * 0.6;
+      g.fillStyle = b > 0.82 ? '#dce8ff' : b > 0.55 ? '#fff6e0' : '#ffffff';      // a mix of cool/warm star tints
+      g.fillRect(x, y, 1, 1);
+    }
     g.globalAlpha = 1;
-    g.fillStyle = 'rgba(255,255,255,0.6)';                // a few brighter stars
-    for (let i = 0; i < 12; i++) { const x = (Math.random() * 256) | 0, y = (Math.random() * 96) | 0; g.fillRect(x, y, 1, 1); g.fillRect(x - 1, y, 1, 1); g.fillRect(x + 1, y, 1, 1); g.fillRect(x, y - 1, 1, 1); g.fillRect(x, y + 1, 1, 1); }
+    g.fillStyle = 'rgba(255,255,255,0.7)';
+    for (let i = 0; i < 12; i++) {
+      const x = (Math.random() * 256) | 0, y = (Math.random() * 80) | 0;
+      g.fillRect(x, y, 1, 1);
+      g.globalAlpha = 0.35; g.fillRect(x - 1, y, 1, 1); g.fillRect(x + 1, y, 1, 1); g.fillRect(x, y - 1, 1, 1); g.fillRect(x, y + 1, 1, 1);
+      g.globalAlpha = 0.7;
+    }
+    g.globalAlpha = 1;
   }, 256, 96);
 
-  const SKIES = { havana: SKY, parisnight: SKY_PARISNIGHT, nycday: SKY_NYCDAY, starrynight: SKY_STARRYNIGHT };
-  const SKYNAMES = ['havana', 'parisnight', 'nycday', 'starrynight'];
+  // ---- a fifth parallax sky: a generic sunset/dusk, no skyline — usable anywhere ----
+  const SKY_SUNSET = cnv(g => {
+    const grd = g.createLinearGradient(0, 0, 0, 96);
+    grd.addColorStop(0, '#2a3468'); grd.addColorStop(0.28, '#5c4a82'); grd.addColorStop(0.52, '#a85f78');
+    grd.addColorStop(0.72, '#e08858'); grd.addColorStop(0.87, '#f7bf6a'); grd.addColorStop(1, '#fbdf9a');
+    g.fillStyle = grd; g.fillRect(0, 0, 256, 96);
+    // a handful of early stars up near the zenith, fading out toward the warm horizon band
+    g.fillStyle = 'rgba(255,255,255,0.55)';
+    for (let i = 0; i < 30; i++) { const x = Math.random() * 256, y = Math.random() * 26; g.globalAlpha = (0.2 + Math.random() * 0.6) * (1 - y / 30); g.fillRect(x, y, 1, 1); }
+    g.globalAlpha = 1;
+    // low sun, big soft glow, half-hidden by the horizon
+    const sunG = g.createRadialGradient(128, 68, 0, 128, 68, 46);
+    sunG.addColorStop(0, 'rgba(255,238,200,0.9)'); sunG.addColorStop(0.4, 'rgba(255,200,140,0.55)'); sunG.addColorStop(1, 'rgba(255,200,140,0)');
+    g.fillStyle = sunG; g.beginPath(); g.arc(128, 68, 46, 0, 7); g.fill();
+    g.fillStyle = 'rgba(255,244,220,0.95)'; g.beginPath(); g.arc(128, 68, 16, 0, 7); g.fill();
+    // backlit cloud bands catching the last light — flat elongated streaks, warm on the sun-facing edge
+    [[40, 34, 60, 6], [150, 24, 70, 5], [90, 48, 50, 5], [190, 44, 46, 4]].forEach(([x, y, w, h]) => {
+      g.fillStyle = 'rgba(120,70,90,0.28)'; g.fillRect(x, y, w, h);
+      g.fillStyle = 'rgba(255,210,150,0.35)'; g.fillRect(x, y - 1.5, w * 0.7, 2);
+    });
+    // silhouetted birds, small and few
+    g.strokeStyle = 'rgba(30,20,30,0.55)'; g.lineWidth = 1;
+    [[60, 30], [70, 26], [190, 20], [200, 24]].forEach(([x, y]) => {
+      g.beginPath(); g.moveTo(x - 3, y); g.quadraticCurveTo(x, y - 2.5, x + 3, y);
+      g.moveTo(x - 3, y); g.quadraticCurveTo(x, y + 1.5, x + 3, y); g.stroke();
+    });
+    // dark horizon band — an unlit foreground silhouette line, generic (no specific skyline)
+    g.fillStyle = 'rgba(24,16,26,0.55)'; g.fillRect(0, 88, 256, 3);
+    speck(g, 25, 'rgba(255,220,180,0.05)');
+  }, 256, 96);
+
+  const SKIES = { havana: SKY, parisnight: SKY_PARISNIGHT, nycday: SKY_NYCDAY, starrynight: SKY_STARRYNIGHT, sunset: SKY_SUNSET };
+  const SKYNAMES = ['havana', 'parisnight', 'nycday', 'starrynight', 'sunset'];
 
   // ---- unified texture registry (name → canvas): walls + all surfaces ----
   // Every texture is assignable to any floor, ceiling, or wall in the editor.
@@ -9757,6 +9829,17 @@ const World = (() => {
   SPR.doorsecuritygray = SPR.desk;
   SPR.doorlondon10 = SPR.desk;
   SPR.doordiamondglass = SPR.desk;
+  SPR.londonrow = SPR.desk;
+  SPR.londonoffice = SPR.desk;
+  SPR.londonflats = SPR.desk;
+  SPR.hkcluster = SPR.desk;
+  SPR.hkdomebuilding = SPR.desk;
+  SPR.parisrow1 = SPR.desk;
+  SPR.parisrow2 = SPR.desk;
+  SPR.moscowblock = SPR.desk;
+  SPR.havanarow = SPR.desk;
+  SPR.tehranmosquebuilding = SPR.desk;
+  SPR.tehranoffice = SPR.desk;
   // City signage/billboard props, cropped from regional prop sheets
   SPR.havanarumbillboard = SPR.desk;
   SPR.havanafloriditasign = SPR.desk;
@@ -10067,6 +10150,17 @@ const World = (() => {
     doorsecuritygray: 'assets/sprites/doorsecuritygray.png?v=1',
     doorlondon10: 'assets/sprites/doorlondon10.png?v=1',
     doordiamondglass: 'assets/sprites/doordiamondglass.png?v=1',
+    londonrow: 'assets/sprites/londonrow.png?v=1',
+    londonoffice: 'assets/sprites/londonoffice.png?v=1',
+    londonflats: 'assets/sprites/londonflats.png?v=1',
+    hkcluster: 'assets/sprites/hkcluster.png?v=1',
+    hkdomebuilding: 'assets/sprites/hkdomebuilding.png?v=1',
+    parisrow1: 'assets/sprites/parisrow1.png?v=1',
+    parisrow2: 'assets/sprites/parisrow2.png?v=1',
+    moscowblock: 'assets/sprites/moscowblock.png?v=1',
+    havanarow: 'assets/sprites/havanarow.png?v=1',
+    tehranmosquebuilding: 'assets/sprites/tehranmosquebuilding.png?v=1',
+    tehranoffice: 'assets/sprites/tehranoffice.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
     blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash',
@@ -10797,6 +10891,18 @@ const World = (() => {
     doorsecuritygray: (x, y) => prop('doorsecuritygray', 'GRAY SECURITY DOOR', x, y, 1.0, false),
     doorlondon10: (x, y) => prop('doorlondon10', 'LONDON NO. 10 DOOR', x, y, 1.0, false),
     doordiamondglass: (x, y) => prop('doordiamondglass', 'DIAMOND-GLASS DOOR', x, y, 1.0, false),
+    // skyline building fronts — flat backdrop scenery, solid like the other landmarks
+    londonrow: (x, y) => prop('londonrow', 'LONDON TERRACED ROW', x, y, 1.6, true),
+    londonoffice: (x, y) => prop('londonoffice', 'LONDON OFFICE BUILDING', x, y, 1.6, true),
+    londonflats: (x, y) => prop('londonflats', 'LONDON APARTMENT BLOCK', x, y, 1.8, true),
+    hkcluster: (x, y) => prop('hkcluster', 'HONG KONG TENEMENT CLUSTER', x, y, 2.2, true),
+    hkdomebuilding: (x, y) => prop('hkdomebuilding', 'HONG KONG DOME CORNER BUILDING', x, y, 1.8, true),
+    parisrow1: (x, y) => prop('parisrow1', 'PARIS HAUSSMANN ROW (1)', x, y, 1.8, true),
+    parisrow2: (x, y) => prop('parisrow2', 'PARIS HAUSSMANN ROW (2)', x, y, 1.8, true),
+    moscowblock: (x, y) => prop('moscowblock', 'MOSCOW APARTMENT BLOCK', x, y, 1.6, true),
+    havanarow: (x, y) => prop('havanarow', 'HAVANA COLONIAL ROW', x, y, 1.4, true),
+    tehranmosquebuilding: (x, y) => prop('tehranmosquebuilding', 'TEHRAN TILED BUILDING', x, y, 1.6, true),
+    tehranoffice: (x, y) => prop('tehranoffice', 'TEHRAN OFFICE TOWER', x, y, 2.0, true),
   };
 
   function removeEnt(ent) {

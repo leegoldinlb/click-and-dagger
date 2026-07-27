@@ -627,7 +627,21 @@ const Engine = (() => {
       }
     }
 
-    let start = sectorAt(px, py, geo);
+    // Prefer the physics-tracked sector (p.sector, kept continuous frame-to-frame
+    // by moveStep/localSector — see below) over a fresh sectorAt() search. sectorAt
+    // picks the innermost (smallest-area) sector containing the point with no
+    // memory of the previous frame; right at a shared portal edge — e.g. a small
+    // room's doorway opening onto a big plaza, where both polygons legitimately
+    // contain the point — tiny sub-pixel movement noise can flip which one "wins"
+    // from one frame to the next. When that flips, the whole portal walk restarts
+    // from a different root sector: a one-frame flash (different floor/ceiling tex,
+    // different draw order) most visible in open areas with lots of nested rooms.
+    // Physics already solved this exact problem (moveStep/localSector, below) by
+    // trusting the last-known sector first — reuse that same answer for rendering
+    // so the two stay in agreement, falling back to a fresh search only when the
+    // cached sector no longer actually contains the player (e.g. first frame).
+    let start = (p.sector != null && p.sector >= 0 && geo.sectors[p.sector] &&
+      pInLoop(px, py, geo.sectors[p.sector].loop, geo.verts)) ? p.sector : sectorAt(px, py, geo);
     if (start < 0) start = 0;
     drawSector(start, 0, W - 1, 0, -1);
 
