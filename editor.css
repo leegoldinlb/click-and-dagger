@@ -208,7 +208,7 @@ input[type="number"] { width: 52px; }
   font-size: 12px; letter-spacing: 1px; padding: 4px 9px; pointer-events: none;
 }
 #favbar {
-  position: absolute; top: 10px; right: 10px; display: flex; gap: 3px; pointer-events: none;
+  position: absolute; bottom: 10px; right: 10px; display: flex; gap: 3px; pointer-events: none;
 }
 #texpalette {
   position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
@@ -255,6 +255,12 @@ input[type="number"] { width: 52px; }
   color: var(--gold); text-decoration: none; font-size: 11px; letter-spacing: 1px;
 }
 #helplink:hover { color: var(--gold-bright); border-color: var(--brass); }
+
+#enginecredit {
+  position: fixed; left: 16px; bottom: 14px; z-index: 20;
+  color: var(--parchment-dim); font-size: 10px; letter-spacing: 1px;
+  opacity: 0.6;
+}
 
 #checks { list-style: none; font-size: 11px; letter-spacing: 0.5px; line-height: 1.9; }
 #checks .ok { color: var(--green-bright); }

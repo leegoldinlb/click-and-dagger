@@ -1566,25 +1566,36 @@ const Editor = (() => {
     if (idx >= 0 && lv.ents[idx]) lv.ents[idx].behavior = ent.behavior;
     status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + ent.behavior.toUpperCase());
   }
-  // M: flatten ⇄ billboard toggle on the entity under the crosshair — a
-  // flattened sprite stops turning to face the camera and instead renders as
-  // a fixed 2D plane at flatAngle (see geoRotateEntFlat, below).
+  // M: cycles the entity under the crosshair through three states — ordinary
+  // camera-facing BILLBOARD, FLATTENED (a fixed vertical 2D plane at
+  // flatAngle, e.g. a poster mounted on a wall), and FLAT ON GROUND (the same
+  // fixed plane laid down flat at floor height, e.g. a rug or a body). , / .
+  // rotate the plane in either flat state (see geoRotateEntFlat, below).
   function geoToggleEntFlat() {
     const r = pickEntNear();
     if (!r) { status('LOOK AT AN OBJECT.'); return; }
     const ent = r.ent, idx = World.ents.indexOf(ent);
-    ent.flat = !ent.flat;
-    if (ent.flat && ent.flatAngle == null) ent.flatAngle = 0;
-    if (idx >= 0 && lv.ents[idx]) { lv.ents[idx].flat = ent.flat; lv.ents[idx].flatAngle = ent.flatAngle; }
-    status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + (ent.flat ? 'FLATTENED  ( , . to rotate )' : 'BILLBOARD'));
+    if (!ent.flat && !ent.flatGround) {                  // billboard → flattened (vertical)
+      ent.flat = true; ent.flatGround = false;
+      if (ent.flatAngle == null) ent.flatAngle = 0;
+    } else if (ent.flat) {                                // flattened (vertical) → flat on the ground
+      ent.flat = false; ent.flatGround = true;
+      if (ent.flatAngle == null) ent.flatAngle = 0;
+    } else {                                              // flat on the ground → back to billboard
+      ent.flatGround = false;
+    }
+    if (idx >= 0 && lv.ents[idx]) { lv.ents[idx].flat = ent.flat; lv.ents[idx].flatGround = ent.flatGround; lv.ents[idx].flatAngle = ent.flatAngle; }
+    status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' +
+      (ent.flat ? 'FLATTENED  ( , . to rotate )' : ent.flatGround ? 'FLAT ON GROUND  ( , . to rotate )' : 'BILLBOARD'));
   }
-  // , / . : rotate a flattened entity 45° at a time — no-op (with a hint) on
-  // an ordinary billboard sprite, which has no fixed facing to rotate.
+  // , / . : rotate a flattened (either vertical or ground) entity 45° at a
+  // time — no-op (with a hint) on an ordinary billboard sprite, which has no
+  // fixed facing to rotate.
   function geoRotateEntFlat(dir) {
     const r = pickEntNear();
     if (!r) { status('LOOK AT AN OBJECT.'); return; }
     const ent = r.ent, idx = World.ents.indexOf(ent);
-    if (!ent.flat) { status((ent.name || ent.kind || 'OBJECT').toUpperCase() + " ISN'T FLATTENED — PRESS M FIRST."); return; }
+    if (!ent.flat && !ent.flatGround) { status((ent.name || ent.kind || 'OBJECT').toUpperCase() + " ISN'T FLATTENED — PRESS M FIRST."); return; }
     ent.flatAngle = ((ent.flatAngle || 0) + dir * Math.PI / 4 + Math.PI * 2) % (Math.PI * 2);
     if (idx >= 0 && lv.ents[idx]) lv.ents[idx].flatAngle = ent.flatAngle;
     status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' FACING → ' + Math.round(ent.flatAngle * 180 / Math.PI) + '°');
@@ -1620,6 +1631,7 @@ const Editor = (() => {
     if (ent.solid != null) newEnt.solid = ent.solid;
     if (ent.scale != null) newEnt.scale = ent.scale;
     if (ent.flat) { newEnt.flat = true; newEnt.flatAngle = ent.flatAngle || 0; }
+    if (ent.flatGround) { newEnt.flatGround = true; newEnt.flatAngle = ent.flatAngle || 0; }
     if (ent.zOff) newEnt.zOff = ent.zOff;
     World.ents[idx] = newEnt;
     if (lv.ents[idx]) lv.ents[idx].kind = spec.kind;
@@ -2214,6 +2226,7 @@ const Editor = (() => {
         : geo.sectors[s].parent >= 0 ? 'rgba(200,80,80,0.10)' : 'rgba(120,180,255,0.08)';
       g.fill();
       if (geo.sectors[s].hostile) { g.fillStyle = 'rgba(220,40,30,0.16)'; g.fill(); }  // hostile-area tint, on top
+      if (geo.sectors[s].win) { g.fillStyle = 'rgba(40,220,90,0.28)'; g.fill(); }      // win sector — green, on top
     }
     g.lineWidth = 2.5; g.lineCap = 'round';                    // walls: white solid, red portal
     for (let s = 0; s < geo.sectors.length; s++) {
@@ -2333,6 +2346,7 @@ const Editor = (() => {
       ceilTex: document.getElementById('secCeilTex'),
       solid: document.getElementById('secSolid'),
       hostile: document.getElementById('secHostile'),
+      win: document.getElementById('secWin'),
     };
   }
   function updateSectorPanel() {
@@ -2349,6 +2363,7 @@ const Editor = (() => {
     el.ceilTex.value = first.ceilTex;
     el.solid.disabled = !selSectors.every(s => geo.sectors[s].parent >= 0);
     el.hostile.classList.toggle('active', selSectors.every(s => geo.sectors[s].hostile));
+    el.win.classList.toggle('active', selSectors.every(s => geo.sectors[s].win));
   }
   function applyToSelected(fn) {
     if (!selSectors.length) return;
@@ -2377,6 +2392,12 @@ const Editor = (() => {
       const allOn = selSectors.every(s => geo.sectors[s].hostile);
       applyToSelected(sec => { sec.hostile = !allOn; });
       status((allOn ? 'HOSTILE AREA OFF' : 'HOSTILE AREA ON') + ' — ' + selSectors.length + ' SECTOR' + (selSectors.length > 1 ? 'S' : '') + '.');
+      updateSectorPanel();
+    };
+    el.win.onclick = () => {
+      const allOn = selSectors.every(s => geo.sectors[s].win);
+      applyToSelected(sec => { sec.win = !allOn; });
+      status((allOn ? 'WIN SECTOR OFF' : 'WIN SECTOR ON') + ' — ' + selSectors.length + ' SECTOR' + (selSectors.length > 1 ? 'S' : '') + '.');
       updateSectorPanel();
     };
   })();

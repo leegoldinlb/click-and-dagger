@@ -10175,7 +10175,7 @@ const World = (() => {
     tehranphonesign: 'assets/sprites/tehranphonesign.png?v=1',
     tehranbusstopsign: 'assets/sprites/tehranbusstopsign.png?v=1',
     iransoldier: 'assets/sprites/iransoldier.png?v=1',
-    reza: 'assets/sprites/officeruniform.png?v=1',
+    reza: 'assets/sprites/reza.png?v=1',
     rezaWarmed: 'assets/sprites/rezawarmed.png?v=1',
     rostam: 'assets/sprites/rostam.png?v=1',
     rostamDisguised: 'assets/sprites/officeruniform.png?v=1',

@@ -1,6 +1,14 @@
 'use strict';
 
 // ---------------------------------------------------------------------------
+// CLICK & DAGGER runs on the DUMM engine — the Deterministic Utility for
+// Mission Mapping. DOOM-style portal/sector rendering (this file) fused with
+// a SCUMM-style point-and-click adventure layer (adventure.js) over vector
+// mission geometry authored in the Lair Architect editor (editor.js) and
+// shipped as deterministic JSON (missions/*.json).
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
 // Sector renderer (Build-engine-lite), painter's-algorithm edition.
 //
 // Per screen column we DDA-march the grid and collect the run of open sectors
@@ -705,6 +713,55 @@ const Engine = (() => {
           if (y0i <= y1i) { if (x < minX) minX = x; if (x > maxX) maxX = x; if (yTop < minY) minY = yTop; if (yBot > maxY) maxY = yBot; }
         }
         if (drawn) rects.push({ ent: e, x0: minX, x1: maxX, y0: minY, y1: maxY, dist: (ad + bd) / 2 });
+        continue;
+      }
+      if (e.flatGround) {                                 // flat on the ground: a horizontal plane at floor
+        // height, rotated by flatAngle — rasterised the same way as a sector's
+        // own floor (per-pixel ray/plane intersection), but bounded to a small
+        // sc×sc square footprint centred on the entity instead of the whole sector.
+        const sc = e.dead ? 0.3 : e.scale, hw = sc / 2;
+        const ang = e.flatAngle || 0, ca = Math.cos(ang), sa = Math.sin(ang);
+        const fz = geoFloorAtXY(geo, graph, e.x, e.y, e.sector) + (e.zOff || 0) + 0.01;
+        const corners = [[-hw, -hw], [hw, -hw], [hw, hw], [-hw, hw]].map(([lx, ly]) => ({
+          x: e.x + lx * ca - ly * sa, y: e.y + lx * sa + ly * ca,
+        }));
+        let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9, culled = false;
+        for (const c of corners) {
+          const rx = c.x - px, ry = c.y - py;
+          let cd = rx * cosA + ry * sinA;
+          if (cd < NEAR) { culled = true; break; }
+          const side = rx * -sinA + ry * cosA;
+          const scx = W / 2 + (side / cd) * FX, scy = horizon - (fz - eyeZ) * H / cd;
+          if (scx < minX) minX = scx; if (scx > maxX) maxX = scx;
+          if (scy < minY) minY = scy; if (scy > maxY) maxY = scy;
+        }
+        if (culled) continue;
+        const xs = Math.max(0, Math.floor(minX)), xe = Math.min(W - 1, Math.ceil(maxX));
+        const ys = Math.max(0, Math.floor(minY)), ye = Math.min(H - 1, Math.ceil(maxY));
+        if (xs > xe || ys > ye) continue;
+        const tex = cacheOf(e.getTex());
+        let drawn = false, dMinX = 1e9, dMaxX = -1e9, dMinY = 1e9, dMaxY = -1e9, dSum = 0, dN = 0;
+        for (let x = xs; x <= xe; x++) {
+          const tan = (x - W / 2) / FX, rdx = cosA - sinA * tan, rdy = sinA + cosA * tan;
+          for (let y = ys; y <= ye; y++) {
+            if (y <= horizon) continue;
+            const rd = (eyeZ - fz) * H / (y - horizon);
+            if (!(rd > 0.02 && rd < 64)) continue;
+            const wx = px + rdx * rd, wy = py + rdy * rd;
+            const lx = (wx - e.x) * ca + (wy - e.y) * sa, ly = -(wx - e.x) * sa + (wy - e.y) * ca;
+            if (lx < -hw || lx > hw || ly < -hw || ly > hw) continue;
+            const idx = y * W + x;
+            if (rd > depth[idx] + 0.05) continue;
+            const texU = clamp((((lx + hw) / sc) * tex.w) | 0, 0, tex.w - 1);
+            const texV = clamp((((ly + hw) / sc) * tex.h) | 0, 0, tex.h - 1);
+            const c = tex.u32[texV * tex.w + texU];
+            if ((c >>> 24) < 128) continue;
+            buf[idx] = shade(c, fogAt(rd)); depth[idx] = rd; drawn = true;
+            dSum += rd; dN++;
+            if (x < dMinX) dMinX = x; if (x > dMaxX) dMaxX = x; if (y < dMinY) dMinY = y; if (y > dMaxY) dMaxY = y;
+          }
+        }
+        if (drawn) rects.push({ ent: e, x0: dMinX, x1: dMaxX, y0: dMinY, y1: dMaxY, dist: dSum / dN });
         continue;
       }
       const sx = W / 2 + (s.side / d) * FX;
