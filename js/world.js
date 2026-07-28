@@ -11,7 +11,7 @@
 //   o outdoor ground (open sky)   w helipad win-zone (raised, open sky)
 // ---------------------------------------------------------------------------
 const World = (() => {
-  const T = { NONE: 0, TEAK: 1, LAIR: 2, EXIT: 3, RADIO: 4, MAINFRAME: 5, POSTER: 6 };
+  const T = { NONE: 0, TEAK: 1, LAIR: 2, EXIT: 3, RADIO: 4, MAINFRAME: 5, POSTER: 6, KEYCARD: 7, STDKEY: 8 };
   const CH = { '#': 1, '%': 2, 'E': 3, 'C': 4, 'F': 5, 'P': 6,
                '.': 0, 'w': 0, 'o': 0, 'r': 0, 'l': 0, 'p': 0,
                '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0 };
@@ -3886,6 +3886,26 @@ const World = (() => {
   }
   TEX[T.MAINFRAME] = mainframe(false);
 
+  // universal door kinds — usable in ANY mission, not scripted to one puzzle:
+  // a keycard door (reusable keycard item) and a standard key door (expendable
+  // key item, consumed on use, and collectible in any quantity a level provides).
+  TEX[T.KEYCARD] = cnv(g => {
+    g.fillStyle = '#565c66'; g.fillRect(0, 0, 64, 64);
+    g.strokeStyle = '#31363e'; g.lineWidth = 3; g.strokeRect(3, 3, 58, 58);
+    g.fillStyle = '#2c2e33'; g.fillRect(16, 18, 32, 28);              // reader housing
+    g.fillStyle = '#111214'; g.fillRect(20, 40, 24, 3);               // card slot
+    g.fillStyle = '#3a8f52'; g.beginPath(); g.arc(46, 24, 3, 0, 7); g.fill();  // status LED
+    g.fillStyle = '#8a8f98'; g.font = 'bold 7px monospace'; g.textAlign = 'center';
+    g.fillText('CARD', 32, 30);
+  });
+  TEX[T.STDKEY] = cnv(g => {
+    g.fillStyle = '#4a3a20'; g.fillRect(0, 0, 64, 64);
+    g.strokeStyle = '#2a2010'; g.lineWidth = 3; g.strokeRect(3, 3, 58, 58);
+    g.fillStyle = '#2c2e33'; g.fillRect(22, 22, 20, 24);              // lock plate
+    g.fillStyle = '#c9a227'; g.beginPath(); g.arc(32, 30, 4, 0, 7); g.fill();  // keyhole
+    g.fillRect(30.5, 31, 3, 9);
+  });
+
   function setPowered() {
     TEX[T.EXIT] = blastDoor(true); TEX[T.MAINFRAME] = mainframe(true);
     TX.blast = TEX[T.EXIT]; TX.mainframe = TEX[T.MAINFRAME];   // keep the registry in sync
@@ -5501,6 +5521,7 @@ const World = (() => {
   const TX = Object.assign({
     teak: TEX[T.TEAK], lair: TEX[T.LAIR], radio: TEX[T.RADIO],
     blast: TEX[T.EXIT], mainframe: TEX[T.MAINFRAME], poster: TEX[T.POSTER],
+    keycard: TEX[T.KEYCARD], stdkey: TEX[T.STDKEY],
   }, FLOOR);
   // realism pass: fine per-texel grain over every texture — flat vector fills
   // read as plastic; a whisper of noise reads as material. Water stays clean.
@@ -5527,8 +5548,8 @@ const World = (() => {
     'clapboard', 'picketfence', 'shagcarpet', 'linoleum', 'woodpaneling',
     'concreteblock', 'redbanner', 'domemosaic', 'parquet', 'muralsoviet',
     'warehousebrick', 'depositorywindow', 'depositorycorner', 'concretepergola', 'lawngrass', 'roadway', 'sidewalk',
-    'radio', 'blast', 'mainframe', 'poster'];
-  const WALLTX = { 1: 'teak', 2: 'lair', 3: 'blast', 4: 'radio', 5: 'mainframe', 6: 'poster' };
+    'radio', 'blast', 'mainframe', 'poster', 'keycard', 'stdkey'];
+  const WALLTX = { 1: 'teak', 2: 'lair', 3: 'blast', 4: 'radio', 5: 'mainframe', 6: 'poster', 7: 'keycard', 8: 'stdkey' };
   const wallTexName = (x, y) => {
     const i = Math.floor(y) * MW + Math.floor(x);
     return (stexg && stexg[i]) || WALLTX[get(x, y)] || 'brick';
@@ -8029,6 +8050,31 @@ const World = (() => {
     g.fillStyle = '#1c1e22'; for (let i = 0; i < 4; i++) g.fillRect(26.5 + i * 3.4, 57, 1.4, 5);
   });
 
+  SPR.keycard = outlined(g => {
+    g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(32, 46, 13, 2, 0, 0, 7); g.fill();
+    g.save(); g.translate(32, 32); g.rotate(-0.12);
+    let cg = g.createLinearGradient(-18, 0, 18, 0);
+    cg.addColorStop(0, '#e8e2cf'); cg.addColorStop(0.5, '#f7f2e2'); cg.addColorStop(1, '#cfc8ae');
+    g.fillStyle = cg; g.fillRect(-18, -11, 36, 22);
+    bevel(g, -18, -11, 36, 22, 'rgba(255,255,255,0.6)', 'rgba(0,0,0,0.35)');
+    g.fillStyle = '#1c1e22'; g.fillRect(-18, -4, 36, 5);              // magnetic stripe
+    g.fillStyle = '#8a1f1f'; g.fillRect(-13, 3, 14, 5);               // agency seal block
+    g.fillStyle = '#e8dfc8'; g.font = 'bold 4px monospace'; g.textAlign = 'left';
+    g.fillText('MI-6', -12, 7);
+    g.restore();
+  });
+  SPR.stdkey = outlined(g => {
+    g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(32, 48, 12, 2, 0, 0, 7); g.fill();
+    g.save(); g.translate(32, 34); g.rotate(0.5);
+    let kg = g.createLinearGradient(0, -16, 0, 16);
+    kg.addColorStop(0, '#e8c96a'); kg.addColorStop(0.5, '#c9a227'); kg.addColorStop(1, '#8a6a18');
+    g.strokeStyle = kg; g.lineWidth = 3; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(0, -14); g.lineTo(0, 12); g.stroke();     // shaft
+    g.fillStyle = kg; g.beginPath(); g.arc(0, -16, 7, 0, 7); g.fill();  // bow
+    g.beginPath(); g.arc(0, -16, 3.4, 0, 7, true); g.fillStyle = '#4a3a20'; g.fill();
+    g.fillStyle = kg; g.fillRect(0, 6, 6, 2.4); g.fillRect(0, 10, 5, 2.4);  // bit teeth
+    g.restore();
+  });
   SPR.medkit = outlined(g => {
     g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(32, 58.5, 21, 2.4, 0, 0, 7); g.fill();
     let cs = g.createLinearGradient(0, 31, 0, 57);
@@ -9801,6 +9847,13 @@ const World = (() => {
   SPR.sovietshopper = SPR.civilianF;
   SPR.sovietscientist = SPR.civilianM;
   SPR.iransoldier = SPR.soviet;
+  SPR.maheen = SPR.memother;
+  SPR.reza = SPR.iransoldier;
+  SPR.rezaWarmed = SPR.iransoldier;
+  SPR.rostam = SPR.civilianM;
+  SPR.rostamDisguised = SPR.iransoldier;
+  SPR.brothersphoto = SPR.headshot;
+  SPR.tehranuniform = SPR.briefcase;
   SPR.hkcop = SPR.spy;
   SPR.elpresidente = SPR.brute;
   SPR.visittehran = SPR.desk;
@@ -10122,6 +10175,12 @@ const World = (() => {
     tehranphonesign: 'assets/sprites/tehranphonesign.png?v=1',
     tehranbusstopsign: 'assets/sprites/tehranbusstopsign.png?v=1',
     iransoldier: 'assets/sprites/iransoldier.png?v=1',
+    reza: 'assets/sprites/officeruniform.png?v=1',
+    rezaWarmed: 'assets/sprites/rezawarmed.png?v=1',
+    rostam: 'assets/sprites/rostam.png?v=1',
+    rostamDisguised: 'assets/sprites/officeruniform.png?v=1',
+    brothersphoto: 'assets/sprites/brothersphoto.png?v=1',
+    tehranuniform: 'assets/sprites/tehranuniform.png?v=1',
     hkcop: 'assets/sprites/hkcop.png?v=1',
     elpresidente: 'assets/sprites/elpresidente.png?v=1',
     visittehran: 'assets/sprites/visittehran.png?v=1',
@@ -10294,6 +10353,8 @@ const World = (() => {
     cactus: (x, y) => prop('cactus', 'POTTED CACTUS', x, y, 0.55, false),
     hedge: (x, y) => prop('hedge', 'HEDGE', x, y, 0.9, true),
     bar: (x, y) => prop('bar', 'BAR CART', x, y, 0.85, true),
+    keycard: (x, y) => prop('keycard', 'KEYCARD', x, y, 0.28, false),
+    stdkey: (x, y) => prop('stdkey', 'KEY', x, y, 0.24, false),
     medkit: (x, y) => prop('medkit', 'FIRST-AID TIN', x, y, 0.34, false, { pickup: 'med' }),
     ammo: (x, y) => prop('ammo', 'AMMO BOX', x, y, 0.34, false, { pickup: 'ammo' }),
     wpn_sterling: (x, y) => prop('wpn_sterling', 'STERLING CASE', x, y, 0.42, false, { pickup: 'weapon', weaponKind: 'sterling', grantAmmo: 60 }),
@@ -10446,6 +10507,26 @@ const World = (() => {
       behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
       getTex() { return this.dead ? SPR.civilianCorpse : SPR.matron; },
     }),
+    // Tehran: "A Brother's Freedom" — Maheen's husband Rostam is imprisoned; his twin
+    // brother Reza can free him but is loyal to the Shah until his heart is warmed by
+    // the photo of the two of them as boys. See adventure.js for the puzzle logic.
+    maheen: (x, y, e) => ({
+      kind: 'maheen', name: 'MAHEEN', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.maheen; },
+    }),
+    reza: (x, y, e) => ({
+      kind: 'reza', name: 'REZA', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      warmed: false,
+      getTex() { return this.dead ? SPR.civilianCorpse : (this.warmed ? SPR.rezaWarmed : SPR.reza); },
+    }),
+    rostam: (x, y, e) => ({
+      kind: 'rostam', name: 'ROSTAM', x, y, solid: false, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      disguised: false,
+      getTex() { return this.dead ? SPR.civilianCorpse : (this.disguised ? SPR.rostamDisguised : SPR.rostam); },
+    }),
     streetartist: (x, y, e) => ({
       kind: 'streetartist', name: 'STREET ARTIST', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
       behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
@@ -10474,6 +10555,8 @@ const World = (() => {
     }),
     sheetmusic: (x, y) => prop('sheetmusic', 'SHEET MUSIC', x, y, 0.32, false),
     headshot: (x, y) => prop('headshot', "MATRON'S HEADSHOT", x, y, 0.3, false),
+    brothersphoto: (x, y) => prop('brothersphoto', 'PHOTOGRAPH OF BROTHERS', x, y, 0.3, false),
+    tehranuniform: (x, y) => prop('tehranuniform', 'UNIFORM', x, y, 0.4, false),
     metroticket: (x, y) => prop('metroticket', 'METRO TICKET', x, y, 0.26, false),
     fabergeegg: (x, y) => prop('fabergeegg', 'FABERGÉ EGG', x, y, 0.55, true),
     laundrylady: (x, y, e) => ({

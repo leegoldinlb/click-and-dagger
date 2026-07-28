@@ -347,11 +347,18 @@ const Editor = (() => {
     { kind: 'package', name: 'WRAPPED PACKAGE', spr: 'package' },
     { kind: 'curtainrods', name: 'CURTAIN RODS', spr: 'curtainrods' },
     { kind: 'suitrack', name: 'GARMENT RACK', spr: 'suitrack' },
+    { kind: 'keycard', name: 'KEYCARD', spr: 'keycard' },
+    { kind: 'stdkey', name: 'STANDARD KEY', spr: 'stdkey' },
+    { kind: 'maheen', name: 'MAHEEN', spr: 'maheen' },
+    { kind: 'reza', name: 'REZA', spr: 'reza' },
+    { kind: 'rostam', name: 'ROSTAM', spr: 'rostam' },
+    { kind: 'brothersphoto', name: 'PHOTOGRAPH OF BROTHERS', spr: 'brothersphoto' },
+    { kind: 'tehranuniform', name: 'UNIFORM', spr: 'tehranuniform' },
   ];
   const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
   const WEAPON_KINDS = new Set(['medkit', 'ammo', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden', 'camera', 'disguise']);  // pulled out of PERSONNEL & PROPS into their own WEAPONS & POWER-UPS palette
-  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
-  const ITEM_KINDS = new Set(['tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'sheetmusic']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
+  const PERSONNEL_KINDS = new Set(['goon', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist', 'maheen', 'reza', 'rostam']);
+  const ITEM_KINDS = new Set(['tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'sheetmusic', 'keycard', 'stdkey', 'brothersphoto', 'tehranuniform']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 
   // ---- state ----
@@ -1707,7 +1714,7 @@ const Editor = (() => {
     portalGraph = Engine.buildGraph(geo);                      // re-derive wall.texScale
     status('WALL ' + (hit.i + 1) + ' TILE ×' + next + (next > 1 ? ' (bigger)' : next < 1 ? ' (smaller)' : ''));
   }
-  const DOORKINDS = [null, 'radio', 'blast', 'mainframe', 'poster'];
+  const DOORKINDS = [null, 'radio', 'blast', 'mainframe', 'poster', 'keycard', 'stdkey'];
   function geoDoor() {                                         // cycle the looked-at wall's door/interaction tag
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
     const sec = geo.sectors[hit.s];
@@ -2325,6 +2332,7 @@ const Editor = (() => {
       floorTex: document.getElementById('secFloorTex'),
       ceilTex: document.getElementById('secCeilTex'),
       solid: document.getElementById('secSolid'),
+      hostile: document.getElementById('secHostile'),
     };
   }
   function updateSectorPanel() {
@@ -2340,6 +2348,7 @@ const Editor = (() => {
     el.floorTex.value = first.floorTex;
     el.ceilTex.value = first.ceilTex;
     el.solid.disabled = !selSectors.every(s => geo.sectors[s].parent >= 0);
+    el.hostile.classList.toggle('active', selSectors.every(s => geo.sectors[s].hostile));
   }
   function applyToSelected(fn) {
     if (!selSectors.length) return;
@@ -2362,6 +2371,13 @@ const Editor = (() => {
       applyToSelected(sec => { if (sec.parent >= 0) sec.solid = !sec.solid; });
       portalGraph = Engine.buildGraph(geo);
       status('TOGGLED SOLID ON ' + selSectors.length + ' SECTOR' + (selSectors.length > 1 ? 'S' : '') + '.');
+      updateSectorPanel();
+    };
+    el.hostile.onclick = () => {
+      const allOn = selSectors.every(s => geo.sectors[s].hostile);
+      applyToSelected(sec => { sec.hostile = !allOn; });
+      status((allOn ? 'HOSTILE AREA OFF' : 'HOSTILE AREA ON') + ' — ' + selSectors.length + ' SECTOR' + (selSectors.length > 1 ? 'S' : '') + '.');
+      updateSectorPanel();
     };
   })();
   document.getElementById('selectbtn').onclick = () => {

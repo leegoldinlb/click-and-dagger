@@ -111,7 +111,7 @@ const Game = (() => {
     G.combat = document.pointerLockElement === canvas;
     document.body.classList.toggle('adventure', !G.combat);
     modeEl.textContent = G.combat
-      ? 'COMBAT MODE — TAB, F, or right-click to holster & point-and-click'
+      ? 'COMBAT MODE — TAB, F, 0, or right-click to holster & point-and-click'
       : 'ADVENTURE MODE — pick a verb, click the world · TAB, F, or right-click to draw your gun';
   }
   document.addEventListener('pointerlockchange', syncMode);
@@ -151,6 +151,7 @@ const Game = (() => {
       const wi = WEAPON_KEYS.indexOf(e.code);
       if (wi >= 0) switchWeapon(WEAPON_ORDER[wi]);
       if (e.code === 'Tab' || e.code === 'KeyF') { e.preventDefault(); if (!e.repeat) toggleMode(); }   // faster than right-click for switching combat <-> adventure
+      if (e.code === 'Digit0' && G.combat && !e.repeat) { e.preventDefault(); toggleMode(); }             // 0: holster (combat → adventure only)
       if ((e.code === 'ControlLeft' || e.code === 'ControlRight') && G.combat) { ctrlDown = true; if (!e.repeat) shoot(); }
     }
   });
@@ -383,6 +384,20 @@ const Game = (() => {
       }
     }
 
+    // Tehran escort: once Rostam is flagged following (see adventure.js), he tags
+    // along at a short distance, same as the Havana defector. Dying en route ends
+    // the mission — again, only from the player's own fire.
+    if (Adventure.flags.rostamFollowing && !Adventure.flags.rostamLost) {
+      const ros = World.ents.find(e => e.kind === 'rostam');
+      if (!ros || ros.dead) {
+        Adventure.flags.rostamLost = true;
+        dieRostam();
+      } else {
+        const rd = Math.hypot(p.x - ros.x, p.y - ros.y);
+        if (rd > 1.4) tryMove(ros, ros.x + (p.x - ros.x) * Math.min(1, 2.2 * dt / rd), ros.y + (p.y - ros.y) * Math.min(1, 2.2 * dt / rd), 0.3);
+      }
+    }
+
     // transient fx (explosion bursts from destroyed props): age out and remove
     for (const e of [...World.ents]) {
       if (e.kind !== 'fx') continue;
@@ -514,6 +529,16 @@ const Game = (() => {
     Music.stop();
     endOverlay('MISSION FAILED', '',
       'The defector never made it out. Whatever he knew, it dies with him — and so does London’s trust in you.',
+      '[ INSERT NEXT AGENT ]');
+  }
+
+  function dieRostam() {
+    if (G.over) return;
+    G.over = true;
+    document.exitPointerLock();
+    Music.stop();
+    endOverlay('MISSION FAILED', '',
+      'Rostam never made it out. Maheen will wait for a husband who is not coming home.',
       '[ INSERT NEXT AGENT ]');
   }
 

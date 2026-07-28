@@ -25,6 +25,8 @@ const Adventure = (() => {
     gotDrPepper: false, metPatsy: false, patsyComplete: false,
     // Lao & The Great Baldini (casino)
     wilsonPlayed: false,
+    // A Brother's Freedom (Tehran)
+    rezaWarmed: false, rostamFollowing: false, rostamDisguised: false, rostamLost: false,
   };
   let verb = 'look';
   let selected = null;            // selected inventory item id
@@ -57,10 +59,14 @@ const Adventure = (() => {
   function renderInv() {
     invEl.querySelectorAll('.item').forEach(n => n.remove());
     invEmptyEl.style.display = inv.length ? 'none' : 'inline';
+    const seen = new Set();
     for (const it of inv) {
+      if (seen.has(it.id)) continue;                       // stackable items (e.g. keys) show once, with a count
+      seen.add(it.id);
+      const count = inv.filter(x => x.id === it.id).length;
       const b = document.createElement('button');
       b.className = 'item' + (selected === it.id ? ' selected' : '');
-      b.textContent = it.name;
+      b.textContent = it.name + (count > 1 ? ' ×' + count : '');
       b.onclick = () => {
         selected = selected === it.id ? null : it.id;
         if (selected) { setVerb('use'); msg('Ready to USE the ' + it.name + '. Click a target.'); }
@@ -111,8 +117,8 @@ const Adventure = (() => {
     return null;
   }
 
-  const WALLNAMES = { 1: 'WALL', 2: 'WALL', 3: 'BLAST DOOR', 4: 'RADIO ROOM', 5: 'MAINFRAME', 6: 'POSTER' };
-  const DOORVAL = { radio: 4, blast: 3, mainframe: 5, poster: 6 };   // vector wall tag → grid-equivalent val
+  const WALLNAMES = { 1: 'WALL', 2: 'WALL', 3: 'BLAST DOOR', 4: 'RADIO ROOM', 5: 'MAINFRAME', 6: 'POSTER', 7: 'CARD READER', 8: 'LOCKED DOOR' };
+  const DOORVAL = { radio: 4, blast: 3, mainframe: 5, poster: 6, keycard: 7, stdkey: 8 };   // vector wall tag → grid-equivalent val
   // open the thing under the cursor: a vector door toggles its portal; a grid door becomes floor
   function openWall(t) { if (t.wall && t.wall.door) Engine.openDoor(t.wall); else World.set(t.x, t.y, 0); }
   function nameAt(mx, my) {
@@ -126,7 +132,7 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'iransoldier', 'hkcop', 'elpresidente', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'nyofficer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'iransoldier', 'hkcop', 'elpresidente', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'nyofficer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'maheen', 'reza', 'rostam'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
@@ -168,6 +174,13 @@ const Adventure = (() => {
       case 'wilson': return e.dead
         ? 'The piano falls silent for good.'
         : 'Wilson works the keys without looking up, sunglasses on indoors like it’s a religious observance.';
+      case 'maheen': return 'A woman with worry etched into every line of her face, holding her daughter close.';
+      case 'reza': return e.warmed
+        ? 'Reza, the tears not yet dry. The Shah’s man, softened at last.'
+        : 'Reza, an officer of the Shah, loyal and unmoved. His own twin brother means nothing to him tonight.';
+      case 'rostam': return e.disguised
+        ? 'Rostam, wearing his brother’s uniform. From a distance, he could pass for Reza himself.'
+        : 'Rostam, Maheen’s husband, imprisoned for speaking out. He looks exhausted, but not broken.';
       case 'fiona': return e.sitting
         ? 'Fiona, sitting pretty, thoroughly pleased with herself.'
         : 'Fiona. Best dog in Havana, possibly the world. She is not part of this mission.';
@@ -355,6 +368,8 @@ const Adventure = (() => {
       case 'screwdriver': return 'A flathead screwdriver. Four screws between you and whatever this is.';
       case 'pliers': return 'A pair of pliers. For wires, presumably, and not the friendly kind.';
       case 'ciphermachine': return 'A cipher machine, three rotors and a keyboard. It wants paper, not conversation.';
+      case 'keycard': return 'A plastic keycard, magnetic stripe worn smooth from someone else’s thumb.';
+      case 'stdkey': return 'An old brass key. Whatever it opens, it only opens once.';
       case 'bomb': return flags.bombDefused
         ? 'Dead and harmless now, wires cut, the countdown stopped for good.'
         : (e.casingOpen
@@ -426,6 +441,8 @@ const Adventure = (() => {
         ? (flags.gotPortrait ? 'The easel, canvas bare again — you already took the portrait.' : 'A finished portrait on the easel, uncannily accurate. Worth taking.')
         : 'An artist\'s tripod easel, blank canvas waiting for a subject.';
       case 'headshot': return 'An old publicity photograph — the Matron in her opera days, luminous, every inch the star. An artist could work from this.';
+      case 'brothersphoto': return 'Reza and Rostam as boys, they look so happy together.';
+      case 'tehranuniform': return "It looks like Reza's uniform.";
       case 'metroticket': return 'A single Métro ticket. One ride, one way.';
       case 'fabergeegg': return flags.hasEgg
         ? 'The case stands empty. You already have what you came for.'
@@ -473,6 +490,15 @@ const Adventure = (() => {
         flags.tube = true;
         addItem('tube', 'VACUUM TUBE');
         return 'You pocket the vacuum tube, gently. It is the only one for miles.';
+      case 'keycard':
+        if (inv.some(i => i.id === 'keycard')) return 'You already have a keycard.';
+        World.removeEnt(e);
+        addItem('keycard', 'KEYCARD');
+        return 'You pocket the keycard. Reusable — every card reader in the place should take it.';
+      case 'stdkey':                                       // expendable — collect as many as a level scatters
+        World.removeEnt(e);
+        addItem('key', 'KEY');
+        return 'You pocket a key. One turn, one door, then it’s spent.';
       case 'goon': return e.dead
         ? 'His pockets: lint, sunflower seeds, a photo of Volkov signed “V”. Nothing useful.'
         : 'Absolutely not. He bites.';
@@ -545,6 +571,16 @@ const Adventure = (() => {
         World.removeEnt(e);
         addItem('headshot', "MATRON'S HEADSHOT");
         return "You pocket the old publicity photo. An artist could paint quite a flattering portrait from this.";
+      case 'brothersphoto':
+        if (inv.some(i => i.id === 'brothersphoto')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('brothersphoto', 'PHOTOGRAPH OF BROTHERS');
+        return 'You take the photograph of the two brothers.';
+      case 'tehranuniform':
+        if (inv.some(i => i.id === 'tehranuniform')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('tehranuniform', 'UNIFORM');
+        return "It doesn't fit you, but you take it anyway.";
       case 'metroticket':
         if (inv.some(i => i.id === 'ticket')) return 'You already have it.';
         World.removeEnt(e);
@@ -730,6 +766,47 @@ const Adventure = (() => {
       }
       if (!flags.familySmuggled) return '“I’m not leaving without my family.”';
       return '“Thank heavens, we must leave at once! But I can’t leave without my father’s watch.”';
+    }
+    // A Brother's Freedom (Tehran): Maheen's husband Rostam is imprisoned; his twin
+    // brother Reza can release him but is loyal to the Shah until the photo of the
+    // two of them as boys warms his heart. Escorting Rostam out undisguised while
+    // Reza's heart is still hardened blows cover; in his brother's spare uniform he
+    // passes as an officer either way. Reaching the win sector with him in tow wins.
+    if (e.kind === 'maheen') {
+      if (e.dead) return 'There is nothing left to do here.';
+      return 'My husband Rostam has been imprisoned for speaking up against the government. His own twin brother Reza has the power to release him, but his loyalty is to the Shah, not his own family.';
+    }
+    if (e.kind === 'reza') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'brothersphoto' && !flags.rezaWarmed) {
+        flags.rezaWarmed = true;
+        e.warmed = true;
+        removeItem('brothersphoto');
+        Sfx.pickup();
+        return 'My heart is warmed, I shall set my brother free.';
+      }
+      if (flags.rezaWarmed) return 'My heart is warmed, I shall set my brother free.';
+      return 'My heart is hardened.';
+    }
+    if (e.kind === 'rostam') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (flags.rostamFollowing) return e.disguised
+        ? 'He stays close beside you, every inch an officer on official business.'
+        : 'He stays close behind you, careful not to be noticed.';
+      if (selected === 'tehranuniform' && !flags.rostamDisguised) {
+        flags.rostamDisguised = true;
+        e.disguised = true;
+        removeItem('tehranuniform');
+        Sfx.pickup();
+        return "He pulls his brother's uniform on over his prison clothes. From a distance, he could be Reza himself.";
+      }
+      flags.rostamFollowing = true;
+      if (flags.rostamDisguised) return 'Disguised as an officer, Rostam falls in behind you. No one gives him a second look.';
+      if (!flags.rezaWarmed) {
+        if (blowFn) blowFn();
+        return 'You walk a prisoner out in plain sight of the guards. Cover blown!';
+      }
+      return 'Word has reached the guards from Reza himself — they wave you both through. Rostam falls in behind you.';
     }
     if (e.kind === 'phonebooth') {
       if (selected === 'businesscard' && !flags.familySmuggled) {
@@ -990,7 +1067,38 @@ const Adventure = (() => {
     return 'That doesn’t work. And the clock is running.';
   }
 
+  // Universal door kinds — work in ANY mission (not scripted to a specific
+  // puzzle): a keycard door stays unlocked forever once swiped (the keycard is
+  // reusable and stays in your kit); a standard key door consumes one KEY from
+  // your inventory per door — collect as many keys as a level scatters around.
+  function lookKeycardDoor(t) {
+    return t.wall.open ? 'The card reader glows green. Already open.' : 'A card-reader door. It wants a keycard.';
+  }
+  function lookStdKeyDoor(t) {
+    return t.wall.open ? 'Unlocked, the key still turned in the mechanism.' : 'A locked door. It needs a key.';
+  }
+  function useKeycardDoor(t) {
+    if (t.wall.open) return 'Already open.';
+    if (inv.some(i => i.id === 'keycard')) {
+      openWall(t); Sfx.door();
+      return 'You swipe the keycard. The reader chirps green and the door slides open.';
+    }
+    Sfx.denied();
+    return 'Card reader. Locked — you need a keycard.';
+  }
+  function useStdKeyDoor(t) {
+    if (t.wall.open) return 'Already unlocked.';
+    if (inv.some(i => i.id === 'key')) {
+      openWall(t); removeItem('key'); Sfx.door();
+      return 'The key turns. One less in your pocket now.';
+    }
+    Sfx.denied();
+    return 'Locked. You need a key.';
+  }
+
   function lookWall(t) {
+    if (t.wall && t.wall.door === 'keycard') return lookKeycardDoor(t);
+    if (t.wall && t.wall.door === 'stdkey') return lookStdKeyDoor(t);
     switch (t.val) {
       case 3: return flags.tubeIn
         ? 'The harbour gate. The card reader glows, ready and waiting.'
@@ -1005,6 +1113,8 @@ const Adventure = (() => {
   }
 
   function useWall(t) {
+    if (t.wall && t.wall.door === 'keycard') return useKeycardDoor(t);
+    if (t.wall && t.wall.door === 'stdkey') return useStdKeyDoor(t);
     if (t.val === 4) {                                     // radio room
       if (selected === 'lockpick' || selected === 'hairpin') {
         openWall(t);
