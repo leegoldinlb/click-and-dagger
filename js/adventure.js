@@ -594,7 +594,6 @@ const Adventure = (() => {
         return 'You take the portrait, still smelling faintly of turpentine. Uncanny, really.';
       case 'fabergeegg':
         if (flags.hasEgg) return 'You already have it.';
-        if (!flags.galleryAccess) return 'Behind glass, and the Matron has not so much as glanced your way. Not yet.';
         World.removeEnt(e);
         flags.hasEgg = true;
         addItem('egg', 'FABERGÉ EGG');
