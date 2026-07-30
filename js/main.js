@@ -38,6 +38,7 @@ const Game = (() => {
   // rushes to meleeRange. aggroR is how close (with LOS) wakes them from idle.
   const HOSTILE = {
     goon:   { speed: 1.7, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 9, atkCd: 0.95 },
+    gunman: { speed: 1.7, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 9, atkCd: 0.95 },
     brute:  { speed: 1.3, meleeRange: 1.0,  meleeDmg: [12, 20], aggroR: 7, atkCd: 1.1 },
     sniper: { speed: 1.4, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 10, atkCd: 1.3,
               ranged: true, rangedRange: 7, rangedDmg: [10, 16] },

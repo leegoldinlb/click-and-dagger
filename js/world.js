@@ -9786,6 +9786,7 @@ const World = (() => {
   SPR.blackbelt = SPR.brute;
   SPR.soviet = SPR.goon;
   SPR.spy = SPR.sniper;
+  SPR.gunman = SPR.goon;
   // Casino puzzle cast — Lao (3 moods), The Great Baldini (2), Wilson, and a
   // TV — none have procedural art of their own, so alias a generic stand-in
   // as a placeholder until shipped art loads.
@@ -10034,6 +10035,7 @@ const World = (() => {
     tvconsole: 'assets/sprites/tvconsole.png?v=1',
     tvconsoleOn: 'assets/sprites/tvconsoleOn.png?v=1',
     blackbelt: 'assets/sprites/blackbelt.png?v=1',
+    gunman: 'assets/sprites/gunman.png?v=1',
     soviet: 'assets/sprites/soviet.png?v=1',
     spy: 'assets/sprites/spy.png?v=1',
     lao: 'assets/sprites/lao.png?v=2',
@@ -10236,7 +10238,7 @@ const World = (() => {
     tehranoffice: 'assets/sprites/tehranoffice.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
-    blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash',
+    blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash', gunman: 'gunmanFlash',
     iransoldier: 'iransoldierFlash', hkcop: 'hkcopFlash', elpresidente: 'elpresidenteFlash',
     nyofficer: 'nyofficerFlash', officer: 'officerFlash' };  // hit-flash white silhouettes
                                                                                           // derived from these — regenerate
@@ -10353,6 +10355,12 @@ const World = (() => {
       kind: 'goon', name: 'HENCHMAN', x, y, solid: true, scale: 0.82,
       hp: 45, dead: false, aggro: false, atkT: 0, flash: 0,
       getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.goonFlash : SPR.goon); },
+    }),
+    // gameplay-identical reskin of goon — same stats, different suit (see HOSTILE in main.js)
+    gunman: (x, y) => ({
+      kind: 'gunman', name: 'GUNMAN', x, y, solid: true, scale: 0.82,
+      hp: 45, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.corpse : (this.flash > 0 ? SPR.gunmanFlash : SPR.gunman); },
     }),
     agent: (x, y) => prop('agent', 'AGENT 004', x, y, 0.55, false,
       { has: true, getTex() { return this.has ? SPR.agentCase : SPR.agent; } }),

@@ -132,13 +132,16 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'iransoldier', 'hkcop', 'elpresidente', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'nyofficer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'maheen', 'reza', 'rostam'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['goon', 'gunman', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'iransoldier', 'hkcop', 'elpresidente', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'nyofficer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'maheen', 'reza', 'rostam'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
       case 'goon': return e.dead
         ? 'A retired henchman. The benefits package was misrepresented.'
         : 'A henchman in a regulation orange jumpsuit. Union rules require him to attack on sight.';
+      case 'gunman': return e.dead
+        ? 'A sharp suit, ruined. The tailor would be appalled.'
+        : 'A gunman in a dark suit and fedora, pistol already drawn. Volkov hires for menace, not subtlety.';
       case 'brute': return e.dead
         ? 'A very large problem, permanently solved.'
         : 'A slab of a man in a torn singlet. He does not carry a gun. He has not needed one in years.';
@@ -661,7 +664,7 @@ const Adventure = (() => {
       Sfx.pick();
       return e.on ? 'The picture snaps to life — a rerun flickering through the static.' : 'The picture dies. Better reception elsewhere, probably.';
     }
-    if (['goon', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy'].includes(e.kind) && !e.dead) {
+    if (['goon', 'gunman', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy'].includes(e.kind) && !e.dead) {
       if (selected === 'lettersoftransit' || selected === 'phrase') {
         const geo = World.getGeo();
         let count = 0;
