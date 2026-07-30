@@ -9918,6 +9918,13 @@ const World = (() => {
   SPR.nycparkingsign = SPR.desk;
   SPR.pariscafesign = SPR.desk;
   SPR.parisposter1 = SPR.desk;
+  SPR.matrongirlpearl = SPR.desk;
+  SPR.matronlastsupper = SPR.desk;
+  SPR.matronfrida = SPR.desk;
+  SPR.matrongothic = SPR.desk;
+  SPR.matronmagritte = SPR.desk;
+  SPR.matronscream = SPR.desk;
+  SPR.matronmonalisa = SPR.desk;
   SPR.parisposter2 = SPR.desk;
   SPR.parisruesign = SPR.desk;
   SPR.parisbrasseriesign = SPR.desk;
@@ -10133,6 +10140,13 @@ const World = (() => {
     nycparkingsign: 'assets/sprites/nycparkingsign.png?v=1',
     pariscafesign: 'assets/sprites/pariscafesign.png?v=1',
     parisposter1: 'assets/sprites/parisposter1.png?v=1',
+    matrongirlpearl: 'assets/sprites/matrongirlpearl.png?v=1',
+    matronlastsupper: 'assets/sprites/matronlastsupper.png?v=1',
+    matronfrida: 'assets/sprites/matronfrida.png?v=1',
+    matrongothic: 'assets/sprites/matrongothic.png?v=1',
+    matronmagritte: 'assets/sprites/matronmagritte.png?v=1',
+    matronscream: 'assets/sprites/matronscream.png?v=1',
+    matronmonalisa: 'assets/sprites/matronmonalisa.png?v=1',
     parisposter2: 'assets/sprites/parisposter2.png?v=1',
     parisruesign: 'assets/sprites/parisruesign.png?v=1',
     parisbrasseriesign: 'assets/sprites/parisbrasseriesign.png?v=1',
@@ -10904,6 +10918,15 @@ const World = (() => {
     nycparkingsign: (x, y) => prop('nycparkingsign', 'NO PARKING SIGN', x, y, 0.65, false),
     pariscafesign: (x, y) => prop('pariscafesign', 'CAFE DES DEUX MAGOTS', x, y, 0.5, false),
     parisposter1: (x, y) => prop('parisposter1', 'MISSION CASABLANCA POSTER', x, y, 0.85, false),
+    // Matron's gallery (Paris) — a wing of self-portraits done up in the style of
+    // famous paintings, each a sly wink at a different work of art history.
+    matrongirlpearl: (x, y) => prop('matrongirlpearl', 'GIRL WITH A PEARL EARRING', x, y, 0.85, false),
+    matronlastsupper: (x, y) => prop('matronlastsupper', 'THE LAST SUPPER', x, y, 0.85, false),
+    matronfrida: (x, y) => prop('matronfrida', 'SELF-PORTRAIT WITH MONKEYS', x, y, 0.85, false),
+    matrongothic: (x, y) => prop('matrongothic', 'AMERICAN GOTHIC', x, y, 0.85, false),
+    matronmagritte: (x, y) => prop('matronmagritte', 'THE SON OF MAN', x, y, 0.85, false),
+    matronscream: (x, y) => prop('matronscream', 'THE SCREAM', x, y, 0.85, false),
+    matronmonalisa: (x, y) => prop('matronmonalisa', 'MONA LISA', x, y, 0.85, false),
     parisposter2: (x, y) => prop('parisposter2', 'LA DERNIERE VAGUE POSTER', x, y, 0.85, false),
     parisruesign: (x, y) => prop('parisruesign', 'RUE DES RENAISSANCES', x, y, 0.45, false),
     parisbrasseriesign: (x, y) => prop('parisbrasseriesign', "BRASSERIE DE L'OPERA", x, y, 0.5, false),
