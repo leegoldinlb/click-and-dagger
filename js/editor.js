@@ -1862,14 +1862,7 @@ const Editor = (() => {
     if (pkeys.Space) { manualEyeZ = true; cam.eyeZ = Math.min(20, cam.eyeZ + 3.0 * dt); }
     if (pkeys.KeyC) { manualEyeZ = true; cam.eyeZ = Math.max(-8, cam.eyeZ - 3.0 * dt); }
     if (!manualEyeZ) {
-      // localSector (not sectorAt): trust cam.sector — kept continuous frame-to-
-      // frame by moveGeo above — before falling back to a fresh search. A plain
-      // sectorAt() re-picks the smallest-area sector with no memory of the last
-      // frame, so right at any doorway/portal boundary, sub-pixel float noise can
-      // flip which sector "wins" every other frame — eye height (and the whole
-      // render) then pops between two floor heights each frame: exactly the
-      // flickering seen standing at a portal in the 3D preview.
-      const s = Engine.localSector(geo, portalGraph, cam.x, cam.y, cam.sector);
+      const s = Engine.sectorAt(cam.x, cam.y, geo);
       const target = (s >= 0 ? geo.sectors[s].floor : 0) + 0.5;
       cam.eyeZ += (target - cam.eyeZ) * Math.min(1, dt * 10);
     }
