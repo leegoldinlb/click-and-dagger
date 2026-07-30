@@ -363,6 +363,16 @@ const Editor = (() => {
     { kind: 'brothersphoto', name: 'PHOTOGRAPH OF BROTHERS', spr: 'brothersphoto' },
     { kind: 'tehranuniform', name: 'UNIFORM', spr: 'tehranuniform' },
   ];
+  const LOCATION_PREFIXES = [
+    ['paris', 'PARIS'], ['matron', 'PARIS'], ['havana', 'HAVANA'], ['nyc', 'NEW YORK'], ['ny', 'NEW YORK'],
+    ['tehran', 'TEHRAN'], ['iran', 'TEHRAN'], ['me', 'TEHRAN'], ['london', 'LONDON'],
+    ['moscow', 'MOSCOW'], ['soviet', 'MOSCOW'], ['cosmonaut', 'MOSCOW'], ['hk', 'HONG KONG'],
+    ['dallas', 'DALLAS'],
+  ];
+  function locOf(kind) {
+    for (const [pre, loc] of LOCATION_PREFIXES) if (kind.startsWith(pre)) return loc;
+    return 'GENERAL';
+  }
   const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
   const WEAPON_KINDS = new Set(['medkit', 'ammo', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden', 'camera', 'disguise']);  // pulled out of PERSONNEL & PROPS into their own WEAPONS & POWER-UPS palette
   const PERSONNEL_KINDS = new Set(['goon', 'gunman', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist', 'maheen', 'reza', 'rostam']);
@@ -580,8 +590,27 @@ const Editor = (() => {
       const parent = WEAPON_KINDS.has(e.kind) ? wpnEl : PERSONNEL_KINDS.has(e.kind) ? personnelEl : ITEM_KINDS.has(e.kind) ? itemsEl : propsEl;
       const b = toolBtn(parent, e.name, tc, () => { tool = { t: 'ent', v: e.kind }; });
       if (e.kind === tool.v) b.classList.add('sel');
+      b.dataset.searchName = (e.name + ' ' + e.kind).toLowerCase();
+      b.dataset.loc = locOf(e.kind);
       return b;
     });
+
+    // FIND — search + location filter across PERSONNEL / PROPS / INVENTORY ITEMS
+    const locSel = document.getElementById('palLocation');
+    const locs = ['ALL LOCATIONS', ...new Set(entBtns.map(b => b.dataset.loc))].sort((a, b) => a === 'ALL LOCATIONS' ? -1 : b === 'ALL LOCATIONS' ? 1 : a.localeCompare(b));
+    locSel.innerHTML = locs.map(l => `<option value="${l}">${l}</option>`).join('');
+    const searchIn = document.getElementById('palSearch');
+    const applyPalFilter = () => {
+      const q = searchIn.value.trim().toLowerCase();
+      const loc = locSel.value;
+      for (const b of entBtns) {
+        const matchQ = !q || b.dataset.searchName.includes(q);
+        const matchLoc = loc === 'ALL LOCATIONS' || b.dataset.loc === loc;
+        b.style.display = (matchQ && matchLoc) ? '' : 'none';
+      }
+    };
+    searchIn.oninput = applyPalFilter;
+    locSel.onchange = applyPalFilter;
     const spEl = document.getElementById('specials');
     toolBtn(spEl, 'SPAWN', thumb(gg => {
       gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
