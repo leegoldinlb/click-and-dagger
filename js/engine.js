@@ -497,20 +497,23 @@ const Engine = (() => {
       // since per-cell compiled geometry puts the eye on a portal constantly.
       for (const t of through) drawSector(t, xL, xR, dep + 1, sn);
 
-      // Wall segments that portal to the SAME neighbour sector — whether adjacent in
-      // the wall list (e.g. a doorway split into two colinear edges by a stray vertex)
-      // or separated by other walls (e.g. a nested sub-sector whose boundary touches
-      // its parent through two separate, non-adjacent openings) — used to trigger a
-      // SEPARATE drawSector recursion each. Two independent recursions into the same
-      // sector, each through its own wall segment's projection math and each clipped
-      // to its own slice of screen, can resolve that sector differently: a deeper
-      // portal glimpsed through one slice but clipped out of the other, or the same
-      // columns redrawn twice with slightly different projected heights, whichever
-      // pass runs last silently winning. Which one runs last — or whether both slices
-      // even appear — shifts with the view angle, reading as flicker. Coalesce EVERY
-      // wall segment targeting the same neighbour within this sector into one
-      // recursion over their combined range, regardless of order or adjacency.
-      const portalRuns = new Map();                                  // neighbour sector index → {x1, x2}
+      // Wall segments that portal to the SAME neighbour sector and sit at ADJACENT or
+      // OVERLAPPING columns (e.g. a doorway split into two colinear edges by a stray
+      // vertex, or a nested sub-sector's boundary reaching its parent through two
+      // touching openings) used to trigger a SEPARATE drawSector recursion each. Two
+      // independent recursions into the same sector for what's really one continuous
+      // opening, each through its own wall segment's projection math, can resolve that
+      // sector differently — a deeper portal glimpsed through one slice but clipped out
+      // of the other, or the same columns redrawn twice with slightly different
+      // projected heights, whichever pass runs last silently winning. Which one runs
+      // last — or whether both slices even appear — shifts with the view angle, reading
+      // as flicker. Coalesce same-neighbour segments into one recursion ONLY when their
+      // column ranges actually touch: two genuinely separate windows into the same
+      // sector, far apart on screen, must stay separate recursions — unioning their
+      // ranges would hand the recursion a span that includes columns neither window
+      // actually owns, overwriting whatever unrelated, correctly-occluded geometry
+      // (e.g. a solid wall closer to the camera) already closed those columns.
+      const portalRuns = new Map();                                  // neighbour sector index → array of disjoint {x1, x2} spans
       for (const w of vis) {
         const wall = w.wall, ad = w.ad, bd = w.bd, x1 = w.x1, x2 = w.x2, span = x2 - x1;
         const wallHL = !!(hl && hl.edge != null && hl.sec === sn && hl.edge === w.wi);   // this exact wall targeted
@@ -658,12 +661,16 @@ const Engine = (() => {
         // Any geometry genuinely visible "around" the child was already drawn by
         // the ancestor's own first pass, so skipping this back-edge loses nothing.
         if (ns && pX2 >= pX1 && wall.next !== from) {
-          const run = portalRuns.get(wall.next);
-          if (run) { if (pX1 < run.x1) run.x1 = pX1; if (pX2 > run.x2) run.x2 = pX2; }
-          else portalRuns.set(wall.next, { x1: pX1, x2: pX2 });
+          const spans = portalRuns.get(wall.next);
+          if (!spans) { portalRuns.set(wall.next, [{ x1: pX1, x2: pX2 }]); }
+          else {
+            const touching = spans.find(s => pX1 <= s.x2 + 1 && pX2 >= s.x1 - 1);
+            if (touching) { if (pX1 < touching.x1) touching.x1 = pX1; if (pX2 > touching.x2) touching.x2 = pX2; }
+            else spans.push({ x1: pX1, x2: pX2 });
+          }
         }
       }
-      for (const [next, r] of portalRuns) {
+      for (const [next, spans] of portalRuns) for (const r of spans) {
         if (r.x2 >= r.x1) drawSector(next, r.x1, r.x2, dep + 1, sn);
       }
     }
