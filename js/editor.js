@@ -1854,12 +1854,16 @@ const Editor = (() => {
     const len = Math.hypot(mx, my);
     if (len > 0) {
       const sp = 3.0 * dt / len, nx = cam.x + mx * sp, ny = cam.y + my * sp;
-      Engine.moveGeo(geo, portalGraph, cam, nx, ny, 0.2, 0.5);      // real wall/step collision on the Build engine
-      for (const e of World.ents) {                                 // same solid-entity push-back as the game (main.js tryMove)
-        if (!e.solid || e.dead) continue;
-        const er = (e.scale || 0.5) * 0.4, min = 0.2 + er;
-        const dx = cam.x - e.x, dy = cam.y - e.y, d = Math.hypot(dx, dy);
-        if (d < min && d > 1e-4) { cam.x = e.x + (dx / d) * min; cam.y = e.y + (dy / d) * min; }
+      if (pkeys.ShiftLeft || pkeys.ShiftRight) {                     // noclip: fly straight through walls/entities
+        cam.x = nx; cam.y = ny;
+      } else {
+        Engine.moveGeo(geo, portalGraph, cam, nx, ny, 0.2, 0.5);      // real wall/step collision on the Build engine
+        for (const e of World.ents) {                                 // same solid-entity push-back as the game (main.js tryMove)
+          if (!e.solid || e.dead) continue;
+          const er = (e.scale || 0.5) * 0.4, min = 0.2 + er;
+          const dx = cam.x - e.x, dy = cam.y - e.y, d = Math.hypot(dx, dy);
+          if (d < min && d > 1e-4) { cam.x = e.x + (dx / d) * min; cam.y = e.y + (dy / d) * min; }
+        }
       }
     }
     // SPACE/C free-fly the eye up/down for navigation. The first tap of either
@@ -1986,8 +1990,8 @@ const Editor = (() => {
     b.classList.add('active'); b.innerHTML = '&#9638; MAP EDITOR';
     document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
     document.getElementById('pcontrols').innerHTML = previewCompiled
-      ? '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D &nbsp;·&nbsp; <b>ESC</b> map &nbsp;·&nbsp; full controls: <a href="help.html" target="_blank">HELP</a>'
-      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; <b>ESC</b> map &nbsp;·&nbsp; full controls: <a href="help.html" target="_blank">HELP</a>';
+      ? '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; <b>SHIFT</b> noclip &nbsp;·&nbsp; grid level — DRAW SECTORS to sculpt in 3D &nbsp;·&nbsp; <b>ESC</b> map &nbsp;·&nbsp; full controls: <a href="help.html" target="_blank">HELP</a>'
+      : '<b>WASD</b> move &nbsp;·&nbsp; <b>DRAG</b> look &nbsp;·&nbsp; <b>SHIFT</b> noclip &nbsp;·&nbsp; <b>ESC</b> map &nbsp;·&nbsp; full controls: <a href="help.html" target="_blank">HELP</a>';
     document.getElementById('favbar').style.display = previewCompiled ? 'none' : 'flex';
     renderFavbar();
     previewOn = true; plast = performance.now();
