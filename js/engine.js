@@ -311,13 +311,13 @@ const Engine = (() => {
       const bobY = Math.abs(Math.cos(g.bobT * 6)) * 4 * g.bobAmt;
       const kick = g.fireT > 0 ? g.fireT * 22 : 0;
       const gw = 150, gx = W / 2 - gw / 2 + bobX, gy = H - 96 + bobY + kick;
-      if (g.fireT > 0.2) {                                    // muzzle points away from camera → flash centred, near the top
+      if (g.fireT > 0.2 && g.gunSprite) {                     // muzzle points away from camera → flash centred, near the top (skip for fists — no muzzle)
         octx.fillStyle = 'rgba(255,233,168,0.8)';
         octx.beginPath(); octx.arc(W / 2 + bobX, gy + 10, 10, 0, 7); octx.fill();
         octx.fillStyle = 'rgba(200,200,210,0.5)';
         octx.beginPath(); octx.arc(W / 2 + bobX, gy + 6, 6, 0, 7); octx.fill();
       }
-      octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, gx, gy, gw, gw);
+      if (g.gunSprite) octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, gx, gy, gw, gw);   // no sprite yet (fists) → bare-handed, nothing drawn
     }
     if (!g.combat && !g.preview) {
       octx.fillStyle = 'rgba(40,60,120,0.06)'; octx.fillRect(0, 0, W, H);

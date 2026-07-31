@@ -57,5 +57,6 @@ const Sfx = (() => {
     alarm()  { tone(500, 900, 0.16, 'square', 0.18); tone(500, 900, 0.16, 'square', 0.18, 0.22); },  // cover blown — rising two-whoop klaxon
     bark()   { noise(0.05, 0.2, 900, 250); tone(340, 180, 0.08, 'square', 0.22);
                noise(0.05, 0.18, 850, 240, 0.14); tone(320, 170, 0.08, 'square', 0.2, 0.14); },  // woof, woof
+    punch()  { noise(0.06, 0.3, 500, 90); tone(160, 55, 0.08, 'sine', 0.22); },                  // judo chop
   };
 })();

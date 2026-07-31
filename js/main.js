@@ -16,6 +16,10 @@ const Game = (() => {
     ar7:      { name: 'AR-7',          spr: 'gunAR7',      dmg: [32, 46], cd: 0.55, maxAmmo: 30, auto: false },
     laser:    { name: 'LASER',         spr: 'gunLaser',    dmg: [55, 75], cd: 0.9,  maxAmmo: 12, auto: false },
     golden:   { name: 'GOLDEN GUN',    spr: 'gunGolden',   dmg: [999, 999], cd: 0.6, maxAmmo: 99, auto: false },
+    // unarmed melee, selected with 0 — no viewmodel sprite yet (spr stays null: the
+    // renderer just skips drawing one), no ammo to track. `melee: true` gates the
+    // separate short-range/no-ammo handling in shoot() and the HUD's ammo readout.
+    fists:    { name: 'FISTS', spr: null, dmg: [12, 20], cd: 0.6, melee: true, range: 1.2 },
   };
   const WEAPON_ORDER = ['walther', 'sterling', 'ar7', 'laser', 'golden'];
 
@@ -29,7 +33,7 @@ const Game = (() => {
     kills: 0, civKills: 0, t0: 0,
     blown: World.startBlown,          // Cover status: false = Undercover (hostiles ignore you), true = Blown (one-way door for the level)
     weapon: 'walther',                 // currently equipped weapon kind
-    owned: { walther: true, sterling: false, ar7: false, laser: false, golden: false },
+    owned: { walther: true, sterling: false, ar7: false, laser: false, golden: false, fists: true },
     ammo: { walther: 24, sterling: 0, ar7: 0, laser: 0, golden: 0 },
     gunSprite: 'gun',                  // read by Engine.paintOverlays for the HUD viewmodel — kept in sync by switchWeapon
   };
@@ -177,7 +181,7 @@ const Game = (() => {
       const wi = WEAPON_KEYS.indexOf(e.code);
       if (wi >= 0) switchWeapon(WEAPON_ORDER[wi]);
       if (e.code === 'Tab' || e.code === 'KeyF') { e.preventDefault(); if (!e.repeat) toggleMode(); }   // faster than right-click for switching combat <-> adventure
-      if (e.code === 'Digit0' && G.combat && !e.repeat) { e.preventDefault(); toggleMode(); }             // 0: holster (combat → adventure only)
+      if (e.code === 'Digit0' && !e.repeat) { e.preventDefault(); switchWeapon('fists'); }                 // 0: fists — bare-handed melee, same slot mechanics as any gun
       if ((e.code === 'ControlLeft' || e.code === 'ControlRight') && G.combat) { ctrlDown = true; if (!e.repeat) shoot(); }
       if (e.key && e.key.length === 1 && /[a-zA-Z]/.test(e.key) && !e.repeat) {
         cheatBuf = (cheatBuf + e.key.toUpperCase()).slice(-3);
@@ -215,30 +219,11 @@ const Game = (() => {
   window.addEventListener('mouseup', () => { mouseDown = false; });
 
   // --------------------------------------------------------------- combat --
-  function shoot() {
-    const wpn = WEAPONS[G.weapon];
-    if (G.fireT > 0) return;
-    if (G.ammo[G.weapon] <= 0) { Sfx.dry(); Adventure.msg('Click. The magazine is empty.'); return; }
-    G.ammo[G.weapon]--;
-    G.fireT = wpn.cd;
-    Sfx.shoot();
-    if (blowCover()) Adventure.msg('The shot cracks across the square. Cover’s blown.', 4);
-
-    const p = G.player;
-    const dx = Math.cos(p.a), dy = Math.sin(p.a);
-    const wallDist = Engine.colHit[Engine.W >> 1] ? Engine.colHit[Engine.W >> 1].dist : 64;
-    let best = null, bestDepth = 1e9;
-    for (const e of World.ents) {
-      if (e.dead || e.hp == null || NO_DAMAGE.has(e.kind)) continue;   // everything with hp is fair game
-      const rx = e.x - p.x, ry = e.y - p.y;
-      const depth = rx * dx + ry * dy;
-      if (depth < 0.2 || depth > wallDist + 0.4) continue;
-      const lateral = rx * -dy + ry * dx;
-      if (Math.abs(lateral) > 0.42) continue;
-      if (depth < bestDepth) { bestDepth = depth; best = e; }
-    }
-    if (!best) return;
-    best.hp -= wpn.dmg[0] + Math.random() * (wpn.dmg[1] - wpn.dmg[0]);
+  // shared by every shoot() outcome (gun or fists): apply [lo,hi] damage to an
+  // already-picked target and resolve the hit/kill outcome the same way
+  // regardless of what dealt it.
+  function applyHit(best, lo, hi) {
+    best.hp -= lo + Math.random() * (hi - lo);
     best.flash = 0.12;
     if (best.hp > 0) {
       if (HOSTILE[best.kind]) { best.aggro = true; Sfx.impHit(); }
@@ -266,6 +251,41 @@ const Game = (() => {
       World.removeEnt(best);
       Sfx.impDie();
     }
+  }
+
+  function shoot() {
+    const wpn = WEAPONS[G.weapon];
+    if (G.fireT > 0) return;
+    if (!wpn.melee) {
+      if (G.ammo[G.weapon] <= 0) { Sfx.dry(); Adventure.msg('Click. The magazine is empty.'); return; }
+      G.ammo[G.weapon]--;
+    }
+    G.fireT = wpn.cd;
+    if (wpn.melee) Sfx.punch();
+    else Sfx.shoot();
+    // a gunshot is loud regardless of whether it connects — cover blows the instant
+    // you fire. A punch is silent unless it actually lands on someone; thrown at
+    // empty air it blows nothing (checked again below, only once a target is found).
+    if (!wpn.melee && blowCover()) Adventure.msg('The shot cracks across the square. Cover’s blown.', 4);
+    if (wpn.melee) Adventure.msg('JUDO CHOP!', 1.5);
+
+    const p = G.player;
+    const dx = Math.cos(p.a), dy = Math.sin(p.a);
+    const wallDist = Engine.colHit[Engine.W >> 1] ? Engine.colHit[Engine.W >> 1].dist : 64;
+    const maxDepth = Math.min(wpn.melee ? wpn.range : Infinity, wallDist + 0.4);
+    let best = null, bestDepth = 1e9;
+    for (const e of World.ents) {
+      if (e.dead || e.hp == null || NO_DAMAGE.has(e.kind)) continue;   // everything with hp is fair game
+      const rx = e.x - p.x, ry = e.y - p.y;
+      const depth = rx * dx + ry * dy;
+      if (depth < 0.2 || depth > maxDepth) continue;
+      const lateral = rx * -dy + ry * dx;
+      if (Math.abs(lateral) > 0.42) continue;
+      if (depth < bestDepth) { bestDepth = depth; best = e; }
+    }
+    if (!best) return;
+    if (wpn.melee && blowCover()) Adventure.msg('Cover’s blown.', 4);
+    applyHit(best, wpn.dmg[0], wpn.dmg[1]);
   }
 
   // ------------------------------------------------------- vector runtime --
@@ -499,7 +519,7 @@ const Game = (() => {
   function updateHud() {
     hpEl.textContent = Math.ceil(G.player.hp);
     hpEl.classList.toggle('low', G.player.hp < 30);
-    ammoEl.textContent = G.ammo[G.weapon];
+    ammoEl.textContent = WEAPONS[G.weapon].melee ? '—' : G.ammo[G.weapon];
     weaponEl.textContent = WEAPONS[G.weapon].name;
     drawgunEl.textContent = '✦ DRAW ' + WEAPONS[G.weapon].name;
     coverEl.textContent = G.blown ? 'BLOWN' : 'UNDERCOVER';
