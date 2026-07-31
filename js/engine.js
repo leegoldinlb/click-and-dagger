@@ -410,8 +410,13 @@ const Engine = (() => {
             texScale: sec.wallTexScale ? (sec.wallTexScale[i] || 1) : 1, open: false,
           });
         } else {
-          sw[t].forEach(w => { if (w.next < 0) w.next = p; });
-          for (let i = 0; i < n; i++) sw[p].push({ v1: L[(i + 1) % n], v2: L[i], next: t, sibling: null, tex: null, cell: null, door: null, texScale: 1, open: false });
+          for (let i = 0; i < n; i++) {
+            const cw = sw[t][i];                        // child's own wall for this edge
+            if (cw.next < 0) cw.next = p;
+            const pw = { v1: L[(i + 1) % n], v2: L[i], next: t, sibling: null, tex: null, cell: null, door: null, texScale: 1, open: false };
+            if (cw.next === p) { pw.sibling = cw; cw.sibling = pw; }  // link the reciprocal pair so the
+            sw[p].push(pw);                                          // renderer can tell "came in via this edge"
+          }
         }
       }
     });
@@ -437,6 +442,15 @@ const Engine = (() => {
     depth.fill(MAXD);
     for (let x = 0; x < W; x++) { yTopA[x] = 0; yBotA[x] = H - 1; zbuf[x] = MAXD; colHit[x] = null; }
     if (dbgOn) dbgTrace = [];
+    // per-FRAME "already crossed" set, keyed by wall object identity. A portal whose
+    // neighbour has the same floor/ceiling as the current sector never narrows the
+    // clip window (there's no soffit/riser to shrink it) — e.g. a sub-sector used
+    // purely to tag a floor texture or win-zone, with no real physical boundary.
+    // Without this, two adjacent sectors like that can recurse into each other
+    // forever (dep hits the 256 cap). Bounding recursion by "never cross the same
+    // edge twice" caps total portal traversal at ~2x the wall count, which a purely
+    // depth/window-based guard can't guarantee once the geometry stops narrowing.
+    const crossed = new Set();
 
     function drawSector(sn, xL, xR, dep, from) {
       if (dep > 256 || xL > xR) return;                 // deep enough for per-cell compiled geometry
@@ -461,7 +475,7 @@ const Engine = (() => {
           const cp = closestOnSeg(px, py, A.x, A.y, B.x, B.y);       // if the eye is physically ON this wall the
           const ddx = px - cp.x, ddy = py - cp.y;                    // projection is degenerate — don't project it;
           if (ddx * ddx + ddy * ddy < NEAR * NEAR) {                 // pass open portals through so the room beyond shows
-            if (wall.next >= 0 && !(wall.door && !wall.open) && wall.next !== from) through.push(wall.next);
+            if (wall.next >= 0 && !(wall.door && !wall.open) && !crossed.has(wall)) through.push(wall);
             continue;
           }
         }
@@ -495,7 +509,7 @@ const Engine = (() => {
       // clobber correctly-drawn far content on every cell-boundary crossing —
       // visible as a texture "warp"/glitch on ANY level, not just sloped ones,
       // since per-cell compiled geometry puts the eye on a portal constantly.
-      for (const t of through) drawSector(t, xL, xR, dep + 1, sn);
+      for (const w of through) { crossed.add(w); drawSector(w.next, xL, xR, dep + 1, sn); }
 
       for (const w of vis) {
         const wall = w.wall, ad = w.ad, bd = w.bd, x1 = w.x1, x2 = w.x2, span = x2 - x1;
@@ -631,7 +645,13 @@ const Engine = (() => {
             if (x < pX1) pX1 = x; if (x > pX2) pX2 = x;
           }
         }
-        if (ns && pX2 >= pX1) drawSector(wall.next, pX1, pX2, dep + 1, sn);   // depth-first into the neighbour
+        // recurse into the neighbour through THIS wall, unless this exact edge has
+        // already been crossed once this frame (see `crossed` above). Tracking by
+        // wall identity — not sector id — still allows re-entering the same
+        // neighbour sector through a genuinely different, disjoint portal elsewhere
+        // on screen (e.g. two doorways into one room); a sector-id guard would
+        // wrongly block that too.
+        if (ns && pX2 >= pX1 && !crossed.has(wall)) { crossed.add(wall); drawSector(wall.next, pX1, pX2, dep + 1, sn); }
       }
     }
 
