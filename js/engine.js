@@ -437,6 +437,37 @@ const Engine = (() => {
     depth.fill(MAXD);
     for (let x = 0; x < W; x++) { yTopA[x] = 0; yBotA[x] = H - 1; zbuf[x] = MAXD; colHit[x] = null; }
     if (dbgOn) dbgTrace = [];
+    // per-FRAME record of which screen-column ranges have already been drawn
+    // THROUGH each wall (keyed by wall object identity), as a list of merged
+    // [a,b] intervals. A sub-sector whose floor/ceiling exactly matches its
+    // parent's never narrows the clip window (no soffit/riser to shrink it —
+    // e.g. a sub-sector used only to tag a floor texture or win-zone), so nothing
+    // here guarantees the SAME columns stop being re-requested through the SAME
+    // wall — that's what used to run dep up to the 256 cap. Blocking a wall
+    // outright after one crossing (tried previously) is wrong: a concave sector
+    // can legitimately need to cross the same wall twice for two DISJOINT column
+    // ranges (e.g. that wall is visible in two separate places on screen). So we
+    // track coverage per wall instead of a single visited flag — a repeat
+    // request is only skipped once it's already fully covered by prior crossings.
+    const crossedRanges = new Map();
+    function alreadyCovered(wall, a, b) {
+      const ranges = crossedRanges.get(wall);
+      if (!ranges) return false;
+      for (const r of ranges) if (a >= r[0] && b <= r[1]) return true;
+      return false;
+    }
+    function markCovered(wall, a, b) {
+      let ranges = crossedRanges.get(wall);
+      if (!ranges) { ranges = []; crossedRanges.set(wall, ranges); }
+      ranges.push([a, b]);
+      ranges.sort((p, q) => p[0] - q[0]);
+      const merged = [];
+      for (const r of ranges) {
+        if (merged.length && r[0] <= merged[merged.length - 1][1] + 1) merged[merged.length - 1][1] = Math.max(merged[merged.length - 1][1], r[1]);
+        else merged.push(r.slice());
+      }
+      crossedRanges.set(wall, merged);
+    }
 
     function drawSector(sn, xL, xR, dep, from) {
       if (dep > 256 || xL > xR) return;                 // deep enough for per-cell compiled geometry
@@ -461,7 +492,7 @@ const Engine = (() => {
           const cp = closestOnSeg(px, py, A.x, A.y, B.x, B.y);       // if the eye is physically ON this wall the
           const ddx = px - cp.x, ddy = py - cp.y;                    // projection is degenerate — don't project it;
           if (ddx * ddx + ddy * ddy < NEAR * NEAR) {                 // pass open portals through so the room beyond shows
-            if (wall.next >= 0 && !(wall.door && !wall.open) && wall.next !== from) through.push(wall.next);
+            if (wall.next >= 0 && !(wall.door && !wall.open) && !alreadyCovered(wall, xL, xR)) through.push(wall);
             continue;
           }
         }
@@ -495,7 +526,7 @@ const Engine = (() => {
       // clobber correctly-drawn far content on every cell-boundary crossing —
       // visible as a texture "warp"/glitch on ANY level, not just sloped ones,
       // since per-cell compiled geometry puts the eye on a portal constantly.
-      for (const t of through) drawSector(t, xL, xR, dep + 1, sn);
+      for (const w of through) { markCovered(w, xL, xR); drawSector(w.next, xL, xR, dep + 1, sn); }
 
       for (const w of vis) {
         const wall = w.wall, ad = w.ad, bd = w.bd, x1 = w.x1, x2 = w.x2, span = x2 - x1;
@@ -631,7 +662,10 @@ const Engine = (() => {
             if (x < pX1) pX1 = x; if (x > pX2) pX2 = x;
           }
         }
-        if (ns && pX2 >= pX1) drawSector(wall.next, pX1, pX2, dep + 1, sn);   // depth-first into the neighbour
+        if (ns && pX2 >= pX1 && !alreadyCovered(wall, pX1, pX2)) {           // depth-first into the neighbour —
+          markCovered(wall, pX1, pX2);                                       // unless these exact columns through
+          drawSector(wall.next, pX1, pX2, dep + 1, sn);                      // this exact wall were already drawn
+        }
       }
     }
 
