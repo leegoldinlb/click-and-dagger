@@ -60,14 +60,14 @@
  "ents": [
   {
    "kind": "meantiquedealer",
-   "x": 27.48,
-   "y": 18.49,
+   "x": 27.19,
+   "y": 18.52,
    "behavior": "stationary"
   },
   {
    "kind": "meelder",
-   "x": 27.48,
-   "y": 21.64,
+   "x": 27.71,
+   "y": 21.47,
    "behavior": "stationary"
   },
   {
@@ -82,12 +82,13 @@
    "y": 15
   },
   {
-   "kind": "headshot",
+   "kind": "doortehranarch",
    "x": 25.47,
    "y": 20.97,
    "flat": true,
    "flatAngle": 0,
-   "zOff": 0.4
+   "zOff": 0,
+   "scale": 1.41
   },
   {
    "kind": "medkit",
@@ -276,6 +277,24 @@
    "flat": true,
    "flatAngle": 4.71238898038469,
    "zOff": 0.4
+  },
+  {
+   "kind": "nycpanamposter",
+   "x": 17.51,
+   "y": 21,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0,
+   "zOff": 1.2
+  },
+  {
+   "kind": "nycpanamposter",
+   "x": 17.49,
+   "y": 17.04,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0,
+   "zOff": 0.1
   }
  ],
  "blown": false,
@@ -514,6 +533,38 @@
    {
     "x": 38.5,
     "y": 14.5
+   },
+   {
+    "x": 17,
+    "y": 21
+   },
+   {
+    "x": 18,
+    "y": 21
+   },
+   {
+    "x": 18,
+    "y": 19.5
+   },
+   {
+    "x": 17,
+    "y": 19.5
+   },
+   {
+    "x": 17,
+    "y": 18
+   },
+   {
+    "x": 14,
+    "y": 18
+   },
+   {
+    "x": 14,
+    "y": 17
+   },
+   {
+    "x": 18,
+    "y": 17
    }
   ],
   "sectors": [
@@ -525,6 +576,8 @@
      14,
      13,
      12,
+     58,
+     59,
      11,
      10,
      9,
@@ -556,7 +609,7 @@
     "floor": 0,
     "ceil": 3,
     "floorTex": "concrete",
-    "ceilTex": "ceiltile",
+    "ceilTex": "windowrow",
     "sky": true,
     "win": false,
     "hostile": false,
@@ -593,33 +646,39 @@
      false
     ],
     "wallTex": [
-     null,
-     null,
-     null,
-     null,
-     "brick",
-     "sandstone",
-     "stucco",
-     "stucco",
      "stucco",
      "stucco",
      null,
-     "stucco",
      null,
      "stucco",
      "stucco",
      "stucco",
      "stucco",
      "stucco",
+     "stucco",
+     "stucco",
+     "stucco",
      null,
-     "sandstone",
-     null,
-     "sandstone",
+     "stucco",
+     "stucco",
+     "stucco",
+     "stucco",
+     "stucco",
+     "stucco",
      "sandstone",
      null,
      "sandstone",
+     "stucco",
+     "stucco",
      "sandstone",
+     "stucco",
      null,
+     "stucco",
+     "stucco",
+     null,
+     "stucco",
+     "stucco",
+     "stucco",
      "stucco",
      "stucco"
     ],
@@ -665,15 +724,15 @@
      null,
      null,
      null,
-     null,
+     "stucco",
      null,
      null,
      null,
      "stucco",
      null,
+     "stucco",
      null,
-     null,
-     null,
+     "stucco",
      null,
      null,
      null,
@@ -700,12 +759,18 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "floorTex": "stucco",
+    "ceilTex": "stucco",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "stucco",
+     null,
+     "stucco",
+     null
+    ],
     "parent": -1
    },
    {
@@ -719,12 +784,20 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "floorTex": "stucco",
+    "ceilTex": "stucco",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "stucco",
+     "stucco",
+     "stucco",
+     "stucco",
+     "stucco",
+     null
+    ],
     "parent": -1
    },
    {
@@ -736,12 +809,18 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "floorTex": "stucco",
+    "ceilTex": "stucco",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "stucco",
+     "stucco",
+     "stucco",
+     null
+    ],
     "parent": -1
    },
    {
@@ -753,12 +832,18 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "floorTex": "stucco",
+    "ceilTex": "stucco",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "stucco",
+     "stucco",
+     "stucco",
+     null
+    ],
     "parent": -1
    },
    {
@@ -770,12 +855,18 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "floorTex": "stucco",
+    "ceilTex": "stucco",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "stucco",
+     null,
+     "stucco",
+     null
+    ],
     "parent": -1
    },
    {
@@ -787,12 +878,18 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "floorTex": "stucco",
+    "ceilTex": "stucco",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "stucco",
+     null,
+     "stucco",
+     null
+    ],
     "parent": -1
    },
    {
@@ -807,12 +904,21 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "floorTex": "stucco",
+    "ceilTex": "stucco",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     null,
+     "stucco",
+     "stucco",
+     "stucco",
+     null,
+     "stucco",
+     null
+    ],
     "parent": -1
    },
    {
@@ -824,12 +930,18 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "floorTex": "stucco",
+    "ceilTex": "sandstone",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "sandstone",
+     null,
+     "sandstone",
+     null
+    ],
     "parent": -1
    },
    {
@@ -843,12 +955,20 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "floorTex": "stucco",
+    "ceilTex": "sandstone",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "sandstone",
+     "sandstone",
+     "sandstone",
+     "sandstone",
+     "sandstone",
+     null
+    ],
     "parent": -1
    },
    {
@@ -860,13 +980,70 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "stucco",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": true,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "stucco",
+     "stucco",
+     "stucco",
+     null
+    ],
     "parent": -1
+   },
+   {
+    "loop": [
+     58,
+     61,
+     60,
+     59
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "marble",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "marble",
+     null,
+     "marble",
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     61,
+     62,
+     63,
+     64,
+     65,
+     60
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "marble",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "marble",
+     null,
+     null,
+     "marble",
+     "marble",
+     null
+    ],
+    "parent": -1,
+    "missionLink": "hub"
    }
   ]
  }
