@@ -143,6 +143,31 @@ const Game = (() => {
   document.addEventListener('mousedown', e => { if (e.button === 2) toggleMode(); });
   document.getElementById('drawgun').addEventListener('click', requestCombat);
 
+  // -------------------------------------------------------------- cheats --
+  // typed anywhere during a mission, like a classic arcade cheat code — no
+  // console, just type the letters and release. Reuses the exact same pickup
+  // logic as the real items/weapons so a cheat can't leave state inconsistent
+  // with a legitimately-collected one (e.g. LEE resets aggro exactly like the
+  // disguise kit does; GUY caps ammo at the same maxAmmo the HUD assumes).
+  const CHEATS = {
+    GUY: () => {                                            // all guns, full ammo
+      for (const wk of WEAPON_ORDER) { G.owned[wk] = true; G.ammo[wk] = WEAPONS[wk].maxAmmo; }
+      Adventure.msg('CHEAT: full arsenal, fully loaded.', 3);
+    },
+    LEE: () => {                                            // clear cover-blown status
+      if (!G.blown) { Adventure.msg('CHEAT: already undercover.', 3); return; }
+      G.blown = false;
+      for (const h of World.ents) { if (HOSTILE[h.kind] && !h.dead) { h.aggro = false; h.atkT = 0; } }
+      Music.setBlown(false);
+      Adventure.msg('CHEAT: cover regained.', 3);
+    },
+    MAX: () => {                                            // collect every currently-takeable item
+      const n = Adventure.cheatCollectAll();
+      Adventure.msg('CHEAT: collected ' + n + ' item' + (n === 1 ? '' : 's') + '.', 3);
+    },
+  };
+  let cheatBuf = '';
+
   // ---------------------------------------------------------------- input --
   const WEAPON_KEYS = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5'];
   document.addEventListener('keydown', e => {
@@ -154,6 +179,10 @@ const Game = (() => {
       if (e.code === 'Tab' || e.code === 'KeyF') { e.preventDefault(); if (!e.repeat) toggleMode(); }   // faster than right-click for switching combat <-> adventure
       if (e.code === 'Digit0' && G.combat && !e.repeat) { e.preventDefault(); toggleMode(); }             // 0: holster (combat → adventure only)
       if ((e.code === 'ControlLeft' || e.code === 'ControlRight') && G.combat) { ctrlDown = true; if (!e.repeat) shoot(); }
+      if (e.key && e.key.length === 1 && /[a-zA-Z]/.test(e.key) && !e.repeat) {
+        cheatBuf = (cheatBuf + e.key.toUpperCase()).slice(-3);
+        if (CHEATS[cheatBuf]) { CHEATS[cheatBuf](); cheatBuf = ''; }
+      }
     }
   });
   document.addEventListener('keyup', e => {

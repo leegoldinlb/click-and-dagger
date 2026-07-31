@@ -1172,6 +1172,20 @@ const Adventure = (() => {
     msg(out, 4.5);
   }
 
+  // debug cheat: collect everything CURRENTLY takeable, reusing takeEnt's own
+  // flag/inventory checks so it can't double-grant an item or bypass a puzzle
+  // gate that hasn't been satisfied yet (e.g. the easel before a portrait exists).
+  function cheatCollectAll() {
+    let count = 0;
+    for (const e of [...World.ents]) {
+      if (e.dead) continue;
+      const before = inv.length;
+      takeEnt(e);
+      if (inv.length > before) count++;
+    }
+    return count;
+  }
+
   renderInv();
-  return { flags, msg, setVerb, clickAt, nameAt, resolveAt, addItem, setWinTrigger, setLoseTrigger, setBlowTrigger, get selected() { return selected; } };
+  return { flags, msg, setVerb, clickAt, nameAt, resolveAt, addItem, setWinTrigger, setLoseTrigger, setBlowTrigger, cheatCollectAll, get selected() { return selected; } };
 })();
