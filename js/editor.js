@@ -2152,10 +2152,28 @@ const Editor = (() => {
     }
     return a / 2;
   }
+  // AREA-WEIGHTED polygon centroid (shoelace-based) — NOT a plain average of the
+  // vertices. A simple vertex average is wildly sensitive to a single outlier:
+  // drag one corner of an otherwise-stable room far enough and the average alone
+  // can cross into a neighbouring sector, which used to make rebuildParents()
+  // silently reparent the WHOLE room (every wall turns portal-red, buildGraph
+  // synthesizes a bogus nested boundary) from one accidental drag. The
+  // area-weighted centroid stays anchored near the polygon's actual bulk.
   function centroid(loop) {
-    let x = 0, y = 0;
-    for (const vi of loop) { x += geo.verts[vi].x; y += geo.verts[vi].y; }
-    return { x: x / loop.length, y: y / loop.length };
+    const a = polyArea(loop);
+    if (Math.abs(a) < 1e-6) {                          // degenerate (near-zero-area) loop — fall back to a plain average
+      let x = 0, y = 0;
+      for (const vi of loop) { x += geo.verts[vi].x; y += geo.verts[vi].y; }
+      return { x: x / loop.length, y: y / loop.length };
+    }
+    let cx = 0, cy = 0;
+    for (let i = 0; i < loop.length; i++) {
+      const p = geo.verts[loop[i]], q = geo.verts[loop[(i + 1) % loop.length]];
+      const cross = p.x * q.y - q.x * p.y;
+      cx += (p.x + q.x) * cross;
+      cy += (p.y + q.y) * cross;
+    }
+    return { x: cx / (6 * a), y: cy / (6 * a) };
   }
   function pointInLoop(px, py, loop) {
     let inside = false;
@@ -2335,8 +2353,16 @@ const Editor = (() => {
 
   // ---- vector deletion (Build-style: remove verts / sectors) ----
   function rebuildParents() {
+    // a sector that already has children of its own never becomes someone
+    // ELSE's child too — this engine's parent/solid portal synthesis
+    // (Engine.buildGraph) only understands one level of nesting, so letting a
+    // room-with-a-pit get silently swallowed as another room's child (which an
+    // ordinary drag can trigger — see the centroid comment above) produces a
+    // genuinely broken graph, not just a visual oddity.
+    const hasChildren = new Set(geo.sectors.map(s => s.parent).filter(p => p >= 0));
     geo.sectors.forEach((sec, s) => {
       sec.parent = -1;
+      if (hasChildren.has(s)) return;
       const c = centroid(sec.loop);
       for (let p = 0; p < geo.sectors.length; p++) {
         if (p === s || !pointInLoop(c.x, c.y, geo.sectors[p].loop)) continue;
