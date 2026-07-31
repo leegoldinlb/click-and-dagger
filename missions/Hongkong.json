@@ -60,9 +60,13 @@
  "ents": [
   {
    "kind": "lanternstring",
-   "x": 27.95,
-   "y": 22.47,
-   "scale": 2.43
+   "x": 33.28,
+   "y": 23.38,
+   "scale": 2.62,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 1.5707963267948966,
+   "zOff": 1.9
   },
   {
    "kind": "teastall",
@@ -83,17 +87,19 @@
   },
   {
    "kind": "neonsignboard",
-   "x": 33.1,
-   "y": 23.6,
+   "x": 31.48,
+   "y": 24.68,
    "flat": true,
-   "flatAngle": 1.5707963267948957,
-   "scale": 2.57
+   "flatAngle": 6.283185307179585,
+   "scale": 1.89,
+   "zOff": 1.2
   },
   {
    "kind": "junkboat",
    "x": 28.6,
    "y": 15.57,
-   "scale": 4.09
+   "scale": 4.09,
+   "zOff": 0
   },
   {
    "kind": "lao",
@@ -108,24 +114,14 @@
   },
   {
    "kind": "carlotta",
-   "x": 29.18,
-   "y": 29,
+   "x": 28.93,
+   "y": 28.97,
    "behavior": "wander"
   },
   {
    "kind": "blackbelt",
-   "x": 26.35,
-   "y": 25.63
-  },
-  {
-   "kind": "blackbelt",
-   "x": 30.48,
-   "y": 24.6
-  },
-  {
-   "kind": "blackbelt",
-   "x": 32.42,
-   "y": 24.55
+   "x": 26.51,
+   "y": 25.61
   },
   {
    "kind": "baldini",
@@ -149,6 +145,57 @@
    "flatGround": false,
    "flatAngle": 4.71238898038469,
    "zOff": 1.2
+  },
+  {
+   "kind": "hkcluster",
+   "x": 44.42,
+   "y": 19.53,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0,
+   "scale": 3.01,
+   "zOff": 0
+  },
+  {
+   "kind": "tv",
+   "x": 42.46,
+   "y": 22.51,
+   "zOff": 0
+  },
+  {
+   "kind": "wilson",
+   "x": 28.97,
+   "y": 31.88
+  },
+  {
+   "kind": "hkcop",
+   "x": 30.51,
+   "y": 24.64
+  },
+  {
+   "kind": "hkcop",
+   "x": 32.44,
+   "y": 24.71
+  },
+  {
+   "kind": "hkcop",
+   "x": 37.47,
+   "y": 22.47
+  },
+  {
+   "kind": "hkcop",
+   "x": 37.47,
+   "y": 24.59
+  },
+  {
+   "kind": "sheetmusic",
+   "x": 45.92,
+   "y": 24.54,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 4.71238898038469,
+   "zOff": 0.5,
+   "scale": 0.41
   }
  ],
  "blown": false,
@@ -347,6 +394,190 @@
    {
     "x": 19,
     "y": 24
+   },
+   {
+    "x": 38,
+    "y": 22
+   },
+   {
+    "x": 38,
+    "y": 25
+   },
+   {
+    "x": 38,
+    "y": 23
+   },
+   {
+    "x": 38,
+    "y": 24
+   },
+   {
+    "x": 38.5,
+    "y": 24
+   },
+   {
+    "x": 38.5,
+    "y": 23
+   },
+   {
+    "x": 39,
+    "y": 24.5
+   },
+   {
+    "x": 39,
+    "y": 23.5
+   },
+   {
+    "x": 39.5,
+    "y": 25
+   },
+   {
+    "x": 39.5,
+    "y": 24
+   },
+   {
+    "x": 40,
+    "y": 24.5
+   },
+   {
+    "x": 40,
+    "y": 25.5
+   },
+   {
+    "x": 40.5,
+    "y": 25
+   },
+   {
+    "x": 40.5,
+    "y": 26
+   },
+   {
+    "x": 41,
+    "y": 25.5
+   },
+   {
+    "x": 41,
+    "y": 26.5
+   },
+   {
+    "x": 41.5,
+    "y": 26
+   },
+   {
+    "x": 41.5,
+    "y": 27
+   },
+   {
+    "x": 42,
+    "y": 26.5
+   },
+   {
+    "x": 42,
+    "y": 27.5
+   },
+   {
+    "x": 42.5,
+    "y": 27
+   },
+   {
+    "x": 42.5,
+    "y": 28
+   },
+   {
+    "x": 46,
+    "y": 27
+   },
+   {
+    "x": 46,
+    "y": 28
+   },
+   {
+    "x": 44,
+    "y": 27
+   },
+   {
+    "x": 45,
+    "y": 27
+   },
+   {
+    "x": 45,
+    "y": 26
+   },
+   {
+    "x": 44,
+    "y": 26
+   },
+   {
+    "x": 43,
+    "y": 26
+   },
+   {
+    "x": 43,
+    "y": 23
+   },
+   {
+    "x": 43,
+    "y": 22
+   },
+   {
+    "x": 43,
+    "y": 21
+   },
+   {
+    "x": 46,
+    "y": 21
+   },
+   {
+    "x": 46,
+    "y": 22
+   },
+   {
+    "x": 46,
+    "y": 23.5
+   },
+   {
+    "x": 46,
+    "y": 26
+   },
+   {
+    "x": 43.5,
+    "y": 21
+   },
+   {
+    "x": 45.5,
+    "y": 21
+   },
+   {
+    "x": 43.5,
+    "y": 20.5
+   },
+   {
+    "x": 45.5,
+    "y": 20.5
+   },
+   {
+    "x": 43.5,
+    "y": 20
+   },
+   {
+    "x": 45.5,
+    "y": 20
+   },
+   {
+    "x": 41.5,
+    "y": 19
+   },
+   {
+    "x": 47.5,
+    "y": 19
+   },
+   {
+    "x": 42,
+    "y": 22
+   },
+   {
+    "x": 42,
+    "y": 23
    }
   ],
   "sectors": [
@@ -409,6 +640,8 @@
      null,
      null,
      null,
+     "windowshut",
+     null,
      "windowshut"
     ],
     "parent": -1
@@ -433,6 +666,26 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTexScale": [
+     1,
+     1,
+     1,
+     0.5,
+     0.5,
+     0.5,
+     0.5,
+     0.5
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     "wood",
+     "wood",
+     "wood",
+     "wood",
+     "wood"
+    ],
     "parent": -1
    },
    {
@@ -442,15 +695,27 @@
      7,
      2
     ],
-    "floor": 2.1,
+    "floor": 0,
     "ceil": 3.1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": true,
     "skyTex": "parisnight",
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTexScale": [
+     1,
+     1,
+     1,
+     0.5
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     "wood"
+    ],
     "parent": -1
    },
    {
@@ -487,6 +752,14 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallStepTex": [
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     null
+    ],
     "parent": -1
    },
    {
@@ -600,6 +873,408 @@
     ],
     "parent": -1,
     "missionLink": "hub"
+   },
+   {
+    "loop": [
+     6,
+     48,
+     50,
+     51,
+     49,
+     7
+    ],
+    "floor": 0,
+    "ceil": 3.1,
+    "floorTex": "concrete",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "skyTex": "parisnight",
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepTex": [
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     null
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     50,
+     53,
+     52,
+     51
+    ],
+    "floor": 0.2,
+    "ceil": 2.1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     "brick",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     53,
+     55,
+     54,
+     52
+    ],
+    "floor": 0.4,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     "brick",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     55,
+     57,
+     56,
+     54
+    ],
+    "floor": 0.6,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     "brick",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     57,
+     58,
+     59,
+     56
+    ],
+    "floor": 0.8,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     "brick",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     58,
+     60,
+     61,
+     59
+    ],
+    "floor": 1,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     "brick",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     60,
+     62,
+     63,
+     61
+    ],
+    "floor": 1.2,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     "brick",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     62,
+     64,
+     65,
+     63
+    ],
+    "floor": 1.4,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     "brick",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     64,
+     66,
+     67,
+     65
+    ],
+    "floor": 1.6,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     "brick",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     66,
+     68,
+     69,
+     67
+    ],
+    "floor": 1.8,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     "brick",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     68,
+     72,
+     73,
+     70,
+     71,
+     69
+    ],
+    "floor": 2,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     72,
+     75,
+     74,
+     73
+    ],
+    "floor": 2,
+    "ceil": 3,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     75,
+     76,
+     77,
+     78,
+     79,
+     84,
+     85,
+     80,
+     81,
+     82,
+     83,
+     74
+    ],
+    "floor": 1.8,
+    "ceil": 3.9,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepTex": [
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     null,
+     null,
+     null,
+     "brick"
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     "brick",
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     84,
+     86,
+     87,
+     85
+    ],
+    "floor": 2.3,
+    "ceil": 3.5,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     86,
+     88,
+     89,
+     87
+    ],
+    "floor": 2,
+    "ceil": 3.8,
+    "floorTex": "water",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "skyTex": "starrynight",
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     88,
+     90,
+     91,
+     89
+    ],
+    "floor": 1.9,
+    "ceil": 2.2,
+    "floorTex": "water",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "skyTex": "starrynight",
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     77,
+     93,
+     92,
+     78
+    ],
+    "floor": 2.3,
+    "ceil": 3.5,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
    }
   ]
  }
