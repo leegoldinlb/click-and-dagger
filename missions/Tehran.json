@@ -211,11 +211,6 @@
    "scale": 1.4
   },
   {
-   "kind": "memother",
-   "x": 40.99,
-   "y": 24.93
-  },
-  {
    "kind": "iransoldier",
    "x": 32.48,
    "y": 18.43
@@ -295,6 +290,11 @@
    "flatGround": false,
    "flatAngle": 0,
    "zOff": 0.1
+  },
+  {
+   "kind": "maheen",
+   "x": 26.51,
+   "y": 25.71
   }
  ],
  "blown": false,
