@@ -307,17 +307,41 @@ const Engine = (() => {
   function paintOverlays(g) {
     const p = g.player;
     if (g.combat && !g.over && !g.preview) {
-      const bobX = Math.sin(g.bobT * 6) * 5 * g.bobAmt;
-      const bobY = Math.abs(Math.cos(g.bobT * 6)) * 4 * g.bobAmt;
-      const kick = g.fireT > 0 ? g.fireT * 22 : 0;
-      const gw = 150, gx = W / 2 - gw / 2 + bobX, gy = H - 96 + bobY + kick;
-      if (g.fireT > 0.2 && g.gunSprite) {                     // muzzle points away from camera → flash centred, near the top (skip for fists — no muzzle)
-        octx.fillStyle = 'rgba(255,233,168,0.8)';
-        octx.beginPath(); octx.arc(W / 2 + bobX, gy + 10, 10, 0, 7); octx.fill();
-        octx.fillStyle = 'rgba(200,200,210,0.5)';
-        octx.beginPath(); octx.arc(W / 2 + bobX, gy + 6, 6, 0, 7); octx.fill();
+      if (g.meleeWeapon) {
+        // fists are invisible at rest — the hand only exists on-screen for the
+        // ~0.6s of a punch: a windshield-wiper sweep pivoting on a fixed anchor
+        // below the bottom edge. It arcs in from one side, across the screen,
+        // then back out the same arc — one continuous pivot, not a slide.
+        if (g.fireT > 0 && g.meleeSwingCd > 0 && g.gunSprite) {
+          const t = 1 - g.fireT / g.meleeSwingCd;             // 0 = swing start, 1 = swing end
+          const phase = t < 0.5 ? t * 2 : (1 - t) * 2;        // 0 → 1 → 0: in, then back out
+          const gw = 260;
+          const pivotX = W * 0.5, pivotY = H * 1.15;          // fixed wiper anchor, just below the bottom edge
+          const A1 = Math.PI * 0.62, A2 = -Math.PI * 0.30;    // wiper's full arc: starts leaning hard right, sweeps left
+          const angle = A1 + (A2 - A1) * phase;
+          octx.save();
+          octx.translate(pivotX, pivotY);
+          octx.rotate(angle);
+          // sprite (fitCharacter) is bottom-aligned in its own square canvas — its
+          // wrist/sleeve cut sits along the local bottom edge. Drawing that bottom
+          // edge AT the pivot means the rotation always keeps the cut hidden behind
+          // the anchor point instead of exposing a floating disconnected edge.
+          octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, -gw / 2, -gw, gw, gw);
+          octx.restore();
+        }
+      } else {
+        const bobX = Math.sin(g.bobT * 6) * 5 * g.bobAmt;
+        const bobY = Math.abs(Math.cos(g.bobT * 6)) * 4 * g.bobAmt;
+        const kick = g.fireT > 0 ? g.fireT * 22 : 0;
+        const gw = 150, gx = W / 2 - gw / 2 + bobX, gy = H - 96 + bobY + kick;
+        if (g.fireT > 0.2 && g.gunSprite) {                   // muzzle points away from camera → flash centred, near the top
+          octx.fillStyle = 'rgba(255,233,168,0.8)';
+          octx.beginPath(); octx.arc(W / 2 + bobX, gy + 10, 10, 0, 7); octx.fill();
+          octx.fillStyle = 'rgba(200,200,210,0.5)';
+          octx.beginPath(); octx.arc(W / 2 + bobX, gy + 6, 6, 0, 7); octx.fill();
+        }
+        if (g.gunSprite) octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, gx, gy, gw, gw);
       }
-      if (g.gunSprite) octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, gx, gy, gw, gw);   // no sprite yet (fists) → bare-handed, nothing drawn
     }
     if (!g.combat && !g.preview) {
       octx.fillStyle = 'rgba(40,60,120,0.06)'; octx.fillRect(0, 0, W, H);

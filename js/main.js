@@ -19,7 +19,7 @@ const Game = (() => {
     // unarmed melee, selected with 0 — no viewmodel sprite yet (spr stays null: the
     // renderer just skips drawing one), no ammo to track. `melee: true` gates the
     // separate short-range/no-ammo handling in shoot() and the HUD's ammo readout.
-    fists:    { name: 'FISTS', spr: null, dmg: [12, 20], cd: 0.6, melee: true, range: 1.2 },
+    fists:    { name: 'FISTS', spr: 'judochop', dmg: [12, 20], cd: 0.6, melee: true, range: 1.2 },
   };
   const WEAPON_ORDER = ['walther', 'sterling', 'ar7', 'laser', 'golden'];
 
@@ -36,6 +36,8 @@ const Game = (() => {
     owned: { walther: true, sterling: false, ar7: false, laser: false, golden: false, fists: true },
     ammo: { walther: 24, sterling: 0, ar7: 0, laser: 0, golden: 0 },
     gunSprite: 'gun',                  // read by Engine.paintOverlays for the HUD viewmodel — kept in sync by switchWeapon
+    meleeWeapon: false,                // true for fists — hides the viewmodel at rest, animates it as a slash instead
+    meleeSwingCd: 0,                   // wpn.cd at the moment a punch was thrown — normalizes the slash's progress
   };
   // Per-kind combat stats for hostile entities. `ranged` kinds hold position and fire
   // once in rangedRange (with LOS), only closing distance to get there; everyone else
@@ -103,6 +105,7 @@ const Game = (() => {
     if (G.weapon === kind) { if (!wasDrawn) Adventure.msg(WEAPONS[kind].name + ' READY.', 1.5); return; }
     G.weapon = kind;
     G.gunSprite = WEAPONS[kind].spr;
+    G.meleeWeapon = !!WEAPONS[kind].melee;
     G.fireT = 0;
     Adventure.msg(WEAPONS[kind].name + ' READY.', 1.5);
   }
@@ -261,6 +264,7 @@ const Game = (() => {
       G.ammo[G.weapon]--;
     }
     G.fireT = wpn.cd;
+    if (wpn.melee) G.meleeSwingCd = wpn.cd;   // lets the renderer normalize the slash animation's progress (0..1)
     if (wpn.melee) Sfx.punch();
     else Sfx.shoot();
     // a gunshot is loud regardless of whether it connects — cover blows the instant

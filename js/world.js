@@ -9711,6 +9711,7 @@ const World = (() => {
     g.strokeStyle = bezel; g.lineWidth = 1.4; g.beginPath(); g.arc(48, 12, 5.4, 0, 7); g.stroke();
     speck(g, 20, 'rgba(255,240,180,0.1)', 96, 96); speck(g, 8, 'rgba(0,0,0,0.08)', 96, 96);
   }, 96, 96);
+  SPR.judochop = SPR.gun;   // placeholder until the shipped art loads (ART_ASSETS below)
 
   // -------------------------------------------------------------------------
   // CUSTOM ART — swap any procedural texture/sprite for an uploaded image.
@@ -10011,6 +10012,7 @@ const World = (() => {
     gunAR7: 'assets/sprites/gunAR7.png?v=1',
     gunLaser: 'assets/sprites/gunLaser.png?v=1',
     gunGolden: 'assets/sprites/gunGolden.png?v=1',
+    judochop: 'assets/sprites/judochop.png?v=1',
     maskstand: 'assets/sprites/maskstand.png?v=1',
     nixonmask: 'assets/sprites/nixonmask.png?v=1',
     sportscar: 'assets/sprites/sportscar.png?v=1',
