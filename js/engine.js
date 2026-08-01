@@ -309,37 +309,15 @@ const Engine = (() => {
     if (g.combat && !g.over && !g.preview) {
       if (g.meleeWeapon) {
         // fists are invisible at rest — the hand only exists on-screen for the
-        // ~0.6s of a punch, tracing the path from Lee's own reference footage:
-        // fist enters upper-left, arcs up to upper-right, then chops down
-        // through the middle and exits lower-right. Modeled as a quadratic
-        // bezier for the FIST's screen position (not a fixed pivot this time —
-        // real arm motion bends at the elbow, a single rigid pivot couldn't
-        // match it), with the sprite's rotation solved backward each frame so
-        // that its hand point lands exactly on the bezier at every step.
+        // ~0.6s of a punch. It's a first-person shot of Lee's own arm, already
+        // posed correctly — no rotation needed, just slide it straight across
+        // the screen like a real judo chop swipe.
         if (g.fireT > 0 && g.meleeSwingCd > 0 && g.gunSprite) {
-          const t = 1 - g.fireT / g.meleeSwingCd;             // 0 = swing start, 1 = swing end
-          const gw = 260;
-          const P0x = 190, P0y = 50, P1x = 430, P1y = 20, P2x = 260, P2y = 430;
-          const u = 1 - t;
-          const handX = u * u * P0x + 2 * u * t * P1x + t * t * P2x;
-          const handY = u * u * P0y + 2 * u * t * P1y + t * t * P2y;
-          const angle = Math.PI * 0.42 * t;                   // hand tilts through the chop as it comes down
-          // localHandOffset: where the hand cluster sits, in unrotated local
-          // space, relative to the arm-base anchor (measured from the sprite's
-          // own art placement — see the fitCharacter/offset note below).
-          const hoX = 210, hoY = -100;
-          const cosA = Math.cos(angle), sinA = Math.sin(angle);
-          const anchorX = handX - (hoX * cosA - hoY * sinA);
-          const anchorY = handY - (hoX * sinA + hoY * cosA);
-          octx.save();
-          octx.translate(anchorX, anchorY);
-          octx.rotate(angle);
-          // sprite (fitCharacter) is bottom-aligned in its own square canvas, and
-          // the source art's arm enters from that canvas's bottom-LEFT corner (the
-          // hand reaches up toward the top-right) — that corner is the true "base
-          // of the arm", so it — not the bottom-centre — has to sit at the anchor.
-          octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, 0, -gw, gw, gw);
-          octx.restore();
+          const t = 1 - g.fireT / g.meleeSwingCd;             // 0 = enters left, 1 = exits right
+          const gw = 340;
+          const gy = H * 0.5 - gw * 0.5 + 90;                 // lower — keeps the sprite's bottom (where the arm is
+          const gx = -gw + (W + gw) * t;                      // cut off) pushed below the visible frame
+          octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, gx, gy, gw, gw);
         }
       } else {
         const bobX = Math.sin(g.bobT * 6) * 5 * g.bobAmt;
