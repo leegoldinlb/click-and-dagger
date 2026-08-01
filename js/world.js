@@ -9848,7 +9848,6 @@ const World = (() => {
   SPR.sovietshopper = SPR.civilianF;
   SPR.sovietscientist = SPR.civilianM;
   SPR.iransoldier = SPR.soviet;
-  SPR.maheen = SPR.memother;
   SPR.reza = SPR.iransoldier;
   SPR.rezaWarmed = SPR.iransoldier;
   SPR.rostam = SPR.civilianM;
@@ -10535,7 +10534,7 @@ const World = (() => {
     maheen: (x, y, e) => ({
       kind: 'maheen', name: 'MAHEEN', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
       behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
-      getTex() { return this.dead ? SPR.civilianCorpse : SPR.maheen; },
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.memother; },   // same art as the mother/daughter sprite
     }),
     reza: (x, y, e) => ({
       kind: 'reza', name: 'REZA', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
