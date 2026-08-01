@@ -9,8 +9,6 @@
 <div id="game">
   <div id="viewwrap">
     <canvas id="view" width="640" height="360"></canvas>
-    <div id="crosshair">+</div>
-    <div id="hoverlabel"></div>
     <div id="message"></div>
     <div id="overlay">
       <img class="splashart" src="assets/ui/splash.png?v=1" alt="CLICK AND DAGGER">
@@ -28,14 +26,11 @@
       <span class="stat">COVER <b id="cover">UNDERCOVER</b></span>
     </div>
     <div id="verbs">
-      <button class="verb active" data-verb="look">LOOK</button>
-      <button class="verb" data-verb="take">TAKE</button>
-      <button class="verb" data-verb="use">USE</button>
       <button id="drawgun">&#10022; DRAW WALTHER</button>
     </div>
     <div id="inventory"><span id="invempty">FIELD KIT: EMPTY</span></div>
   </div>
-  <div id="modeline">COMBAT MODE — right-click to holster &amp; point-and-click</div>
+  <div id="modeline">COMBAT MODE — TAB or F to holster · right-click to LOOK</div>
   <a id="editlink" href="editor.html" title="Open this level in LAIR ARCHITECT to edit it">&#9998; EDIT THIS LEVEL</a>
 </div>
 <script src="js/audio.js?v=8"></script>

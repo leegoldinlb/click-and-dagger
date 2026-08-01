@@ -72,32 +72,7 @@ body {
   );
 }
 
-#crosshair {
-  position: absolute;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -52%);
-  color: var(--gold-bright);
-  font-size: 22px;
-  text-shadow: 0 0 4px var(--gold), 1px 1px 0 #000;
-  pointer-events: none;
-}
-body.adventure #crosshair { display: none; }
-
-#hoverlabel {
-  position: absolute;
-  display: none;
-  padding: 3px 9px;
-  background: linear-gradient(160deg, var(--panel-hi), var(--panel-lo));
-  border: 2px solid var(--brass);
-  box-shadow: inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo);
-  color: var(--gold-bright);
-  font-size: 13px;
-  letter-spacing: 1px;
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 5;
-}
-body.adventure #hoverlabel.on { display: block; }
+/* the reticule (combat and holstered alike) is drawn on the canvas — see Engine.paintReticule */
 
 #message {
   position: absolute;
@@ -156,13 +131,6 @@ button:hover { color: var(--gold-bright); border-color: var(--brass); }
 button:active {
   box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo);
 }
-.verb.active {
-  background: linear-gradient(160deg, #5a4614, #2e2508);
-  color: var(--gold-bright);
-  border-color: var(--gold);
-  box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo);
-}
-body:not(.adventure) #verbs .verb { opacity: 0.35; pointer-events: none; }
 #drawgun { color: var(--gold-bright); border-color: var(--brass); display: none; }
 body.adventure #drawgun { display: inline-block; }
 
@@ -185,11 +153,12 @@ body.adventure #drawgun { display: inline-block; }
   cursor: pointer;
 }
 .item.selected {
-  background: linear-gradient(160deg, #6e5818, #3a2e0a);
-  color: #fff2c0;
-  border-color: var(--gold-bright);
-  box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo);
+  background: linear-gradient(160deg, #2e6e28, #123a0e);   /* green: this item is armed for USE — a left-click will use it */
+  color: #d6ffca;
+  border-color: #6fe25a;
+  box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo), 0 0 6px rgba(111,226,90,0.6);
 }
+.item.hl { border-color: #fff2c0; box-shadow: 0 0 0 1px #fff2c0, inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo); }   /* [ ] keyboard cycle highlight, independent of .selected */
 
 #modeline {
   text-align: center;

@@ -303,9 +303,47 @@ const Engine = (() => {
     ctx.drawImage(off, 0, 0, W, H, 0, 0, DW, DH);
   }
 
+  // one reticule, shared by combat and holstered — combat's is a plain neutral
+  // dot (nothing to classify while a gun is drawn), holstered's swaps color and
+  // adds the LOOK/USE/TAKE tag from Adventure.hudAt (set each frame by
+  // Game.updateHud onto g.reticule / g.reticuleName / g.invSelectedName)
+  function paintReticule(g) {
+    const cx = W / 2, cy = H / 2;
+    const RETICULE_COLOR = { use: '#ffd66b', take: '#8fe28f', look: '#e8e2c8' };
+    const col = g.combat ? '#e8e2c8' : (RETICULE_COLOR[g.reticule] || '#e8e2c8');
+    octx.strokeStyle = col;
+    octx.lineWidth = 2;
+    octx.beginPath();
+    octx.moveTo(cx - 8, cy); octx.lineTo(cx - 3, cy);
+    octx.moveTo(cx + 3, cy); octx.lineTo(cx + 8, cy);
+    octx.moveTo(cx, cy - 8); octx.lineTo(cx, cy - 3);
+    octx.moveTo(cx, cy + 3); octx.lineTo(cx, cy + 8);
+    octx.stroke();
+    if (g.combat) return;
+    if (g.reticule === 'use' || g.reticule === 'take') {
+      octx.font = 'bold 13px monospace';
+      octx.textAlign = 'center';
+      octx.fillStyle = col;
+      octx.fillText(g.reticule.toUpperCase(), cx, cy - 16);
+    }
+    if (g.reticuleName) {
+      octx.font = '12px monospace';
+      octx.textAlign = 'center';
+      octx.fillStyle = '#e8e2c8';
+      octx.fillText(g.reticuleName, cx, cy + 24);
+    }
+    if (g.invSelectedName) {
+      octx.font = '11px monospace';
+      octx.textAlign = 'center';
+      octx.fillStyle = '#ffd66b';
+      octx.fillText('USING: ' + g.invSelectedName, cx, H - 14);
+    }
+  }
+
   // weapon + holster letterbox + hurt flash — drawn on octx over either renderer
   function paintOverlays(g) {
     const p = g.player;
+    if (!g.over && !g.preview) paintReticule(g);
     if (g.combat && !g.over && !g.preview) {
       if (g.meleeWeapon) {
         // fists are invisible at rest — the hand only exists on-screen for the
@@ -332,10 +370,6 @@ const Engine = (() => {
         }
         if (g.gunSprite) octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, gx, gy, gw, gw);
       }
-    }
-    if (!g.combat && !g.preview) {
-      octx.fillStyle = 'rgba(40,60,120,0.06)'; octx.fillRect(0, 0, W, H);
-      octx.fillStyle = '#000'; octx.fillRect(0, 0, W, 7); octx.fillRect(0, H - 7, W, 7);
     }
     if (p.hurtT > 0) {
       octx.fillStyle = 'rgba(200,20,10,' + Math.min(0.45, p.hurtT * 1.6).toFixed(2) + ')';

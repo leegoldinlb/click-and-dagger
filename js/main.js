@@ -26,7 +26,9 @@ const Game = (() => {
   const G = {
     player: { x: World.spawn.x, y: World.spawn.y, a: World.spawn.a, hp: 100, hurtT: 0,
               eyeZ: World.floorZAt(World.spawn.x, World.spawn.y) + 0.5, pitch: 0, vz: 0 },
-    combat: false,
+    combat: false,               // gun drawn (shooting mode) vs holstered — both are pointer-locked now
+    locked: false,                // pointer-lock engaged at all (drawn or holstered) — replaces the old free-cursor adventure mode
+    reticule: null,               // 'look' | 'use' | 'take' | null — what the crosshair shows while holstered
     started: false,
     over: false,
     bobT: 0, bobAmt: 0, fireT: 0,
@@ -84,7 +86,6 @@ const Game = (() => {
     'memother']);  // nor children — the mother/daughter pair (one sprite) is always off-limits
 
   const keys = {};
-  const mouse = { x: -1, y: -1 };            // internal canvas coords
   let mouseDown = false;                     // held for full-auto weapons
   let ctrlDown = false;                      // Ctrl is an alternate fire key, held for full-auto weapons — kept
                                               // separate from mouseDown so releasing one doesn't cut off the other
@@ -95,13 +96,13 @@ const Game = (() => {
   const weaponEl = document.getElementById('weapon');
   const drawgunEl = document.getElementById('drawgun');
   const modeEl = document.getElementById('modeline');
-  const hoverEl = document.getElementById('hoverlabel');
   const overlay = document.getElementById('overlay');
 
   function switchWeapon(kind) {
     if (!G.owned[kind]) { Adventure.msg('You don’t have that yet.', 1.5); return; }
     const wasDrawn = G.combat;
-    if (!G.combat) requestCombat();         // picking a weapon pulls it — no separate "draw" step needed
+    G.combat = true;                        // picking a weapon draws it — no separate "draw" step needed
+    if (!G.locked) requestLock();
     if (G.weapon === kind) { if (!wasDrawn) Adventure.msg(WEAPONS[kind].name + ' READY.', 1.5); return; }
     G.weapon = kind;
     G.gunSprite = WEAPONS[kind].spr;
@@ -111,16 +112,22 @@ const Game = (() => {
   }
 
   // ---------------------------------------------------------------- modes --
-  function requestCombat() {
+  // The view stays pointer-locked throughout play, whether the gun is drawn
+  // (G.combat) or holstered — holstering no longer drops back to a free
+  // cursor, it just switches what a left-click on the crosshair's target does
+  // (shoot vs. LOOK/USE/TAKE). Losing the lock (e.g. the browser's own Esc)
+  // always falls back to holstered; the canvas re-requests it on next click.
+  function requestLock() {
     const p = canvas.requestPointerLock && canvas.requestPointerLock();
     if (p && p.catch) p.catch(() => {});
   }
   function syncMode() {
-    G.combat = document.pointerLockElement === canvas;
+    G.locked = document.pointerLockElement === canvas;
+    if (!G.locked) G.combat = false;
     document.body.classList.toggle('adventure', !G.combat);
     modeEl.textContent = G.combat
-      ? 'COMBAT MODE — TAB, F, 0, or right-click to holster & point-and-click'
-      : 'ADVENTURE MODE — pick a verb, click the world · TAB, F, or right-click to draw your gun';
+      ? 'COMBAT MODE — TAB or F to holster · right-click to LOOK'
+      : 'HOLSTERED — click to USE/TAKE, right-click to LOOK · [ ] cycle kit, ENTER select · TAB or F to draw';
   }
   document.addEventListener('pointerlockchange', syncMode);
   document.addEventListener('pointerlockerror', syncMode);
@@ -140,15 +147,22 @@ const Game = (() => {
 
   function toggleMode() {
     if (!G.started || G.over) return;
-    if (G.combat) document.exitPointerLock();
-    else requestCombat();
+    if (!G.locked) { requestLock(); return; }     // lost the lock (e.g. Esc) — re-engage it, holstered
+    G.combat = !G.combat;
+    syncMode();
   }
-  // Chrome refuses requestPointerLock() when called from a contextmenu handler
-  // (not a valid user gesture) — so the toggle has to fire on mousedown instead;
-  // contextmenu is only used to suppress the native right-click menu.
+  // Right-click is no longer the draw/holster toggle (TAB/F/the draw button
+  // cover that) — it's always LOOK on the crosshair's target, holstered or
+  // not. That's the escape hatch for anything both takeable/usable AND worth
+  // reading the flavor text on (the passive hover label is just a name tag).
+  // contextmenu is still suppressed so it doesn't pop the native menu.
   document.addEventListener('contextmenu', e => e.preventDefault());
-  document.addEventListener('mousedown', e => { if (e.button === 2) toggleMode(); });
-  document.getElementById('drawgun').addEventListener('click', requestCombat);
+  document.addEventListener('mousedown', e => {
+    if (e.button !== 2 || !G.started || G.over) return;
+    if (!G.locked) { requestLock(); return; }
+    Adventure.lookAt(Engine.W / 2, Engine.H / 2);
+  });
+  document.getElementById('drawgun').addEventListener('click', () => { G.combat = true; if (!G.locked) requestLock(); syncMode(); });
 
   // -------------------------------------------------------------- cheats --
   // typed anywhere during a mission, like a classic arcade cheat code — no
@@ -186,6 +200,9 @@ const Game = (() => {
       if (e.code === 'Tab' || e.code === 'KeyF') { e.preventDefault(); if (!e.repeat) toggleMode(); }   // faster than right-click for switching combat <-> adventure
       if (e.code === 'Digit0' && !e.repeat) { e.preventDefault(); switchWeapon('fists'); }                 // 0: fists — bare-handed melee, same slot mechanics as any gun
       if ((e.code === 'ControlLeft' || e.code === 'ControlRight') && G.combat) { ctrlDown = true; if (!e.repeat) shoot(); }
+      if (e.code === 'BracketLeft' && !e.repeat) { e.preventDefault(); Adventure.cycleInv(-1); }            // [ / ] cycle the field kit, ENTER selects/deselects for USE
+      if (e.code === 'BracketRight' && !e.repeat) { e.preventDefault(); Adventure.cycleInv(1); }
+      if (e.code === 'Enter' && !e.repeat) { e.preventDefault(); Adventure.confirmInv(); }
       if (e.key && e.key.length === 1 && /[a-zA-Z]/.test(e.key) && !e.repeat) {
         cheatBuf = (cheatBuf + e.key.toUpperCase()).slice(-3);
         if (CHEATS[cheatBuf]) { CHEATS[cheatBuf](); cheatBuf = ''; }
@@ -197,27 +214,20 @@ const Game = (() => {
     if (e.code === 'ControlLeft' || e.code === 'ControlRight') ctrlDown = false;
   });
 
+  // Mouse-look always drives the view once locked, drawn or holstered alike —
+  // holstering no longer frees the cursor, it just changes what a left-click
+  // on the crosshair's target does (see mousedown below).
   document.addEventListener('mousemove', e => {
-    if (G.combat) {
-      G.player.a += e.movementX * 0.0022;
-      G.player.pitch = Math.max(-70, Math.min(70, G.player.pitch - e.movementY * 0.35));
-    } else {
-      const r = canvas.getBoundingClientRect();
-      mouse.x = (e.clientX - r.left) * Engine.W / r.width;
-      mouse.y = (e.clientY - r.top) * Engine.H / r.height;
-      mouse.cx = e.clientX - r.left;
-      mouse.cy = e.clientY - r.top;
-    }
+    if (!G.locked) return;
+    G.player.a += e.movementX * 0.0022;
+    G.player.pitch = Math.max(-70, Math.min(70, G.player.pitch - e.movementY * 0.35));
   });
 
   canvas.addEventListener('mousedown', e => {
     if (!G.started || G.over || e.button !== 0) return;
+    if (!G.locked) { requestLock(); return; }
     if (G.combat) { mouseDown = true; shoot(); }
-    else if (mouse.x >= 0) {
-      const t = Adventure.resolveAt(mouse.x, mouse.y);
-      if (t && t.dist <= 3.2) Adventure.clickAt(mouse.x, mouse.y);   // something to LOOK/TAKE/USE — normal adventure click
-      else requestCombat();                                          // nothing there — draw your weapon instead
-    }
+    else Adventure.clickAt(Engine.W / 2, Engine.H / 2);   // crosshair-center hit test — LOOK/TAKE/USE, context-sensitive
   });
   window.addEventListener('mouseup', () => { mouseDown = false; });
 
@@ -529,18 +539,19 @@ const Game = (() => {
     coverEl.textContent = G.blown ? 'BLOWN' : 'UNDERCOVER';
     coverEl.classList.toggle('low', G.blown);
 
-    if (!G.combat && G.started && !G.over && mouse.x >= 0) {
-      const name = Adventure.nameAt(mouse.x, mouse.y);
-      if (name) {
-        hoverEl.textContent = name;
-        hoverEl.style.left = (mouse.cx + 16) + 'px';
-        hoverEl.style.top = (mouse.cy - 8) + 'px';
-        hoverEl.classList.add('on');
-      } else {
-        hoverEl.classList.remove('on');
-      }
+    // Holstered: hit-test dead-center every frame — the name is the automatic
+    // "LOOK" (drawn on the canvas reticule, see Engine.paintOverlays), and
+    // `verb` (use/take/null) is what the reticule icon shows and what a
+    // left-click will do (see Adventure.clickAt in mousedown).
+    if (!G.combat && G.started && !G.over) {
+      const hit = Adventure.hudAt(Engine.W / 2, Engine.H / 2);
+      G.reticuleName = hit.name;
+      G.reticule = hit.verb;
+      G.invSelectedName = Adventure.selectedName;
     } else {
-      hoverEl.classList.remove('on');
+      G.reticuleName = null;
+      G.reticule = null;
+      G.invSelectedName = null;
     }
   }
 
@@ -663,7 +674,7 @@ const Game = (() => {
     G.started = true;
     G.t0 = performance.now();
     overlay.classList.add('hidden');
-    // start holstered — drawing happens automatically: pick a weapon (1-5) or fire on empty ground
+    requestLock();   // start holstered but pointer-locked — drawing happens on picking a weapon (1-5), TAB/F, or right-click
     Adventure.msg('Eyes open. Cover’s thin and the clock is already running.', 5);
   });
 

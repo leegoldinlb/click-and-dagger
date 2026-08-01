@@ -28,8 +28,8 @@ const Adventure = (() => {
     // A Brother's Freedom (Tehran)
     rezaWarmed: false, rostamFollowing: false, rostamDisguised: false, rostamLost: false,
   };
-  let verb = 'look';
   let selected = null;            // selected inventory item id
+  let hlIndex = -1;                // keyboard-cycle highlight index into uniqueIds(), independent of `selected`
   const inv = [];
   let winFn = null;                // registered by main.js — lets a puzzle payoff end the mission directly
   let loseFn = null;                // ditto, for a puzzle failure (cutting the wrong wire)
@@ -56,24 +56,32 @@ const Adventure = (() => {
   }
 
   // ---- inventory ----
+  // unique item ids in first-seen order — what [ ] cycles through and what
+  // hlIndex/selected index into. Recomputed on demand rather than cached since
+  // the list only changes on addItem/removeItem, both of which are rare.
+  function uniqueIds() {
+    const seen = new Set(), out = [];
+    for (const it of inv) { if (!seen.has(it.id)) { seen.add(it.id); out.push(it); } }
+    return out;
+  }
+
   function renderInv() {
     invEl.querySelectorAll('.item').forEach(n => n.remove());
     invEmptyEl.style.display = inv.length ? 'none' : 'inline';
-    const seen = new Set();
-    for (const it of inv) {
-      if (seen.has(it.id)) continue;                       // stackable items (e.g. keys) show once, with a count
-      seen.add(it.id);
+    const ids = uniqueIds();
+    ids.forEach((it, i) => {
       const count = inv.filter(x => x.id === it.id).length;
       const b = document.createElement('button');
-      b.className = 'item' + (selected === it.id ? ' selected' : '');
+      b.className = 'item' + (selected === it.id ? ' selected' : '') + (hlIndex === i ? ' hl' : '');
       b.textContent = it.name + (count > 1 ? ' ×' + count : '');
       b.onclick = () => {
+        hlIndex = i;
         selected = selected === it.id ? null : it.id;
-        if (selected) { setVerb('use'); msg('Ready to USE the ' + it.name + '. Click a target.'); }
+        if (selected) msg('Ready to USE the ' + it.name + '. Click a target.');
         renderInv();
       };
       invEl.appendChild(b);
-    }
+    });
   }
 
   function addItem(id, name) {
@@ -89,13 +97,59 @@ const Adventure = (() => {
     renderInv();
   }
 
-  // ---- verbs ----
-  const verbBtns = document.querySelectorAll('#verbs .verb');
-  function setVerb(v) {
-    verb = v;
-    verbBtns.forEach(b => b.classList.toggle('active', b.dataset.verb === v));
+  // ---- keyboard inventory cycling: [ / ] move a highlight, Enter confirms it
+  // as `selected` (or clears selection if the highlighted item is already
+  // selected) ----
+  function cycleInv(dir) {
+    const ids = uniqueIds();
+    if (!ids.length) { msg('Field kit is empty.', 1.5); return; }
+    hlIndex = ((hlIndex < 0 ? (dir > 0 ? -1 : 0) : hlIndex) + dir + ids.length) % ids.length;
+    msg(ids[hlIndex].name + ' — ENTER to select', 1.5);
+    renderInv();
   }
-  verbBtns.forEach(b => b.addEventListener('click', () => setVerb(b.dataset.verb)));
+  function confirmInv() {
+    const ids = uniqueIds();
+    if (hlIndex < 0 || hlIndex >= ids.length) return;
+    const id = ids[hlIndex].id;
+    selected = selected === id ? null : id;
+    msg(selected ? 'Ready to USE the ' + ids[hlIndex].name + '. Click a target.' : (ids[hlIndex].name + ' deselected.'), 1.8);
+    renderInv();
+  }
+
+  // ---- context-sensitive verb: no manual LOOK/TAKE/USE selection — the
+  // reticule (and a click) resolve straight from what's being aimed at, or
+  // from the selected inventory item if one is held. The kind lists below are
+  // a curated mirror of the case labels actually handled in takeEnt/useEnt —
+  // an approximation (a few flag-gated kinds show a verb before they're truly
+  // ready), not a full non-mutating preview of those functions.
+  const TAKEABLE_KINDS = new Set(['agent', 'tube', 'keycard', 'stdkey', 'letter', 'telegram', 'businesscard',
+    'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'sheetmusic', 'headshot', 'brothersphoto',
+    'tehranuniform', 'metroticket', 'easel', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'suitrack',
+    'curtainrods']);
+  const USABLE_KINDS = new Set(['desk', 'safe', 'bar', 'tvconsole', 'goon', 'gunman', 'brute', 'sniper', 'blackbelt',
+    'soviet', 'spy', 'agent', 'tube', 'flowergirl', 'carlotta', 'ciphermachine', 'drz', 'bomb', 'defector', 'maheen',
+    'reza', 'rostam', 'phonebooth', 'microfichemachine', 'agent005', 'boss005', 'sportscar', 'streetartist', 'matron',
+    'metroentrance', 'maskstand', 'laundrylady', 'double', 'patsy', 'curtainrods', 'vendingmachine', 'tv', 'baldini',
+    'lao', 'wilson', 'fiona', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'nyfirefighter',
+    'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor',
+    'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician',
+    'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial',
+    'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen',
+    'sovietshopper', 'sovietscientist']);
+  const WALL_USABLE = new Set([3, 4, 5, 6, 7, 8]);   // blast/radio/mainframe/poster/keycard/std-key doors — 1/2 are plain wall
+  function verbAt(t) {
+    if (!t) return 'look';
+    if (t.kind === 'ent') {
+      const e = t.ent;
+      // curtainrods is genuinely dual-purpose across the quest — TAKE the
+      // coins once ready, USE (stash the package) beforehand
+      if (e.kind === 'curtainrods') return flags.coinsReady && !flags.gotCoins ? 'take' : 'use';
+      if (TAKEABLE_KINDS.has(e.kind)) return 'take';
+      if (!e.dead && USABLE_KINDS.has(e.kind)) return 'use';
+      return 'look';
+    }
+    return WALL_USABLE.has(t.val) ? 'use' : 'look';
+  }
 
   // ---- hit-testing the 3D view ----
   function resolveAt(mx, my) {
@@ -126,6 +180,16 @@ const Adventure = (() => {
     if (!t) return null;
     if (t.kind === 'ent') return t.ent.dead ? 'EX-HENCHMAN' : t.ent.name;
     return t.dist < 6 ? WALLNAMES[t.val] : null;
+  }
+
+  // one hit-test per frame for the holstered HUD: name label (always, this is
+  // the automatic "LOOK") plus the context verb the reticule should show for a
+  // left-click right now (null past click range, or once too far to interact)
+  function hudAt(mx, my) {
+    const t = resolveAt(mx, my);
+    const name = !t ? null : t.kind === 'ent' ? (t.ent.dead ? 'EX-HENCHMAN' : t.ent.name) : (t.dist < 6 ? WALLNAMES[t.val] : null);
+    const inRange = !!t && t.dist <= 3.2;
+    return { name, verb: inRange ? (selected ? 'use' : verbAt(t)) : null };
   }
 
   // ---- interactions ----
@@ -1157,19 +1221,32 @@ const Adventure = (() => {
     return 'You push the wall. Volkov built to last.';
   }
 
-  function clickAt(mx, my) {
+  function actWithVerb(mx, my, v) {
     const t = resolveAt(mx, my);
     if (!t) { msg('Nothing there but carpet and consequence.'); return; }
     if (t.dist > 3.2) { msg('Too far. Saunter closer.'); return; }
     let out;
     if (t.kind === 'ent') {
-      out = verb === 'look' ? lookEnt(t.ent) : verb === 'take' ? takeEnt(t.ent) : useEnt(t.ent);
+      out = v === 'look' ? lookEnt(t.ent) : v === 'take' ? takeEnt(t.ent) : useEnt(t.ent);
     } else {
-      out = verb === 'look' ? lookWall(t)
-          : verb === 'take' ? 'That is structural. Leave it for the demolition charges.'
+      out = v === 'look' ? lookWall(t)
+          : v === 'take' ? 'That is structural. Leave it for the demolition charges.'
           : useWall(t);
     }
     msg(out, 4.5);
+  }
+  // left-click: context-sensitive USE/TAKE (or forced USE if an item is
+  // selected) — same as before
+  function clickAt(mx, my) {
+    const t = resolveAt(mx, my);
+    actWithVerb(mx, my, selected ? 'use' : verbAt(t));
+  }
+  // right-click: always LOOK, regardless of what's under the crosshair — the
+  // escape hatch for anything that's both takeable/usable AND has its own
+  // flavor text (the passive hover label is just a name tag, not the full
+  // description)
+  function lookAt(mx, my) {
+    actWithVerb(mx, my, 'look');
   }
 
   // debug cheat: collect everything CURRENTLY takeable, reusing takeEnt's own
@@ -1187,5 +1264,7 @@ const Adventure = (() => {
   }
 
   renderInv();
-  return { flags, msg, setVerb, clickAt, nameAt, resolveAt, addItem, setWinTrigger, setLoseTrigger, setBlowTrigger, cheatCollectAll, get selected() { return selected; } };
+  return { flags, msg, clickAt, lookAt, nameAt, hudAt, resolveAt, addItem, cycleInv, confirmInv,
+    setWinTrigger, setLoseTrigger, setBlowTrigger, cheatCollectAll, get selected() { return selected; },
+    get selectedName() { const it = inv.find(x => x.id === selected); return it ? it.name : null; } };
 })();
