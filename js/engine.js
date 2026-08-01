@@ -316,17 +316,19 @@ const Engine = (() => {
           const t = 1 - g.fireT / g.meleeSwingCd;             // 0 = swing start, 1 = swing end
           const phase = t < 0.5 ? t * 2 : (1 - t) * 2;        // 0 → 1 → 0: in, then back out
           const gw = 260;
-          const pivotX = W * 0.5, pivotY = H * 1.15;          // fixed wiper anchor, just below the bottom edge
-          const A1 = Math.PI * 0.62, A2 = -Math.PI * 0.30;    // wiper's full arc: starts leaning hard right, sweeps left
+          const pivotX = W * 0.28, pivotY = H * 1.05;          // fixed wiper anchor, just past the bottom-left edge
+          const A1 = Math.PI * 0.95, A2 = -Math.PI * 0.05;     // full ~180° sweep: starts flat/hidden, ends flat the other way
           const angle = A1 + (A2 - A1) * phase;
           octx.save();
           octx.translate(pivotX, pivotY);
+          octx.scale(-1, 1);                                  // mirror horizontally — the arm enters from the LEFT
           octx.rotate(angle);
-          // sprite (fitCharacter) is bottom-aligned in its own square canvas — its
-          // wrist/sleeve cut sits along the local bottom edge. Drawing that bottom
-          // edge AT the pivot means the rotation always keeps the cut hidden behind
-          // the anchor point instead of exposing a floating disconnected edge.
-          octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, -gw / 2, -gw, gw, gw);
+          // sprite (fitCharacter) is bottom-aligned in its own square canvas, and
+          // the source art's arm enters from that canvas's bottom-LEFT corner (the
+          // hand reaches up toward the top-right) — that corner is the true "base
+          // of the arm", so it — not the bottom-centre — has to sit at the pivot,
+          // or the rotation swings the shape around empty space next to the arm.
+          octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, 0, -gw, gw, gw);
           octx.restore();
         }
       } else {
