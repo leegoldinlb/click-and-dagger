@@ -34,6 +34,7 @@ const Game = (() => {
     bobT: 0, bobAmt: 0, fireT: 0,
     kills: 0, civKills: 0, t0: 0,
     blown: World.startBlown,          // Cover status: false = Undercover (hostiles ignore you), true = Blown (one-way door for the level)
+    invuln: false,                     // MOM cheat — hostile melee/ranged hits are gated out in update(), no other damage source exists
     weapon: 'walther',                 // currently equipped weapon kind
     owned: { walther: true, sterling: false, ar7: false, laser: false, golden: false, fists: true },
     ammo: { walther: 24, sterling: 0, ar7: 0, laser: 0, golden: 0 },
@@ -189,6 +190,11 @@ const Game = (() => {
     MAX: () => {                                            // collect every currently-takeable item
       const n = Adventure.cheatCollectAll();
       Adventure.msg('CHEAT: collected ' + n + ' item' + (n === 1 ? '' : 's') + '.', 3);
+    },
+    MOM: () => {                                            // full heal + invulnerable (toggle)
+      G.player.hp = 100;
+      G.invuln = !G.invuln;
+      Adventure.msg(G.invuln ? 'CHEAT: full HP, nothing can touch you now.' : 'CHEAT: full HP, invulnerability off.', 3);
     },
   };
   let cheatBuf = '';
@@ -404,20 +410,24 @@ const Game = (() => {
       if (d <= st.meleeRange) {
         if (e.atkT <= 0) {
           e.atkT = st.atkCd;
-          const [lo, hi] = st.meleeDmg;
-          p.hp -= lo + Math.random() * (hi - lo);
-          p.hurtT = 0.35;
-          Sfx.hurt();
-          if (p.hp <= 0) { p.hp = 0; die(); }
+          if (!G.invuln) {
+            const [lo, hi] = st.meleeDmg;
+            p.hp -= lo + Math.random() * (hi - lo);
+            p.hurtT = 0.35;
+            Sfx.hurt();
+            if (p.hp <= 0) { p.hp = 0; die(); }
+          }
         }
       } else if (st.ranged && d <= st.rangedRange) {
         if (e.atkT <= 0 && los(e.x, e.y, p.x, p.y)) {         // holds position and fires — doesn't close in
           e.atkT = st.atkCd;
-          const [lo, hi] = st.rangedDmg;
-          p.hp -= lo + Math.random() * (hi - lo);
-          p.hurtT = 0.35;
-          Sfx.shoot();
-          if (p.hp <= 0) { p.hp = 0; die(); }
+          if (!G.invuln) {
+            const [lo, hi] = st.rangedDmg;
+            p.hp -= lo + Math.random() * (hi - lo);
+            p.hurtT = 0.35;
+            Sfx.shoot();
+            if (p.hp <= 0) { p.hp = 0; die(); }
+          }
         }
       } else {
         const sp = st.speed * edt / d;
