@@ -309,25 +309,27 @@ const Engine = (() => {
     if (g.combat && !g.over && !g.preview) {
       if (g.meleeWeapon) {
         // fists are invisible at rest — the hand only exists on-screen for the
-        // ~0.6s of a punch: a windshield-wiper sweep pivoting on a fixed anchor
-        // below the bottom edge. It arcs in from one side, across the screen,
-        // then back out the same arc — one continuous pivot, not a slide.
+        // ~0.6s of a punch. Big rotations kept swinging the arm's base off the
+        // bottom-edge line it needs to stay glued to, so this keeps the base
+        // pinned AT the bottom edge at all times (never rotated away from it)
+        // and does the "swoop across the screen" with a horizontal slide of
+        // that anchor instead — in from off-screen left, across, and back out.
         if (g.fireT > 0 && g.meleeSwingCd > 0 && g.gunSprite) {
           const t = 1 - g.fireT / g.meleeSwingCd;             // 0 = swing start, 1 = swing end
           const phase = t < 0.5 ? t * 2 : (1 - t) * 2;        // 0 → 1 → 0: in, then back out
           const gw = 260;
-          const pivotX = W * 0.28, pivotY = H * 1.05;          // fixed wiper anchor, just past the bottom-left edge
-          const A1 = Math.PI * 0.95, A2 = -Math.PI * 0.05;     // full ~180° sweep: starts flat/hidden, ends flat the other way
+          const pivotY = H + 15;                              // arm base always pinned just below the bottom edge
+          const x1 = -gw * 0.4, x2 = W * 0.62;                 // anchor slides from off-screen left to on-screen right
+          const pivotX = x1 + (x2 - x1) * phase;
+          const A1 = Math.PI * 0.12, A2 = -Math.PI * 0.08;     // only a mild tilt change — the slide does the sweeping
           const angle = A1 + (A2 - A1) * phase;
           octx.save();
           octx.translate(pivotX, pivotY);
-          octx.scale(-1, 1);                                  // mirror horizontally — the arm enters from the LEFT
           octx.rotate(angle);
           // sprite (fitCharacter) is bottom-aligned in its own square canvas, and
           // the source art's arm enters from that canvas's bottom-LEFT corner (the
           // hand reaches up toward the top-right) — that corner is the true "base
-          // of the arm", so it — not the bottom-centre — has to sit at the pivot,
-          // or the rotation swings the shape around empty space next to the arm.
+          // of the arm", so it — not the bottom-centre — has to sit at the pivot.
           octx.drawImage(World.SPR[g.gunSprite] || World.SPR.gun, 0, -gw, gw, gw);
           octx.restore();
         }
