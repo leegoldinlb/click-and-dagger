@@ -65,8 +65,8 @@
   },
   {
    "kind": "medkit",
-   "x": 18.63,
-   "y": 18.5
+   "x": 27.13,
+   "y": 21.15
   },
   {
    "kind": "hkromanceposter",
@@ -94,6 +94,24 @@
    "flatAngle": 0,
    "zOff": 2.2,
    "scale": 1.46
+  },
+  {
+   "kind": "nycpanamposter",
+   "x": 21,
+   "y": 18.48,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 4.71238898038469,
+   "zOff": 1.1
+  },
+  {
+   "kind": "nycpanamposter",
+   "x": 17.04,
+   "y": 18.5,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 4.71238898038469,
+   "zOff": 0.1
   }
  ],
  "blown": false,
@@ -222,32 +240,20 @@
     "y": 20
    },
    {
-    "x": 22,
+    "x": 21,
     "y": 18
    },
    {
-    "x": 22,
+    "x": 21,
     "y": 19
    },
    {
-    "x": 18,
+    "x": 19,
+    "y": 19
+   },
+   {
+    "x": 19,
     "y": 18
-   },
-   {
-    "x": 18,
-    "y": 19
-   },
-   {
-    "x": 17,
-    "y": 19
-   },
-   {
-    "x": 17,
-    "y": 12
-   },
-   {
-    "x": 18,
-    "y": 12
    },
    {
     "x": 25,
@@ -408,6 +414,22 @@
    {
     "x": 47.5,
     "y": 18.5
+   },
+   {
+    "x": 18,
+    "y": 18
+   },
+   {
+    "x": 18,
+    "y": 13
+   },
+   {
+    "x": 17,
+    "y": 13
+   },
+   {
+    "x": 17,
+    "y": 19
    }
   ],
   "sectors": [
@@ -670,54 +692,52 @@
    {
     "loop": [
      22,
-     47,
-     48,
+     44,
+     45,
      26,
      31,
-     33,
-     32,
      30,
      27,
-     37,
+     34,
+     36,
      39,
-     42,
-     57,
-     67,
-     69,
-     70,
-     68,
+     54,
+     64,
      66,
+     67,
      65,
-     58,
-     41,
+     63,
+     62,
+     55,
+     38,
+     47,
+     48,
+     49,
+     46,
      50,
      51,
-     52,
-     49,
      53,
-     54,
+     52,
      56,
-     55,
-     59,
-     60,
-     43,
-     44,
-     64,
-     73,
-     75,
-     76,
-     74,
-     63,
-     72,
-     71,
-     62,
-     61,
+     57,
      40,
-     38,
+     41,
+     61,
+     70,
+     72,
+     73,
+     71,
+     60,
+     69,
+     68,
+     59,
+     58,
+     37,
+     35,
      28,
      29,
-     46,
-     45,
+     43,
+     42,
      25,
      24,
      23
@@ -801,7 +821,7 @@
      null,
      null,
      "cork",
-     null,
+     "marble",
      "subwaytile",
      null,
      "subwaytile",
@@ -854,21 +874,54 @@
    },
    {
     "loop": [
+     31,
+     32,
      33,
-     34,
-     35,
-     36,
-     32
+     30
     ],
-    "floor": 0.9,
-    "ceil": 5.3,
+    "floor": 1,
+    "ceil": 2,
     "floorTex": "carpet",
-    "ceilTex": "ceiltile",
-    "sky": true,
+    "ceilTex": "marble",
+    "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "marble",
+     null,
+     "marble",
+     null
+    ],
     "parent": -1
+   },
+   {
+    "loop": [
+     32,
+     77,
+     76,
+     75,
+     74,
+     33
+    ],
+    "floor": 1,
+    "ceil": 2,
+    "floorTex": "carpet",
+    "ceilTex": "marble",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "marble",
+     "marble",
+     null,
+     null,
+     "marble",
+     null
+    ],
+    "parent": -1,
+    "missionLink": "hub"
    }
   ]
  }
