@@ -9848,6 +9848,8 @@ const World = (() => {
   SPR.sovietshopper = SPR.civilianF;
   SPR.sovietscientist = SPR.civilianM;
   SPR.iransoldier = SPR.soviet;
+  SPR.maheen = SPR.memother;   // placeholder only — editor palette thumbnails read this directly;
+                                // in-game rendering (FACT.maheen's getTex) reads SPR.memother live instead
   SPR.reza = SPR.iransoldier;
   SPR.rezaWarmed = SPR.iransoldier;
   SPR.rostam = SPR.civilianM;
