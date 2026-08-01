@@ -125,9 +125,13 @@ const Game = (() => {
     G.locked = document.pointerLockElement === canvas;
     if (!G.locked) G.combat = false;
     document.body.classList.toggle('adventure', !G.combat);
-    modeEl.textContent = G.combat
-      ? 'COMBAT MODE — TAB or F to holster · right-click to LOOK'
-      : 'HOLSTERED — click to USE/TAKE, right-click to LOOK · [ ] cycle kit, ENTER select · TAB or F to draw';
+    if (!G.locked) {
+      modeEl.textContent = 'CURSOR FREE — click the game to resume';
+    } else {
+      modeEl.textContent = G.combat
+        ? 'COMBAT MODE — TAB or F to holster · right-click to LOOK'
+        : 'HOLSTERED — click to USE/TAKE, right-click to LOOK · Q/E or [ ] cycle kit, ENTER/R select · TAB or F to draw';
+    }
   }
   document.addEventListener('pointerlockchange', syncMode);
   document.addEventListener('pointerlockerror', syncMode);
@@ -200,9 +204,11 @@ const Game = (() => {
       if (e.code === 'Tab' || e.code === 'KeyF') { e.preventDefault(); if (!e.repeat) toggleMode(); }   // faster than right-click for switching combat <-> adventure
       if (e.code === 'Digit0' && !e.repeat) { e.preventDefault(); switchWeapon('fists'); }                 // 0: fists — bare-handed melee, same slot mechanics as any gun
       if ((e.code === 'ControlLeft' || e.code === 'ControlRight') && G.combat) { ctrlDown = true; if (!e.repeat) shoot(); }
-      if (e.code === 'BracketLeft' && !e.repeat) { e.preventDefault(); Adventure.cycleInv(-1); }            // [ / ] cycle the field kit, ENTER selects/deselects for USE
-      if (e.code === 'BracketRight' && !e.repeat) { e.preventDefault(); Adventure.cycleInv(1); }
-      if (e.code === 'Enter' && !e.repeat) { e.preventDefault(); Adventure.confirmInv(); }
+      // [ / ] cycle the field kit (ENTER selects/deselects for USE); Q/E mirror
+      // them on the left hand so the mouse never has to leave aiming for it
+      if ((e.code === 'BracketLeft' || e.code === 'KeyQ') && !e.repeat) { e.preventDefault(); Adventure.cycleInv(-1); }
+      if ((e.code === 'BracketRight' || e.code === 'KeyE') && !e.repeat) { e.preventDefault(); Adventure.cycleInv(1); }
+      if ((e.code === 'Enter' || e.code === 'KeyR') && !e.repeat) { e.preventDefault(); Adventure.confirmInv(); }   // R mirrors ENTER — left hand can do Q/E/R without leaving WASD
       if (e.key && e.key.length === 1 && /[a-zA-Z]/.test(e.key) && !e.repeat) {
         cheatBuf = (cheatBuf + e.key.toUpperCase()).slice(-3);
         if (CHEATS[cheatBuf]) { CHEATS[cheatBuf](); cheatBuf = ''; }
