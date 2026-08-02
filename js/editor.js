@@ -2153,12 +2153,13 @@ const Editor = (() => {
     return a / 2;
   }
   // AREA-WEIGHTED polygon centroid (shoelace-based) — NOT a plain average of the
-  // vertices. A simple vertex average is wildly sensitive to a single outlier:
-  // drag one corner of an otherwise-stable room far enough and the average alone
-  // can cross into a neighbouring sector, which used to make rebuildParents()
-  // silently reparent the WHOLE room (every wall turns portal-red, buildGraph
-  // synthesizes a bogus nested boundary) from one accidental drag. The
-  // area-weighted centroid stays anchored near the polygon's actual bulk.
+  // vertices, which is wildly sensitive to a single outlier vertex. Still not
+  // safe for the nesting test below, though: even the area-weighted point can
+  // fall outside an elongated/L-shaped/concave room (or worse, inside a
+  // NEIGHBORING sector) after a drag distorts the shape — see interiorPoint(),
+  // which is what rebuildParents()/closeSector() actually use for that check.
+  // This one's still used for display-only placement (e.g. the preview
+  // camera's starting position).
   function centroid(loop) {
     const a = polyArea(loop);
     if (Math.abs(a) < 1e-6) {                          // degenerate (near-zero-area) loop — fall back to a plain average
@@ -2174,6 +2175,40 @@ const Editor = (() => {
       cy += (p.y + q.y) * cross;
     }
     return { x: cx / (6 * a), y: cy / (6 * a) };
+  }
+  function pointInTriangle(px, py, ax, ay, bx, by, cx, cy) {
+    const d1 = (px - bx) * (ay - by) - (ax - bx) * (py - by);
+    const d2 = (px - cx) * (by - cy) - (bx - cx) * (py - cy);
+    const d3 = (px - ax) * (cy - ay) - (cx - ax) * (py - ay);
+    const hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+    const hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+    return !(hasNeg && hasPos);
+  }
+  // A point GUARANTEED to lie strictly inside a simple polygon — unlike the
+  // area-weighted centroid (which is fine for display purposes but can still
+  // land outside an elongated/L-shaped/concave room, or worse, inside a
+  // NEIGHBORING sector, right after a vertex drag distorts the shape). Finds
+  // an "ear" — three consecutive vertices whose triangle contains no other
+  // vertex of the loop — and returns that triangle's centroid, which is
+  // always interior for any simple polygon. Falls back to the plain centroid
+  // for a degenerate/self-intersecting loop where no ear exists.
+  function interiorPoint(loop) {
+    const n = loop.length;
+    if (n < 3) return centroid(loop);
+    const ccw = polyArea(loop) > 0;
+    for (let i = 0; i < n; i++) {
+      const a = geo.verts[loop[(i - 1 + n) % n]], b = geo.verts[loop[i]], c = geo.verts[loop[(i + 1) % n]];
+      const cross = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+      if (ccw ? cross <= 0 : cross >= 0) continue;   // reflex corner — not an ear candidate
+      let earFree = true;
+      for (let k = 0; k < n; k++) {
+        if (k === (i - 1 + n) % n || k === i || k === (i + 1) % n) continue;
+        const p = geo.verts[loop[k]];
+        if (pointInTriangle(p.x, p.y, a.x, a.y, b.x, b.y, c.x, c.y)) { earFree = false; break; }
+      }
+      if (earFree) return { x: (a.x + b.x + c.x) / 3, y: (a.y + b.y + c.y) / 3 };
+    }
+    return centroid(loop);
   }
   function pointInLoop(px, py, loop) {
     let inside = false;
@@ -2215,7 +2250,7 @@ const Editor = (() => {
     const loop = draft.slice();
     if (polyArea(loop) < 0) loop.reverse();                    // normalise to CCW
     const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, skyTex: null, win: false, hostile: false, texScale: 1, wallDoor: null, wallBlock: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false, missionLink: null };
-    const c = centroid(loop);
+    const c = interiorPoint(loop);
     for (let s = 0; s < geo.sectors.length; s++)
       if (pointInLoop(c.x, c.y, geo.sectors[s].loop)) { sec.parent = s; break; }  // nested → sub-sector
     // Build-engine convention: a shape drawn INSIDE another sector starts as a
@@ -2363,7 +2398,7 @@ const Editor = (() => {
     geo.sectors.forEach((sec, s) => {
       sec.parent = -1;
       if (hasChildren.has(s)) return;
-      const c = centroid(sec.loop);
+      const c = interiorPoint(sec.loop);
       for (let p = 0; p < geo.sectors.length; p++) {
         if (p === s || !pointInLoop(c.x, c.y, geo.sectors[p].loop)) continue;
         if (sec.parent < 0 || Math.abs(polyArea(geo.sectors[p].loop)) < Math.abs(polyArea(geo.sectors[sec.parent].loop))) sec.parent = p;
