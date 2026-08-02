@@ -705,6 +705,32 @@ const Game = (() => {
     catch (e) { console.warn('Could not hand the level to the editor:', e); }
   });
 
+  // ------------------------------------------------------------ fullscreen --
+  // Fullscreens #game (not <html>) so the overlay/HUD/mode line — everything
+  // already nested inside it — come along; #game's own width: min(92vw,
+  // 1400px, 150vh) formula then just resolves against the bigger viewport,
+  // no separate scaling logic needed. Safari (incl. iOS-adjacent desktop
+  // builds) still wants the -webkit- prefixed calls.
+  const gameEl = document.getElementById('game');
+  const fsBtn = document.getElementById('fullscreenbtn');
+  function isFullscreen() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function toggleFullscreen() {
+    if (!isFullscreen()) {
+      const req = gameEl.requestFullscreen || gameEl.webkitRequestFullscreen;
+      if (req) { const p = req.call(gameEl); if (p && p.catch) p.catch(() => {}); }
+    } else {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) exit.call(document);
+    }
+  }
+  function syncFullscreenBtn() { fsBtn.textContent = isFullscreen() ? '⛶ EXIT FULLSCREEN' : '⛶ FULLSCREEN'; }
+  fsBtn.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', syncFullscreenBtn);
+  document.addEventListener('webkitfullscreenchange', syncFullscreenBtn);
+  document.addEventListener('keydown', e => {
+    if (e.code === 'KeyV' && !e.repeat && !e.target.matches('input, textarea')) toggleFullscreen();
+  });
+
   if (World.isEpisode) {
     const tag = document.getElementById('episodetag');
     tag.textContent = '▶ MISSION ' + World.episodeSlot + ' OF ' + World.episodeTotal + ' ◀';

@@ -43,6 +43,17 @@ body {
 }
 
 #game { width: min(92vw, 1400px, 150vh); }
+/* Fullscreen just makes #game the top-layer element — its own width formula
+   (above) still applies against the now much bigger vw/vh, but nothing
+   centers it inside the black backdrop without this */
+#game:fullscreen, #game:-webkit-full-screen {
+  width: min(92vw, 1400px, 150vh);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #000;
+}
 
 #viewwrap {
   position: relative;
@@ -254,3 +265,8 @@ body.adventure #modeline { color: #b09048; }
   color: var(--gold); text-decoration: none; font-size: 11px; letter-spacing: 1px;
 }
 #editlink:hover { color: var(--gold-bright); border-color: var(--brass); }
+
+#fullscreenbtn {
+  position: fixed; left: 16px; bottom: 14px; z-index: 20;
+  font-size: 11px; letter-spacing: 1px; padding: 5px 12px;
+}
