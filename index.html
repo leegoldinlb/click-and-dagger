@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>CLICK &amp; DAGGER</title>
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 <div id="game">
@@ -17,6 +17,27 @@
       <button id="startbtn">[ BEGIN MISSION ]</button>
       <a id="editorlink" href="editor.html">LAIR ARCHITECT &mdash; BUILD YOUR OWN MISSION</a>
       <p id="enginecredit">Built on the DUMM engine</p>
+    </div>
+    <!-- Touch controls: shown only on coarse-pointer devices (see body.touch in
+         style.css / the isTouch check in main.js). Every button below just
+         calls the exact same function the matching keyboard/mouse input
+         already calls — no separate mobile game logic. -->
+    <div id="touchlook"></div>
+    <div id="touchdpad">
+      <button id="tdUp" class="tdbtn tdup" aria-label="Move forward">&#9650;</button>
+      <button id="tdDown" class="tdbtn tddown" aria-label="Move back">&#9660;</button>
+      <button id="tdLeft" class="tdbtn tdleft" aria-label="Strafe left">&#9664;</button>
+      <button id="tdRight" class="tdbtn tdright" aria-label="Strafe right">&#9654;</button>
+    </div>
+    <div id="touchkit">
+      <button id="tKitPrev" aria-label="Previous kit item">&#9664;</button>
+      <button id="tKitOk" aria-label="Select kit item">&#10003;</button>
+      <button id="tKitNext" aria-label="Next kit item">&#9654;</button>
+    </div>
+    <div id="touchactions">
+      <button id="tLook" aria-label="Look">LOOK</button>
+      <button id="tMode" aria-label="Draw or holster">DRAW</button>
+      <button id="tFire" aria-label="Fire or interact">&#9679;</button>
     </div>
   </div>
   <div id="hud">
@@ -40,6 +61,6 @@
 <script src="js/world.js?v=134"></script>
 <script src="js/engine.js?v=68"></script>
 <script src="js/adventure.js?v=42"></script>
-<script src="js/main.js?v=56"></script>
+<script src="js/main.js?v=57"></script>
 </body>
 </html>

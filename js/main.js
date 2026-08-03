@@ -96,6 +96,7 @@ const Game = (() => {
   const coverEl = document.getElementById('cover');
   const weaponEl = document.getElementById('weapon');
   const drawgunEl = document.getElementById('drawgun');
+  const tModeEl = document.getElementById('tMode');
   const modeEl = document.getElementById('modeline');
   const overlay = document.getElementById('overlay');
   // Warping in via a hub gate, an episode's "next mission", or "back to the
@@ -104,6 +105,16 @@ const Game = (() => {
   // before first paint, so there's no flash of it either.
   const autoStart = new URLSearchParams(location.search).get('auto') === '1';
   if (autoStart) overlay.classList.add('hidden');
+
+  // Touch devices get an on-screen control layer instead of mouse+keyboard —
+  // see the #touchlook/#touchdpad/#touchkit/#touchactions wiring near the
+  // bottom of this file. Every one of those controls calls the exact same
+  // function a keyboard/mouse action already calls; nothing here is a
+  // separate mobile code path for game logic, just a different input source.
+  // ?touch=1 forces the touch layer on a mouse-driven browser — handy for
+  // testing the control layout without a real touch device.
+  const isTouch = matchMedia('(pointer: coarse)').matches || new URLSearchParams(location.search).get('touch') === '1';
+  if (isTouch) document.body.classList.add('touch');
 
   function switchWeapon(kind) {
     if (!G.owned[kind]) { Adventure.msg('You don’t have that yet.', 1.5); return; }
@@ -124,12 +135,16 @@ const Game = (() => {
   // cursor, it just switches what a left-click on the crosshair's target does
   // (shoot vs. LOOK/USE/TAKE). Losing the lock (e.g. the browser's own Esc)
   // always falls back to holstered; the canvas re-requests it on next click.
+  // Touch has no Pointer Lock API worth relying on (spotty/absent on mobile
+  // Safari, and there's no mouse cursor to hide anyway) — "locked" is just a
+  // flag we set directly and leave true for the whole mission.
   function requestLock() {
+    if (isTouch) { G.locked = true; syncMode(); return; }
     const p = canvas.requestPointerLock && canvas.requestPointerLock();
     if (p && p.catch) p.catch(() => {});
   }
   function syncMode() {
-    G.locked = document.pointerLockElement === canvas;
+    if (!isTouch) G.locked = document.pointerLockElement === canvas;
     if (!G.locked) G.combat = false;
     document.body.classList.toggle('adventure', !G.combat);
     if (!G.locked) {
@@ -248,6 +263,68 @@ const Game = (() => {
     else Adventure.clickAt(Engine.W / 2, Engine.H / 2);   // crosshair-center hit test — LOOK/TAKE/USE, context-sensitive
   });
   window.addEventListener('mouseup', () => { mouseDown = false; });
+
+  // ---------------------------------------------------------------- touch --
+  // Pointer Events unify mouse/touch/pen in one listener, which also means
+  // this is exercisable with a plain mouse in a desktop browser for testing —
+  // every handler below just calls the exact same function its keyboard/mouse
+  // equivalent calls (shoot/clickAt/toggleMode/cycleInv/confirmInv), so there
+  // is no separate mobile game-logic path, only a different input source.
+  if (isTouch) {
+    const touchLookEl = document.getElementById('touchlook');
+    let lookPid = -1, lookX = 0, lookY = 0;
+    touchLookEl.addEventListener('pointerdown', e => {
+      if (!G.started || G.over) { requestLock(); return; }
+      lookPid = e.pointerId; lookX = e.clientX; lookY = e.clientY;
+      touchLookEl.setPointerCapture(e.pointerId);
+    });
+    touchLookEl.addEventListener('pointermove', e => {
+      if (e.pointerId !== lookPid || !G.locked) return;
+      const dx = e.clientX - lookX, dy = e.clientY - lookY;
+      lookX = e.clientX; lookY = e.clientY;
+      G.player.a += dx * 0.006;
+      G.player.pitch = Math.max(-70, Math.min(70, G.player.pitch - dy * 0.6));
+    });
+    const endLook = e => { if (e.pointerId === lookPid) lookPid = -1; };
+    touchLookEl.addEventListener('pointerup', endLook);
+    touchLookEl.addEventListener('pointercancel', endLook);
+
+    // d-pad: hold-to-move, reusing the exact same `keys` state update()
+    // already reads for WASD — releasing (pointerup/cancel/leave, so a finger
+    // sliding off the button doesn't leave it stuck "held") clears it again.
+    const dpadKey = { tdUp: 'KeyW', tdDown: 'KeyS', tdLeft: 'KeyA', tdRight: 'KeyD' };
+    for (const id in dpadKey) {
+      const el = document.getElementById(id), code = dpadKey[id];
+      el.addEventListener('pointerdown', e => { e.preventDefault(); keys[code] = true; el.setPointerCapture(e.pointerId); });
+      const release = () => { keys[code] = false; };
+      el.addEventListener('pointerup', release);
+      el.addEventListener('pointercancel', release);
+      el.addEventListener('pointerleave', release);
+    }
+
+    document.getElementById('tKitPrev').addEventListener('pointerdown', e => { e.preventDefault(); Adventure.cycleInv(-1); });
+    document.getElementById('tKitNext').addEventListener('pointerdown', e => { e.preventDefault(); Adventure.cycleInv(1); });
+    document.getElementById('tKitOk').addEventListener('pointerdown', e => { e.preventDefault(); Adventure.confirmInv(); });
+
+    document.getElementById('tMode').addEventListener('pointerdown', e => { e.preventDefault(); toggleMode(); });
+    document.getElementById('tLook').addEventListener('pointerdown', e => {
+      e.preventDefault();
+      if (!G.started || G.over || !G.locked) return;
+      Adventure.lookAt(Engine.W / 2, Engine.H / 2);
+    });
+    const fireEl = document.getElementById('tFire');
+    fireEl.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      if (!G.started || G.over) return;
+      if (!G.locked) { requestLock(); return; }
+      if (G.combat) { mouseDown = true; shoot(); }
+      else Adventure.clickAt(Engine.W / 2, Engine.H / 2);
+    });
+    const fireRelease = () => { mouseDown = false; };
+    fireEl.addEventListener('pointerup', fireRelease);
+    fireEl.addEventListener('pointercancel', fireRelease);
+    fireEl.addEventListener('pointerleave', fireRelease);
+  }
 
   // --------------------------------------------------------------- combat --
   // shared by every shoot() outcome (gun or fists): apply [lo,hi] damage to an
@@ -558,6 +635,7 @@ const Game = (() => {
     ammoEl.textContent = WEAPONS[G.weapon].melee ? '—' : G.ammo[G.weapon];
     weaponEl.textContent = WEAPONS[G.weapon].name;
     drawgunEl.textContent = '✦ DRAW ' + WEAPONS[G.weapon].name;
+    tModeEl.textContent = G.combat ? 'HOLSTER' : 'DRAW';
     coverEl.textContent = G.blown ? 'BLOWN' : 'UNDERCOVER';
     coverEl.classList.toggle('low', G.blown);
 

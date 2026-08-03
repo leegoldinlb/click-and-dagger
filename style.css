@@ -85,6 +85,57 @@ body {
 
 /* the reticule (combat and holstered alike) is drawn on the canvas — see Engine.paintReticule */
 
+/* ---------- touch controls (coarse-pointer devices only, see the isTouch
+   check in main.js which adds body.touch) — every button here just calls the
+   exact same function the matching keyboard/mouse input already calls ---------- */
+#touchlook, #touchdpad, #touchkit, #touchactions { display: none; }
+body.touch #touchlook, body.touch #touchdpad, body.touch #touchkit, body.touch #touchactions { display: block; }
+
+#touchlook {
+  position: absolute; inset: 0;
+  touch-action: none;
+  z-index: 4;
+}
+
+.tdbtn, #touchkit button, #touchactions button {
+  position: absolute;
+  touch-action: none;
+  background: rgba(74,58,32,0.55);
+  border: 2px solid var(--brass);
+  color: var(--gold-bright);
+  border-radius: var(--radius, 8px);
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 6;
+}
+.tdbtn:active, #touchkit button:active, #touchactions button:active { background: rgba(154,122,58,0.6); }
+
+#touchdpad { position: absolute; left: 14px; bottom: 14px; width: 150px; height: 150px; z-index: 5; }
+.tdbtn { width: 46px; height: 46px; }
+.tdup    { left: 52px; top: 0; }
+.tddown  { left: 52px; bottom: 0; }
+.tdleft  { left: 0; top: 52px; }
+.tdright { right: 0; top: 52px; }
+
+#touchkit {
+  position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
+  width: 150px; height: 40px; z-index: 5;
+}
+#touchkit button { width: 40px; height: 40px; font-size: 15px; top: 0; }
+#tKitPrev { left: 0; }
+#tKitOk   { left: 55px; }
+#tKitNext { right: 0; }
+
+#touchactions { position: absolute; right: 14px; bottom: 14px; width: 150px; height: 150px; z-index: 5; }
+#tFire { width: 72px; height: 72px; right: 0; bottom: 0; font-size: 30px; border-radius: 50%; color: var(--red-bright); border-color: var(--red); }
+#tMode { width: 66px; height: 36px; right: 0; bottom: 82px; font-size: 12px; letter-spacing: 1px; }
+#tLook { width: 66px; height: 36px; right: 76px; bottom: 82px; font-size: 12px; letter-spacing: 1px; }
+
+/* the touch layout needs the whole controls strip out of the way — HUD/mode
+   line shrink down and the corner links move up so thumbs don't cover them */
+body.touch #hud { font-size: 12px; }
+body.touch #editlink, body.touch #fullscreenbtn { bottom: 170px; }
+
 #message {
   position: absolute;
   left: 0; right: 0;
