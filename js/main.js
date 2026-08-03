@@ -265,6 +265,13 @@ const Game = (() => {
   // equivalent calls (shoot/clickAt/toggleMode/cycleInv/confirmInv), so there
   // is no separate mobile game-logic path, only a different input source.
   if (isTouch) {
+    // Belt-and-suspenders on top of the CSS touch-action/overscroll-behavior
+    // lockdown (style.css) — some mobile browsers still sneak in a bounce or
+    // pinch-zoom from a raw touchmove/gesturestart if nothing calls
+    // preventDefault on it directly.
+    document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+    document.addEventListener('gesturestart', e => e.preventDefault());
+
     const touchLookEl = document.getElementById('touchlook');
     let lookPid = -1, lookX = 0, lookY = 0;
     touchLookEl.addEventListener('pointerdown', e => {

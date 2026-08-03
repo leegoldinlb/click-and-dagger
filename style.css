@@ -20,6 +20,16 @@
   --green-bright: #8fe88f;
 }
 
+/* Locks the page in place on mobile — no scroll, no bounce/rubber-band, no
+   pinch-zoom, no pull-to-refresh. Without this, iOS/Android treat the game
+   as a tall scrollable page and every drag-to-look or d-pad touch doubles as
+   a page gesture, so the canvas visibly slides/bounces under your thumb. */
+html {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
 body {
   background:
     radial-gradient(ellipse at 50% 20%, #2a2013 0%, #140e08 60%, #0a0704 100%);
@@ -28,7 +38,12 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
 }
