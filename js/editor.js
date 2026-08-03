@@ -467,6 +467,7 @@ const Editor = (() => {
       loop: s.loop.slice(), floor: s.floor || 0, ceil: s.ceil == null ? 1 : s.ceil,
       floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, skyTex: s.skyTex || null, win: !!s.win, hostile: !!s.hostile,
       texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : null,
+      wallDoorSkin: s.wallDoorSkin ? s.wallDoorSkin.slice() : null,
       wallBlock: s.wallBlock ? s.wallBlock.slice() : null,
       wallTex: s.wallTex ? s.wallTex.slice() : null,
       wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : null, parent: s.parent == null ? -1 : s.parent,
@@ -516,6 +517,7 @@ const Editor = (() => {
         verts: geo.verts.map(v => ({ x: v.x, y: v.y })),
         sectors: geo.sectors.map(s => ({ loop: s.loop.slice(), floor: s.floor, ceil: s.ceil, floorTex: s.floorTex, ceilTex: s.ceilTex, sky: !!s.sky, skyTex: s.skyTex || undefined, win: !!s.win, hostile: !!s.hostile, texScale: s.texScale || 1,
           wallDoor: (s.wallDoor && s.wallDoor.some(Boolean)) ? s.wallDoor.slice() : undefined,
+          wallDoorSkin: (s.wallDoorSkin && s.wallDoorSkin.some(Boolean)) ? s.wallDoorSkin.slice() : undefined,
           wallBlock: (s.wallBlock && s.wallBlock.some(Boolean)) ? s.wallBlock.slice() : undefined,
           wallTex: (s.wallTex && s.wallTex.some(Boolean)) ? s.wallTex.slice() : undefined,
           wallTexScale: (s.wallTexScale && s.wallTexScale.some(v => v && v !== 1)) ? s.wallTexScale.slice() : undefined,
@@ -1773,6 +1775,23 @@ const Editor = (() => {
     portalGraph = Engine.buildGraph(geo);                     // re-derive wall.door + siblings
     status('WALL ' + (hit.i + 1) + (hit.portal ? ' (portal)' : ' (solid)') + ' → ' + (next ? next.toUpperCase() : 'PLAIN'));
   }
+  // SHIFT+F on a keycard/stdkey wall cycles which shipped door PNG it renders
+  // as (World.DOOR_SKINS) instead of the flat procedural card-reader/keyhole
+  // graphic — null (first stop) means "use the plain graphic". Only meaningful
+  // on those two lock types; other door tags (radio/blast/mainframe/poster)
+  // keep their own thematic look and this is a no-op there.
+  function geoDoorSkin() {
+    const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
+    const sec = geo.sectors[hit.s];
+    const kind = sec.wallDoor && sec.wallDoor[hit.i];
+    if (kind !== 'keycard' && kind !== 'stdkey') { status('ONLY KEYCARD/LOCKED DOORS HAVE A SKIN — F TO MAKE ONE FIRST.'); return; }
+    if (!sec.wallDoorSkin) sec.wallDoorSkin = new Array(sec.loop.length).fill(null);
+    const skins = [null, ...World.DOOR_SKINS];
+    const next = skins[(skins.indexOf(sec.wallDoorSkin[hit.i] || null) + 1) % skins.length];
+    sec.wallDoorSkin[hit.i] = next;
+    portalGraph = Engine.buildGraph(geo);                     // re-derive wall.doorSkin + siblings
+    status('WALL ' + (hit.i + 1) + ' DOOR SKIN → ' + (next ? World.DOOR_SKIN_NAMES[next] : 'PLAIN (' + kind.toUpperCase() + ')'));
+  }
   function geoBlockWall() {                                   // toggle an "invisible wall" on the looked-at wall —
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }   // it still renders as a fully open
     const sec = geo.sectors[hit.s];                                              // portal (a forced-perspective vista
@@ -1944,15 +1963,19 @@ const Editor = (() => {
         const wallHit = t.hit, sec = geo.sectors[wallHit.s];
         const wscale = (sec.wallTexScale && sec.wallTexScale[wallHit.i]) || 1;
         const wdoor = sec.wallDoor && sec.wallDoor[wallHit.i];
+        const wdoorSkin = sec.wallDoorSkin && sec.wallDoorSkin[wallHit.i];
         const wdecal = sec.wallDecal && sec.wallDecal[wallHit.i];
         const wblock = sec.wallBlock && sec.wallBlock[wallHit.i];
         const step = wallStepInfo(wallHit);
+        const isLockedDoor = wdoor === 'keycard' || wdoor === 'stdkey';
         let label, hint;
         if (t.kind === 'soffit') { label = 'SOFFIT ' + String((sec.wallStepTex && sec.wallStepTex[wallHit.i]) || 'vent').toUpperCase(); hint = '[ ] soffit tex' + (step.down ? ' · Shift = riser' : ''); }
         else if (t.kind === 'riser') { label = 'RISER ' + String((sec.wallStepFloorTex && sec.wallStepFloorTex[wallHit.i]) || 'metal').toUpperCase(); hint = '[ ] riser tex' + (step.up ? ' · Shift = soffit' : ''); }
-        else { label = String((sec.wallTex && sec.wallTex[wallHit.i]) || 'brick').toUpperCase(); hint = 'T tile · F door · P decal · I invisible wall'; }
+        else { label = String((sec.wallTex && sec.wallTex[wallHit.i]) || 'brick').toUpperCase(); hint = 'T tile · F door' + (isLockedDoor ? ' · SHIFT+F door skin' : '') + ' · P decal · I invisible wall'; }
         el.textContent = '■ WALL ' + (wallHit.i + 1) + (wallHit.portal ? ' (portal)' : ' (solid)') +
-          '   ' + label + (wscale !== 1 ? ' ×' + wscale : '') + (wdoor ? ' · ' + wdoor.toUpperCase() : '') + (wdecal ? ' · ' + wdecal.toUpperCase() + ' DECAL' : '') + (wblock ? ' · INVISIBLE WALL' : '') +
+          '   ' + label + (wscale !== 1 ? ' ×' + wscale : '') + (wdoor ? ' · ' + wdoor.toUpperCase() : '') +
+          (wdoorSkin ? ' (' + World.DOOR_SKIN_NAMES[wdoorSkin] + ')' : '') +
+          (wdecal ? ' · ' + wdecal.toUpperCase() + ' DECAL' : '') + (wblock ? ' · INVISIBLE WALL' : '') +
           (previewCompiled ? '' : '   ' + hint);
         el.style.display = 'block';
         Engine.setHighlight({ sec: wallHit.s, edge: wallHit.i });
@@ -2070,7 +2093,7 @@ const Editor = (() => {
       if (e.code === 'KeyG') { if (!e.repeat) pushUndo(); geoWin(); e.preventDefault(); return; }
       if (e.code === 'KeyN') { if (!e.repeat) pushUndo(); geoHostile(); e.preventDefault(); return; }
       if (e.code === 'KeyL') { if (!e.repeat) pushUndo(); geoMissionLink(); e.preventDefault(); return; }
-      if (e.code === 'KeyF') { if (!e.repeat) pushUndo(); geoDoor(); e.preventDefault(); return; }
+      if (e.code === 'KeyF') { if (!e.repeat) pushUndo(); if (sh) geoDoorSkin(); else geoDoor(); e.preventDefault(); return; }
       if (e.code === 'KeyH') { if (!e.repeat) pushUndo(); geoToggleSolid(); e.preventDefault(); return; }
       if (e.code === 'KeyP') { if (!e.repeat) pushUndo(); geoWallDecal(); e.preventDefault(); return; }   // mount/cycle a sprite on the wall, poster-style
       if (e.code === 'KeyI') { if (!e.repeat) pushUndo(); geoBlockWall(); e.preventDefault(); return; }   // toggle invisible wall (open portal, blocked movement)
@@ -2249,7 +2272,7 @@ const Editor = (() => {
   function closeSector() {
     const loop = draft.slice();
     if (polyArea(loop) < 0) loop.reverse();                    // normalise to CCW
-    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, skyTex: null, win: false, hostile: false, texScale: 1, wallDoor: null, wallBlock: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false, missionLink: null };
+    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, skyTex: null, win: false, hostile: false, texScale: 1, wallDoor: null, wallDoorSkin: null, wallBlock: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false, missionLink: null };
     const c = interiorPoint(loop);
     for (let s = 0; s < geo.sectors.length; s++)
       if (pointInLoop(c.x, c.y, geo.sectors[s].loop)) { sec.parent = s; break; }  // nested → sub-sector

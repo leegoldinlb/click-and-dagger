@@ -10339,6 +10339,45 @@ const World = (() => {
     img.src = path;
   }
 
+  // Locked-door wall skins: the same shipped door PNGs used above as
+  // decorative walk-through props are ALSO loaded here as real WALL textures,
+  // so a keycard/stdkey door can look like any of them instead of the flat
+  // procedural card-reader/keyhole graphic. Chosen per-wall via
+  // sec.wallDoorSkin in the editor (Shift+F on a locked-door wall) — see
+  // Engine.buildGraph's wall.doorSkin and the render lookup in engine.js.
+  // Stretched (not "cover"-cropped like fitCanvas) into the square tile so
+  // the whole door stays visible rather than losing its top/bottom.
+  const DOOR_SKINS = ['doorred', 'doorelevatorplain', 'doortehranarch', 'doorbluepaneled', 'doornavyornate',
+    'doorbrowntransom1', 'doornavyarched', 'doorblackplain', 'doorsaloon', 'doorbankelevator', 'doorhavanashutter',
+    'doorbrowntransom2', 'doorbrowntransom3', 'doorbrowntransom4', 'doormoscoweagle', 'doorsecuritygray',
+    'doorlondon10', 'doordiamondglass'];
+  const DOOR_SKIN_NAMES = {
+    doorred: 'RED PANELED DOOR', doorelevatorplain: 'ELEVATOR DOOR', doortehranarch: 'TILED ARCHWAY DOOR',
+    doorbluepaneled: 'BLUE PANELED DOOR', doornavyornate: 'NAVY ORNATE DOOR', doorbrowntransom1: 'BROWNSTONE DOOR (1)',
+    doornavyarched: 'NAVY ARCHED DOOR', doorblackplain: 'BLACK PANELED DOOR', doorsaloon: 'SALOON DOORS',
+    doorbankelevator: 'BANK ELEVATOR DOOR', doorhavanashutter: 'WEATHERED SHUTTER DOOR',
+    doorbrowntransom2: 'BROWNSTONE DOOR (2)', doorbrowntransom3: 'BROWNSTONE DOOR (3)', doorbrowntransom4: 'BROWNSTONE DOOR (4)',
+    doormoscoweagle: 'STONE EAGLE ENTRY DOOR', doorsecuritygray: 'GRAY SECURITY DOOR', doorlondon10: 'LONDON NO. 10 DOOR',
+    doordiamondglass: 'DIAMOND-GLASS DOOR',
+  };
+  function fitCanvasStretch(img, w, h) {                   // exact w×h, no crop — cropping a door would chop its top/bottom off
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d');
+    g.imageSmoothingEnabled = true;
+    g.drawImage(img, 0, 0, w, h);
+    return c;
+  }
+  for (const name of DOOR_SKINS) {
+    const path = ART_ASSETS[name];
+    if (!path) continue;
+    const img = new Image();
+    img.onload = () => {
+      if (isTainted(img)) return;
+      try { TX[name] = fitCanvasStretch(img, 64, 64); } catch (e) { console.warn('Failed to build door-skin wall texture:', path, e); }
+    };
+    img.src = path;
+  }
+
   // -------------------------------------------------------------------------
   // Entity factories, keyed by the `kind` stored in level data
   // -------------------------------------------------------------------------
@@ -11146,6 +11185,7 @@ const World = (() => {
     T, CH, SURF, get, set, isSolid, winAt, charAt, surfAt, floorZAt,
     setFloorZ, setCeilZ, setSurfTex, setCeilTex, setFloorSlope, compileGeo, getGeo,
     TEX, SPR, FLOOR, SKY, SKIES, SKYNAMES, TX, TXNAMES, wallTex, wallTexName, WALLTX,
+    DOOR_SKINS, DOOR_SKIN_NAMES,
     ents, removeEnt, setPowered, spawnFx, FX_LIFE, FACT,
     spawn, load, defaultLevel, get isCustom() { return isCustom; }, get geoRev() { return geoRev; },
     get isEpisode() { return episodeSlot > 0; },

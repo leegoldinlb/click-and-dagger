@@ -416,6 +416,7 @@ const Engine = (() => {
         tex: sec.wallTex ? sec.wallTex[i] : null,
         cell: sec.wallCell ? sec.wallCell[i] : null,
         door: sec.wallDoor ? (sec.wallDoor[i] || null) : null,   // door kind (string) or null
+        doorSkin: sec.wallDoorSkin ? (sec.wallDoorSkin[i] || null) : null,   // which shipped door PNG to render as, for keycard/stdkey walls
         // an "invisible wall" — still renders as a fully open portal (forced-perspective
         // vistas need to actually SEE into the neighbour sector) but blocks movement in
         // moveStep same as a closed door, so the player can't walk through the window
@@ -441,6 +442,7 @@ const Engine = (() => {
       const rw = wmap.get(rk); if (rw) w.sibling = rw;                 // shared-edge twin (two-sided doors)
     }));
     sw.forEach(walls => walls.forEach(w => { if (w.door && w.sibling && !w.sibling.door) w.sibling.door = w.door; }));  // a door is two-sided
+    sw.forEach(walls => walls.forEach(w => { if (w.doorSkin && w.sibling && !w.sibling.doorSkin) w.sibling.doorSkin = w.doorSkin; }));
     geo.sectors.forEach((sec, t) => {              // sub-sectors: portal to parent, OR a solid column/pillar
       if (sec.parent >= 0) {
         const p = sec.parent, L = sec.loop, n = L.length;
@@ -580,7 +582,7 @@ const Engine = (() => {
         const wall = w.wall, ad = w.ad, bd = w.bd, x1 = w.x1, x2 = w.x2, span = x2 - x1;
         const wallHL = !!(hl && hl.edge != null && hl.sec === sn && hl.edge === w.wi);   // this exact wall targeted
         const wallTx = wall.tex ? cacheOf(World.TX[wall.tex] || World.TX.brick) : wt;
-        const drawTx = wall.door ? cacheOf(World.TX[wall.door] || World.TX.brick) : wallTx;  // door/interactive wall texture
+        const drawTx = wall.door ? cacheOf(World.TX[wall.doorSkin] || World.TX[wall.door] || World.TX.brick) : wallTx;  // door/interactive wall texture — doorSkin (a shipped door PNG) wins if set
         const decalTx = wall.decal ? cacheOf(World.SPR[wall.decal]) : null;                  // flat-mounted sprite, drawn once (no tiling)
         const wallLen = w.ub - w.ua || 1;                             // normalises the decal to the WHOLE edge, whatever its length
         const wisc = 1 / (wall.texScale || 1);                        // wall tile size (>1 bigger, <1 smaller)
