@@ -99,12 +99,6 @@ const Game = (() => {
   const tModeEl = document.getElementById('tMode');
   const modeEl = document.getElementById('modeline');
   const overlay = document.getElementById('overlay');
-  // Warping in via a hub gate, an episode's "next mission", or "back to the
-  // airport" appends &auto=1 to the URL so the fresh page lands straight in
-  // the level instead of showing the splash screen again — hidden here,
-  // before first paint, so there's no flash of it either.
-  const autoStart = new URLSearchParams(location.search).get('auto') === '1';
-  if (autoStart) overlay.classList.add('hidden');
 
   // Touch devices get an on-screen control layer instead of mouse+keyboard —
   // see the #touchlook/#touchdpad/#touchkit/#touchactions wiring near the
@@ -622,7 +616,7 @@ const Game = (() => {
   function enterGate(city) {
     if (World.hasMission(city)) {
       G.transitioning = true;
-      location.href = 'index.html?mission=' + city + '&auto=1';
+      location.href = 'index.html?mission=' + city;
     } else {
       Adventure.msg(city.toUpperCase() + ' — MISSION COMING SOON.', 3);
     }
@@ -731,7 +725,7 @@ const Game = (() => {
         endOverlay('MISSION COMPLETE', 'win',
           stats + 'London sends its regards. The next assignment is already waiting.',
           '[ NEXT MISSION: ' + next + ' OF ' + World.episodeTotal + ' ▶ ]',
-          () => { location.href = 'index.html?episode=' + next + '&auto=1'; });
+          () => { location.href = 'index.html?episode=' + next; });
       } else {
         endOverlay('EPISODE COMPLETE', 'win',
           stats + 'The last gate closes behind you. London sends its regards — the episode is over.',
@@ -745,7 +739,7 @@ const Game = (() => {
         'The extraction goes clean. Somewhere, the people who sent you exhale.<br><br>' +
         stats + 'London sends its regards.',
         '[ BACK TO THE AIRPORT ]',
-        () => { location.href = 'index.html?mission=hub&auto=1'; });
+        () => { location.href = 'index.html?mission=hub'; });
     } else {
       endOverlay('MISSION COMPLETE', 'win',
         'The extraction goes clean. Somewhere, the people who sent you exhale.<br><br>' +
@@ -829,7 +823,6 @@ const Game = (() => {
 
   syncMode();
   requestAnimationFrame(loop);
-  if (autoStart) beginMission();
 
   // debug: drive one frame deterministically (used to verify logic when the
   // preview tab has rAF paused). Harmless in normal play.
