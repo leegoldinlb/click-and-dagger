@@ -10363,13 +10363,28 @@ const World = (() => {
     doormoscoweagle: 'STONE EAGLE ENTRY DOOR', doorsecuritygray: 'GRAY SECURITY DOOR', doorlondon10: 'LONDON NO. 10 DOOR',
     doordiamondglass: 'DIAMOND-GLASS DOOR',
   };
+  // fitCanvas's "cover" scale only guarantees the SHORT side reaches the
+  // target square exactly — whichever side that isn't still lands flush with
+  // no crop at all, and these door PNGs carry a bit of transparent margin
+  // baked into their own canvas on that side, which then shows through as a
+  // black border. An extra zoom crops in from every side equally, past what
+  // "cover" alone requires, chewing into that margin instead of leaving it.
+  function fitCanvasZoomed(img, w, h, zoom) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d');
+    const s = Math.max(w / img.width, h / img.height) * zoom;
+    const dw = img.width * s, dh = img.height * s;
+    g.imageSmoothingEnabled = true;
+    g.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    return c;
+  }
   for (const name of DOOR_SKINS) {
     const path = ART_ASSETS[name];
     if (!path) continue;
     const img = new Image();
     img.onload = () => {
       if (isTainted(img)) return;
-      try { TX[name] = fitCanvas(img, 64, 64); } catch (e) { console.warn('Failed to build door-skin wall texture:', path, e); }
+      try { TX[name] = fitCanvasZoomed(img, 64, 64, 1.3); } catch (e) { console.warn('Failed to build door-skin wall texture:', path, e); }
     };
     img.src = path;
   }
