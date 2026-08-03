@@ -146,10 +146,11 @@ body.touch #touchlook, body.touch #touchdpad, body.touch #touchkit, body.touch #
 #tMode { width: 66px; height: 36px; right: 0; bottom: 82px; font-size: 12px; letter-spacing: 1px; }
 #tLook { width: 66px; height: 36px; right: 76px; bottom: 82px; font-size: 12px; letter-spacing: 1px; }
 
-/* the touch layout needs the whole controls strip out of the way — HUD/mode
-   line shrink down and the corner links move up so thumbs don't cover them */
-body.touch #hud { font-size: 12px; }
-body.touch #editlink, body.touch #fullscreenbtn { bottom: 170px; }
+/* Screen space is tight on a phone, and none of these do anything useful
+   there: HUD/mode line just crowd the touch controls, EDIT THIS LEVEL opens
+   a mouse-and-keyboard-only tool, and FULLSCREEN is redundant with how
+   mobile browsers already present a "full screen" web app. */
+body.touch #hud, body.touch #modeline, body.touch #editlink, body.touch #fullscreenbtn { display: none; }
 
 #message {
   position: absolute;
