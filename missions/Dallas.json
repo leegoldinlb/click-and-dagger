@@ -70,8 +70,8 @@
   }
  ],
  "blown": false,
- "musicUndercover": "undercover",
- "musicCoverBlown": "coverblown",
+ "musicUndercover": "undercoverdallas",
+ "musicCoverBlown": "coverblowndallas",
  "geo": {
   "verts": [
    {
