@@ -512,8 +512,8 @@
   }
  ],
  "blown": false,
- "musicUndercover": "undercover",
- "musicCoverBlown": "coverblown",
+ "musicUndercover": "undercovercuba",
+ "musicCoverBlown": "coverblowncuba",
  "geo": {
   "verts": [
    {

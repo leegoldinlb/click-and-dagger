@@ -6,7 +6,8 @@
 // panel) — MUSIC_TRACKS is the shared menu of what's available to pick from.
 const MUSIC_TRACKS = {
   undercover: [
-    { key: 'undercover', name: 'HAVANA' },
+    { key: 'undercover', name: 'DEFAULT' },
+    { key: 'undercovercuba', name: 'HAVANA' },
     { key: 'undercoverhk', name: 'HONG KONG' },
     { key: 'undercoverussr', name: 'USSR' },
     { key: 'undercoverny', name: 'NEW YORK' },
@@ -16,8 +17,9 @@ const MUSIC_TRACKS = {
     { key: 'undercoverdallas', name: 'DALLAS' },
   ],
   coverblown: [
-    { key: 'coverblown', name: 'HAVANA' },
-    { key: 'coverblown2', name: 'HAVANA (ALT)' },
+    { key: 'coverblown', name: 'DEFAULT' },
+    { key: 'coverblown2', name: 'DEFAULT (ALT)' },
+    { key: 'coverblowncuba', name: 'HAVANA' },
     { key: 'coverblownny', name: 'NEW YORK' },
     { key: 'coverblownap', name: 'ALPS' },
     { key: 'coverblownme', name: 'MIDDLE EAST' },
