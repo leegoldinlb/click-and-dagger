@@ -10345,8 +10345,11 @@ const World = (() => {
   // procedural card-reader/keyhole graphic. Chosen per-wall via
   // sec.wallDoorSkin in the editor (Shift+F on a locked-door wall) — see
   // Engine.buildGraph's wall.doorSkin and the render lookup in engine.js.
-  // Stretched (not "cover"-cropped like fitCanvas) into the square tile so
-  // the whole door stays visible rather than losing its top/bottom.
+  // Uses fitCanvas's "cover" crop (same as the reskin system above) rather
+  // than a plain stretch — stretching left a visible sliver of the PNG's own
+  // background/transparent margin as a black border wherever its aspect
+  // ratio didn't exactly match the square tile. Cropping a little off the
+  // edges reads better than a border on every single copy of the door.
   const DOOR_SKINS = ['doorred', 'doorelevatorplain', 'doortehranarch', 'doorbluepaneled', 'doornavyornate',
     'doorbrowntransom1', 'doornavyarched', 'doorblackplain', 'doorsaloon', 'doorbankelevator', 'doorhavanashutter',
     'doorbrowntransom2', 'doorbrowntransom3', 'doorbrowntransom4', 'doormoscoweagle', 'doorsecuritygray',
@@ -10360,20 +10363,13 @@ const World = (() => {
     doormoscoweagle: 'STONE EAGLE ENTRY DOOR', doorsecuritygray: 'GRAY SECURITY DOOR', doorlondon10: 'LONDON NO. 10 DOOR',
     doordiamondglass: 'DIAMOND-GLASS DOOR',
   };
-  function fitCanvasStretch(img, w, h) {                   // exact w×h, no crop — cropping a door would chop its top/bottom off
-    const c = document.createElement('canvas'); c.width = w; c.height = h;
-    const g = c.getContext('2d');
-    g.imageSmoothingEnabled = true;
-    g.drawImage(img, 0, 0, w, h);
-    return c;
-  }
   for (const name of DOOR_SKINS) {
     const path = ART_ASSETS[name];
     if (!path) continue;
     const img = new Image();
     img.onload = () => {
       if (isTainted(img)) return;
-      try { TX[name] = fitCanvasStretch(img, 64, 64); } catch (e) { console.warn('Failed to build door-skin wall texture:', path, e); }
+      try { TX[name] = fitCanvas(img, 64, 64); } catch (e) { console.warn('Failed to build door-skin wall texture:', path, e); }
     };
     img.src = path;
   }
