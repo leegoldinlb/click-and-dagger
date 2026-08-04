@@ -95,7 +95,6 @@ const Game = (() => {
   const ammoEl = document.getElementById('ammo');
   const coverEl = document.getElementById('cover');
   const weaponEl = document.getElementById('weapon');
-  const drawgunEl = document.getElementById('drawgun');
   const tModeEl = document.getElementById('tMode');
   const modeEl = document.getElementById('modeline');
   const overlay = document.getElementById('overlay');
@@ -182,8 +181,6 @@ const Game = (() => {
     if (!G.locked) { requestLock(); return; }
     Adventure.lookAt(Engine.W / 2, Engine.H / 2);
   });
-  document.getElementById('drawgun').addEventListener('click', () => { G.combat = true; if (!G.locked) requestLock(); syncMode(); });
-
   // -------------------------------------------------------------- cheats --
   // typed anywhere during a mission, like a classic arcade cheat code — no
   // console, just type the letters and release. Reuses the exact same pickup
@@ -635,7 +632,6 @@ const Game = (() => {
     hpEl.classList.toggle('low', G.player.hp < 30);
     ammoEl.textContent = WEAPONS[G.weapon].melee ? '—' : G.ammo[G.weapon];
     weaponEl.textContent = WEAPONS[G.weapon].name;
-    drawgunEl.textContent = '✦ DRAW ' + WEAPONS[G.weapon].name;
     tModeEl.textContent = G.combat ? 'HOLSTER' : 'DRAW';
     coverEl.textContent = G.blown ? 'BLOWN' : 'UNDERCOVER';
     coverEl.classList.toggle('low', G.blown);

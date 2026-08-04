@@ -218,8 +218,6 @@ body.touch #hud, body.touch #modeline, body.touch #editlink, body.touch #fullscr
 .stat b { color: var(--gold-bright); font-size: 19px; text-shadow: 1px 1px 0 #000; }
 .stat b.low { color: var(--red-bright); }
 
-#verbs { display: flex; gap: 6px; }
-
 button {
   font-family: inherit;
   font-size: 14px;
@@ -235,9 +233,6 @@ button:hover { color: var(--gold-bright); border-color: var(--brass); }
 button:active {
   box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo);
 }
-#drawgun { color: var(--gold-bright); border-color: var(--brass); display: none; }
-body.adventure #drawgun { display: inline-block; }
-
 #inventory {
   display: flex;
   gap: 6px;
