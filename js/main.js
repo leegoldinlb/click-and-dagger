@@ -121,6 +121,18 @@ const Game = (() => {
     G.fireT = 0;
     Adventure.msg(WEAPONS[kind].name + ' READY.', 1.5);
   }
+  // Touch has no 1-5/0 weapon-select keys, so the kit-cycle arrows (repurposed
+  // now that autoEquip picks the right inventory item automatically — see
+  // Adventure.autoEquip — so manual item cycling is rarely needed) step
+  // through owned weapons instead, wrapping and skipping anything not owned.
+  const CYCLE_WEAPONS = [...WEAPON_ORDER, 'fists'];
+  function cycleWeapon(dir) {
+    const owned = CYCLE_WEAPONS.filter(k => G.owned[k]);
+    if (!owned.length) return;
+    const i = owned.indexOf(G.weapon);
+    const next = owned[(i < 0 ? 0 : i + dir + owned.length) % owned.length];
+    switchWeapon(next);
+  }
 
   // ---------------------------------------------------------------- modes --
   // The view stays pointer-locked throughout play, whether the gun is drawn
@@ -300,8 +312,8 @@ const Game = (() => {
       el.addEventListener('pointerleave', release);
     }
 
-    document.getElementById('tKitPrev').addEventListener('pointerdown', e => { e.preventDefault(); Adventure.cycleInv(-1); });
-    document.getElementById('tKitNext').addEventListener('pointerdown', e => { e.preventDefault(); Adventure.cycleInv(1); });
+    document.getElementById('tKitPrev').addEventListener('pointerdown', e => { e.preventDefault(); cycleWeapon(-1); });
+    document.getElementById('tKitNext').addEventListener('pointerdown', e => { e.preventDefault(); cycleWeapon(1); });
     document.getElementById('tKitOk').addEventListener('pointerdown', e => { e.preventDefault(); Adventure.confirmInv(); });
 
     document.getElementById('tMode').addEventListener('pointerdown', e => { e.preventDefault(); toggleMode(); });
