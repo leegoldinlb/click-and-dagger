@@ -95,6 +95,8 @@ body {
 }
 #game:fullscreen #editlink, #game:fullscreen #fullscreenbtn,
 #game:-webkit-full-screen #editlink, #game:-webkit-full-screen #fullscreenbtn { display: none; }
+#game:fullscreen #modeline, #game:-webkit-full-screen #modeline { display: none; }
+#game:fullscreen #viewwrap, #game:-webkit-full-screen #viewwrap { border: none; box-shadow: none; }
 
 #viewwrap {
   position: relative;
