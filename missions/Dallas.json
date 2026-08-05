@@ -53,8 +53,8 @@
   "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
  ],
  "spawn": {
-  "x": 24.5,
-  "y": 24.5,
+  "x": 13.7,
+  "y": 22.04,
   "a": 0
  },
  "ents": [
@@ -77,8 +77,8 @@
   },
   {
    "kind": "maskstand",
-   "x": 26.46,
-   "y": 27.58
+   "x": 24.52,
+   "y": 24.67
   },
   {
    "kind": "nixonmask",
@@ -98,19 +98,14 @@
   },
   {
    "kind": "patsy",
-   "x": 30.89,
-   "y": 15.54,
+   "x": 30.78,
+   "y": 15.53,
    "behavior": "stationary"
   },
   {
-   "kind": "curtainrods",
-   "x": 26.71,
-   "y": 41.83
-  },
-  {
    "kind": "bed",
-   "x": 8.49,
-   "y": 42.6
+   "x": 8.36,
+   "y": 43.13
   },
   {
    "kind": "armchair",
@@ -243,11 +238,65 @@
    "kind": "vintagelamppost",
    "x": 24.59,
    "y": 12.4
+  },
+  {
+   "kind": "package",
+   "x": 10.14,
+   "y": 43.38
+  },
+  {
+   "kind": "vendingmachine",
+   "x": 36.5,
+   "y": 13.43,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0
+  },
+  {
+   "kind": "curtainrods",
+   "x": 30.79,
+   "y": 16.44
+  },
+  {
+   "kind": "nyofficer",
+   "x": 29.25,
+   "y": 17.35
+  },
+  {
+   "kind": "nyofficer",
+   "x": 22.11,
+   "y": 23.53
+  },
+  {
+   "kind": "nyofficer",
+   "x": 13.71,
+   "y": 24.33
+  },
+  {
+   "kind": "vendor",
+   "x": 23.49,
+   "y": 24.67,
+   "behavior": "wander"
+  },
+  {
+   "kind": "medkit",
+   "x": 28.36,
+   "y": 24.56
+  },
+  {
+   "kind": "medkit",
+   "x": 8.95,
+   "y": 13.85
+  },
+  {
+   "kind": "ammo",
+   "x": 10.02,
+   "y": 13.87
   }
  ],
  "blown": false,
- "musicUndercover": "undercover",
- "musicCoverBlown": "coverblown",
+ "musicUndercover": "undercoverdallas",
+ "musicCoverBlown": "coverblowndallas",
  "geo": {
   "verts": [
    {
@@ -512,7 +561,7 @@
    },
    {
     "x": 20,
-    "y": 25
+    "y": 29
    },
    {
     "x": 39,
@@ -520,7 +569,7 @@
    },
    {
     "x": 13,
-    "y": 25
+    "y": 29
    },
    {
     "x": 36.5,
@@ -560,31 +609,31 @@
    },
    {
     "x": 23,
-    "y": 25.5
+    "y": 24.5
+   },
+   {
+    "x": 25,
+    "y": 24.5
+   },
+   {
+    "x": 25.5,
+    "y": 24.5
    },
    {
     "x": 25,
     "y": 25.5
    },
    {
-    "x": 28.5,
-    "y": 27
-   },
-   {
-    "x": 28.5,
-    "y": 31
-   },
-   {
-    "x": 17,
-    "y": 31
-   },
-   {
-    "x": 17,
-    "y": 27
-   },
-   {
-    "x": 18,
+    "x": 23,
     "y": 25.5
+   },
+   {
+    "x": 22.5,
+    "y": 25
+   },
+   {
+    "x": 22.5,
+    "y": 24.5
    },
    {
     "x": 35.5,
@@ -987,7 +1036,7 @@
     "y": 7
    },
    {
-    "x": 13,
+    "x": 8,
     "y": 13
    },
    {
@@ -999,7 +1048,7 @@
     "y": 7
    },
    {
-    "x": 13,
+    "x": 8,
     "y": 15
    },
    {
@@ -1016,11 +1065,11 @@
    },
    {
     "x": 14.5,
-    "y": 25
+    "y": 29
    },
    {
     "x": 18.5,
-    "y": 25
+    "y": 29
    },
    {
     "x": 14.5,
@@ -1044,7 +1093,7 @@
    },
    {
     "x": 21.5,
-    "y": 25
+    "y": 29
    },
    {
     "x": 21.5,
@@ -1069,6 +1118,26 @@
    {
     "x": 33,
     "y": 26
+   },
+   {
+    "x": 25.5,
+    "y": 25
+   },
+   {
+    "x": 13,
+    "y": 3.5
+   },
+   {
+    "x": 37,
+    "y": 3.5
+   },
+   {
+    "x": 11,
+    "y": 1
+   },
+   {
+    "x": 39.5,
+    "y": 1
    }
   ],
   "sectors": [
@@ -1099,6 +1168,24 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallBlock": [
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     true
+    ],
     "wallTex": [
      "brick",
      "depositorywindow",
@@ -1158,7 +1245,7 @@
      null,
      null,
      null,
-     null,
+     "concreteblock",
      null,
      null,
      null,
@@ -1811,6 +1898,18 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallBlock": [
+     false,
+     false,
+     true,
+     false
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     "concreteblock",
+     null
+    ],
     "parent": -1
    },
    {
@@ -1836,6 +1935,20 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallBlock": [
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     true,
+     false
+    ],
     "wallTex": [
      null,
      "brick",
@@ -1845,6 +1958,20 @@
      null,
      "shopfront",
      "shopfront"
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     "concreteblock",
+     null
     ],
     "parent": -1
    },
@@ -2021,6 +2148,7 @@
     "loop": [
      78,
      79,
+     205,
      80,
      81,
      82,
@@ -2035,6 +2163,26 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     null,
+     null,
+     null,
+     "clapboard",
+     null,
+     null,
+     null,
+     null
+    ],
+    "wallTexScale": [
+     1,
+     1,
+     1,
+     0.5,
+     1,
+     1,
+     1,
+     1
+    ],
     "parent": -1
    },
    {
@@ -2307,6 +2455,42 @@
     "floorTex": "carpet",
     "ceilTex": "ceiltile",
     "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     63,
+     206,
+     207,
+     5,
+     8,
+     61
+    ],
+    "floor": 2,
+    "ceil": 8,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     206,
+     208,
+     209,
+     207
+    ],
+    "floor": 0,
+    "ceil": 2,
+    "floorTex": "doorwood",
+    "ceilTex": "ceiltile",
+    "sky": true,
     "win": false,
     "hostile": false,
     "texScale": 1,
