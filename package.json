@@ -1,0 +1,15 @@
+{
+  "name": "click-and-dagger",
+  "version": "1.0.0",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^30",
+    "electron-builder": "^24"
+  }
+}
