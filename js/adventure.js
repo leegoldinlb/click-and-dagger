@@ -150,7 +150,8 @@ const Adventure = (() => {
     goon: ['lettersoftransit', 'phrase'], gunman: ['lettersoftransit', 'phrase'], brute: ['lettersoftransit', 'phrase'],
     sniper: ['lettersoftransit', 'phrase'], blackbelt: ['lettersoftransit', 'phrase'], soviet: ['lettersoftransit', 'phrase'], spy: ['lettersoftransit', 'phrase'],
     flowergirl: ['money'], carlotta: ['rose'], ciphermachine: ['letter'], drz: ['telegram'],
-    bomb: ['screwdriver', 'pliers'], defector: ['watch'], reza: ['brothersphoto'], rostam: ['tehranuniform'],
+    bomb: e => e.casingOpen ? ['pliers', 'screwdriver'] : ['screwdriver', 'pliers'],   // sequential, and neither item is ever removed from the kit
+    defector: ['watch'], reza: ['brothersphoto'], rostam: ['tehranuniform'],
     phonebooth: ['businesscard'], microfichemachine: ['microfiche', 'file'], agent005: ['truth'],
     sportscar: ['keys'], streetartist: ['headshot'], matron: ['portrait'], metroentrance: ['ticket'],
     maskstand: ['nixonmask'], laundrylady: ['laundryticket'], double: ['suit', 'jfkmask'],
@@ -161,7 +162,10 @@ const Adventure = (() => {
   let autoEquipped = false;   // true iff `selected` was set by autoEquip, not a manual inventory click/keypress
   function autoEquip(t) {
     let ids = null;
-    if (t && t.kind === 'ent') ids = TARGET_ITEMS[t.ent.kind] || null;
+    if (t && t.kind === 'ent') {
+      const entry = TARGET_ITEMS[t.ent.kind];
+      ids = typeof entry === 'function' ? entry(t.ent) : (entry || null);
+    }
     else if (t && t.kind === 'wall') {
       if (t.wall && t.wall.door === 'keycard') ids = ['keycard'];
       else if (t.wall && t.wall.door === 'stdkey') ids = ['key'];
