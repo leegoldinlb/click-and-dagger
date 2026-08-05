@@ -10316,9 +10316,12 @@ const World = (() => {
                                                                // 64x64 procedural-canvas size — billboards sample at
                                                                // their own texture size now (see engine.js), so there's
                                                                // no upside to downscaling detailed art to 64x64 first
+  function blankCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
   for (const [name, path] of Object.entries(ART_ASSETS)) {
     if (!SPR[name]) continue;
     const w = ART_RES, h = ART_RES;
+    const placeholder = SPR[name];   // the old procedural/default sprite — kept only for the file:// tainted-canvas fallback below
+    SPR[name] = blankCanvas(w, h);   // invisible until the real shipped art loads, instead of flashing the outdated placeholder
     const img = new Image();
     img.onload = () => {
       // A tainted canvas must NEVER reach SPR — the renderer's own texture
@@ -10327,15 +10330,16 @@ const World = (() => {
       // mid-frame and blanks the whole screen, not just this one character.
       if (isTainted(img)) {
         console.warn('Shipped character art blocked by the browser (canvas tainted — this happens opening index.html via file://; serve it from a local server instead, e.g. `python3 -m http.server`). Keeping the built-in art for:', path);
+        SPR[name] = placeholder;
         return;
       }
       try {
         const fit = WEAPON_SPRITE_NAMES.has(name) ? fitWeapon : fitCharacter;
         SPR[name] = fit(trimTransparent(img), w, h);
         if (FLASH_OF[name]) SPR[FLASH_OF[name]] = whiteOf(SPR[name]);
-      } catch (e) { console.warn('Failed to apply shipped character art:', path, e); }
+      } catch (e) { console.warn('Failed to apply shipped character art:', path, e); SPR[name] = placeholder; }
     };
-    img.onerror = () => console.warn('Failed to load shipped character art (check the path/file exists):', path);
+    img.onerror = () => { console.warn('Failed to load shipped character art (check the path/file exists):', path); SPR[name] = placeholder; };
     img.src = path;
   }
 
@@ -11140,6 +11144,7 @@ const World = (() => {
         loop: s.loop.slice(), floor: s.floor || 0, ceil: s.ceil == null ? 1 : s.ceil,
         floorTex: s.floorTex || 'carpet', ceilTex: s.ceilTex || 'ceiltile', sky: !!s.sky, skyTex: s.skyTex || null, win: !!s.win, hostile: !!s.hostile,
         texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : undefined,
+        wallDoorSkin: s.wallDoorSkin ? s.wallDoorSkin.slice() : undefined,
         wallBlock: s.wallBlock ? s.wallBlock.slice() : undefined,
         wallTex: s.wallTex ? s.wallTex.slice() : undefined,
         wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : undefined,
