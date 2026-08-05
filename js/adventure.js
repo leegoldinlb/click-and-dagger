@@ -77,6 +77,7 @@ const Adventure = (() => {
       b.onclick = () => {
         hlIndex = i;
         selected = selected === it.id ? null : it.id;
+        autoEquipped = false;
         if (selected) msg('Ready to USE the ' + it.name + '. Click a target.');
         renderInv();
       };
@@ -93,7 +94,7 @@ const Adventure = (() => {
   function removeItem(id) {
     const i = inv.findIndex(t => t.id === id);
     if (i >= 0) inv.splice(i, 1);
-    if (selected === id) selected = null;
+    if (selected === id) { selected = null; autoEquipped = false; }
     renderInv();
   }
 
@@ -112,6 +113,7 @@ const Adventure = (() => {
     if (hlIndex < 0 || hlIndex >= ids.length) return;
     const id = ids[hlIndex].id;
     selected = selected === id ? null : id;
+    autoEquipped = false;
     msg(selected ? 'Ready to USE the ' + ids[hlIndex].name + '. Click a target.' : (ids[hlIndex].name + ' deselected.'), 1.8);
     renderInv();
   }
@@ -137,6 +139,45 @@ const Adventure = (() => {
     'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen',
     'sovietshopper', 'sovietscientist']);
   const WALL_USABLE = new Set([3, 4, 5, 6, 7, 8]);   // blast/radio/mainframe/poster/keycard/std-key doors — 1/2 are plain wall
+
+  // ---- auto-equip: point the reticule at the thing a held item solves and it
+  // readies itself, no manual inventory click needed. Mirrors the `selected ===
+  // 'x'` checks actually read in useEnt/useWall below — one authoritative list
+  // per target kind (items that fail a flag gate still auto-equip; useEnt's own
+  // gating decides whether the click actually pays off).
+  const TARGET_ITEMS = {
+    desk: ['lockpick', 'hairpin'],
+    goon: ['lettersoftransit', 'phrase'], gunman: ['lettersoftransit', 'phrase'], brute: ['lettersoftransit', 'phrase'],
+    sniper: ['lettersoftransit', 'phrase'], blackbelt: ['lettersoftransit', 'phrase'], soviet: ['lettersoftransit', 'phrase'], spy: ['lettersoftransit', 'phrase'],
+    flowergirl: ['money'], carlotta: ['rose'], ciphermachine: ['letter'], drz: ['telegram'],
+    bomb: ['screwdriver', 'pliers'], defector: ['watch'], reza: ['brothersphoto'], rostam: ['tehranuniform'],
+    phonebooth: ['businesscard'], microfichemachine: ['microfiche', 'file'], agent005: ['truth'],
+    sportscar: ['keys'], streetartist: ['headshot'], matron: ['portrait'], metroentrance: ['ticket'],
+    maskstand: ['nixonmask'], laundrylady: ['laundryticket'], double: ['suit', 'jfkmask'],
+    patsy: ['drpepper'], curtainrods: ['package'], vendingmachine: ['coins'], baldini: ['magicianjoke'],
+    lao: ['trickdeck'], wilson: ['sheetmusic'],
+  };
+  const WALL_TARGET_ITEMS = { 3: ['punchcard'], 4: ['lockpick', 'hairpin'], 5: ['tube'] };
+  let autoEquipped = false;   // true iff `selected` was set by autoEquip, not a manual inventory click/keypress
+  function autoEquip(t) {
+    let ids = null;
+    if (t && t.kind === 'ent') ids = TARGET_ITEMS[t.ent.kind] || null;
+    else if (t && t.kind === 'wall') {
+      if (t.wall && t.wall.door === 'keycard') ids = ['keycard'];
+      else if (t.wall && t.wall.door === 'stdkey') ids = ['key'];
+      else ids = WALL_TARGET_ITEMS[t.val] || null;
+    }
+    const held = ids && ids.find(id => inv.some(it => it.id === id));
+    if (held && selected !== held) {
+      selected = held;
+      autoEquipped = true;
+      renderInv();
+    } else if (!held && autoEquipped) {
+      selected = null;
+      autoEquipped = false;
+      renderInv();
+    }
+  }
   function verbAt(t) {
     if (!t) return 'look';
     if (t.kind === 'ent') {
@@ -187,8 +228,9 @@ const Adventure = (() => {
   // left-click right now (null past click range, or once too far to interact)
   function hudAt(mx, my) {
     const t = resolveAt(mx, my);
-    const name = !t ? null : t.kind === 'ent' ? (t.ent.dead ? 'EX-HENCHMAN' : t.ent.name) : (t.dist < 6 ? WALLNAMES[t.val] : null);
     const inRange = !!t && t.dist <= 3.2;
+    autoEquip(inRange ? t : null);
+    const name = !t ? null : t.kind === 'ent' ? (t.ent.dead ? 'EX-HENCHMAN' : t.ent.name) : (t.dist < 6 ? WALLNAMES[t.val] : null);
     return { name, verb: inRange ? (selected ? 'use' : verbAt(t)) : null };
   }
 
