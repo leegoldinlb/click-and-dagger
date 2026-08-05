@@ -24,15 +24,28 @@
 // look-up / look-down (pitch).  Output is a 320x180 framebuffer scaled up.
 // ---------------------------------------------------------------------------
 const Engine = (() => {
-  const W = 640, H = 360;
-  const DW = 640, DH = 360;
+  // W/H is the raycaster's own internal simulation resolution — how many
+  // columns it casts and how tall each one's vertical scan is. init()'s
+  // renderW/renderH option overrides these (desktop gets a sharper internal
+  // render than touch, see main.js); the buffers below are sized off
+  // whatever init() ends up setting, not this default.
+  let W = 640, H = 360;
+  // DW/DH is the ON-SCREEN canvas's own backing-store resolution — decoupled
+  // from W/H so the final upscale happens once, at the exact device-pixel
+  // size the canvas is actually displayed at (see resize()), instead of the
+  // browser CSS-stretching a small backing store to an arbitrary fractional
+  // size. Both stay nearest-neighbor (imageSmoothingEnabled=false), so this
+  // doesn't change the intentional chunky-pixel look — it just makes sure
+  // the LAST scaling step lands on exact physical pixels instead of a blurry
+  // in-between size on high-DPI screens.
+  let DW = 640, DH = 360;
   const MAXD = 44;
 
-  let ctx = null, off = null, octx = null, img = null, buf = null;
-  const zbuf = new Float64Array(W);        // nearest solid wall per column (adventure picking + hitscan)
-  const depth = new Float32Array(W * H);   // per-pixel scene depth for sprite occlusion
-  const pickBuf = new Int32Array(W * H);   // per-pixel surface id (editor 3D-mode picking)
-  const colHit = new Array(W);
+  let ctx = null, off = null, octx = null, img = null, buf = null, viewCanvas = null;
+  let zbuf = new Float64Array(W);        // nearest solid wall per column (adventure picking + hitscan)
+  let depth = new Float32Array(W * H);   // per-pixel scene depth for sprite occlusion
+  let pickBuf = new Int32Array(W * H);   // per-pixel surface id (editor 3D-mode picking)
+  let colHit = new Array(W);
   let rects = [];
   let dbgOn = false, dbgTrace = null;   // temporary investigation hook: records drawSector calls for one frame
   let hl = null;                        // editor 3D-preview target highlight: {sec, kind:'floor'|'ceil'} or {sec, edge}
@@ -68,7 +81,16 @@ const Engine = (() => {
     return c;
   }
 
-  function init(canvas) {
+  function init(canvas, opts) {
+    viewCanvas = canvas;
+    W = (opts && opts.renderW) || W;
+    H = (opts && opts.renderH) || H;
+    zbuf = new Float64Array(W);
+    depth = new Float32Array(W * H);
+    pickBuf = new Int32Array(W * H);
+    colHit = new Array(W);
+    yTopA = new Int16Array(W);
+    yBotA = new Int16Array(W);
     ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
     off = document.createElement('canvas');
@@ -77,6 +99,32 @@ const Engine = (() => {
     octx.imageSmoothingEnabled = false;
     img = octx.createImageData(W, H);
     buf = new Uint32Array(img.data.buffer);
+    // DW/DH (the on-screen canvas's own backing-store resolution) stay
+    // whatever they already were (the canvas's own width/height attributes)
+    // unless the caller opts in via resize() — the editor's preview canvas
+    // relies on that fixed size (its CSS caps it at max-width:100%, so
+    // auto-resizing here could actually SHRINK its render quality in a
+    // narrow layout instead of improving it). Only main.js's game view
+    // calls resize() itself, right after init().
+  }
+
+  // Sizes the ON-SCREEN canvas's backing store to its actual displayed CSS
+  // size × devicePixelRatio, so the raycast buffer's upscale onto it lands on
+  // exact physical pixels — call this on load and whenever the canvas's
+  // displayed size can change (window resize, fullscreen toggle). A no-op if
+  // the canvas hasn't been laid out yet (rect is 0×0, e.g. mid-navigation).
+  function resize() {
+    if (!viewCanvas) return;
+    const rect = viewCanvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.max(1, Math.round(rect.width * dpr));
+    const h = Math.max(1, Math.round(rect.height * dpr));
+    if (w === DW && h === DH) return;
+    DW = w; DH = h;
+    viewCanvas.width = DW;
+    viewCanvas.height = DH;
+    ctx.imageSmoothingEnabled = false;   // resizing a canvas resets its 2D context state
   }
 
   const FOG_R = 12, FOG_G = 11, FOG_B = 16;
@@ -470,7 +518,7 @@ const Engine = (() => {
   // open a vector door wall (and its twin on the far side)
   function openDoor(wall) { if (!wall) return; wall.open = true; if (wall.sibling) wall.sibling.open = true; }
 
-  const yTopA = new Int16Array(W), yBotA = new Int16Array(W);
+  let yTopA = new Int16Array(W), yBotA = new Int16Array(W);
   function renderPortal(g, geo, graph) {
     const p = g.player, a = p.a;
     const px = p.x, py = p.y;
@@ -970,9 +1018,14 @@ const Engine = (() => {
   }
 
   return {
-    W, H, init, render, zbuf, colHit, rects: () => rects, pickAt,
+    // getters, not plain values — init() can replace W/H/zbuf/colHit/depth
+    // wholesale (a resolution change reallocates them), so a snapshot taken
+    // at module-load time would silently go stale the moment that happens
+    get W() { return W; }, get H() { return H; },
+    init, render, resize, get zbuf() { return zbuf; }, get colHit() { return colHit; },
+    rects: () => rects, pickAt,
     buildGraph, sectorAt, renderPortal, openDoor,
-    moveGeo, losGeo, geoFloorAtXY, localSector, depth,
+    moveGeo, losGeo, geoFloorAtXY, localSector, get depth() { return depth; },
     setDebugTrace: on => { dbgOn = on; }, get debugTrace() { return dbgTrace; },
     setHighlight,
   };

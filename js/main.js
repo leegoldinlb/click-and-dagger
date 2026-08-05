@@ -3,7 +3,22 @@
 // Game state, input, combat, enemy AI, and the main loop.
 const Game = (() => {
   const canvas = document.getElementById('view');
-  Engine.init(canvas);
+  // Touch devices keep the original 640x360 raycast resolution (software
+  // per-column raycasting scales with pixel count — this is the budget the
+  // mobile touch-control work was tuned against). Desktop/laptop gets a
+  // sharper internal render for free, no toggle needed, since it's the same
+  // detection the touch-control layer already uses. ?touch=1 forces the
+  // touch layer (and this lower resolution) on a mouse-driven browser too —
+  // handy for testing without a real touch device.
+  const isTouch = matchMedia('(pointer: coarse)').matches || new URLSearchParams(location.search).get('touch') === '1';
+  Engine.init(canvas, isTouch ? null : { renderW: 1280, renderH: 720 });
+  // Sizes the on-screen canvas's own backing store to its actual displayed
+  // CSS size × devicePixelRatio, so the final upscale from the raycast
+  // buffer lands on exact physical pixels instead of the browser stretching
+  // a small backing store to an arbitrary fractional size. Kept opt-in on
+  // Engine's side (see engine.js) — the editor's own preview canvas doesn't
+  // call this and keeps its old fixed-size behavior.
+  Engine.resize();
 
   // The arsenal: one hardcoded Walther becomes a real weapon table. Each entry is
   // per-weapon ammo (Lee's call — different guns for different jobs, not one shared
@@ -104,9 +119,8 @@ const Game = (() => {
   // bottom of this file. Every one of those controls calls the exact same
   // function a keyboard/mouse action already calls; nothing here is a
   // separate mobile code path for game logic, just a different input source.
-  // ?touch=1 forces the touch layer on a mouse-driven browser — handy for
-  // testing the control layout without a real touch device.
-  const isTouch = matchMedia('(pointer: coarse)').matches || new URLSearchParams(location.search).get('touch') === '1';
+  // (isTouch itself is declared up top, before Engine.init, since the
+  // render-resolution choice needs it too.)
   if (isTouch) document.body.classList.add('touch');
 
   function switchWeapon(kind) {
@@ -817,12 +831,24 @@ const Game = (() => {
       if (exit) exit.call(document);
     }
   }
-  function syncFullscreenBtn() { fsBtn.textContent = isFullscreen() ? '⛶ EXIT FULLSCREEN' : '⛶ FULLSCREEN'; }
+  function syncFullscreenBtn() {
+    fsBtn.textContent = isFullscreen() ? '⛶ EXIT FULLSCREEN' : '⛶ FULLSCREEN';
+    requestAnimationFrame(Engine.resize);   // canvas's displayed CSS size just changed — rAF so layout's settled first
+  }
   fsBtn.addEventListener('click', toggleFullscreen);
   document.addEventListener('fullscreenchange', syncFullscreenBtn);
   document.addEventListener('webkitfullscreenchange', syncFullscreenBtn);
   document.addEventListener('keydown', e => {
     if (e.code === 'KeyV' && !e.repeat && !e.target.matches('input, textarea')) toggleFullscreen();
+  });
+  // Ordinary window resizing (not just fullscreen) also changes the canvas's
+  // displayed CSS size, so its backing store needs to follow — rAF-throttled
+  // so a drag-resize doesn't call it dozens of times per second.
+  let resizeQueued = false;
+  window.addEventListener('resize', () => {
+    if (resizeQueued) return;
+    resizeQueued = true;
+    requestAnimationFrame(() => { resizeQueued = false; Engine.resize(); });
   });
 
   if (World.isEpisode) {
