@@ -11,5 +11,29 @@
   "devDependencies": {
     "electron": "^30",
     "electron-builder": "^24"
+  },
+  "build": {
+    "appId": "com.clickanddagger.app",
+    "productName": "Click and Dagger",
+    "files": [
+      "index.html",
+      "editor.html",
+      "help.html",
+      "*.css",
+      "js/**/*",
+      "assets/**/*",
+      "missions/**/*",
+      "electron/**/*"
+    ],
+    "asarUnpack": [
+      "assets/**/*"
+    ],
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.games"
+    },
+    "win": {
+      "target": "nsis"
+    }
   }
 }
