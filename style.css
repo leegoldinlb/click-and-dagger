@@ -57,10 +57,11 @@ body {
     inset -2px -2px 0 var(--bevel-lo);
 }
 
-#game { width: min(92vw, 1400px, 150vh); }
-/* Fullscreen just makes #game the top-layer element — its own width formula
-   (above) still applies against the now much bigger vw/vh, but nothing
-   centers it inside the black backdrop without this */
+#game { width: min(92vw, 1400px, 150vh); position: relative; }
+/* Fullscreen just makes #game the top-layer element and centers it in the
+   black backdrop — the floating-HUD-over-borderless-picture look below is
+   now the look everywhere, windowed or fullscreen, so there's nothing
+   mode-specific left to do here beyond sizing/centering. */
 #game:fullscreen, #game:-webkit-full-screen {
   width: min(92vw, 1400px, 150vh);
   height: 100vh;
@@ -68,17 +69,14 @@ body {
   flex-direction: column;
   justify-content: center;
   background: #000;
-  position: relative;   /* anchors the floating HUD overlay below */
 }
 
-/* Fullscreen HUD: no bottom bar — the panel background/border/rivets are
-   stripped and the whole thing floats as an absolute overlay directly on
-   top of the view (instead of pushing it up from a bar underneath), so
-   stats read as plain floating text and inventory items as floating boxes.
-   EDIT THIS LEVEL and the fullscreen toggle button are dropped entirely —
-   the level-editing workflow doesn't belong in a fullscreen playtest, and
-   anyone in fullscreen already knows how to exit it. */
-#game:fullscreen #hud, #game:-webkit-full-screen #hud {
+/* Floating HUD, windowed or fullscreen — no bottom bar. The panel
+   background/border/rivets are stripped and the whole thing floats as an
+   absolute overlay directly on top of the view (instead of pushing it up
+   from a bar underneath), so stats and inventory items read as plain
+   floating text with color alone marking selected/highlighted state. */
+#hud {
   position: absolute;
   left: 0; right: 0; bottom: 22px;
   background: none;
@@ -88,40 +86,24 @@ body {
   min-height: 0;
   z-index: 15;
 }
-#game:fullscreen #hud::before, #game:fullscreen #hud::after,
-#game:-webkit-full-screen #hud::before, #game:-webkit-full-screen #hud::after { display: none; }
-#game:fullscreen #stats, #game:-webkit-full-screen #stats {
-  text-shadow: 1px 1px 0 #000, 0 0 8px rgba(0,0,0,0.85);
-}
-/* inventory items as plain floating text too, not floating BOXES — same
-   brass-panel background/border stripped, color alone still marks
-   selected/highlighted state */
-#game:fullscreen .item, #game:-webkit-full-screen .item {
+#hud::before, #hud::after { display: none; }
+#stats { text-shadow: 1px 1px 0 #000, 0 0 8px rgba(0,0,0,0.85); }
+.item {
   background: none;
   border: none;
   box-shadow: none;
   padding: 2px 6px;
   text-shadow: 1px 1px 0 #000, 0 0 8px rgba(0,0,0,0.85);
 }
-#game:fullscreen .item.selected, #game:-webkit-full-screen .item.selected,
-#game:fullscreen .item.hl, #game:-webkit-full-screen .item.hl {
-  background: none;
-  border: none;
-  box-shadow: none;
-}
-#game:fullscreen #invempty, #game:-webkit-full-screen #invempty {
-  text-shadow: 1px 1px 0 #000, 0 0 8px rgba(0,0,0,0.85);
-}
+.item.selected, .item.hl { background: none; border: none; box-shadow: none; }
+#invempty { text-shadow: 1px 1px 0 #000, 0 0 8px rgba(0,0,0,0.85); }
+#modeline { display: none; }
+#viewwrap { border: none; box-shadow: none; }
 #game:fullscreen #editlink, #game:fullscreen #fullscreenbtn,
 #game:-webkit-full-screen #editlink, #game:-webkit-full-screen #fullscreenbtn { display: none; }
-#game:fullscreen #modeline, #game:-webkit-full-screen #modeline { display: none; }
-#game:fullscreen #viewwrap, #game:-webkit-full-screen #viewwrap { border: none; box-shadow: none; }
 
 #viewwrap {
   position: relative;
-  border: 4px solid var(--brass-dim);
-  border-bottom: none;
-  box-shadow: inset 0 0 0 2px var(--panel-deep), inset 3px 3px 0 var(--bevel-hi);
   background: #000;
 }
 
@@ -214,26 +196,7 @@ body.touch #hud, body.touch #modeline, body.touch #editlink, body.touch #fullscr
 }
 #message.on { opacity: 1; transition: none; }
 
-#hud {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  background: linear-gradient(160deg, var(--panel-hi), var(--panel) 55%, var(--panel-lo));
-  border: 4px solid var(--brass-dim);
-  box-shadow: inset 2px 2px 0 var(--bevel-hi), inset -2px -2px 0 var(--bevel-lo);
-  padding: 10px 16px;
-  min-height: 58px;
-}
-#hud::before, #hud::after {  /* brass corner rivets */
-  content: "";
-  position: absolute;
-  top: 6px; width: 5px; height: 5px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, var(--gold-bright), var(--brass-dim) 70%);
-  box-shadow: 0 1px 0 rgba(0,0,0,0.6);
-}
-#hud::before { left: 8px; }
-#hud::after { right: 8px; }
+#hud { display: flex; align-items: center; gap: 18px; }
 
 #stats { display: flex; gap: 16px; font-size: 15px; letter-spacing: 1px; color: var(--parchment-dim); }
 .stat b { color: var(--gold-bright); font-size: 19px; text-shadow: 1px 1px 0 #000; }
@@ -263,22 +226,13 @@ button:active {
 }
 #invempty { color: #6a5c3e; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
 .item {
-  background: linear-gradient(160deg, var(--panel-hi), var(--panel-lo));
-  border: 2px solid var(--brass);
-  box-shadow: inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo);
   color: var(--gold-bright);
-  padding: 6px 10px;
   font-size: 13px;
   letter-spacing: 1px;
   cursor: pointer;
 }
-.item.selected {
-  background: linear-gradient(160deg, #2e6e28, #123a0e);   /* green: this item is armed for USE — a left-click will use it */
-  color: #d6ffca;
-  border-color: #6fe25a;
-  box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo), 0 0 6px rgba(111,226,90,0.6);
-}
-.item.hl { border-color: #fff2c0; box-shadow: 0 0 0 1px #fff2c0, inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo); }   /* [ ] keyboard cycle highlight, independent of .selected */
+.item.selected { color: #d6ffca; }   /* green: this item is armed for USE — a left-click will use it */
+.item.hl { color: #fff2c0; }   /* [ ] keyboard cycle highlight, independent of .selected */
 
 #modeline {
   text-align: center;
