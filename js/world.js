@@ -5531,6 +5531,7 @@ const World = (() => {
     speck(gt, 80, 'rgba(0,0,0,0.05)', c.width, c.height);
     speck(gt, 55, 'rgba(255,246,220,0.04)', c.width, c.height);
   }
+  TX.catacombwall = TX.rockwall;   // placeholder until the shipped PNG loads (ART_ASSETS/SHIPPED_WALL_TEX below)
   // ordered list the editor shows as a palette
   const TXNAMES = ['lair', 'teak', 'brick', 'stucco', 'stuccob', 'stuccop', 'panel', 'tile',
     'cobble', 'wood', 'marble', 'concrete', 'water', 'metal', 'vent', 'carpet', 'lounge',
@@ -5548,6 +5549,7 @@ const World = (() => {
     'clapboard', 'picketfence', 'shagcarpet', 'linoleum', 'woodpaneling',
     'concreteblock', 'redbanner', 'domemosaic', 'parquet', 'muralsoviet',
     'warehousebrick', 'depositorywindow', 'depositorycorner', 'concretepergola', 'lawngrass', 'roadway', 'sidewalk',
+    'catacombwall',
     'radio', 'blast', 'mainframe', 'poster', 'keycard', 'stdkey'];
   const WALLTX = { 1: 'teak', 2: 'lair', 3: 'blast', 4: 'radio', 5: 'mainframe', 6: 'poster', 7: 'keycard', 8: 'stdkey' };
   const wallTexName = (x, y) => {
@@ -8672,6 +8674,38 @@ const World = (() => {
     g.fillStyle = 'rgba(255,255,255,0.3)'; g.fillRect(23, 35, 18, 1.2);
   });
 
+  // Paris Catacombs — rough placeholders, swapped for shipped art below (ART_ASSETS)
+  SPR.skull = outlined(g => {
+    g.fillStyle = '#e8dcc0'; g.beginPath(); g.arc(32, 28, 14, 0, 7); g.fill();
+    g.fillRect(24, 34, 16, 12);
+    g.fillStyle = '#100c0a'; g.beginPath(); g.arc(27, 27, 3.2, 0, 7); g.fill(); g.beginPath(); g.arc(37, 27, 3.2, 0, 7); g.fill();
+  });
+  SPR.skullpile = outlined(g => {
+    g.fillStyle = '#e8dcc0';
+    g.beginPath(); g.arc(24, 36, 11, 0, 7); g.fill();
+    g.beginPath(); g.arc(40, 36, 11, 0, 7); g.fill();
+    g.beginPath(); g.arc(32, 26, 12, 0, 7); g.fill();
+    g.fillStyle = '#100c0a'; g.beginPath(); g.arc(28, 25, 2.6, 0, 7); g.fill(); g.beginPath(); g.arc(36, 25, 2.6, 0, 7); g.fill();
+  });
+  SPR.operaplans = outlined(g => {
+    g.fillStyle = '#d8bf8c'; g.fillRect(14, 16, 36, 32);
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 1; g.strokeRect(14, 16, 36, 32);
+    g.strokeStyle = 'rgba(90,60,20,0.4)'; g.lineWidth = 0.8;
+    for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(18, 22 + i * 5); g.lineTo(46, 22 + i * 5); g.stroke(); }
+  });
+  SPR.catacombssign = outlined(g => {
+    g.fillStyle = '#8a8474'; g.fillRect(8, 22, 48, 20);
+    bevel(g, 8, 22, 48, 20, 'rgba(255,255,255,0.25)', 'rgba(0,0,0,0.4)');
+    g.fillStyle = '#2a2620'; g.font = 'bold 6px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('CATACOMBES', 32, 30); g.fillText('DE PARIS', 32, 38);
+  });
+  SPR.dallasnews = outlined(g => {
+    g.fillStyle = '#e8e0c8'; g.fillRect(12, 10, 40, 44);
+    g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 1; g.strokeRect(12, 10, 40, 44);
+    g.fillStyle = '#100c0a'; g.font = 'bold 6px serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('DALLAS', 32, 20); g.fillText('MORNING', 32, 27); g.fillText('NEWS', 32, 34);
+  });
+
   SPR.screwdriver = outlined(g => {                               // flathead screwdriver, red handle
     g.fillStyle = 'rgba(0,0,0,0.24)'; g.beginPath(); g.ellipse(32, 47, 15, 2.2, 0, 0, 7); g.fill();
     let sh = g.createLinearGradient(14, 40, 32, 44);
@@ -10067,6 +10101,12 @@ const World = (() => {
     vintagelamppost: 'assets/sprites/vintagelamppost.png?v=1',
     mailboxpost: 'assets/sprites/mailboxpost.png?v=1',
     flagpole: 'assets/sprites/flagpole.png?v=1',
+    pergolacolonnade: 'assets/sprites/pergolacolonnade.png?v=1',
+    skull: 'assets/sprites/skull.png?v=1',
+    skullpile: 'assets/sprites/skullpile.png?v=1',
+    operaplans: 'assets/sprites/operaplans.png?v=1',
+    catacombssign: 'assets/sprites/catacombssign.png?v=1',
+    dallasnews: 'assets/sprites/dallasnews.png?v=1',
     bookshelf: 'assets/sprites/bookshelf.png?v=1',
     radioset: 'assets/sprites/radioset.png?v=1',
     bar: 'assets/sprites/barcart.png?v=1',
@@ -10236,6 +10276,7 @@ const World = (() => {
     doorsecuritygray: 'assets/sprites/doorsecuritygray.png?v=1',
     doorlondon10: 'assets/sprites/doorlondon10.png?v=1',
     doordiamondglass: 'assets/sprites/doordiamondglass.png?v=1',
+    catacombwall: 'assets/sprites/catacombwall.png?v=1',
     londonrow: 'assets/sprites/londonrow.png?v=1',
     londonoffice: 'assets/sprites/londonoffice.png?v=1',
     londonflats: 'assets/sprites/londonflats.png?v=1',
@@ -10397,6 +10438,20 @@ const World = (() => {
     img.onload = () => {
       if (isTainted(img)) return;
       try { TX[name] = fitCanvasZoomed(img, 64, 64, 1.3); } catch (e) { console.warn('Failed to build door-skin wall texture:', path, e); }
+    };
+    img.src = path;
+  }
+
+  // General shipped wall materials — same PNG-tile pipeline as DOOR_SKINS above,
+  // but for ordinary wallTex/floorTex/ceilTex picks (not door-specific skins).
+  const SHIPPED_WALL_TEX = ['catacombwall'];
+  for (const name of SHIPPED_WALL_TEX) {
+    const path = ART_ASSETS[name];
+    if (!path) continue;
+    const img = new Image();
+    img.onload = () => {
+      if (isTainted(img)) return;
+      try { TX[name] = fitCanvasZoomed(img, 64, 64, 1.0); } catch (e) { console.warn('Failed to build shipped wall texture:', path, e); }
     };
     img.src = path;
   }
@@ -11082,6 +11137,12 @@ const World = (() => {
     havanarow: (x, y) => prop('havanarow', 'HAVANA COLONIAL ROW', x, y, 1.4, true),
     tehranmosquebuilding: (x, y) => prop('tehranmosquebuilding', 'TEHRAN TILED BUILDING', x, y, 1.6, true),
     tehranoffice: (x, y) => prop('tehranoffice', 'TEHRAN OFFICE TOWER', x, y, 2.0, true),
+    // Paris Catacombs
+    skull: (x, y) => prop('skull', 'SKULL', x, y, 0.3, false),
+    skullpile: (x, y) => prop('skullpile', 'PILE OF SKULLS', x, y, 0.55, true),
+    operaplans: (x, y) => prop('operaplans', 'PLANS DE L’OPÉRA', x, y, 0.3, false),
+    catacombssign: (x, y) => prop('catacombssign', 'CATACOMBES DE PARIS SIGN', x, y, 0.5, false),
+    dallasnews: (x, y) => prop('dallasnews', 'THE DALLAS MORNING NEWS', x, y, 0.45, false),
   };
 
   function removeEnt(ent) {
