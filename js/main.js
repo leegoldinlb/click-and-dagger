@@ -38,6 +38,13 @@ const Game = (() => {
   };
   const WEAPON_ORDER = ['walther', 'sterling', 'ar7', 'laser', 'golden'];
 
+  // Pitch (vertical look) is a raw pixel offset added to the horizon line in
+  // engine.js's render(), so its clamp has to scale with Engine.H — a fixed
+  // pixel cap here would give desktop (720 internal render height) half the
+  // proportional look range of touch (360), which is exactly what made
+  // looking down at floor items feel so restrictive on desktop.
+  const pitchLimit = () => Engine.H * 0.3;
+
   const G = {
     player: { x: World.spawn.x, y: World.spawn.y, a: World.spawn.a, hp: 100, hurtT: 0,
               eyeZ: World.floorZAt(World.spawn.x, World.spawn.y) + 0.5, pitch: 0, vz: 0 },
@@ -270,7 +277,8 @@ const Game = (() => {
   document.addEventListener('mousemove', e => {
     if (!G.locked) return;
     G.player.a += e.movementX * 0.0022;
-    G.player.pitch = Math.max(-70, Math.min(70, G.player.pitch - e.movementY * 0.35));
+    const pLim = pitchLimit();
+    G.player.pitch = Math.max(-pLim, Math.min(pLim, G.player.pitch - e.movementY * 0.35));
   });
 
   canvas.addEventListener('mousedown', e => {
@@ -307,7 +315,8 @@ const Game = (() => {
       const dx = e.clientX - lookX, dy = e.clientY - lookY;
       lookX = e.clientX; lookY = e.clientY;
       G.player.a += dx * 0.006;
-      G.player.pitch = Math.max(-70, Math.min(70, G.player.pitch - dy * 0.6));
+      const pLim = pitchLimit();
+      G.player.pitch = Math.max(-pLim, Math.min(pLim, G.player.pitch - dy * 0.6));
     });
     const endLook = e => { if (e.pointerId === lookPid) lookPid = -1; };
     touchLookEl.addEventListener('pointerup', endLook);
