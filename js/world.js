@@ -5123,6 +5123,96 @@ const World = (() => {
     speck(g, 25, 'rgba(90,84,68,0.1)');
   });
 
+  FLOOR.clapboardblue = cnv(g => {                      // horizontal wood clapboard siding, powder-blue paint
+    vgrad(g, 0, 0, 64, 64, '#a8c4e0', '#7ea0c4');
+    g.strokeStyle = 'rgba(36,52,68,0.35)'; g.lineWidth = 1;
+    for (let y = 6; y < 64; y += 8) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.fillStyle = 'rgba(255,255,255,0.16)';
+    for (let y = 0; y < 64; y += 8) g.fillRect(0, y, 64, 2);
+    stains(g, 4, ['#5c7ea0', '#4a6890']);
+    speck(g, 40, 'rgba(28,40,52,0.1)'); speck(g, 25, 'rgba(255,255,255,0.08)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,255,255,0.12)', 'rgba(20,28,38,0.25)');
+  });
+
+  FLOOR.clapboardyellow = cnv(g => {                    // horizontal wood clapboard siding, butter-yellow paint
+    vgrad(g, 0, 0, 64, 64, '#e8d888', '#c4b45e');
+    g.strokeStyle = 'rgba(76,64,24,0.35)'; g.lineWidth = 1;
+    for (let y = 6; y < 64; y += 8) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.fillStyle = 'rgba(255,255,255,0.16)';
+    for (let y = 0; y < 64; y += 8) g.fillRect(0, y, 64, 2);
+    stains(g, 4, ['#a89448', '#94823c']);
+    speck(g, 40, 'rgba(60,50,18,0.1)'); speck(g, 25, 'rgba(255,255,255,0.08)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,255,255,0.12)', 'rgba(40,32,10,0.25)');
+  });
+
+  FLOOR.brickveneer = cnv(g => {                        // ranch-house brick front — warmer/lighter running bond than the industrial 'brick' texture
+    vgrad(g, 0, 0, 64, 64, '#c47850', '#a85e3c');
+    g.fillStyle = 'rgba(230,214,196,0.4)';                // mortar joints, running-bond offset every other row
+    for (let y = 0; y < 64; y += 8) g.fillRect(0, y, 64, 1.4);
+    for (let row = 0; row < 8; row++) {
+      const off = (row % 2) * 8;
+      for (let x = -8 + off; x < 64; x += 16) g.fillRect(x, row * 8, 1.4, 8);
+    }
+    stains(g, 5, ['#8a4a2c', '#7a4024']);
+    speck(g, 45, 'rgba(60,30,16,0.12)'); speck(g, 20, 'rgba(255,240,220,0.1)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,230,210,0.1)', 'rgba(40,20,10,0.25)');
+  });
+
+  FLOOR.asphaltshingle = cnv(g => {                      // gray-brown asphalt roof shingle, overlapping courses
+    vgrad(g, 0, 0, 64, 64, '#726a60', '#544c44');
+    g.fillStyle = 'rgba(0,0,0,0.25)';
+    for (let y = 4; y < 64; y += 10) g.fillRect(0, y, 64, 2);
+    g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 1;
+    for (let row = 0; row < 7; row++) {
+      const off = (row % 2) * 5;
+      for (let x = off; x < 64; x += 10) { g.beginPath(); g.moveTo(x, row * 10); g.lineTo(x, row * 10 + 10); g.stroke(); }
+    }
+    speck(g, 60, 'rgba(0,0,0,0.1)'); speck(g, 30, 'rgba(255,255,255,0.06)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,255,255,0.06)', 'rgba(0,0,0,0.3)');
+  });
+
+  FLOOR.garagedoor = cnv(g => {                          // white paneled garage door, four raised-panel rows + small windows
+    vgrad(g, 0, 0, 64, 64, '#f0ede4', '#d0ccc0');
+    g.strokeStyle = 'rgba(90,84,70,0.4)'; g.lineWidth = 1.2;
+    for (let y = 0; y < 64; y += 16) {
+      g.strokeRect(3, y + 2, 58, 12);
+      g.fillStyle = 'rgba(255,255,255,0.18)'; g.fillRect(4, y + 3, 56, 2);
+    }
+    g.fillStyle = 'rgba(120,150,170,0.5)'; g.fillRect(10, 4, 12, 6); g.fillRect(42, 4, 12, 6);  // small top windows
+    g.strokeStyle = 'rgba(90,84,70,0.5)'; g.strokeRect(10, 4, 12, 6); g.strokeRect(42, 4, 12, 6);
+    speck(g, 20, 'rgba(90,84,70,0.08)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,255,255,0.15)', 'rgba(60,54,44,0.25)');
+  });
+
+  FLOOR.screenporch = cnv(g => {                        // fine mesh screen over a porch opening, dim interior beyond
+    vgrad(g, 0, 0, 64, 64, '#3a4038', '#242822');
+    g.strokeStyle = 'rgba(200,200,190,0.12)'; g.lineWidth = 0.6;
+    for (let x = 0; x < 64; x += 3) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 64); g.stroke(); }
+    for (let y = 0; y < 64; y += 3) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.strokeStyle = 'rgba(120,110,90,0.5)'; g.lineWidth = 2; g.strokeRect(2, 2, 60, 60);  // wood frame
+    speck(g, 20, 'rgba(0,0,0,0.15)');
+  });
+
+  FLOOR.carportmetal = cnv(g => {                       // corrugated aluminum carport roofing, seen from below
+    vgrad(g, 0, 0, 64, 64, '#c0c4c8', '#9a9ea4');
+    g.strokeStyle = 'rgba(255,255,255,0.25)'; g.lineWidth = 1.5;
+    for (let x = 1; x < 64; x += 6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 64); g.stroke(); }
+    g.strokeStyle = 'rgba(60,64,68,0.3)'; g.lineWidth = 1;
+    for (let x = 4; x < 64; x += 6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 64); g.stroke(); }
+    speck(g, 30, 'rgba(255,255,255,0.1)'); speck(g, 25, 'rgba(60,64,68,0.15)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,255,255,0.15)', 'rgba(40,44,48,0.3)');
+  });
+
+  FLOOR.concretedriveway = cnv(g => {                   // pale cracked concrete slab, expansion-joint grid
+    vgrad(g, 0, 0, 64, 64, '#b8b4a8', '#9c988c');
+    g.strokeStyle = 'rgba(80,76,68,0.3)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(0, 32); g.lineTo(64, 32); g.moveTo(32, 0); g.lineTo(32, 64); g.stroke();
+    g.strokeStyle = 'rgba(60,56,48,0.25)'; g.lineWidth = 0.8;
+    g.beginPath(); g.moveTo(6, 4); g.lineTo(18, 20); g.lineTo(14, 30); g.stroke();          // hairline crack
+    speck(g, 60, 'rgba(60,56,48,0.1)'); speck(g, 25, 'rgba(255,255,250,0.08)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,255,250,0.08)', 'rgba(40,38,32,0.22)');
+  });
+
   FLOOR.shagcarpet = cnv(g => {                          // avocado-green shag carpet, deep pile
     vgrad(g, 0, 0, 64, 64, '#8a9a4a', '#647232');
     for (let i = 0; i < 90; i++) {
@@ -5546,7 +5636,8 @@ const World = (() => {
     'subwaytile', 'brownstone', 'delitile', 'skyscraperglass', 'marquee', 'nybaywindow', 'nyacwindow',
     'neonsign', 'bambooscaffold', 'hongkongtile', 'junkwood', 'tenementwall',
     'hkgrillewindow', 'hklaundrypole', 'hkrollshutter', 'hkwireclutter', 'hkaircon', 'hkneonwindow',
-    'clapboard', 'picketfence', 'shagcarpet', 'linoleum', 'woodpaneling',
+    'clapboard', 'clapboardblue', 'clapboardyellow', 'brickveneer', 'asphaltshingle', 'garagedoor', 'screenporch', 'carportmetal', 'concretedriveway',
+    'picketfence', 'shagcarpet', 'linoleum', 'woodpaneling',
     'concreteblock', 'redbanner', 'domemosaic', 'parquet', 'muralsoviet',
     'warehousebrick', 'depositorywindow', 'depositorycorner', 'concretepergola', 'lawngrass', 'roadway', 'sidewalk',
     'catacombwall',
