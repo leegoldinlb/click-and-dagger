@@ -292,6 +292,7 @@ const Editor = (() => {
     { kind: 'eiffeltower', name: 'EIFFEL TOWER', spr: 'eiffeltower' },
     { kind: 'arcdetriomphe', name: 'ARC DE TRIOMPHE', spr: 'arcdetriomphe' },
     { kind: 'notredame', name: 'NOTRE-DAME', spr: 'notredame' },
+    { kind: 'parisoperahouse', name: 'PALAIS GARNIER', spr: 'parisoperahouse' },
     { kind: 'louvrepyramid', name: 'LOUVRE PYRAMID', spr: 'louvrepyramid' },
     { kind: 'moulinrouge', name: 'MOULIN ROUGE', spr: 'moulinrouge' },
     { kind: 'sacrecoeur', name: 'SACRÉ-CŒUR', spr: 'sacrecoeur' },

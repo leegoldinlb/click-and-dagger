@@ -7503,6 +7503,18 @@ const World = (() => {
     bevel(g, 6, 34, 52, 24, 'rgba(255,255,255,0.12)', 'rgba(80,72,54,0.2)');
   });
 
+  SPR.parisoperahouse = outlined(g => {                                // Palais Garnier — placeholder until shipped art loads (ART_ASSETS)
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.beginPath(); g.ellipse(32, 61, 26, 3, 0, 0, 7); g.fill();
+    const sg = g.createLinearGradient(2, 20, 62, 58);
+    sg.addColorStop(0, '#e8dcc0'); sg.addColorStop(1, '#c0b088');
+    g.fillStyle = sg; g.fillRect(4, 36, 56, 22);
+    g.fillStyle = '#7a9a88'; g.beginPath(); g.arc(32, 30, 16, Math.PI, 0); g.fill();          // patina dome
+    g.fillStyle = '#c9a227'; g.beginPath(); g.arc(32, 12, 1.6, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(120,110,88,0.35)'; g.lineWidth = 0.7;
+    for (let x = 8; x < 56; x += 6) { g.beginPath(); g.moveTo(x, 40); g.lineTo(x, 58); g.stroke(); }
+    bevel(g, 4, 36, 56, 22, 'rgba(255,255,255,0.12)', 'rgba(80,72,54,0.2)');
+  });
+
   // ---------------------------------------------------------------------------
   // MID-CENTURY SUBURBIA props — American backyard/driveway clutter, 1950s-60s.
   // ---------------------------------------------------------------------------
@@ -10041,6 +10053,7 @@ const World = (() => {
     moulinrouge: 'assets/sprites/moulinrouge.png?v=1',
     sacrecoeur: 'assets/sprites/sacrecoeur.png?v=1',
     notredame: 'assets/sprites/notredame.png?v=1',
+    parisoperahouse: 'assets/sprites/parisoperahouse.png?v=1',
     gun: 'assets/sprites/gun.png?v=2',
     gunSterling: 'assets/sprites/gunSterling.png?v=1',
     gunAR7: 'assets/sprites/gunAR7.png?v=1',
@@ -10786,6 +10799,7 @@ const World = (() => {
     eiffeltower: (x, y) => prop('eiffeltower', 'EIFFEL TOWER', x, y, 2.4, true),
     arcdetriomphe: (x, y) => prop('arcdetriomphe', 'ARC DE TRIOMPHE', x, y, 1.6, true),
     notredame: (x, y) => prop('notredame', 'NOTRE-DAME', x, y, 1.8, true),
+    parisoperahouse: (x, y) => prop('parisoperahouse', 'PALAIS GARNIER', x, y, 2.0, true),
     louvrepyramid: (x, y) => prop('louvrepyramid', 'LOUVRE PYRAMID', x, y, 1.3, true),
     moulinrouge: (x, y) => prop('moulinrouge', 'MOULIN ROUGE', x, y, 1.3, true),
     sacrecoeur: (x, y) => prop('sacrecoeur', 'SACRÉ-CŒUR', x, y, 1.6, true),
