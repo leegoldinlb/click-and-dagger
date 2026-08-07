@@ -9934,6 +9934,7 @@ const World = (() => {
   SPR.baldini = SPR.civilianM;
   SPR.baldiniSad = SPR.civilianM;
   SPR.wilson = SPR.civilianM;
+  SPR.hkgangster = SPR.civilianM;
   SPR.tv = SPR.tvconsole;
   SPR.tvOn = SPR.tvconsole;
   SPR.sheetmusic = SPR.letter;
@@ -10185,6 +10186,7 @@ const World = (() => {
     baldini: 'assets/sprites/baldini.png?v=1',
     baldiniSad: 'assets/sprites/baldiniSad.png?v=1',
     wilson: 'assets/sprites/wilson.png?v=1',
+    hkgangster: 'assets/sprites/hkgangster.png?v=1',
     tv: 'assets/sprites/tv.png?v=1',
     tvOn: 'assets/sprites/tvOn.png?v=1',
     sheetmusic: 'assets/sprites/sheetmusic.png?v=1',
@@ -10795,6 +10797,11 @@ const World = (() => {
       kind: 'wilson', name: 'WILSON', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
       behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
       getTex() { return this.dead ? SPR.civilianCorpse : SPR.wilson; },
+    }),
+    hkgangster: (x, y, e) => ({
+      kind: 'hkgangster', name: 'TRIAD BOSS', x, y, solid: true, scale: 0.85, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.hkgangster; },
     }),
     tv: (x, y) => prop('tv', 'TV', x, y, 0.85, true, {
       on: false, getTex() { return this.on ? SPR.tvOn : SPR.tv; },

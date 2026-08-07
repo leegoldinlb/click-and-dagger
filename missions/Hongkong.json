@@ -196,6 +196,11 @@
    "flatAngle": 4.71238898038469,
    "zOff": 0.5,
    "scale": 0.41
+  },
+  {
+   "kind": "hkgangster",
+   "x": 33.6,
+   "y": 31.4
   }
  ],
  "blown": false,

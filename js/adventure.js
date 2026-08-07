@@ -24,7 +24,7 @@ const Adventure = (() => {
     gotPackage: false, curtainsUsed: false, coinsReady: false, gotCoins: false,
     gotDrPepper: false, metPatsy: false, patsyComplete: false,
     // Lao & The Great Baldini (casino)
-    wilsonPlayed: false,
+    wilsonPlayed: false, gangsterPaid: false,
     // A Brother's Freedom (Tehran)
     rezaWarmed: false, rostamFollowing: false, rostamDisguised: false, rostamLost: false,
   };
@@ -132,7 +132,7 @@ const Adventure = (() => {
     'soviet', 'spy', 'agent', 'tube', 'flowergirl', 'carlotta', 'ciphermachine', 'drz', 'bomb', 'defector', 'maheen',
     'reza', 'rostam', 'phonebooth', 'microfichemachine', 'agent005', 'boss005', 'sportscar', 'streetartist', 'matron',
     'metroentrance', 'maskstand', 'laundrylady', 'double', 'patsy', 'curtainrods', 'vendingmachine', 'tv', 'baldini',
-    'lao', 'wilson', 'fiona', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'nyfirefighter',
+    'lao', 'wilson', 'hkgangster', 'fiona', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'nyfirefighter',
     'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor',
     'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician',
     'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial',
@@ -156,7 +156,7 @@ const Adventure = (() => {
     sportscar: ['keys'], streetartist: ['headshot'], matron: ['portrait'], metroentrance: ['ticket'],
     maskstand: ['nixonmask'], laundrylady: ['laundryticket'], double: ['suit', 'jfkmask'],
     patsy: ['drpepper'], curtainrods: ['package'], vendingmachine: ['coins'], baldini: ['magicianjoke'],
-    lao: ['trickdeck'], wilson: ['sheetmusic'],
+    lao: ['trickdeck'], wilson: ['sheetmusic'], hkgangster: ['milliondollars'],
   };
   const WALL_TARGET_ITEMS = { 3: ['punchcard'], 4: ['lockpick', 'hairpin'], 5: ['tube'] };
   let autoEquipped = false;   // true iff `selected` was set by autoEquip, not a manual inventory click/keypress
@@ -242,7 +242,7 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'gunman', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'iransoldier', 'hkcop', 'elpresidente', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'nyofficer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'maheen', 'reza', 'rostam'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['goon', 'gunman', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'iransoldier', 'hkcop', 'elpresidente', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'nyofficer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'hkgangster', 'maheen', 'reza', 'rostam'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
@@ -287,6 +287,11 @@ const Adventure = (() => {
       case 'wilson': return e.dead
         ? 'The piano falls silent for good.'
         : 'Wilson works the keys without looking up, sunglasses on indoors like it’s a religious observance.';
+      case 'hkgangster': return e.dead
+        ? 'The Triad boss, folded for good. Whatever debt he was owed dies with him.'
+        : flags.gangsterPaid
+          ? 'He counts the money one more time, satisfied, and waves you toward the door.'
+          : 'He watches the tables with the patient look of a man who is owed money and knows it.';
       case 'maheen': return 'A woman with worry etched into every line of her face, holding her daughter close.';
       case 'reza': return e.warmed
         ? 'Reza, the tears not yet dry. The Shah’s man, softened at last.'
@@ -1161,6 +1166,18 @@ const Adventure = (() => {
         return 'Wilson slides the sheet music onto the piano and launches into “Anything Goes.” Lao looks distracted. Time to make your move.';
       }
       return 'Wilson works the keys without looking up.';
+    }
+    if (e.kind === 'hkgangster') {
+      if (e.dead) return 'There is nothing left to do here.';
+      if (selected === 'milliondollars') {
+        if (flags.gangsterPaid) return 'The debt is settled. He has nothing further to say to you.';
+        flags.gangsterPaid = true;
+        removeItem('milliondollars');
+        Sfx.power();
+        if (winFn) winFn();
+        return '“We’re square,” he says, counting the stack without looking up. He nods toward the door — you’re free to go.';
+      }
+      return 'He is owed money, and he is not a patient man.';
     }
     if (e.kind === 'fiona') {
       Sfx.bark();

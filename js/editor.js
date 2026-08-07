@@ -79,6 +79,7 @@ const Editor = (() => {
     { kind: 'lao', name: 'LAO', spr: 'lao' },
     { kind: 'baldini', name: 'THE GREAT BALDINI', spr: 'baldini' },
     { kind: 'wilson', name: 'WILSON', spr: 'wilson' },
+    { kind: 'hkgangster', name: 'TRIAD BOSS', spr: 'hkgangster' },
     { kind: 'fiona', name: 'FIONA', spr: 'fiona' },
     { kind: 'nyofficer', name: 'NYPD OFFICER', spr: 'nyofficer' },
     { kind: 'nyfirefighter', name: 'FIREFIGHTER', spr: 'nyfirefighter' },
