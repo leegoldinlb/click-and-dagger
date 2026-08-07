@@ -688,9 +688,17 @@ const Game = (() => {
   }
 
   // ------------------------------------------------------------- end game --
-  function endOverlay(title, cls, body, btn, onClick) {
+  // Per-mission "MISSION ACCOMPLISHED" banner art — already carries its own
+  // title/episode-name lettering, so when one's shown the plain text <h1> is
+  // skipped entirely rather than duplicating the title underneath it.
+  const WIN_BANNERS = {
+    cuba: 'Havanasuccess.png', dallas: 'dallassuccess.png', newyork: 'nycsuccess.png',
+    tehran: 'tehransuccess.png', hongkong: 'hongkongsuccess.png', paris: 'Parissuccess.png',
+    moscow: 'moscowsuccess.png',
+  };
+  function endOverlay(title, cls, body, btn, onClick, img) {
     overlay.innerHTML =
-      '<h1 class="' + cls + '">' + title + '</h1>' +
+      (img ? '<img class="winart" src="assets/ui/' + img + '?v=1" alt="' + title + '">' : '<h1 class="' + cls + '">' + title + '</h1>') +
       '<p class="story">' + body + '</p>' +
       '<button id="againbtn">' + btn + '</button>';
     overlay.classList.remove('hidden');
@@ -757,18 +765,19 @@ const Game = (() => {
     Music.stop();
     const secs = Math.round((performance.now() - G.t0) / 1000);
     const stats = 'ENEMIES NEUTRALIZED: ' + G.kills + ' / ' + totalHostiles + ' &nbsp;·&nbsp; TIME: ' + secs + 's<br>';
+    const banner = WIN_BANNERS[World.currentMission];
     if (World.isEpisode) {
       const next = World.episodeSlot + 1;
       if (World.episodeHasNext) {
         endOverlay('MISSION COMPLETE', 'win',
           stats + 'London sends its regards. The next assignment is already waiting.',
           '[ NEXT MISSION: ' + next + ' OF ' + World.episodeTotal + ' ▶ ]',
-          () => { location.href = 'index.html?episode=' + next; });
+          () => { location.href = 'index.html?episode=' + next; }, banner);
       } else {
         endOverlay('EPISODE COMPLETE', 'win',
           stats + 'The last gate closes behind you. London sends its regards — the episode is over.',
           '[ BACK TO START ]',
-          () => { location.href = 'index.html'; });
+          () => { location.href = 'index.html'; }, banner);
       }
       return;
     }
@@ -777,12 +786,12 @@ const Game = (() => {
         'The extraction goes clean. Somewhere, the people who sent you exhale.<br><br>' +
         stats + 'London sends its regards.',
         '[ BACK TO THE AIRPORT ]',
-        () => { location.href = 'index.html?mission=hub'; });
+        () => { location.href = 'index.html?mission=hub'; }, banner);
     } else {
       endOverlay('MISSION COMPLETE', 'win',
         'The extraction goes clean. Somewhere, the people who sent you exhale.<br><br>' +
         stats + 'London sends its regards.',
-        '[ PLAY AGAIN ]');
+        '[ PLAY AGAIN ]', undefined, banner);
     }
   }
 
