@@ -509,7 +509,20 @@ const Engine = (() => {
           });
         } else {
           sw[t].forEach(w => { if (w.next < 0) w.next = p; });
-          for (let i = 0; i < n; i++) sw[p].push({ v1: L[(i + 1) % n], v2: L[i], next: t, sibling: null, tex: null, cell: null, door: null, texScale: 1, open: false });
+          for (let i = 0; i < n; i++) {
+            // Skip edges this child SHARES with a sibling child (a porch meeting the
+            // building it wraps, two adjoining rooms inside one outdoor sector, …).
+            // Such an edge is interior to the parent's children — the parent's own
+            // space never touches it. Pushing it anyway (as we do for genuine
+            // child↔parent boundary edges) gave the parent a phantom wall, and since
+            // BOTH siblings contribute their own copy, the parent ended up with two
+            // opposite-facing portals sitting on one interior edge. drawSector then
+            // recursed into those children through an edge nowhere near the eye and
+            // painted their contents across the parent — the awning/porch "smear".
+            const a = L[(i + 1) % n], b = L[i];
+            if (smap.has(key(a, b))) continue;              // a real sibling already owns this directed edge
+            sw[p].push({ v1: a, v2: b, next: t, sibling: null, tex: null, cell: null, door: null, texScale: 1, open: false });
+          }
         }
       }
     });
