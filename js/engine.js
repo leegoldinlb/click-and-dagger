@@ -976,9 +976,29 @@ const Engine = (() => {
   }
   // sector containing (x,y), searching the cached sector + its neighbours first
   function localSector(geo, graph, x, y, from) {
-    if (from != null && from >= 0 && from < geo.sectors.length && pInLoop(x, y, geo.sectors[from].loop, geo.verts)) return from;
-    if (from != null && from >= 0 && graph[from]) {
-      for (const w of graph[from]) if (w.next >= 0 && pInLoop(x, y, geo.sectors[w.next].loop, geo.verts)) return w.next;
+    if (from != null && from >= 0 && from < geo.sectors.length) {
+      // A child sector's polygon sits entirely INSIDE its parent's own polygon
+      // (that's what makes it nested) — so "still inside `from`'s loop" reads
+      // true forever once `from` is the parent, even after actually walking
+      // through an open doorway into the child. Blindly trusting that check
+      // meant a nested room could never be entered from its parent: every
+      // frame re-confirmed "yep, still in the parent," so the render/physics
+      // sector never advanced past the boundary. Check `from` AND its open
+      // neighbours (which include a child, once wallOpen gives the parent a
+      // portal into it) and prefer whichever containing candidate has the
+      // SMALLEST area — same innermost-wins rule sectorAt uses — so a nested
+      // child always wins over the larger parent that contains it too.
+      let best = pInLoop(x, y, geo.sectors[from].loop, geo.verts) ? from : -1;
+      let bestArea = best >= 0 ? loopArea(geo.sectors[best].loop, geo.verts) : Infinity;
+      if (graph[from]) {
+        for (const w of graph[from]) {
+          if (w.next < 0 || w.next === best) continue;
+          if (!pInLoop(x, y, geo.sectors[w.next].loop, geo.verts)) continue;
+          const a = loopArea(geo.sectors[w.next].loop, geo.verts);
+          if (a < bestArea) { best = w.next; bestArea = a; }
+        }
+      }
+      if (best >= 0) return best;
     }
     return sectorAt(x, y, geo);
   }
