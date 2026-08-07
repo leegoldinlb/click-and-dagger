@@ -1470,6 +1470,29 @@ const Editor = (() => {
     const u = ((ax - ox) * dy - (ay - oy) * dx) / den;        // along segment
     return (t >= 0 && u >= 0 && u <= 1) ? t : null;
   }
+  // A child sector's boundary is appended to its PARENT's own wall list too
+  // (so the parent has something to render there) — but that appended entry's
+  // index doesn't correspond to anything in the parent's own wallTex/wallOpen/
+  // etc. arrays, since it's really the CHILD's edge seen from the far side.
+  // Resolve it to {the child sector, the child's own edge index} by matching
+  // the reversed vertex pair, so every wall-editing command reads/writes the
+  // one true owner regardless of which side of the boundary you're standing on.
+  function resolveSubEdge(hit) {
+    if (!hit) return hit;
+    const sec = geo.sectors[hit.s];
+    if (hit.i < sec.loop.length) return hit;                    // one of the sector's own authored edges — already correct
+    const L = sec.loop, n = L.length;
+    const w = portalGraph[hit.s][hit.i];                        // the appended entry itself carries the true v1/v2
+    for (let ci = 0; ci < geo.sectors.length; ci++) {
+      const child = geo.sectors[ci];
+      if (child.parent !== hit.s) continue;
+      const CL = child.loop, cn = CL.length;
+      for (let j = 0; j < cn; j++) {
+        if (CL[j] === w.v2 && CL[(j + 1) % cn] === w.v1) return { s: ci, i: j, portal: hit.portal, dist: hit.dist };
+      }
+    }
+    return hit;                                                 // shouldn't happen, but fail safe rather than throw
+  }
   function pickGeoWall() {                                     // the loop edge of the current sector the crosshair hits
     // Deliberately NOT pickGeoSector() — that one marches the flat ray THROUGH open
     // portals to find the farthest visible room (correct for floor/ceiling: aiming
@@ -1481,14 +1504,14 @@ const Editor = (() => {
     const s = Engine.sectorAt(cam.x, cam.y, geo);
     if (s < 0 || !portalGraph[s]) return null;
     const dx = Math.cos(cam.a), dy = Math.sin(cam.a);
-    const walls = portalGraph[s], loopLen = geo.sectors[s].loop.length;
+    const walls = portalGraph[s];
     let best = null, bt = Infinity;
-    for (let i = 0; i < walls.length && i < loopLen; i++) {   // own loop edges only (skip appended hole walls)
+    for (let i = 0; i < walls.length; i++) {                   // includes appended child-boundary walls — resolved below
       const w = walls[i], A = geo.verts[w.v1], B = geo.verts[w.v2];
       const t = raySeg(cam.x, cam.y, dx, dy, A.x, A.y, B.x, B.y);
       if (t != null && t < bt) { bt = t; best = { s, i, portal: w.next >= 0, dist: t }; }
     }
-    return best;
+    return resolveSubEdge(best);
   }
   const WALL_PICK_DIST = 6;                                    // T/[/] act on the WALL (not the floor) when it's this close
   // Inside a small NESTED sector (fountain, stage…) that 6-unit reach is bigger
@@ -1815,7 +1838,9 @@ const Editor = (() => {
   // Shift+I explicitly joins the looked-at edge through to the parent (Build's
   // "red wall"), the same per-edge opt-in as wallBlock/wallDoor. Only
   // meaningful on a sector with parent >= 0; has no effect on a top-level
-  // sector's own boundary, which is solid on its own terms.
+  // sector's own boundary, which is solid on its own terms. pickGeoWall
+  // already resolves an appended parent-side hit back to the child's own
+  // edge, so this works whichever side of the boundary you're standing on.
   function geoOpenWall() {
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
     const sec = geo.sectors[hit.s];
