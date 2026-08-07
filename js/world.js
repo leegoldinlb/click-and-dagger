@@ -11320,7 +11320,7 @@ const World = (() => {
         texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : undefined,
         wallDoorSkin: s.wallDoorSkin ? s.wallDoorSkin.slice() : undefined,
         wallBlock: s.wallBlock ? s.wallBlock.slice() : undefined,
-        wallSolid: s.wallSolid ? s.wallSolid.slice() : undefined,
+        wallOpen: s.wallOpen ? s.wallOpen.slice() : undefined,
         wallTex: s.wallTex ? s.wallTex.slice() : undefined,
         wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : undefined,
         wallStepTex: s.wallStepTex ? s.wallStepTex.slice() : undefined,

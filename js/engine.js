@@ -508,21 +508,20 @@ const Engine = (() => {
             texScale: sec.wallTexScale ? (sec.wallTexScale[i] || 1) : 1, open: false,
           });
         } else {
-          // Every child edge that isn't otherwise spoken for defaults to an
-          // always-open portal back to the parent — there was no way to give a
-          // walkable sub-sector even ONE genuinely solid side. That's fine for a
-          // flush floor patch (a win-zone tag, a texture callout) but it's why a
-          // raised dais/room reads as "nothing there" once you're standing on
-          // it: every direction immediately re-opens into the parent, so no wall
-          // is ever seen or felt underfoot. wallSolid lets an edge opt out of
-          // that — same per-edge-array convention as wallBlock/wallDoor — and
-          // become a REAL wall (both visually and for collision), textured from
-          // the child's own wallTex, exactly like the sec.solid "hole" case
-          // below but scoped to one edge instead of the whole sector.
+          // Build/Doom convention: a sector drawn inside another starts SOLID on
+          // every wall (like Build's plain white walls) — a room, not an
+          // automatic hole. Only a wall the author explicitly joins (Build's RED
+          // two-sided wall) opens through to the parent. wallOpen is that opt-in,
+          // same per-edge-array convention as wallBlock/wallDoor. Getting this
+          // backwards (every unmatched edge auto-porting to the parent, solid
+          // only by opt-out) was the actual bug behind "the sector disappears
+          // the moment you step into it" — a raised room/dais/porch had no wall
+          // on ANY side by default, so every direction immediately re-opened
+          // into the parent the instant you were inside it.
           for (let i = 0; i < n; i++) {
             const w = sw[t][i];
-            if (sec.wallSolid && sec.wallSolid[i]) continue;   // stays solid on the child's own side too — never gets a `next`
-            if (w.next < 0) w.next = p;
+            if (sec.wallOpen && sec.wallOpen[i]) { if (w.next < 0) w.next = p; }   // explicit opt-in: portal to parent
+            // else: leave next=-1 — solid on the child's own side, textured from its own wallTex (set at wall creation)
           }
           for (let i = 0; i < n; i++) {
             // Skip edges this child SHARES with a sibling child (a porch meeting the
@@ -536,13 +535,14 @@ const Engine = (() => {
             // painted their contents across the parent — the awning/porch "smear".
             const a = L[(i + 1) % n], b = L[i];
             if (smap.has(key(a, b))) continue;              // a real sibling already owns this directed edge
-            if (sec.wallSolid && sec.wallSolid[i]) {
-              sw[p].push({ v1: a, v2: b, next: -1, sibling: null,
-                tex: sec.wallTex ? sec.wallTex[i] : null, cell: null, door: null,
-                texScale: sec.wallTexScale ? (sec.wallTexScale[i] || 1) : 1, open: false });
+            if (sec.wallOpen && sec.wallOpen[i]) {
+              sw[p].push({ v1: a, v2: b, next: t, sibling: null, tex: null, cell: null, door: null, texScale: 1, open: false });
               continue;
             }
-            sw[p].push({ v1: a, v2: b, next: t, sibling: null, tex: null, cell: null, door: null, texScale: 1, open: false });
+            // default: solid from the parent's side too, textured from the child's own wallTex (reversed face)
+            sw[p].push({ v1: a, v2: b, next: -1, sibling: null,
+              tex: sec.wallTex ? sec.wallTex[i] : null, cell: null, door: null,
+              texScale: sec.wallTexScale ? (sec.wallTexScale[i] || 1) : 1, open: false });
           }
         }
       }

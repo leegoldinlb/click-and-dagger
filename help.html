@@ -131,7 +131,7 @@
       <dt><kbd>H</kbd></dt><dd>Solid column &harr; walkable.</dd>
       <dt><kbd>P</kbd></dt><dd>Mount/cycle a sprite flat on the wall, poster-style.</dd>
       <dt><kbd>I</kbd></dt><dd>Toggle invisible wall (open portal, but blocks movement).</dd>
-      <dt><kbd>Shift</kbd>+<kbd>I</kbd></dt><dd>On a sub-sector's own edge: toggle it between a real wall and an open portal to its parent (sub-sector edges are open by default &mdash; this is how a raised room/dais gets an actual wall on a side instead of vanishing the moment you step onto it).</dd>
+      <dt><kbd>Shift</kbd>+<kbd>I</kbd></dt><dd>On a sub-sector's own edge: toggle it between solid and joined-open to its parent. A sub-sector's edges are SOLID by default (Build/Doom convention &mdash; a room drawn inside another sector, walled on every side unless you explicitly connect it) &mdash; use this to open a doorway through to the sector around it.</dd>
     </dl>
     <dt style="margin-top:14px; color:var(--gold-bright)">OBJECT (aim at a placed person/prop)</dt>
     <dl>
