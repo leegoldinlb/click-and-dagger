@@ -698,7 +698,7 @@ const Game = (() => {
   };
   function endOverlay(title, cls, body, btn, onClick, img) {
     overlay.innerHTML =
-      (img ? '<img class="winart" src="assets/ui/' + img + '?v=1" alt="' + title + '">' : '<h1 class="' + cls + '">' + title + '</h1>') +
+      (img ? '<img class="endart" src="assets/ui/' + img + '?v=1" alt="' + title + '">' : '<h1 class="' + cls + '">' + title + '</h1>') +
       '<p class="story">' + body + '</p>' +
       '<button id="againbtn">' + btn + '</button>';
     overlay.classList.remove('hidden');
@@ -714,7 +714,7 @@ const Game = (() => {
     Music.stop();
     endOverlay('MISSION FAILED', '',
       'Someone was always going to be waiting. This time, it was them.',
-      '[ INSERT NEXT AGENT ]');
+      '[ INSERT NEXT AGENT ]', undefined, 'Dead.png');
   }
 
   function dieCivilians() {
@@ -724,7 +724,7 @@ const Game = (() => {
     Music.stop();
     endOverlay('MISSION FAILED', '',
       'Three bodies that were never supposed to be part of this. London does not send its regards.',
-      '[ INSERT NEXT AGENT ]');
+      '[ INSERT NEXT AGENT ]', undefined, 'imprisoned.png');
   }
 
   function dieDefector() {

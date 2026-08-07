@@ -275,7 +275,7 @@ body.adventure #modeline { color: #b09048; }
   box-shadow: 0 6px 0 rgba(0,0,0,0.55);
   flex-shrink: 0;
 }
-#overlay .winart {
+#overlay .endart {
   max-width: 720px;
   width: 100%;
   image-rendering: pixelated;
