@@ -475,6 +475,7 @@ const Editor = (() => {
       texScale: s.texScale || 1, wallDoor: s.wallDoor ? s.wallDoor.slice() : null,
       wallDoorSkin: s.wallDoorSkin ? s.wallDoorSkin.slice() : null,
       wallBlock: s.wallBlock ? s.wallBlock.slice() : null,
+      wallSolid: s.wallSolid ? s.wallSolid.slice() : null,
       wallTex: s.wallTex ? s.wallTex.slice() : null,
       wallTexScale: s.wallTexScale ? s.wallTexScale.slice() : null, parent: s.parent == null ? -1 : s.parent,
       wallStepTex: s.wallStepTex ? s.wallStepTex.slice() : null,
@@ -525,6 +526,7 @@ const Editor = (() => {
           wallDoor: (s.wallDoor && s.wallDoor.some(Boolean)) ? s.wallDoor.slice() : undefined,
           wallDoorSkin: (s.wallDoorSkin && s.wallDoorSkin.some(Boolean)) ? s.wallDoorSkin.slice() : undefined,
           wallBlock: (s.wallBlock && s.wallBlock.some(Boolean)) ? s.wallBlock.slice() : undefined,
+          wallSolid: (s.wallSolid && s.wallSolid.some(Boolean)) ? s.wallSolid.slice() : undefined,
           wallTex: (s.wallTex && s.wallTex.some(Boolean)) ? s.wallTex.slice() : undefined,
           wallTexScale: (s.wallTexScale && s.wallTexScale.some(v => v && v !== 1)) ? s.wallTexScale.slice() : undefined,
           wallStepTex: (s.wallStepTex && s.wallStepTex.some(Boolean)) ? s.wallStepTex.slice() : undefined,
@@ -1808,6 +1810,23 @@ const Editor = (() => {
     status('WALL ' + (hit.i + 1) + (hit.portal ? ' (portal)' : ' (solid)') + ' → ' + (next ? 'INVISIBLE WALL ON' : 'INVISIBLE WALL OFF') +
       (!hit.portal ? ' (already solid — no effect)' : ''));
   }
+  // A walkable sub-sector's edges default to always-open portals back to its
+  // parent — fine for a flush floor patch, but it means a raised room/dais has
+  // no wall on ANY side: step onto it and every direction re-opens into the
+  // parent, so it reads as if the room vanished. Shift+I marks the looked-at
+  // edge of a sub-sector as a genuine wall instead (both visually and for
+  // collision) — only meaningful on a sector with parent >= 0; has no effect
+  // on a top-level sector's own boundary, which is already solid by default.
+  function geoSolidWall() {
+    const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
+    const sec = geo.sectors[hit.s];
+    if (sec.parent < 0) { status('WALL ' + (hit.i + 1) + ' — not a sub-sector edge, already solid by default.'); return; }
+    if (!sec.wallSolid) sec.wallSolid = new Array(sec.loop.length).fill(false);
+    const next = !sec.wallSolid[hit.i];
+    sec.wallSolid[hit.i] = next;
+    portalGraph = Engine.buildGraph(geo);                     // re-derive wall.next for this edge
+    status('WALL ' + (hit.i + 1) + ' SUB-SECTOR BOUNDARY → ' + (next ? 'SOLID (real wall)' : 'OPEN (portal to parent again)'));
+  }
 
   // ---- texture favorites: hover a surface in the 3D preview, 1-9/0 applies a saved
   // texture, Shift+1-9/0 saves the surface under the crosshair into that slot. One
@@ -2102,7 +2121,7 @@ const Editor = (() => {
       if (e.code === 'KeyF') { if (!e.repeat) pushUndo(); if (sh) geoDoorSkin(); else geoDoor(); e.preventDefault(); return; }
       if (e.code === 'KeyH') { if (!e.repeat) pushUndo(); geoToggleSolid(); e.preventDefault(); return; }
       if (e.code === 'KeyP') { if (!e.repeat) pushUndo(); geoWallDecal(); e.preventDefault(); return; }   // mount/cycle a sprite on the wall, poster-style
-      if (e.code === 'KeyI') { if (!e.repeat) pushUndo(); geoBlockWall(); e.preventDefault(); return; }   // toggle invisible wall (open portal, blocked movement)
+      if (e.code === 'KeyI') { if (!e.repeat) pushUndo(); if (sh) geoSolidWall(); else geoBlockWall(); e.preventDefault(); return; }   // I: invisible wall (open portal, blocked movement) · Shift+I: real wall on a sub-sector edge
       const favIdx = FAV_KEYS.indexOf(e.code);
       if (favIdx >= 0) { if (!e.repeat) { if (e.ctrlKey) favSave(favIdx, sh); else favApply(favIdx, sh); } e.preventDefault(); return; }
     }
@@ -2278,7 +2297,7 @@ const Editor = (() => {
   function closeSector() {
     const loop = draft.slice();
     if (polyArea(loop) < 0) loop.reverse();                    // normalise to CCW
-    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, skyTex: null, win: false, hostile: false, texScale: 1, wallDoor: null, wallDoorSkin: null, wallBlock: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false, missionLink: null };
+    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, skyTex: null, win: false, hostile: false, texScale: 1, wallDoor: null, wallDoorSkin: null, wallBlock: null, wallSolid: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false, missionLink: null };
     const c = interiorPoint(loop);
     for (let s = 0; s < geo.sectors.length; s++)
       if (pointInLoop(c.x, c.y, geo.sectors[s].loop)) { sec.parent = s; break; }  // nested → sub-sector

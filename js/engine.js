@@ -508,7 +508,22 @@ const Engine = (() => {
             texScale: sec.wallTexScale ? (sec.wallTexScale[i] || 1) : 1, open: false,
           });
         } else {
-          sw[t].forEach(w => { if (w.next < 0) w.next = p; });
+          // Every child edge that isn't otherwise spoken for defaults to an
+          // always-open portal back to the parent — there was no way to give a
+          // walkable sub-sector even ONE genuinely solid side. That's fine for a
+          // flush floor patch (a win-zone tag, a texture callout) but it's why a
+          // raised dais/room reads as "nothing there" once you're standing on
+          // it: every direction immediately re-opens into the parent, so no wall
+          // is ever seen or felt underfoot. wallSolid lets an edge opt out of
+          // that — same per-edge-array convention as wallBlock/wallDoor — and
+          // become a REAL wall (both visually and for collision), textured from
+          // the child's own wallTex, exactly like the sec.solid "hole" case
+          // below but scoped to one edge instead of the whole sector.
+          for (let i = 0; i < n; i++) {
+            const w = sw[t][i];
+            if (sec.wallSolid && sec.wallSolid[i]) continue;   // stays solid on the child's own side too — never gets a `next`
+            if (w.next < 0) w.next = p;
+          }
           for (let i = 0; i < n; i++) {
             // Skip edges this child SHARES with a sibling child (a porch meeting the
             // building it wraps, two adjoining rooms inside one outdoor sector, …).
@@ -521,6 +536,12 @@ const Engine = (() => {
             // painted their contents across the parent — the awning/porch "smear".
             const a = L[(i + 1) % n], b = L[i];
             if (smap.has(key(a, b))) continue;              // a real sibling already owns this directed edge
+            if (sec.wallSolid && sec.wallSolid[i]) {
+              sw[p].push({ v1: a, v2: b, next: -1, sibling: null,
+                tex: sec.wallTex ? sec.wallTex[i] : null, cell: null, door: null,
+                texScale: sec.wallTexScale ? (sec.wallTexScale[i] || 1) : 1, open: false });
+              continue;
+            }
             sw[p].push({ v1: a, v2: b, next: t, sibling: null, tex: null, cell: null, door: null, texScale: 1, open: false });
           }
         }
