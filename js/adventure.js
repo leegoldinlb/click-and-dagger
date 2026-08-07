@@ -1177,7 +1177,7 @@ const Adventure = (() => {
         if (winFn) winFn();
         return '“We’re square,” he says, counting the stack without looking up. He nods toward the door — you’re free to go.';
       }
-      return 'He is owed money, and he is not a patient man.';
+      return '“If you want to make it out of this town alive, it’ll cost you… One Million Dollars, Mr. Vaughn.”';
     }
     if (e.kind === 'fiona') {
       Sfx.bark();

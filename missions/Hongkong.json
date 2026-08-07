@@ -76,8 +76,8 @@
   },
   {
    "kind": "hongkongbar",
-   "x": 27.89,
-   "y": 24.47,
+   "x": 29.26,
+   "y": 24.31,
    "scale": 1.47
   },
   {
@@ -120,8 +120,8 @@
   },
   {
    "kind": "blackbelt",
-   "x": 26.51,
-   "y": 25.61
+   "x": 25.46,
+   "y": 24.31
   },
   {
    "kind": "baldini",
@@ -201,6 +201,16 @@
    "kind": "hkgangster",
    "x": 33.6,
    "y": 31.4
+  },
+  {
+   "kind": "hkgangster",
+   "x": 26.54,
+   "y": 26.43
+  },
+  {
+   "kind": "blackbelt",
+   "x": 27.54,
+   "y": 24.49
   }
  ],
  "blown": false,

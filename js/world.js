@@ -9934,7 +9934,7 @@ const World = (() => {
   SPR.baldini = SPR.civilianM;
   SPR.baldiniSad = SPR.civilianM;
   SPR.wilson = SPR.civilianM;
-  SPR.hkgangster = SPR.civilianM;
+  SPR.hkgangster = SPR.civilianM;   // placeholder until the shipped London-gangster art loads (ART_ASSETS below)
   SPR.tv = SPR.tvconsole;
   SPR.tvOn = SPR.tvconsole;
   SPR.sheetmusic = SPR.letter;
@@ -10186,7 +10186,7 @@ const World = (() => {
     baldini: 'assets/sprites/baldini.png?v=1',
     baldiniSad: 'assets/sprites/baldiniSad.png?v=1',
     wilson: 'assets/sprites/wilson.png?v=1',
-    hkgangster: 'assets/sprites/hkgangster.png?v=1',
+    hkgangster: 'assets/sprites/londongangster.png?v=1',   // reuses the shipped London gangster art — no HK-specific art yet
     tv: 'assets/sprites/tv.png?v=1',
     tvOn: 'assets/sprites/tvOn.png?v=1',
     sheetmusic: 'assets/sprites/sheetmusic.png?v=1',
