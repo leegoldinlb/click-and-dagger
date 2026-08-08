@@ -10107,6 +10107,14 @@ const World = (() => {
   SPR.tehranbooksign3 = SPR.desk;
   SPR.tehranphonesign = SPR.desk;
   SPR.tehranbusstopsign = SPR.desk;
+  // ART_ASSETS below only replaces a kind that already has a procedural
+  // placeholder (`if (!SPR[name]) continue;`) — these four are pure shipped
+  // art with no procedural version, so they just borrow an existing tree's
+  // placeholder until their real PNGs load in.
+  SPR.oaktree = SPR.royalpalm;
+  SPR.pinetree = SPR.royalpalm;
+  SPR.mapletree = SPR.bananaplant;
+  SPR.birchtree = SPR.royalpalm;
 
   // -------------------------------------------------------------------------
   // SHIPPED CHARACTER ART — real PNG assets replacing specific procedural
@@ -10195,6 +10203,10 @@ const World = (() => {
     phonebooth: 'assets/sprites/phonebooth.png?v=1',
     royalpalm: 'assets/sprites/royalpalm.png?v=1',
     bananaplant: 'assets/sprites/bananaplant.png?v=1',
+    oaktree: 'assets/sprites/oaktree.png?v=1',
+    pinetree: 'assets/sprites/pinetree.png?v=1',
+    mapletree: 'assets/sprites/mapletree.png?v=1',
+    birchtree: 'assets/sprites/birchtree.png?v=1',
     parkbench: 'assets/sprites/parkbench.png?v=1',
     firehydrant: 'assets/sprites/firehydrant.png?v=1',
     mailbox: 'assets/sprites/mailbox.png?v=1',
@@ -10596,6 +10608,10 @@ const World = (() => {
     plant: (x, y) => prop('plant', 'POTTED PALM', x, y, 0.7, false),
     royalpalm: (x, y) => prop('royalpalm', 'ROYAL PALM', x, y, 1.3, true),
     bananaplant: (x, y) => prop('bananaplant', 'BANANA TREE', x, y, 0.85, true),
+    oaktree: (x, y) => prop('oaktree', 'OAK TREE', x, y, 1.4, true),
+    pinetree: (x, y) => prop('pinetree', 'PINE TREE', x, y, 1.5, true),
+    mapletree: (x, y) => prop('mapletree', 'MAPLE TREE', x, y, 1.25, true),
+    birchtree: (x, y) => prop('birchtree', 'BIRCH TREE', x, y, 1.5, true),
     bougainvillea: (x, y) => prop('bougainvillea', 'BOUGAINVILLEA', x, y, 0.75, false),
     fern: (x, y) => prop('fern', 'POTTED FERN', x, y, 0.65, false),
     cactus: (x, y) => prop('cactus', 'POTTED CACTUS', x, y, 0.55, false),
