@@ -1143,9 +1143,18 @@ const Editor = (() => {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(toLevel(), null, 1)], { type: 'application/json' }));
     a.download = clean + '.json';
+    // Electron's download goes through the main process (session
+    // 'will-download'), which isn't as immediate as a plain browser's
+    // in-page download — appending the link and delaying the revoke gives
+    // it time to actually read the blob before the URL dies. Revoking
+    // synchronously right after click() (the old code) raced that and
+    // silently dropped the file in the desktop build.
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(a.href);
-    status('EXPORTED ' + a.download.toUpperCase() + '.');
+    a.remove();
+    const exportedName = a.download;
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    status('EXPORTED ' + exportedName.toUpperCase() + '.');
   });
 
   document.getElementById('import').addEventListener('click', () => document.getElementById('filein').click());
