@@ -222,6 +222,20 @@ input[type="number"] { width: 52px; }
 #favbar {
   position: absolute; bottom: 10px; right: 10px; display: flex; gap: 3px; pointer-events: none;
 }
+.modalOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+}
+.modalBox {
+  background: linear-gradient(160deg, var(--panel-hi), var(--panel) 55%, var(--panel-lo));
+  border: 3px solid var(--brass); box-shadow: inset 2px 2px 0 var(--bevel-hi), inset -2px -2px 0 var(--bevel-lo), 0 8px 24px rgba(0,0,0,0.6);
+  padding: 18px 20px; min-width: 320px; font-family: inherit;
+}
+.modalBox .modalMsg { color: var(--parchment); font-size: 13px; letter-spacing: 1px; margin-bottom: 10px; }
+.modalBox input[type="text"] { width: 100%; margin-bottom: 14px; }
+.modalBox .modalBtns { display: flex; justify-content: flex-end; gap: 8px; }
+.modalBox button { font-family: inherit; font-size: 12px; letter-spacing: 1px; padding: 6px 14px; }
+
 #texpalette {
   position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
   background: rgba(15, 12, 8, 0.94);

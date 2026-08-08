@@ -1133,15 +1133,49 @@ const Editor = (() => {
     localStorage.setItem(LS_KEY, JSON.stringify(toLevel()));
     status('SAVED TO BROWSER.');
   }
+  // window.prompt() throws "prompt() is not supported" in Electron's
+  // renderer (it's not implemented at all there, unlike a normal browser),
+  // which was silently breaking EXPORT in the desktop build — the click
+  // handler threw before ever reaching the actual file-saving code. This
+  // in-page modal works identically on the web and in Electron.
+  function promptText(message, defaultValue) {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modalOverlay';
+      overlay.innerHTML = `
+        <div class="modalBox">
+          <div class="modalMsg"></div>
+          <input type="text">
+          <div class="modalBtns">
+            <button class="cancelBtn">CANCEL</button>
+            <button class="okBtn gold">OK</button>
+          </div>
+        </div>`;
+      overlay.querySelector('.modalMsg').textContent = message;
+      const input = overlay.querySelector('input');
+      input.value = defaultValue || '';
+      document.body.appendChild(overlay);
+      input.focus();
+      input.select();
+      const finish = value => { overlay.remove(); resolve(value); };
+      overlay.querySelector('.okBtn').addEventListener('click', () => finish(input.value));
+      overlay.querySelector('.cancelBtn').addEventListener('click', () => finish(null));
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') finish(input.value);
+        else if (e.key === 'Escape') finish(null);
+      });
+    });
+  }
+
   document.getElementById('save').addEventListener('click', save);
   document.getElementById('play').addEventListener('click', () => {
     save();
     window.open('index.html?level=custom', '_blank');
   });
 
-  document.getElementById('export').addEventListener('click', () => {
+  document.getElementById('export').addEventListener('click', async () => {
     const suggested = document.getElementById('missionName').value.trim() || 'click-and-dagger-mission';
-    const name = prompt('Export filename:', suggested);
+    const name = await promptText('Export filename:', suggested);
     if (name === null) return;                                    // cancelled
     const clean = (name.trim() || 'click-and-dagger-mission').replace(/[^a-z0-9\-_. ]/gi, '').replace(/\.json$/i, '');
     const a = document.createElement('a');
@@ -1254,10 +1288,10 @@ const Editor = (() => {
       status('LOADED SLOT ' + (selectedSlot + 1) + ' — ' + geo.sectors.length + ' SECTORS.');
     } catch (err) { status('LOAD FAILED: ' + String(err.message || err).toUpperCase()); }
   });
-  document.getElementById('episodeSave').addEventListener('click', () => {
+  document.getElementById('episodeSave').addEventListener('click', async () => {
     let name = missionNameEl.value.trim();
     if (!name) {
-      name = prompt('Name this mission:', 'Mission ' + (selectedSlot + 1));
+      name = await promptText('Name this mission:', 'Mission ' + (selectedSlot + 1));
       if (name === null) return;                                  // cancelled
       name = name.trim() || 'Mission ' + (selectedSlot + 1);
       missionNameEl.value = name;
