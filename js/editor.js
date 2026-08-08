@@ -717,12 +717,33 @@ const Editor = (() => {
   }
 
   function fitCanvas() {
-    const base = Math.max(12, Math.min(30, Math.floor(740 / Math.max(lv.w, lv.h))));
+    // Fit the whole map into whatever room #gridscroll actually has (its
+    // parent #center now stretches to fill the window — see editor.css),
+    // instead of the old hardcoded 740px budget left over from the
+    // fixed-width layout. zoom (scroll-wheel) still scales up/down from
+    // this fitted baseline.
+    const gridscroll = document.getElementById('gridscroll');
+    const availW = gridscroll.clientWidth - 8;
+    const availH = gridscroll.clientHeight - 8;
+    const base = Math.max(12, Math.min(64, Math.floor(Math.min(availW / lv.w, availH / lv.h))));
     cellPx = Math.max(6, Math.min(160, Math.round(base * zoom)));
     cvs.width = lv.w * cellPx;
     cvs.height = lv.h * cellPx;
     g.imageSmoothingEnabled = false;
   }
+
+  // Both the 2D grid and the 3D preview now size themselves to fill #center
+  // (see editor.css), so a window resize has to re-fit whichever one is
+  // currently visible — rAF-throttled so a drag-resize doesn't spam layout.
+  let resizeRAF = null;
+  window.addEventListener('resize', () => {
+    if (resizeRAF) return;
+    resizeRAF = requestAnimationFrame(() => {
+      resizeRAF = null;
+      if (previewOn) fitPreviewCanvas();
+      else { fitCanvas(); render(); }
+    });
+  });
 
   function render() {
     const c = cellPx;
@@ -2063,6 +2084,27 @@ const Editor = (() => {
     }
     el.style.display = 'block';
   }
+  // Sizes pcanvas to fill however much of #preview3d is left after its
+  // sibling controls (favbar/pcontrols), preserving the 16:9 render aspect,
+  // then hands off to Engine.resize() to match the backing store to that
+  // displayed size × devicePixelRatio — same pattern main.js uses for the
+  // game canvas, opted into here now that the editor's preview is meant to
+  // fill the window instead of sitting at a small fixed size.
+  const PREVIEW_ASPECT = 1280 / 720;
+  function fitPreviewCanvas() {
+    const wrap = document.getElementById('preview3d');
+    const favbar = document.getElementById('favbar');
+    const pcontrols = document.getElementById('pcontrols');
+    const availW = wrap.clientWidth - 8;
+    const availH = wrap.clientHeight - (favbar.offsetHeight || 0) - (pcontrols.offsetHeight || 0) - 16;
+    if (availW <= 0 || availH <= 0) return;
+    let w = availW, h = w / PREVIEW_ASPECT;
+    if (h > availH) { h = availH; w = h * PREVIEW_ASPECT; }
+    pcanvas.style.width = Math.max(1, Math.floor(w)) + 'px';
+    pcanvas.style.height = Math.max(1, Math.floor(h)) + 'px';
+    Engine.resize();
+  }
+
   function enterPreview() {
     // Always preview on the Build/portal engine (matches the game — no raycaster).
     // A grid level is compiled to vector sectors in-place for the walkthrough;
@@ -2086,9 +2128,10 @@ const Editor = (() => {
     }
     const s = Engine.sectorAt(cam.x, cam.y, geo);
     cam.eyeZ = (s >= 0 ? geo.sectors[s].floor : 0) + 0.5;
-    if (!pengineReady) { Engine.init(pcanvas); pengineReady = true; }
-    document.getElementById('grid').hidden = true;
+    if (!pengineReady) { Engine.init(pcanvas, { renderW: 1280, renderH: 720 }); pengineReady = true; }
+    document.getElementById('gridscroll').hidden = true;
     document.getElementById('preview3d').hidden = false;
+    fitPreviewCanvas();
     const b = document.getElementById('viewtoggle');
     b.classList.add('active'); b.innerHTML = '&#9638; MAP EDITOR';
     document.getElementById('viewhint').textContent = previewCompiled ? 'Walking your level on the Build engine' : 'Walking & sculpting your vector sectors';
@@ -2104,7 +2147,7 @@ const Editor = (() => {
     previewOn = false; if (praf) cancelAnimationFrame(praf);
     previewCam = { x: +cam.x.toFixed(2), y: +cam.y.toFixed(2), a: cam.a };  // remember exactly where you left off
     if (previewCompiled) { geo.verts = []; geo.sectors = []; previewCompiled = false; }  // discard the throwaway grid compile
-    document.getElementById('grid').hidden = false;
+    document.getElementById('gridscroll').hidden = false;
     document.getElementById('preview3d').hidden = true;
     const b = document.getElementById('viewtoggle');
     b.classList.remove('active'); b.innerHTML = '&#9633; 3D PREVIEW';
