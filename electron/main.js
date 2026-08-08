@@ -2,6 +2,16 @@
 const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 
+// Customizes the native "About Click and Dagger" panel (the role:'about'
+// menu item below opens this) — otherwise it shows Electron's own generic
+// name/icon/version instead of ours.
+app.setAboutPanelOptions({
+  applicationName: 'Click and Dagger',
+  applicationVersion: app.getVersion(),
+  version: app.getVersion(),
+  copyright: 'Copyright Lee and Guy Goldin 2026',
+});
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1280,
