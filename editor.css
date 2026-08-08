@@ -39,7 +39,7 @@ aside::-webkit-scrollbar-thumb, #center::-webkit-scrollbar-thumb, #gridscroll::-
 }
 aside::-webkit-scrollbar-thumb:hover, #center::-webkit-scrollbar-thumb:hover, #gridscroll::-webkit-scrollbar-thumb:hover { background: var(--brass); }
 
-#wrap { max-width: 1240px; height: 100%; margin: 0 auto; padding: 14px; display: flex; flex-direction: column; }
+#wrap { height: 100%; margin: 0 auto; padding: 14px; display: flex; flex-direction: column; }
 
 header {
   position: relative;
