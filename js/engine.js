@@ -547,13 +547,24 @@ const Engine = (() => {
               sw[p].push({ v1: a, v2: b, next: t, sibling: null, tex: null, cell: null, door: null, texScale: 1,
                 stepTex: sec.wallStepTex ? (sec.wallStepTex[i] || null) : null,
                 stepFloorTex: sec.wallStepFloorTex ? (sec.wallStepFloorTex[i] || null) : null,
+                // The editor's crosshair-highlight glow (setHighlight) is keyed to
+                // the CHILD's own (sector, edge) — the same coordinates its texture
+                // edits resolve to via resolveSubEdge — but this appended object is
+                // what's actually walked during the PARENT's own drawSector pass, at
+                // the PARENT's wall-array index. Without this back-reference, the
+                // highlight check (sec===sn && edge===w.wi) can never match here, so
+                // aiming at a nested building's wall/soffit/riser from outside it
+                // never shows the targeting glow even though the text label and
+                // texture edits both work correctly.
+                childSector: t, childEdge: i,
                 open: false });
               continue;
             }
             // default: solid from the parent's side too, textured from the child's own wallTex (reversed face)
             sw[p].push({ v1: a, v2: b, next: -1, sibling: null,
               tex: sec.wallTex ? sec.wallTex[i] : null, cell: null, door: null,
-              texScale: sec.wallTexScale ? (sec.wallTexScale[i] || 1) : 1, open: false });
+              texScale: sec.wallTexScale ? (sec.wallTexScale[i] || 1) : 1,
+              childSector: t, childEdge: i, open: false });
           }
         }
       }
@@ -673,7 +684,16 @@ const Engine = (() => {
 
       for (const w of vis) {
         const wall = w.wall, ad = w.ad, bd = w.bd, x1 = w.x1, x2 = w.x2, span = x2 - x1;
-        const wallHL = !!(hl && hl.edge != null && hl.sec === sn && hl.edge === w.wi);   // this exact wall targeted
+        // Matches either by (sector currently drawn, index in its own wall array) —
+        // correct for a sector's own edges — OR by the wall's childSector/childEdge
+        // back-reference, for a nested child's boundary wall appended to its
+        // parent's array (see buildGraph): the editor's highlight is always keyed
+        // to the CHILD's own coordinates, which don't equal (sn, w.wi) when this
+        // appended copy is what's actually being drawn.
+        const wallHL = !!(hl && hl.edge != null && (
+          (hl.sec === sn && hl.edge === w.wi) ||
+          (wall.childSector != null && hl.sec === wall.childSector && hl.edge === wall.childEdge)
+        ));   // this exact wall targeted
         const wallTx = wall.tex ? cacheOf(World.TX[wall.tex] || World.TX.brick) : wt;
         const drawTx = wall.door ? cacheOf(World.TX[wall.doorSkin] || World.TX[wall.door] || World.TX.brick) : wallTx;  // door/interactive wall texture — doorSkin (a shipped door PNG) wins if set
         const decalTx = wall.decal ? cacheOf(World.SPR[wall.decal]) : null;                  // flat-mounted sprite, drawn once (no tiling)
