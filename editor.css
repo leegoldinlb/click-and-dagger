@@ -176,8 +176,6 @@ input[type="number"] { width: 52px; }
   width: 100%;
   flex: 1;
   min-height: 0;                    /* lets flex shrink it to the real available space instead of content size */
-  justify-content: center;
-  align-items: flex-start;
   overflow: auto;
   border: 3px solid var(--brass-dim);
   box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5);
@@ -191,6 +189,13 @@ input[type="number"] { width: 52px; }
   image-rendering: pixelated;
   display: block;
   flex: none;                       /* keep its own pixel size — fitCanvas() sizes it to fill the container */
+  /* Centers the canvas when it's smaller than #gridscroll, same as the old
+     justify-content:center did — but justify-content:center on a scrolling
+     flex container has a well-known browser bug where it clamps the
+     scrollable range so you can never scroll into the "start" side of the
+     overflow (left/top), only the "end" side. margin:auto centering avoids
+     that bug entirely while looking identical. */
+  margin: auto;
 }
 #preview3d {
   position: relative; display: flex; flex-direction: column; width: 100%;
