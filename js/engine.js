@@ -536,7 +536,18 @@ const Engine = (() => {
             const a = L[(i + 1) % n], b = L[i];
             if (smap.has(key(a, b))) continue;              // a real sibling already owns this directed edge
             if (sec.wallOpen && sec.wallOpen[i]) {
-              sw[p].push({ v1: a, v2: b, next: t, sibling: null, tex: null, cell: null, door: null, texScale: 1, open: false });
+              // This appended object — not the child's own sw[t][i] — is what
+              // actually renders when the eye is standing in the PARENT sector
+              // looking at the child (e.g. an outdoor plaza looking at a
+              // building's wall). It was missing stepTex/stepFloorTex entirely,
+              // so a soffit/riser texture set via the editor (which correctly
+              // resolves to and saves on the CHILD's own wallStepTex/
+              // wallStepFloorTex) never showed up from the parent's side —
+              // the editor reported success but nothing visually changed.
+              sw[p].push({ v1: a, v2: b, next: t, sibling: null, tex: null, cell: null, door: null, texScale: 1,
+                stepTex: sec.wallStepTex ? (sec.wallStepTex[i] || null) : null,
+                stepFloorTex: sec.wallStepFloorTex ? (sec.wallStepFloorTex[i] || null) : null,
+                open: false });
               continue;
             }
             // default: solid from the parent's side too, textured from the child's own wallTex (reversed face)
