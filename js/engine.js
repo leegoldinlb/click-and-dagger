@@ -798,10 +798,13 @@ const Engine = (() => {
             if (nyf > yBotA[x]) nyf = yBotA[x]; if (nyf < yTopA[x]) nyf = yTopA[x];
             for (let y = yTopA[x]; y < (nyc | 0); y++) {             // upper step (neighbour ceiling lower)
               const idx = y * W + x;
-              if (sky && ns.sky) {                                   // both sides open sky — a Build-style thin
-                const ang = Math.atan2(rdy, rdx);                     // "border sector" trick to fake a horizon:
-                const skyU = (((ang / TAU) * skyTex.w * 2) % skyTex.w + skyTex.w) % skyTex.w | 0;  // no facade band,
-                const v = clamp(((y - horizon + H * 0.5) / H) * skyTex.h, 0, skyTex.h - 1) | 0;     // just more sky
+              if (sky && ns.sky && !wall.stepTex) {                  // both sides open sky, no explicit override —
+                const ang = Math.atan2(rdy, rdx);                     // a Build-style thin "border sector" trick to
+                const skyU = (((ang / TAU) * skyTex.w * 2) % skyTex.w + skyTex.w) % skyTex.w | 0;  // fake a horizon:
+                const v = clamp(((y - horizon + H * 0.5) / H) * skyTex.h, 0, skyTex.h - 1) | 0;     // no facade band, just more sky.
+                // An explicit per-wall override always wins over this default too — otherwise there was
+                // no way to retexture a soffit between two sky sectors at all (the editor would happily
+                // save and label the choice, but the visual never changed no matter what you cycled to).
                 let cpx = skyTex.u32[v * skyTex.w + skyU];
                 if (wallHL) cpx = hlMix(cpx);
                 buf[idx] = cpx; depth[idx] = MAXD;
