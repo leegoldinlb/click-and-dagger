@@ -1892,12 +1892,44 @@ const Editor = (() => {
     portalGraph = Engine.buildGraph(geo);                     // re-derive wall.doorSkin + siblings
     status('WALL ' + (hit.i + 1) + ' DOOR SKIN → ' + (next ? World.DOOR_SKIN_NAMES[next] : 'PLAIN (' + kind.toUpperCase() + ')'));
   }
+  // A shared portal edge is really TWO independent wall records, one owned by
+  // each sector's own loop (unlike door/doorSkin, buildGraph never syncs
+  // wallBlock between them). Toggling from one side only — e.g. once in the
+  // 3D preview standing in one room, then later via 2D-map hover, which
+  // always resolves to whichever sector happens to come first — leaves the
+  // OTHER side's copy permanently stuck at its old value, since nothing ever
+  // touches it again: the wall reads as invisible forever from that sector's
+  // perspective no matter how many times you toggle the side you can see.
+  // Find and sync it here so both copies always agree.
+  function findSiblingEdge(s, i) {
+    const sec = geo.sectors[s], L = sec.loop, n = L.length;
+    const a = L[i], b = L[(i + 1) % n];
+    for (let s2 = 0; s2 < geo.sectors.length; s2++) {
+      if (s2 === s) continue;
+      const L2 = geo.sectors[s2].loop, n2 = L2.length;
+      for (let j = 0; j < n2; j++) {
+        if (L2[j] === b && L2[(j + 1) % n2] === a) return { s: s2, i: j };
+      }
+    }
+    return null;
+  }
+  function setWallBlock(s, i, val) {
+    const sec = geo.sectors[s];
+    if (!sec.wallBlock) sec.wallBlock = new Array(sec.loop.length).fill(false);
+    sec.wallBlock[i] = val;
+    const sib = findSiblingEdge(s, i);
+    if (sib) {
+      const sec2 = geo.sectors[sib.s];
+      if (!sec2.wallBlock) sec2.wallBlock = new Array(sec2.loop.length).fill(false);
+      sec2.wallBlock[sib.i] = val;
+    }
+  }
   function geoBlockWall() {                                   // toggle an "invisible wall" on the looked-at wall —
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }   // it still renders as a fully open
     const sec = geo.sectors[hit.s];                                              // portal (a forced-perspective vista
     if (!sec.wallBlock) sec.wallBlock = new Array(sec.loop.length).fill(false);   // stays visible) but blocks movement
     const next = !sec.wallBlock[hit.i];                                          // like a window you can't walk through
-    sec.wallBlock[hit.i] = next;
+    setWallBlock(hit.s, hit.i, next);
     portalGraph = Engine.buildGraph(geo);                     // re-derive wall.block
     status('WALL ' + (hit.i + 1) + (hit.portal ? ' (portal)' : ' (solid)') + ' → ' + (next ? 'INVISIBLE WALL ON' : 'INVISIBLE WALL OFF') +
       (!hit.portal ? ' (already solid — no effect)' : ''));
@@ -2451,7 +2483,7 @@ const Editor = (() => {
     const { s, i } = hoverEdge, sec = geo.sectors[s];
     if (!sec.wallBlock) sec.wallBlock = new Array(sec.loop.length).fill(false);
     const next = !sec.wallBlock[i];
-    sec.wallBlock[i] = next;
+    setWallBlock(s, i, next);
     portalGraph = Engine.buildGraph(geo);
     const portal = edgeIsPortal(s, sec.loop[i], sec.loop[(i + 1) % sec.loop.length]);
     status('WALL ' + (i + 1) + (portal ? ' (portal)' : ' (solid)') + ' → ' + (next ? 'INVISIBLE WALL ON' : 'INVISIBLE WALL OFF') +
