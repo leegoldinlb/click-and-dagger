@@ -98,11 +98,12 @@
     <dl>
       <dt><kbd>Space</kbd> / Click</dt><dd>Drop a wall vertex.</dd>
       <dt>Drag a vertex</dt><dd>Move it.</dd>
-      <dt><kbd>I</kbd></dt><dd>Insert a vertex on a wall.</dd>
+      <dt><kbd>V</kbd></dt><dd>Insert a vertex on the hovered wall.</dd>
+      <dt><kbd>I</kbd></dt><dd>Toggle invisible wall on the hovered wall (only has an effect on a portal/sector wall — a solid boundary wall has nothing to make invisible).</dd>
       <dt><kbd>DEL</kbd></dt><dd>Remove the selected vertex/sector.</dd>
       <dt><kbd>Ctrl</kbd>+<kbd>Z</kbd></dt><dd>Undo.</dd>
       <dt>Scroll</dt><dd>Pan. <kbd>Ctrl</kbd>+Scroll zooms. Middle-drag also pans.</dd>
-      <dt>Colors</dt><dd>White = solid wall, red = sector wall.</dd>
+      <dt>Colors</dt><dd>White = solid wall, red = sector wall, dashed gold = invisible wall.</dd>
       <dt>PREVIEW CAM tool</dt><dd>Sets where 3D PREVIEW starts &mdash; click to place (cyan marker), right-click to clear.
       Exiting 3D preview always remembers where you last stood, too.</dd>
     </dl>
@@ -130,7 +131,7 @@
       <dt><kbd>F</kbd></dt><dd>Cycle door/interactive-wall kind.</dd>
       <dt><kbd>H</kbd></dt><dd>Solid column &harr; walkable.</dd>
       <dt><kbd>P</kbd></dt><dd>Mount/cycle a sprite flat on the wall, poster-style.</dd>
-      <dt><kbd>I</kbd></dt><dd>Toggle invisible wall (open portal, but blocks movement).</dd>
+      <dt><kbd>I</kbd></dt><dd>Toggle invisible wall (open portal, but blocks movement) — also available hovering a wall in the 2D map, same key.</dd>
       <dt><kbd>Shift</kbd>+<kbd>I</kbd></dt><dd>On a sub-sector's own edge: toggle it between solid and joined-open to its parent. A sub-sector's edges are SOLID by default (Build/Doom convention &mdash; a room drawn inside another sector, walled on every side unless you explicitly connect it) &mdash; use this to open a doorway through to the sector around it.</dd>
     </dl>
     <dt style="margin-top:14px; color:var(--gold-bright)">OBJECT (aim at a placed person/prop)</dt>

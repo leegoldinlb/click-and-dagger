@@ -2427,7 +2427,7 @@ const Editor = (() => {
     render();
   }
   function insertVertexOnWall() {
-    if (!hoverEdge) { status('HOVER A WALL, THEN PRESS I.'); return; }
+    if (!hoverEdge) { status('HOVER A WALL, THEN PRESS V.'); return; }
     const { s, i } = hoverEdge, loop = geo.sectors[s].loop;
     const a = loop[i], b = loop[(i + 1) % loop.length];
     const cp = distToSeg(gcur.x, gcur.y, geo.verts[a].x, geo.verts[a].y, geo.verts[b].x, geo.verts[b].y);
@@ -2441,6 +2441,22 @@ const Editor = (() => {
       }
     }
     status('VERTEX INSERTED ON WALL.'); render();
+  }
+  // 2D-map counterpart to geoBlockWall() — that one aims via the 3D preview
+  // camera (pickGeoWall), which doesn't exist here, so this operates on
+  // whatever edge the mouse is hovering instead (same hoverEdge the [V]
+  // insert-vertex command already uses).
+  function toggleWallBlockAtHover() {
+    if (!hoverEdge) { status('HOVER A WALL, THEN PRESS I.'); return; }
+    const { s, i } = hoverEdge, sec = geo.sectors[s];
+    if (!sec.wallBlock) sec.wallBlock = new Array(sec.loop.length).fill(false);
+    const next = !sec.wallBlock[i];
+    sec.wallBlock[i] = next;
+    portalGraph = Engine.buildGraph(geo);
+    const portal = edgeIsPortal(s, sec.loop[i], sec.loop[(i + 1) % sec.loop.length]);
+    status('WALL ' + (i + 1) + (portal ? ' (portal)' : ' (solid)') + ' → ' + (next ? 'INVISIBLE WALL ON' : 'INVISIBLE WALL OFF') +
+      (!portal ? ' (already solid — no effect)' : ''));
+    render();
   }
   function cancelDraft() { if (draft.length) { draft = []; status('DRAFT CANCELLED.'); render(); } }
 
@@ -2468,7 +2484,7 @@ const Editor = (() => {
       }
     }
     coordsEl.textContent = 'DRAW  x ' + gcur.x.toFixed(1) + '  y ' + gcur.y.toFixed(1) +
-      (draft.length ? '  · ' + draft.length + ' verts' : '') + (hoverEdge ? '  · [I] split wall' : '');
+      (draft.length ? '  · ' + draft.length + ' verts' : '') + (hoverEdge ? '  · [V] split wall · [I] invisible wall' : '');
     render();
   }
 
@@ -2486,13 +2502,24 @@ const Editor = (() => {
       if (geo.sectors[s].win) { g.fillStyle = 'rgba(40,220,90,0.28)'; g.fill(); }      // win sector — green, on top
     }
     g.lineWidth = 2.5; g.lineCap = 'round';                    // walls: white solid, red portal
-    for (let s = 0; s < geo.sectors.length; s++) {
-      const L = geo.sectors[s].loop;
+    const invisibleEdges = [];                                 // collected and drawn after, dashed gold on top —
+    for (let s = 0; s < geo.sectors.length; s++) {             // an invisible wall is still a real (portal) wall
+      const L = geo.sectors[s].loop;                           // underneath, so its own color draws normally first
+      const sec = geo.sectors[s];
       for (let i = 0; i < L.length; i++) {
         const A = geo.verts[L[i]], B = geo.verts[L[(i + 1) % L.length]];
         g.strokeStyle = edgeIsPortal(s, L[i], L[(i + 1) % L.length]) ? '#ff5555' : '#eef2f6';
         g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
+        if (sec.wallBlock && sec.wallBlock[i]) invisibleEdges.push({ A, B });
       }
+    }
+    if (invisibleEdges.length) {
+      g.save();
+      g.strokeStyle = '#ffd75e'; g.lineWidth = 3; g.setLineDash([6, 5]);
+      for (const { A, B } of invisibleEdges) {
+        g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
+      }
+      g.restore();                                             // setLineDash is sticky — must not leak to later strokes
     }
     if (hoverEdge) {
       const L = geo.sectors[hoverEdge.s].loop, A = geo.verts[L[hoverEdge.i]], B = geo.verts[L[(hoverEdge.i + 1) % L.length]];
@@ -2705,7 +2732,8 @@ const Editor = (() => {
     }
     if (!drawMode || previewOn) return;
     if (e.code === 'Space') { pushUndo(); placeVertex(); e.preventDefault(); }
-    else if (e.code === 'KeyI') { pushUndo(); insertVertexOnWall(); e.preventDefault(); }
+    else if (e.code === 'KeyV') { pushUndo(); insertVertexOnWall(); e.preventDefault(); }
+    else if (e.code === 'KeyI') { pushUndo(); toggleWallBlockAtHover(); e.preventDefault(); }
     else if (e.code === 'Escape') {
       if (draft.length) cancelDraft();
       else deselectEntTool();
