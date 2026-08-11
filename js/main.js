@@ -387,6 +387,7 @@ const Game = (() => {
         Adventure.addItem('keys', 'KEYS');
         Adventure.msg('005 falls. A set of keys spills from his jacket.', 4);
       }
+      checkAllHostilesDead();
     } else {
       World.spawnFx(best.x, best.y);                       // a plain prop, wrecked — burst + vanish, no lingering corpse
       World.removeEnt(best);
@@ -757,6 +758,17 @@ const Game = (() => {
       '[ INSERT NEXT AGENT ]');
   }
 
+  // Default win condition for every level, on top of whatever a mission
+  // scripts on its own (win sectors, mission-link gates, puzzle payoffs like
+  // Hong Kong's boss buyoff or Moscow's "The Truth"): clearing every hostile
+  // wins the level outright. Checks World.ents live rather than comparing
+  // G.kills to the totalHostiles count taken at load, since a kind can turn
+  // hostile mid-mission (agent005 → boss005) without ever having been
+  // counted as one of the original hostiles.
+  function checkAllHostilesDead() {
+    if (G.over || totalHostiles === 0) return;
+    if (!World.ents.some(e => HOSTILE[e.kind] && !e.dead)) win();
+  }
   function win() {
     if (G.over) return;
     G.over = true;
