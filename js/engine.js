@@ -721,7 +721,19 @@ const Engine = (() => {
           const f = (x - x1) / span;
           const ycTrue = yc1 + (yc2 - yc1) * f, yfTrue = yf1 + (yf2 - yf1) * f;  // TRUE projected position —
           let yc = ycTrue, yf = yfTrue;                     // used for the wall's OWN texture V mapping below.
-          if (yc < yTopA[x]) yc = yTopA[x]; if (yf > yBotA[x]) yf = yBotA[x];    // yc/yf get clamped to the
+          // Clamp BOTH ways, like the portal branch below already does for
+          // nyc/nyf. Clamping yc only against the window TOP left the ceiling
+          // line free to sit below the window BOTTOM — which happens whenever
+          // you view a sector whose ceiling is lower than the bottom edge of
+          // the opening you're seeing it through (e.g. a sunken sector whose
+          // ceiling is at eye level, so its ceiling line pins to the horizon
+          // at any distance). The ceiling fill then ran from yTopA all the way
+          // down past yBotA, painting sky/ceiling outside this sector's own
+          // clip window and straight over the nearer wall that had already
+          // correctly drawn there — a far sector's horizon line bleeding
+          // through a foreground wall. Same reasoning mirrored for yf.
+          if (yc < yTopA[x]) yc = yTopA[x]; if (yc > yBotA[x]) yc = yBotA[x];
+          if (yf > yBotA[x]) yf = yBotA[x]; if (yf < yTopA[x]) yf = yTopA[x];    // yc/yf get clamped to the
           // current per-column visible window for floor/ceiling occlusion purposes only — using the CLAMPED
           // value for the wall's texture V would shrink/shift the span whenever the true edge is off-screen
           // (routinely true up close or near the screen edges), stretching the texture unevenly column to
