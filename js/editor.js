@@ -2325,14 +2325,30 @@ const Editor = (() => {
     return { x: (e.clientX - r.left) * (cvs.width / r.width) / cellPx,
              y: (e.clientY - r.top) * (cvs.height / r.height) / cellPx };
   }
-  function snapWorld(wx, wy) {                                  // snap to a nearby vertex, else 0.5 grid
-    let best = -1, bd = 0.45 * 0.45;
+  // Vertex placement/drag granularity. Quarter of a cell, not half — 0.25 is
+  // an exact binary fraction so repeated snapping never drifts, and every old
+  // half-grid position is still on it, so existing maps keep landing exactly
+  // where they always did.
+  const GRID = 0.25;
+  const snapGrid = v => Math.round(v / GRID) * GRID;
+  // Magnet radius for reusing an existing vertex (how loops get closed and
+  // edges get shared). Held at a roughly constant SCREEN size instead of a
+  // fixed 0.45 world units: at the old fixed radius the magnet was almost two
+  // grid steps wide once the grid went to 0.25, which swallowed every
+  // quarter-step position next to an existing vertex and made them
+  // unreachable. Capped at the original 0.45 so it is never grabbier than it
+  // used to be, and it tightens as you zoom in — which is exactly when you're
+  // placing fine detail.
+  const magnetR = () => Math.min(0.45, 12 / Math.max(1, cellPx));
+  function snapWorld(wx, wy) {                                  // snap to a nearby vertex, else the GRID
+    const mr = magnetR();
+    let best = -1, bd = mr * mr;
     for (let i = 0; i < geo.verts.length; i++) {
       const dx = geo.verts[i].x - wx, dy = geo.verts[i].y - wy, d = dx * dx + dy * dy;
       if (d < bd) { bd = d; best = i; }
     }
     if (best >= 0) return { x: geo.verts[best].x, y: geo.verts[best].y, vi: best };
-    return { x: Math.round(wx * 2) / 2, y: Math.round(wy * 2) / 2, vi: -1 };
+    return { x: snapGrid(wx), y: snapGrid(wy), vi: -1 };
   }
   function vertIndexFor(sp) {
     if (sp.vi >= 0) return sp.vi;
@@ -2498,9 +2514,9 @@ const Editor = (() => {
       draggingEnt.x = +w.x.toFixed(2); draggingEnt.y = +w.y.toFixed(2);
       render(); return;
     }
-    if (draggingVert >= 0) {                          // move the dragged vertex, snapped to the half-grid
-      geo.verts[draggingVert].x = Math.round(w.x * 2) / 2;
-      geo.verts[draggingVert].y = Math.round(w.y * 2) / 2;
+    if (draggingVert >= 0) {                          // move the dragged vertex, snapped to the GRID
+      geo.verts[draggingVert].x = snapGrid(w.x);
+      geo.verts[draggingVert].y = snapGrid(w.y);
       gcur.x = geo.verts[draggingVert].x; gcur.y = geo.verts[draggingVert].y; gcur.vi = draggingVert;
       render(); return;
     }

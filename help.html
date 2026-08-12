@@ -96,8 +96,8 @@
     <h2>DRAW MODE (vector sectors)</h2>
     <p class="lead">This is a vector map. Click (or Space) drops wall vertices; close the loop on the first point to make a sector.</p>
     <dl>
-      <dt><kbd>Space</kbd> / Click</dt><dd>Drop a wall vertex.</dd>
-      <dt>Drag a vertex</dt><dd>Move it.</dd>
+      <dt><kbd>Space</kbd> / Click</dt><dd>Drop a wall vertex. Snaps to quarter-cell steps (0.25).</dd>
+      <dt>Drag a vertex</dt><dd>Move it, snapped to the same quarter-cell steps. Dropping it onto an existing vertex merges them &mdash; that's how loops close and edges get shared. Zoom in (<kbd>Ctrl</kbd>+Scroll) to tighten that merge radius when you need a vertex placed right next to another one.</dd>
       <dt><kbd>V</kbd></dt><dd>Insert a vertex on the hovered wall.</dd>
       <dt><kbd>I</kbd></dt><dd>Toggle invisible wall on the hovered wall (only has an effect on a portal/sector wall — a solid boundary wall has nothing to make invisible).</dd>
       <dt><kbd>DEL</kbd></dt><dd>Remove the selected vertex/sector.</dd>
