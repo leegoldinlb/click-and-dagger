@@ -458,12 +458,24 @@ const Game = (() => {
   // enough to stop you walking into one; it doesn't need wall-quality sliding).
   function tryMove(o, nx, ny, r) {
     Engine.moveGeo(geo, graph, o, nx, ny, r, STEP);
+    let pushed = false;
     for (const e of World.ents) {
       if (e === o || !e.solid || e.dead) continue;
       const er = (e.scale || 0.5) * 0.4, min = r + er;
       const dx = o.x - e.x, dy = o.y - e.y, d = Math.hypot(dx, dy);
-      if (d < min && d > 1e-4) { o.x = e.x + (dx / d) * min; o.y = e.y + (dy / d) * min; }
+      if (d < min && d > 1e-4) { o.x = e.x + (dx / d) * min; o.y = e.y + (dy / d) * min; pushed = true; }
     }
+    // The push-out above writes o.x/o.y directly, AFTER moveGeo already resolved
+    // and cached o.sector for the pre-push position. Even a small shove can carry
+    // the mover across a portal edge, leaving o.sector naming a sector that no
+    // longer contains it. The renderer's "is my cached sector still valid?" check
+    // then fails and it re-roots the whole portal walk at a fresh sectorAt() — a
+    // different sector than physics believes — which reads as a flash while
+    // squeezing past a solid prop near a sector boundary (and also makes the
+    // eye-height lookup on the next line read the wrong sector's floor).
+    // Re-derive from the final position with the same continuity-preserving
+    // lookup physics itself uses, so render and physics stay in agreement.
+    if (pushed) o.sector = Engine.localSector(geo, graph, o.x, o.y, o.sector);
   }
 
   // --------------------------------------------------------------- update --
