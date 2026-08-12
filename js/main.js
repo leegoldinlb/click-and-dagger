@@ -445,6 +445,7 @@ const Game = (() => {
     G.player.sector = undefined;
   }
 
+  let winBlockT = 0;                    // last time the "you can't leave yet" nudge was shown (see the win-sector gate)
   const STEP = 0.5;                     // highest ledge you can climb in one move
   const JUMP_V = 5.2, GRAVITY = 15.5, HEAD_CLR = 0.12;   // jump takeoff speed, gravity, headroom before a ceiling bonk
   function los(x0, y0, x1, y1) { return Engine.losGeo(geo, graph, x0, y0, x1, y1); }
@@ -607,6 +608,20 @@ const Game = (() => {
       }
     }
 
+    // Dealey Plaza: once the double is suited and masked he tags along to the
+    // extraction point, same shape as the Havana/Tehran escorts. Losing him
+    // ends the mission — the whole plan is him being seen leaving.
+    if (Adventure.flags.doubleFollowing && !Adventure.flags.doubleLost) {
+      const dbl = World.ents.find(e => e.kind === 'double');
+      if (!dbl || dbl.dead) {
+        Adventure.flags.doubleLost = true;
+        dieDouble();
+      } else {
+        const bd = Math.hypot(p.x - dbl.x, p.y - dbl.y);
+        if (bd > 1.4) tryMove(dbl, dbl.x + (p.x - dbl.x) * Math.min(1, 2.2 * dt / bd), dbl.y + (p.y - dbl.y) * Math.min(1, 2.2 * dt / bd), 0.3);
+      }
+    }
+
     // transient fx (explosion bursts from destroyed props): age out and remove
     for (const e of [...World.ents]) {
       if (e.kind !== 'fx') continue;
@@ -658,7 +673,14 @@ const Game = (() => {
 
     const cs = Engine.localSector(geo, graph, p.x, p.y, p.sector);
     if (cs >= 0 && geo.sectors[cs].hostile && blowCover()) Adventure.msg('You’ve wandered into hostile territory. Cover’s blown.', 4);
-    if (cs >= 0 && geo.sectors[cs].win) win();
+    // A win sector is the extraction point — it only counts once the mission's
+    // objective is actually done (escort delivered, prize in hand). Without this
+    // gate you could walk straight to the exit and skip the whole puzzle.
+    if (cs >= 0 && geo.sectors[cs].win) {
+      const block = Adventure.winSectorBlock();
+      if (!block) win();
+      else if (performance.now() - winBlockT > 4000) { winBlockT = performance.now(); Adventure.msg(block, 3.5); }  // throttled: this runs every frame you stand there
+    }
     if (cs >= 0 && geo.sectors[cs].missionLink && !G.transitioning) enterGate(geo.sectors[cs].missionLink);
   }
 
@@ -747,6 +769,16 @@ const Game = (() => {
     Music.stop();
     endOverlay('MISSION FAILED', '',
       'The defector never made it out. Whatever he knew, it dies with him — and so does London’s trust in you.',
+      '[ INSERT NEXT AGENT ]');
+  }
+
+  function dieDouble() {
+    if (G.over) return;
+    G.over = true;
+    document.exitPointerLock();
+    Music.stop();
+    endOverlay('MISSION FAILED', '',
+      'The double never made it out of the plaza. There is no second man in the window now — only you, and a very good photograph of you.',
       '[ INSERT NEXT AGENT ]');
   }
 

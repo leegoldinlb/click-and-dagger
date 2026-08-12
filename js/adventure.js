@@ -20,6 +20,7 @@ const Adventure = (() => {
     // The Double (Dealey Plaza)
     gotNixonMask: false, exchangedMask: false, metLaundry: false, laundryDone: false,
     suitReady: false, gotSuit: false, doubleSuited: false, doubleComplete: false,
+    doubleFollowing: false, doubleLost: false,
     // The Patsy (Dealey Plaza)
     gotPackage: false, curtainsUsed: false, coinsReady: false, gotCoins: false,
     gotDrPepper: false, metPatsy: false, patsyComplete: false,
@@ -37,10 +38,26 @@ const Adventure = (() => {
   function setWinTrigger(fn) { winFn = fn; }
   function setLoseTrigger(fn) { loseFn = fn; }
   function setBlowTrigger(fn) { blowFn = fn; }
-  // The Double + The Patsy are two independent side-quests that converge on one
-  // shared win — called after either completes, fires only once both are true.
-  function checkDealeyWin() {
-    if (flags.doubleComplete && flags.patsyComplete && winFn) winFn();
+  // A win sector is the mission's EXTRACTION POINT, not the win itself —
+  // reaching it only counts once the objective is actually done. main.js used
+  // to fire win() the instant you stepped into any sector flagged `win`, with
+  // no condition at all, so Havana/Paris/Tehran could each be finished by
+  // walking to the exit and skipping their entire puzzle. Returns null when
+  // the player may win here, else a short line explaining what's missing.
+  function winSectorBlock() {
+    switch (World.currentMission) {
+      case 'cuba':                                          // escort the defector out
+        return flags.defectorFollowing ? null : 'Not without the defector. He is why you came.';
+      case 'tehran':                                        // escort Rostam out
+        return flags.rostamFollowing ? null : 'Not without Rostam. Maheen is waiting on a husband.';
+      case 'paris':                                         // leave with the egg
+        return flags.hasEgg ? null : 'Not empty-handed. The egg is the mission.';
+      case 'dallas':                                        // the double must be in position AND the patsy settled
+        if (!flags.doubleComplete) return 'Not without the double — he has to be dressed and in position first.';
+        if (!flags.patsyComplete) return 'The patsy is still loose and jumpy. Settle him before you pull out.';
+        return null;
+      default: return null;
+    }
   }
 
   const invEl = document.getElementById('inventory');
@@ -1072,13 +1089,13 @@ const Adventure = (() => {
         if (!flags.doubleSuited) return '“The suit first,” he says. “I\'m not doing this half dressed.”';
         if (flags.doubleComplete) return 'He is already in position, mask and all.';
         flags.doubleComplete = true;
+        flags.doubleFollowing = true;      // he tags along now — walk him to the extraction point
         removeItem('jfkmask');
         e.disguised = true;
         Sfx.power();
-        checkDealeyWin();
-        return 'He settles the mask into place. From ten feet, in bad light, he could fool a crowd. That is the idea.';
+        return 'He settles the mask into place. From ten feet, in bad light, he could fool a crowd. “Lead the way — I am not walking out of here alone.”';
       }
-      return flags.doubleComplete ? 'He holds his position, mask and all, saying nothing.' : 'He is waiting on instructions, and clothes.';
+      return flags.doubleComplete ? 'He keeps close, mask and all, waiting on you to move.' : 'He is waiting on instructions, and clothes.';
     }
     if (e.kind === 'patsy') {
       if (e.dead) return 'There is nothing left to do here.';
@@ -1087,7 +1104,6 @@ const Adventure = (() => {
         flags.patsyComplete = true;
         removeItem('drpepper');
         Sfx.pick();
-        checkDealeyWin();
         return '“...Dr Pepper?” His shoulders drop half an inch — the first calm he has shown all day. “Yeah. Yeah, okay. I can wait here.”';
       }
       if (!flags.metPatsy) {
@@ -1328,6 +1344,6 @@ const Adventure = (() => {
 
   renderInv();
   return { flags, msg, clickAt, lookAt, nameAt, hudAt, resolveAt, addItem, cycleInv, confirmInv,
-    setWinTrigger, setLoseTrigger, setBlowTrigger, cheatCollectAll, get selected() { return selected; },
+    setWinTrigger, setLoseTrigger, setBlowTrigger, winSectorBlock, cheatCollectAll, get selected() { return selected; },
     get selectedName() { const it = inv.find(x => x.id === selected); return it ? it.name : null; } };
 })();

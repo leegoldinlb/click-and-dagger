@@ -537,6 +537,11 @@
    "y": 44.44,
    "scale": 3.43,
    "zOff": 0.1
+  },
+  {
+   "kind": "sedan",
+   "x": 38.81,
+   "y": 9.15
   }
  ],
  "blown": false,
@@ -3378,7 +3383,7 @@
     "floorTex": "lawngrass",
     "ceilTex": "ceiltile",
     "sky": true,
-    "win": false,
+    "win": true,
     "hostile": false,
     "texScale": 1,
     "parent": -1
