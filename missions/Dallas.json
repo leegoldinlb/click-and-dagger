@@ -255,8 +255,8 @@
   },
   {
    "kind": "nyofficer",
-   "x": 22.11,
-   "y": 23.53
+   "x": 22.5,
+   "y": 23.33
   },
   {
    "kind": "nyofficer",
@@ -267,7 +267,7 @@
    "kind": "vendor",
    "x": 23.49,
    "y": 24.67,
-   "behavior": "wander"
+   "behavior": "stationary"
   },
   {
    "kind": "medkit",
@@ -542,6 +542,24 @@
    "kind": "sedan",
    "x": 38.81,
    "y": 9.15
+  },
+  {
+   "kind": "nycpanamposter",
+   "x": 13.07,
+   "y": 22.52,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 4.71238898038469,
+   "zOff": 1.2
+  },
+  {
+   "kind": "nycpanamposter",
+   "x": 8.98,
+   "y": 22.52,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 4.71238898038469,
+   "zOff": 0.1
   }
  ],
  "blown": false,
@@ -1274,7 +1292,7 @@
     "y": 29
    },
    {
-    "x": 18.5,
+    "x": 18,
     "y": 25
    },
    {
@@ -1282,7 +1300,7 @@
     "y": 24
    },
    {
-    "x": 18.5,
+    "x": 18,
     "y": 24
    },
    {
@@ -1298,11 +1316,11 @@
     "y": 24
    },
    {
-    "x": 21.5,
+    "x": 22,
     "y": 25
    },
    {
-    "x": 21.5,
+    "x": 22,
     "y": 24
    },
    {
@@ -1684,6 +1702,38 @@
    {
     "x": 29.5,
     "y": 42
+   },
+   {
+    "x": 13,
+    "y": 22
+   },
+   {
+    "x": 13,
+    "y": 23
+   },
+   {
+    "x": 11,
+    "y": 23
+   },
+   {
+    "x": 11,
+    "y": 22
+   },
+   {
+    "x": 9,
+    "y": 23
+   },
+   {
+    "x": 9,
+    "y": 18
+   },
+   {
+    "x": 10,
+    "y": 18
+   },
+   {
+    "x": 10,
+    "y": 22
    }
   ],
   "sectors": [
@@ -2785,6 +2835,8 @@
      182,
      180,
      67,
+     285,
+     284,
      64
     ],
     "floor": 0,
@@ -2813,7 +2865,7 @@
      null,
      "nyacwindow",
      null,
-     null
+     "brick"
     ],
     "parent": -1
    },
@@ -4361,6 +4413,57 @@
      null
     ],
     "parent": 3
+   },
+   {
+    "loop": [
+     285,
+     286,
+     287,
+     284
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "marble",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "marble",
+     null,
+     "marble",
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     286,
+     288,
+     289,
+     290,
+     291,
+     287
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "marble",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "marble",
+     "marble",
+     null,
+     null,
+     "marble",
+     null
+    ],
+    "parent": -1,
+    "missionLink": "hub"
    }
   ]
  }

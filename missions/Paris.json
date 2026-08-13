@@ -853,11 +853,11 @@
     "y": 17
    },
    {
-    "x": 39.5,
-    "y": 17.5
+    "x": 39,
+    "y": 17
    },
    {
-    "x": 39.5,
+    "x": 39,
     "y": 19
    },
    {
@@ -897,12 +897,12 @@
     "y": 21.5
    },
    {
-    "x": 36.5,
+    "x": 37,
     "y": 5
    },
    {
-    "x": 39,
-    "y": 7
+    "x": 39.25,
+    "y": 6.75
    },
    {
     "x": 33,
@@ -1698,6 +1698,13 @@
      false,
      null,
      null,
+     true,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
      true
     ],
     "wallTex": [
@@ -1715,7 +1722,7 @@
      "balconywin",
      "balconywin",
      "balconywin",
-     "brick",
+     "balconywin",
      "haussmannwindow",
      "haussmannwindow",
      "haussmann",
@@ -1742,47 +1749,6 @@
      "haussmann",
      null,
      "haussmann"
-    ],
-    "wallTexScale": [
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     1,
-     0.5,
-     1,
-     1,
-     1,
-     1
     ],
     "wallStepTex": [
      null,
@@ -1875,8 +1841,8 @@
      9,
      0
     ],
-    "floor": 0.4,
-    "ceil": 2.8,
+    "floor": 0.5,
+    "ceil": 3,
     "floorTex": "riverstone",
     "ceilTex": "stuccob",
     "sky": true,
@@ -1884,6 +1850,12 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallBlock": [
+     false,
+     false,
+     false,
+     true
+    ],
     "wallTex": [
      "riverstone",
      null,
@@ -2569,17 +2541,17 @@
     ],
     "floor": 2,
     "ceil": 3,
-    "floorTex": "carpet",
+    "floorTex": "rooftile",
     "ceilTex": "ceiltile",
     "sky": true,
-    "skyTex": "parisnight",
+    "skyTex": "starrynight",
     "win": false,
     "hostile": false,
     "texScale": 1,
     "wallTex": [
-     null,
+     "balconywin",
      "mansardwindow",
-     null,
+     "balconywin",
      null
     ],
     "parent": -1
