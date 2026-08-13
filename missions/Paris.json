@@ -470,9 +470,29 @@
    "y": 38.94
   },
   {
-   "kind": "keycard",
-   "x": 30.53,
-   "y": 0.74
+   "kind": "boulevardlamp",
+   "x": 21.61,
+   "y": 24.63
+  },
+  {
+   "kind": "boulevardlamp",
+   "x": 35.29,
+   "y": 25.48
+  },
+  {
+   "kind": "boulevardlamp",
+   "x": 32.74,
+   "y": 8.63
+  },
+  {
+   "kind": "metroentrance",
+   "x": 37.82,
+   "y": 8.43
+  },
+  {
+   "kind": "metroticket",
+   "x": 33.46,
+   "y": 7.62
   }
  ],
  "blown": false,
@@ -1589,28 +1609,8 @@
     "y": 9.5
    },
    {
-    "x": 15,
-    "y": 33
-   },
-   {
     "x": 16,
     "y": 33
-   },
-   {
-    "x": 15,
-    "y": 33.5
-   },
-   {
-    "x": 16,
-    "y": 33.5
-   },
-   {
-    "x": 12,
-    "y": 37.5
-   },
-   {
-    "x": 13.5,
-    "y": 37.5
    }
   ],
   "sectors": [
@@ -1643,7 +1643,6 @@
      168,
      173,
      29,
-     278,
      277,
      26,
      25,
@@ -1740,14 +1739,14 @@
      "balconywin",
      null,
      null,
+     "sandstone",
+     "sandstone",
      null,
-     null,
-     null,
-     "haussmann",
+     "sandstone",
      "brick",
      "haussmann",
      "haussmann",
-     null,
+     "haussmann",
      "haussmann"
     ],
     "wallStepTex": [
@@ -1785,11 +1784,11 @@
      null,
      "brick",
      "brick",
-     null,
+     "sandstone",
      "brick",
      "haussmann",
      "haussmann",
-     null,
+     "haussmann",
      "haussmann"
     ],
     "wallStepFloorTex": [
@@ -1821,7 +1820,7 @@
      "brick",
      null,
      "riverstone",
-     null,
+     "riverstone",
      "riverstone",
      "brick",
      null,
@@ -1829,7 +1828,7 @@
      null,
      "riverstone",
      "riverstone",
-     null,
+     "riverstone",
      "riverstone"
     ],
     "parent": -1
@@ -2439,7 +2438,7 @@
     ],
     "floor": 0.3,
     "ceil": 3.7,
-    "floorTex": "carpet",
+    "floorTex": "riverstone",
     "ceilTex": "helipad",
     "sky": true,
     "skyTex": "starrynight",
@@ -2453,7 +2452,7 @@
      false
     ],
     "wallTex": [
-     null,
+     "riverstone",
      "stucco",
      null,
      null
@@ -3692,64 +3691,6 @@
      null,
      null
     ],
-    "parent": -1
-   },
-   {
-    "loop": [
-     278,
-     280,
-     279,
-     277
-    ],
-    "floor": 0.2,
-    "ceil": 1.2,
-    "floorTex": "carpet",
-    "ceilTex": "haussmann",
-    "sky": false,
-    "win": false,
-    "hostile": false,
-    "texScale": 1,
-    "wallDoor": [
-     null,
-     "keycard",
-     null,
-     null
-    ],
-    "wallDoorSkin": [
-     null,
-     "doorsaloon",
-     null,
-     null
-    ],
-    "wallTex": [
-     "haussmann",
-     null,
-     "haussmann",
-     null
-    ],
-    "wallStepTex": [
-     null,
-     "haussmann",
-     null,
-     null
-    ],
-    "parent": -1
-   },
-   {
-    "loop": [
-     280,
-     282,
-     281,
-     279
-    ],
-    "floor": -0.2,
-    "ceil": 1.4,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
-    "sky": false,
-    "win": true,
-    "hostile": false,
-    "texScale": 1,
     "parent": -1
    }
   ]

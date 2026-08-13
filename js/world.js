@@ -10125,7 +10125,8 @@ const World = (() => {
   // arriving a few frames late just pops in with no special handling needed.
   // -------------------------------------------------------------------------
   const ART_ASSETS = {                                      // bump a path's ?v= whenever that file on disk changes
-    metroentrance: 'assets/sprites/metroentrance.png?v=1',
+    metroentrance: 'assets/sprites/metroentrance.png?v=2',
+    boulevardlamp: 'assets/sprites/boulevardlamp.png?v=1',
     matron: 'assets/sprites/matron.png?v=2',
     civilianM: 'assets/sprites/civilianM.png?v=1',
     streetartist: 'assets/sprites/streetartist.png?v=1',
