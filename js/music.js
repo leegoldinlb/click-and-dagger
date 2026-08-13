@@ -7,6 +7,7 @@
 const MUSIC_TRACKS = {
   undercover: [
     { key: 'undercover', name: 'DEFAULT' },
+    { key: 'undercoverairport', name: 'AIRPORT' },
     { key: 'undercovercuba', name: 'HAVANA' },
     { key: 'undercoverhk', name: 'HONG KONG' },
     { key: 'undercoverussr', name: 'USSR' },
