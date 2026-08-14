@@ -4413,6 +4413,145 @@ const World = (() => {
     g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 59, 64, 5);
   });
 
+  // ---------------------------------------------------------------------------
+  // More Spanish/colonial textures, plus more window & door variety.
+  // ---------------------------------------------------------------------------
+  FLOOR.adobewall = cnv(g => {                          // sun-baked adobe/plaster wall, rounded corners, straw fleck
+    vgrad(g, 0, 0, 64, 64, '#d8b884', '#b8905c');
+    speck(g, 200, 'rgba(160,120,60,0.12)'); speck(g, 60, 'rgba(255,240,210,0.15)');
+    stains(g, 8, ['#a9824e', '#8a6a3e']);
+    g.strokeStyle = 'rgba(120,88,48,0.18)'; g.lineWidth = 1;                  // hand-trowelled undulation lines
+    for (let y = 6; y < 64; y += 9) { g.beginPath(); g.moveTo(0, y + Math.sin(y * 0.4) * 2); g.lineTo(64, y + Math.cos(y * 0.5) * 2); g.stroke(); }
+    g.fillStyle = 'rgba(90,60,20,0.1)';                                       // a few visible straw flecks
+    for (let i = 0; i < 14; i++) { const x = Math.random() * 64, y = Math.random() * 64, a = Math.random() * Math.PI; g.save(); g.translate(x, y); g.rotate(a); g.fillRect(-3, -0.4, 6, 0.8); g.restore(); }
+    bevel(g, 0, 0, 64, 64, 'rgba(255,240,210,0.18)', 'rgba(0,0,0,0.2)');
+  });
+
+  FLOOR.talaverafloor = cnv(g => {                      // Talavera ceramic floor tile — warm ochre/blue sunburst, distinct from azulejo's cool blue-white
+    vgrad(g, 0, 0, 64, 64, '#f0d8a0', '#dcc088');
+    for (let ty = 0; ty < 2; ty++) for (let tx = 0; tx < 2; tx++) {
+      const x = tx * 32, y = ty * 32;
+      g.fillStyle = '#f6e6bc'; g.fillRect(x + 1, y + 1, 30, 30);
+      g.strokeStyle = '#b8481e'; g.lineWidth = 1.5;                          // eight-point sunburst
+      g.save(); g.translate(x + 16, y + 16);
+      for (let i = 0; i < 8; i++) { g.rotate(Math.PI / 4); g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -12); g.stroke(); }
+      g.restore();
+      g.strokeStyle = '#2a5f8a'; g.lineWidth = 1; g.beginPath(); g.arc(x + 16, y + 16, 5, 0, 7); g.stroke();
+      g.fillStyle = '#c9a227'; g.beginPath(); g.arc(x + 16, y + 16, 2, 0, 7); g.fill();
+      bevel(g, x + 1, y + 1, 30, 30, 'rgba(255,255,255,0.35)', 'rgba(0,0,0,0.14)');
+    }
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 31, 64, 2); g.fillRect(31, 0, 2, 64);
+    speck(g, 20, 'rgba(0,0,0,0.05)');
+  });
+
+  FLOOR.courtyardtile = cnv(g => {                      // herringbone terracotta courtyard paving
+    vgrad(g, 0, 0, 64, 64, '#c8845a', '#a05e38');
+    const brick = (x, y, w, h, vertical) => {
+      const grd2 = g.createLinearGradient(x, y, vertical ? x + w : x, vertical ? y : y + h);
+      grd2.addColorStop(0, '#d89468'); grd2.addColorStop(1, '#8a4e2c');
+      g.fillStyle = grd2; g.fillRect(x, y, w, h);
+      g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 0.6; g.strokeRect(x, y, w, h);
+    };
+    for (let y = 0; y < 64; y += 16) {
+      for (let x = -8; x < 64; x += 16) { brick(x, y, 8, 16, false); brick(x + 8, y + 8 >= 64 ? 0 : y, 8, 16, false); }
+    }
+    speck(g, 80, 'rgba(0,0,0,0.08)'); speck(g, 40, 'rgba(255,220,190,0.08)');
+    bevel(g, 0, 0, 64, 64, 'rgba(255,220,190,0.15)', 'rgba(0,0,0,0.25)');
+  });
+
+  FLOOR.spanisharch = cnv(g => {                        // stucco Moorish colonnade arch, seen head-on
+    vgrad(g, 0, 0, 64, 64, '#e8dcc0', '#c8b890');
+    stains(g, 5, ['#b0a078', '#8a7c58']);
+    g.fillStyle = 'rgba(30,24,16,0.55)'; g.beginPath();                       // deep horseshoe-arch shadow
+    g.moveTo(14, 60); g.lineTo(14, 30); g.quadraticCurveTo(14, 6, 32, 6); g.quadraticCurveTo(50, 6, 50, 30); g.lineTo(50, 60); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(90,72,44,0.6)'; g.lineWidth = 2.2;                  // archivolt ring
+    g.beginPath(); g.moveTo(10, 30); g.lineTo(10, 26); g.quadraticCurveTo(10, 2, 32, 2); g.quadraticCurveTo(54, 2, 54, 26); g.lineTo(54, 30); g.stroke();
+    g.strokeStyle = 'rgba(255,250,235,0.35)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(11, 29); g.quadraticCurveTo(11, 5, 32, 5); g.quadraticCurveTo(53, 5, 53, 29); g.stroke();
+    g.fillStyle = 'rgba(90,72,44,0.3)'; g.fillRect(9, 30, 5, 30); g.fillRect(50, 30, 5, 30);   // flanking pilasters
+    bevel(g, 9, 30, 5, 30, 'rgba(255,250,235,0.2)', 'rgba(0,0,0,0.2)'); bevel(g, 50, 30, 5, 30, 'rgba(255,250,235,0.2)', 'rgba(0,0,0,0.2)');
+    speck(g, 40, 'rgba(0,0,0,0.05)');
+  });
+
+  FLOOR.churchdoor = cnv(g => {                          // grand carved wooden cathedral door, iron studs and strap hinges
+    vgrad(g, 0, 0, 64, 64, '#c0a888', '#a08868');
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath();                          // arched recess
+    g.moveTo(9, 60); g.lineTo(9, 26); g.quadraticCurveTo(9, 6, 32, 6); g.quadraticCurveTo(55, 6, 55, 26); g.lineTo(55, 60); g.closePath(); g.fill();
+    let dr = g.createLinearGradient(0, 10, 0, 58);
+    dr.addColorStop(0, '#5a3a20'); dr.addColorStop(0.5, '#3e2814'); dr.addColorStop(1, '#241608');
+    g.fillStyle = dr; g.beginPath();
+    g.moveTo(13, 60); g.lineTo(13, 28); g.quadraticCurveTo(13, 12, 32, 12); g.quadraticCurveTo(51, 12, 51, 28); g.lineTo(51, 60); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(32, 12); g.lineTo(32, 60); g.stroke();  // centre seam
+    g.strokeStyle = '#1c1410'; g.lineWidth = 3;                               // strap hinges, diagonal iron bands
+    [16, 32, 48].forEach(y => { g.beginPath(); g.moveTo(15, y); g.lineTo(29, y - 6); g.stroke(); g.beginPath(); g.moveTo(35, y - 6); g.lineTo(49, y); g.stroke(); });
+    g.fillStyle = '#3a3630';                                                  // iron stud rows
+    for (let y = 18; y < 56; y += 7) { g.beginPath(); g.arc(18, y, 1.3, 0, 7); g.fill(); g.beginPath(); g.arc(46, y, 1.3, 0, 7); g.fill(); }
+    let ring = g.createRadialGradient(32, 40, 0.5, 32, 40, 3);
+    ring.addColorStop(0, '#4a4038'); ring.addColorStop(1, '#181410');
+    g.fillStyle = ring; g.beginPath(); g.arc(32, 40, 2.6, 0, 7); g.fill();     // iron ring pull
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 59, 64, 5);
+  });
+
+  FLOOR.stainedglasswindow = cnv(g => {                   // round rose/stained-glass window, leaded panes
+    vgrad(g, 0, 0, 64, 64, '#d0c4a8', '#b0a488');
+    stains(g, 5, ['#8a7c5c', '#6a5e44']);
+    g.fillStyle = 'rgba(0,0,0,0.2)'; g.beginPath(); g.arc(32, 30, 21, 0, 7); g.fill();   // stone surround shadow
+    const colors = ['#c9384a', '#2a5f8a', '#c9a227', '#3a7a4a', '#7a3a8a'];
+    g.save(); g.translate(32, 30);
+    for (let i = 0; i < 8; i++) {
+      g.rotate(Math.PI / 4);
+      g.fillStyle = colors[i % colors.length];
+      g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, 17, -Math.PI / 8, Math.PI / 8); g.closePath(); g.fill();
+    }
+    g.restore();
+    g.fillStyle = '#e8dca0'; g.beginPath(); g.arc(32, 30, 4, 0, 7); g.fill();   // amber centre roundel
+    g.strokeStyle = 'rgba(20,16,10,0.7)'; g.lineWidth = 1;                     // lead came lines
+    g.save(); g.translate(32, 30);
+    for (let i = 0; i < 8; i++) { g.rotate(Math.PI / 4); g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -17); g.stroke(); }
+    g.restore();
+    g.beginPath(); g.arc(32, 30, 17, 0, 7); g.stroke(); g.beginPath(); g.arc(32, 30, 4, 0, 7); g.stroke();
+    g.strokeStyle = 'rgba(90,80,60,0.6)'; g.lineWidth = 2; g.beginPath(); g.arc(32, 30, 21, 0, 7); g.stroke();  // outer stone ring
+    g.fillStyle = '#8a7c5c'; g.fillRect(10, 52, 44, 4);                        // sill
+    bevel(g, 10, 52, 44, 4, 'rgba(255,240,210,0.2)', 'rgba(0,0,0,0.3)');
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 59, 64, 5);
+  });
+
+  FLOOR.balconydoors = cnv(g => {                         // tall Juliet-balcony French doors, iron rail
+    vgrad(g, 0, 0, 64, 64, '#c8b090', '#a89070');
+    g.fillStyle = 'rgba(0,0,0,0.16)'; g.fillRect(8, 2, 48, 58);                // recess
+    for (const dx of [10, 34]) {
+      let dr = g.createLinearGradient(dx, 4, dx, 56);
+      dr.addColorStop(0, '#7a5c3a'); dr.addColorStop(1, '#4a3420');
+      g.fillStyle = dr; g.fillRect(dx, 4, 20, 52);
+      bevel(g, dx, 4, 20, 52, 'rgba(255,230,190,0.18)', 'rgba(0,0,0,0.4)');
+      const gl = g.createLinearGradient(dx + 2, 6, dx + 18, 40);
+      gl.addColorStop(0, '#9ab4c0'); gl.addColorStop(1, '#4a626c');
+      g.fillStyle = gl; g.fillRect(dx + 2, 6, 16, 32);
+      g.strokeStyle = 'rgba(20,14,8,0.5)'; g.lineWidth = 1; g.strokeRect(dx + 2, 6, 16, 32);
+      g.beginPath(); g.moveTo(dx + 10, 6); g.lineTo(dx + 10, 38); g.moveTo(dx + 2, 22); g.lineTo(dx + 18, 22); g.stroke();
+    }
+    g.strokeStyle = '#1c1e22'; g.lineWidth = 1.6;                              // iron balcony rail across the base
+    g.beginPath(); g.moveTo(6, 50); g.lineTo(58, 50); g.stroke();
+    for (let x = 9; x < 58; x += 5) { g.beginPath(); g.moveTo(x, 50); g.lineTo(x, 42); g.stroke(); }
+    g.beginPath(); g.moveTo(6, 42); g.lineTo(58, 42); g.stroke();
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 59, 64, 5);
+  });
+
+  FLOOR.gardengate = cnv(g => {                           // ornamental wrought-iron gate, foliage visible through the bars
+    vgrad(g, 0, 0, 64, 64, '#6a8858', '#3e5c34');           // greenery glimpsed beyond
+    speck(g, 120, 'rgba(30,50,24,0.3)'); speck(g, 60, 'rgba(150,180,110,0.2)');
+    g.strokeStyle = '#232620'; g.lineWidth = 2.2; g.lineCap = 'round';
+    for (let x = 8; x <= 56; x += 8) { g.beginPath(); g.moveTo(x, 8); g.lineTo(x, 56); g.stroke(); }
+    g.strokeStyle = '#2a2e26'; g.lineWidth = 2.6;
+    g.beginPath(); g.moveTo(6, 14); g.lineTo(58, 14); g.moveTo(6, 50); g.lineTo(58, 50); g.stroke();
+    g.strokeStyle = '#232620'; g.lineWidth = 1.6;                              // scrollwork arch across the top
+    g.beginPath(); g.moveTo(6, 14); g.quadraticCurveTo(32, -2, 58, 14); g.stroke();
+    [16, 32, 48].forEach(x => { g.beginPath(); g.arc(x, 12, 3, 0, 7); g.stroke(); });
+    g.fillStyle = 'rgba(255,255,255,0.1)'; for (let x = 8; x <= 56; x += 8) g.fillRect(x - 0.4, 8, 0.8, 48);
+    g.fillStyle = '#3a3d34'; g.fillRect(4, 50, 56, 4);                         // low base rail
+    bevel(g, 4, 50, 56, 4, 'rgba(200,220,170,0.2)', 'rgba(0,0,0,0.3)');
+  });
+
   FLOOR.rockwall = cnv(g => {                           // rough natural stone / cliff face
     vgrad(g, 0, 0, 64, 64, '#8c887e', '#5e5a52');
     const cols = ['#7a7668', '#67635a', '#918c7e', '#544f47', '#847e70'];
@@ -5603,8 +5742,48 @@ const World = (() => {
     speck(g, 25, 'rgba(255,220,180,0.05)');
   }, 256, 96);
 
-  const SKIES = { havana: SKY, parisnight: SKY_PARISNIGHT, nycday: SKY_NYCDAY, starrynight: SKY_STARRYNIGHT, sunset: SKY_SUNSET };
-  const SKYNAMES = ['havana', 'parisnight', 'nycday', 'starrynight', 'sunset'];
+  // ---- sunrise: cool pre-dawn blue up top, warming to a low gold sun — the
+  // mirror mood of SKY_SUNSET (hopeful/opening vs. dusky/closing), no stars ----
+  const SKY_SUNRISE = cnv(g => {
+    const grd = g.createLinearGradient(0, 0, 0, 96);
+    grd.addColorStop(0, '#2c3f6a'); grd.addColorStop(0.3, '#5470a0'); grd.addColorStop(0.55, '#8fa0c4');
+    grd.addColorStop(0.74, '#f0b98a'); grd.addColorStop(0.88, '#fbd9a0'); grd.addColorStop(1, '#fff0c8');
+    g.fillStyle = grd; g.fillRect(0, 0, 256, 96);
+    // low sun just breaking the horizon, soft glow
+    const sunG = g.createRadialGradient(150, 74, 0, 150, 74, 42);
+    sunG.addColorStop(0, 'rgba(255,248,220,0.95)'); sunG.addColorStop(0.4, 'rgba(255,220,160,0.5)'); sunG.addColorStop(1, 'rgba(255,220,160,0)');
+    g.fillStyle = sunG; g.beginPath(); g.arc(150, 74, 42, 0, 7); g.fill();
+    g.fillStyle = 'rgba(255,252,235,0.98)'; g.beginPath(); g.arc(150, 74, 14, 0, 7); g.fill();
+    // thin lit cloud bands, cool lavender in shadow / warm gold facing the sun
+    [[20, 40, 55, 5], [90, 30, 60, 4], [180, 50, 50, 5], [40, 58, 40, 4]].forEach(([x, y, w, h]) => {
+      g.fillStyle = 'rgba(140,150,190,0.22)'; g.fillRect(x, y, w, h);
+      g.fillStyle = 'rgba(255,215,170,0.3)'; g.fillRect(x, y + h - 1.5, w * 0.65, 2);
+    });
+    // a few early birds, distant and small
+    g.strokeStyle = 'rgba(40,40,60,0.4)'; g.lineWidth = 1;
+    [[70, 34], [200, 40]].forEach(([x, y]) => {
+      g.beginPath(); g.moveTo(x - 3, y); g.quadraticCurveTo(x, y - 2, x + 3, y);
+      g.moveTo(x - 3, y); g.quadraticCurveTo(x, y + 1.5, x + 3, y); g.stroke();
+    });
+    g.fillStyle = 'rgba(20,18,28,0.5)'; g.fillRect(0, 88, 256, 3);   // dark horizon silhouette line
+    speck(g, 20, 'rgba(255,230,190,0.05)');
+  }, 256, 96);
+
+  // ---- a bare, minimal starry night: near-black sky and stars, nothing else ----
+  const SKY_STARRYNIGHT_BARE = cnv(g => {
+    g.fillStyle = '#05050a'; g.fillRect(0, 0, 256, 96);
+    for (let i = 0; i < 130; i++) {
+      const x = Math.random() * 256, y = Math.random() * 96, b = Math.random();
+      g.globalAlpha = 0.25 + b * 0.65;
+      g.fillStyle = '#ffffff';
+      g.fillRect(x, y, 1, 1);
+    }
+    g.globalAlpha = 1;
+  }, 256, 96);
+
+  const SKIES = { havana: SKY, parisnight: SKY_PARISNIGHT, nycday: SKY_NYCDAY, starrynight: SKY_STARRYNIGHT, sunset: SKY_SUNSET,
+    sunrise: SKY_SUNRISE, starrynightbare: SKY_STARRYNIGHT_BARE };
+  const SKYNAMES = ['havana', 'parisnight', 'nycday', 'starrynight', 'sunset', 'sunrise', 'starrynightbare'];
 
   // ---- unified texture registry (name → canvas): walls + all surfaces ----
   // Every texture is assignable to any floor, ceiling, or wall in the editor.
@@ -5628,6 +5807,8 @@ const World = (() => {
     'ceiltile', 'ground', 'helipad', 'rattan', 'azulejo', 'cork', 'corrugated', 'awning', 'limestone',
     'terrazzo', 'rooftile', 'mural', 'sandbag', 'rope', 'windowrow', 'balconywin', 'shopfront',
     'doorwood', 'doorarch', 'doubledoor', 'windowbars', 'windowshut',
+    'adobewall', 'talaverafloor', 'courtyardtile', 'spanisharch',
+    'churchdoor', 'stainedglasswindow', 'balconydoors', 'gardengate',
     'rockwall', 'mossyrock', 'pond', 'wetstone',
     'sandstone', 'zellige', 'mashrabiya', 'kilim', 'sandfloor', 'orosiwindow', 'tehranbalcony',
     'haussmann', 'wroughtiron', 'opart', 'toile', 'zincroof',
@@ -10132,6 +10313,8 @@ const World = (() => {
     screwdriver: 'assets/sprites/screwdriver.png?v=1',
     pliers: 'assets/sprites/pliers.png?v=1',
     watch: 'assets/sprites/watch.png?v=1',
+    curtainrods: 'assets/sprites/curtainrods.png?v=2',
+    package: 'assets/sprites/package.png?v=2',
     metroticket: 'assets/sprites/metroticket.png?v=1',
     laundryticket: 'assets/sprites/laundryticket.png?v=1',
     telegram: 'assets/sprites/telegram.png?v=1',
@@ -10862,7 +11045,9 @@ const World = (() => {
     maskstand: (x, y) => prop('maskstand', 'MASK STAND', x, y, 0.85, true),
     laundryticket: (x, y) => prop('laundryticket', 'LAUNDRY TICKET', x, y, 0.26, false),
     package: (x, y) => prop('package', 'WRAPPED PACKAGE', x, y, 0.5, false),
-    curtainrods: (x, y) => prop('curtainrods', 'CURTAIN RODS', x, y, 0.7, true),
+    curtainrods: (x, y) => prop('curtainrods', 'CURTAIN RODS', x, y, 0.7, true, {
+      armed: false, getTex() { return this.armed ? SPR.package : SPR.curtainrods; },
+    }),
     suitrack: (x, y) => prop('suitrack', 'GARMENT RACK', x, y, 0.9, true),
     sedan: (x, y) => prop('sedan', 'PARKED SEDAN', x, y, 1.3, true),
     motorcycle: (x, y) => prop('motorcycle', 'MOTORCYCLE', x, y, 1.0, true),

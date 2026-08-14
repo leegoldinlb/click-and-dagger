@@ -1117,6 +1117,7 @@ const Adventure = (() => {
         if (flags.curtainsUsed) return 'One package is plenty. Any more and someone will notice.';
         flags.curtainsUsed = true;
         flags.coinsReady = true;
+        e.armed = true;
         removeItem('package');
         Sfx.pick();
         return 'You tuck the package in among the rods. Something inside rattles — and it isn\'t curtain hardware.';
