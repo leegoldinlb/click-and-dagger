@@ -11,6 +11,13 @@ const Game = (() => {
   // touch layer (and this lower resolution) on a mouse-driven browser too —
   // handy for testing without a real touch device.
   const isTouch = matchMedia('(pointer: coarse)').matches || new URLSearchParams(location.search).get('touch') === '1';
+  // Marks the desktop app (see the fullscreen section below for why it exists
+  // at all). This has to happen BEFORE the Engine.resize() a few lines down:
+  // the class is what widens the canvas's CSS box to the whole screen, and
+  // resize() sizes the backing store off that box — set it afterwards and the
+  // backing store keeps the narrower windowed shape while the box is already
+  // full-screen, which silently stretches the picture instead of filling it.
+  if (window.CLICKDAGGER_DESKTOP) document.body.classList.add('desktop');
   Engine.init(canvas, isTouch ? null : { renderW: 1280, renderH: 720 });
   // Sizes the on-screen canvas's own backing store to its actual displayed
   // CSS size × devicePixelRatio, so the final upscale from the raycast
@@ -902,7 +909,6 @@ const Game = (() => {
   // picture dropped back to the windowed letterbox and had to be re-entered
   // by hand each time. On desktop we skip the API entirely and let CSS render
   // the fill-the-screen layout unconditionally, which no navigation can undo.
-  if (window.CLICKDAGGER_DESKTOP) document.body.classList.add('desktop');
   function isFullscreen() {
     if (window.CLICKDAGGER_DESKTOP) return true;
     return !!(document.fullscreenElement || document.webkitFullscreenElement);

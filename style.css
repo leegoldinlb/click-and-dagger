@@ -66,7 +66,7 @@ body {
    main.js): its window is always OS-fullscreen, so it gets this same layout
    permanently rather than through the Fullscreen API, which would be lost on
    every scene navigation. */
-#game:fullscreen, #game:-webkit-full-screen, body.desktop #game {
+#game:fullscreen, #game:-webkit-full-screen {
   width: min(92vw, 1400px, 150vh);
   height: 100vh;
   display: flex;
@@ -74,6 +74,22 @@ body {
   justify-content: center;
   background: #000;
 }
+/* Desktop drops the 92vw/1400px caps the browser build keeps — there is no
+   surrounding page to inset the picture from — and lets the canvas take the
+   screen outright rather than deriving its height from a 16:9 intrinsic
+   ratio, which is what left letterbox bars on a non-16:9 display. The engine
+   widens the horizontal FOV to match (see halfFov in engine.js), so filling
+   an off-16:9 screen shows more of the world instead of stretching it. */
+body.desktop #game {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #000;
+}
+body.desktop #viewwrap { width: 100vw; height: 100vh; }
+body.desktop #view { width: 100vw; height: 100vh; }
 
 /* Floating HUD, windowed or fullscreen — no bottom bar. The panel
    background/border/rivets are stripped and the whole thing floats as an

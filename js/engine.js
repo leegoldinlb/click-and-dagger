@@ -39,6 +39,18 @@ const Engine = (() => {
   // the LAST scaling step lands on exact physical pixels instead of a blurry
   // in-between size on high-DPI screens.
   let DW = 640, DH = 360;
+  // Horizontal half-FOV, as world units at unit distance. The vertical span is
+  // a fixed 1 world unit at distance 1 (heights project as H/d, over H rows),
+  // so it cannot absorb a change in shape — on a display that isn't 16:9 the
+  // horizontal span has to scale with the display's aspect instead, or the
+  // picture stretches. Derived from the display size (DW/DH is the canvas's
+  // real on-screen box after resize()) so it re-derives itself for free on any
+  // resize. The constant is the original hard-coded 0.66 divided by 16:9, so a
+  // 16:9 canvas still computes exactly 0.66 and the browser build's geometry
+  // is unchanged to the last pixel; the editor's fixed 640x360 preview canvas
+  // (which never calls resize()) likewise stays exactly as it was.
+  const FOV_K = 0.66 / (16 / 9);
+  const halfFov = () => FOV_K * (DH > 0 ? DW / DH : 16 / 9);
   const MAXD = 44;
 
   let ctx = null, off = null, octx = null, img = null, buf = null, viewCanvas = null;
@@ -140,7 +152,8 @@ const Engine = (() => {
     const p = g.player;
     const px = p.x, py = p.y;
     const dirx = Math.cos(p.a), diry = Math.sin(p.a);
-    const planex = -diry * 0.66, planey = dirx * 0.66;
+    const hfov = halfFov();
+    const planex = -diry * hfov, planey = dirx * hfov;
     const eyeZ = (p.eyeZ != null) ? p.eyeZ : World.floorZAt(px, py) + 0.5;
     const horizon = H * 0.5 + (p.pitch || 0);
     const yOf = (z, d) => horizon - (z - eyeZ) * H / d;
@@ -581,7 +594,7 @@ const Engine = (() => {
     const cosA = Math.cos(a), sinA = Math.sin(a);
     const eyeZ = p.eyeZ != null ? p.eyeZ : 0.5;
     const horizon = H * 0.5 + (p.pitch || 0);
-    const FX = (W / 2) / 0.66, NEAR = 0.04;
+    const FX = (W / 2) / halfFov(), NEAR = 0.04;
     const wt = cacheOf(World.TX.brick);
     const facadeTex = cacheOf(World.TX.stucco || World.TX.brick);   // building wall up to the sky roofline
     const stepDn = cacheOf(World.TX.metal);                         // riser of a step UP (neighbour floor higher)
