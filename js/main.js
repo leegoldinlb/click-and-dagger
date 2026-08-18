@@ -895,8 +895,20 @@ const Game = (() => {
   // builds) still wants the -webkit- prefixed calls.
   const gameEl = document.getElementById('game');
   const fsBtn = document.getElementById('fullscreenbtn');
-  function isFullscreen() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  // The desktop app's own window is already OS-fullscreen and stays that way
+  // for the whole session, so the browser Fullscreen API buys nothing there —
+  // and actively hurt: every scene change (menu → mission → hub) is a real
+  // page navigation, and document fullscreen does not survive one, so the
+  // picture dropped back to the windowed letterbox and had to be re-entered
+  // by hand each time. On desktop we skip the API entirely and let CSS render
+  // the fill-the-screen layout unconditionally, which no navigation can undo.
+  if (window.CLICKDAGGER_DESKTOP) document.body.classList.add('desktop');
+  function isFullscreen() {
+    if (window.CLICKDAGGER_DESKTOP) return true;
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
   function toggleFullscreen() {
+    if (window.CLICKDAGGER_DESKTOP) return;   // always fullscreen — nothing to toggle
     if (!isFullscreen()) {
       const req = gameEl.requestFullscreen || gameEl.webkitRequestFullscreen;
       if (req) { const p = req.call(gameEl); if (p && p.catch) p.catch(() => {}); }

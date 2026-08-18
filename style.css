@@ -62,7 +62,11 @@ body {
    black backdrop — the floating-HUD-over-borderless-picture look below is
    now the look everywhere, windowed or fullscreen, so there's nothing
    mode-specific left to do here beyond sizing/centering. */
-#game:fullscreen, #game:-webkit-full-screen {
+/* body.desktop is the Electron app (see the CLICKDAGGER_DESKTOP check in
+   main.js): its window is always OS-fullscreen, so it gets this same layout
+   permanently rather than through the Fullscreen API, which would be lost on
+   every scene navigation. */
+#game:fullscreen, #game:-webkit-full-screen, body.desktop #game {
   width: min(92vw, 1400px, 150vh);
   height: 100vh;
   display: flex;
@@ -108,7 +112,8 @@ body {
 #modeline { display: none; }
 #viewwrap { border: none; box-shadow: none; }
 #game:fullscreen #editlink, #game:fullscreen #fullscreenbtn,
-#game:-webkit-full-screen #editlink, #game:-webkit-full-screen #fullscreenbtn { display: none; }
+#game:-webkit-full-screen #editlink, #game:-webkit-full-screen #fullscreenbtn,
+body.desktop #editlink, body.desktop #fullscreenbtn { display: none; }
 
 #viewwrap {
   position: relative;
