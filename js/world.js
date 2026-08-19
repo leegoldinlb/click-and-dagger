@@ -10608,6 +10608,23 @@ const World = (() => {
     tehranoffice: 'assets/sprites/tehranoffice.png?v=1',
     // --- sci-fi set (shipped art only; no procedural placeholders, which the
     // loader above now tolerates) ---
+    // crew + hostiles
+    crewcommand: 'assets/sprites/crewcommand.png?v=1',
+    crewscience: 'assets/sprites/crewscience.png?v=1',
+    crewengineer: 'assets/sprites/crewengineer.png?v=1',
+    crewsecurity: 'assets/sprites/crewsecurity.png?v=1',
+    crewmedic: 'assets/sprites/crewmedic.png?v=1',
+    crewtech: 'assets/sprites/crewtech.png?v=1',
+    crewmember: 'assets/sprites/crewmember.png?v=1',
+    crewalien: 'assets/sprites/crewalien.png?v=1',
+    crewops: 'assets/sprites/crewops.png?v=1',
+    saurianbrute: 'assets/sprites/saurianbrute.png?v=1',
+    saurianmarksman: 'assets/sprites/saurianmarksman.png?v=1',
+    saurianstealth: 'assets/sprites/saurianstealth.png?v=1',
+    scavenger: 'assets/sprites/scavenger.png?v=1',
+    saboteur: 'assets/sprites/saboteur.png?v=1',
+    swarmdrone: 'assets/sprites/swarmdrone.png?v=1',
+    alienwarlord: 'assets/sprites/alienwarlord.png?v=1',
     datapads: 'assets/sprites/datapads.png?v=2',
     equipcase: 'assets/sprites/equipcase.png?v=2',
     sciscanner: 'assets/sprites/sciscanner.png?v=2',
@@ -10649,7 +10666,8 @@ const World = (() => {
     medscanner: 'assets/sprites/medscanner.png?v=2',
     powercell: 'assets/sprites/powercell.png?v=2',
   };
-  const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
+  const FLASH_OF = { saurianbrute: 'saurianbruteFlash', saurianmarksman: 'saurianmarksmanFlash', saurianstealth: 'saurianstealthFlash', scavenger: 'scavengerFlash', saboteur: 'saboteurFlash', swarmdrone: 'swarmdroneFlash', alienwarlord: 'alienwarlordFlash',
+    goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
     blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash', gunman: 'gunmanFlash',
     iransoldier: 'iransoldierFlash', hkcop: 'hkcopFlash', elpresidente: 'elpresidenteFlash',
     nyofficer: 'nyofficerFlash', officer: 'officerFlash' };  // hit-flash white silhouettes
@@ -11520,6 +11538,87 @@ const World = (() => {
     tehranmosquebuilding: (x, y) => prop('tehranmosquebuilding', 'TEHRAN TILED BUILDING', x, y, 1.6, true),
     tehranoffice: (x, y) => prop('tehranoffice', 'TEHRAN OFFICE TOWER', x, y, 2.0, true),
     // --- sci-fi set ---
+    // crew (civilian behaviour) and hostiles
+    crewcommand: (x, y, e) => ({
+      kind: 'crewcommand', name: 'COMMAND OFFICER', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.crewcommand; },
+    }),
+    crewscience: (x, y, e) => ({
+      kind: 'crewscience', name: 'SCIENCE OFFICER', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.crewscience; },
+    }),
+    crewengineer: (x, y, e) => ({
+      kind: 'crewengineer', name: 'ENGINEERING OFFICER', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.crewengineer; },
+    }),
+    crewsecurity: (x, y, e) => ({
+      kind: 'crewsecurity', name: 'SECURITY OFFICER', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.crewsecurity; },
+    }),
+    crewmedic: (x, y, e) => ({
+      kind: 'crewmedic', name: 'MEDICAL ORDERLY', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.crewmedic; },
+    }),
+    crewtech: (x, y, e) => ({
+      kind: 'crewtech', name: 'MAINTENANCE TECH', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.crewtech; },
+    }),
+    crewmember: (x, y, e) => ({
+      kind: 'crewmember', name: 'CREW MEMBER', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'wander', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.crewmember; },
+    }),
+    crewalien: (x, y, e) => ({
+      kind: 'crewalien', name: 'ALIEN CREWMAN', x, y, solid: false, scale: 0.95, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.crewalien; },
+    }),
+    crewops: (x, y, e) => ({
+      kind: 'crewops', name: 'OPS CREWMAN', x, y, solid: false, scale: 0.95, hp: 1, dead: false, flash: 0,
+      behavior: (e && e.behavior) || 'stationary', anchorX: x, anchorY: y, wx: x, wy: y, wanderT: Math.random() * 3,
+      getTex() { return this.dead ? SPR.civilianCorpse : SPR.crewops; },
+    }),
+    saurianbrute: (x, y) => ({
+      kind: 'saurianbrute', name: 'SAURIAN BRUTE', x, y, solid: true, scale: 0.95,
+      hp: 70, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.saurianbrute : (this.flash > 0 ? SPR.saurianbruteFlash : SPR.saurianbrute); },
+    }),
+    saurianmarksman: (x, y) => ({
+      kind: 'saurianmarksman', name: 'SAURIAN MARKSMAN', x, y, solid: true, scale: 0.9,
+      hp: 45, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.saurianmarksman : (this.flash > 0 ? SPR.saurianmarksmanFlash : SPR.saurianmarksman); },
+    }),
+    saurianstealth: (x, y) => ({
+      kind: 'saurianstealth', name: 'SAURIAN STALKER', x, y, solid: true, scale: 0.85,
+      hp: 40, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.saurianstealth : (this.flash > 0 ? SPR.saurianstealthFlash : SPR.saurianstealth); },
+    }),
+    scavenger: (x, y) => ({
+      kind: 'scavenger', name: 'SCAVENGER', x, y, solid: true, scale: 0.7,
+      hp: 25, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.scavenger : (this.flash > 0 ? SPR.scavengerFlash : SPR.scavenger); },
+    }),
+    saboteur: (x, y) => ({
+      kind: 'saboteur', name: 'SABOTEUR', x, y, solid: true, scale: 0.72,
+      hp: 30, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.saboteur : (this.flash > 0 ? SPR.saboteurFlash : SPR.saboteur); },
+    }),
+    swarmdrone: (x, y) => ({
+      kind: 'swarmdrone', name: 'SWARM DRONE', x, y, solid: true, scale: 0.65,
+      hp: 20, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.swarmdrone : (this.flash > 0 ? SPR.swarmdroneFlash : SPR.swarmdrone); },
+    }),
+    alienwarlord: (x, y) => ({
+      kind: 'alienwarlord', name: 'WARLORD', x, y, solid: true, scale: 1.1,
+      hp: 200, dead: false, aggro: false, atkT: 0, flash: 0,
+      getTex() { return this.dead ? SPR.alienwarlord : (this.flash > 0 ? SPR.alienwarlordFlash : SPR.alienwarlord); },
+    }),
     datapads: (x, y) => prop('datapads', 'DATAPAD STACK', x, y, 0.42, false),
     equipcase: (x, y) => prop('equipcase', 'FIELD RECORDER', x, y, 0.34, false),
     sciscanner: (x, y) => prop('sciscanner', 'WALL SCANNER', x, y, 0.8, false),

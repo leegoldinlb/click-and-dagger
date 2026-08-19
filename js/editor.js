@@ -25,6 +25,22 @@ const Editor = (() => {
   const ENTS = [
     { kind: 'goon', name: 'HENCHMAN', spr: 'goon' },
     // --- sci-fi set ---
+    { kind: 'crewcommand', name: 'COMMAND OFFICER', spr: 'crewcommand' },
+    { kind: 'crewscience', name: 'SCIENCE OFFICER', spr: 'crewscience' },
+    { kind: 'crewengineer', name: 'ENGINEERING OFFICER', spr: 'crewengineer' },
+    { kind: 'crewsecurity', name: 'SECURITY OFFICER', spr: 'crewsecurity' },
+    { kind: 'crewmedic', name: 'MEDICAL ORDERLY', spr: 'crewmedic' },
+    { kind: 'crewtech', name: 'MAINTENANCE TECH', spr: 'crewtech' },
+    { kind: 'crewmember', name: 'CREW MEMBER', spr: 'crewmember' },
+    { kind: 'crewalien', name: 'ALIEN CREWMAN', spr: 'crewalien' },
+    { kind: 'crewops', name: 'OPS CREWMAN', spr: 'crewops' },
+    { kind: 'saurianbrute', name: 'SAURIAN BRUTE', spr: 'saurianbrute' },
+    { kind: 'saurianmarksman', name: 'SAURIAN MARKSMAN', spr: 'saurianmarksman' },
+    { kind: 'saurianstealth', name: 'SAURIAN STALKER', spr: 'saurianstealth' },
+    { kind: 'scavenger', name: 'SCAVENGER', spr: 'scavenger' },
+    { kind: 'saboteur', name: 'SABOTEUR', spr: 'saboteur' },
+    { kind: 'swarmdrone', name: 'SWARM DRONE', spr: 'swarmdrone' },
+    { kind: 'alienwarlord', name: 'WARLORD', spr: 'alienwarlord' },
     { kind: 'datapads', name: 'DATAPAD STACK', spr: 'datapads' },
     { kind: 'equipcase', name: 'FIELD RECORDER', spr: 'equipcase' },
     { kind: 'sciscanner', name: 'WALL SCANNER', spr: 'sciscanner' },
@@ -419,15 +435,15 @@ const Editor = (() => {
   ];
   // The sci-fi props have no shared name prefix (phaser, tricorder, bone...),
   // so they're grouped by an explicit set rather than LOCATION_PREFIXES.
-  const SCIFI_KINDS = new Set(['bridgeconsole', 'engstation', 'tacticalstation', 'sciterminal', 'sensordisplay', 'captainchair', 'helmchair', 'labstool', 'crewseat', 'navlog', 'engstatus', 'bridgeroster', 'viewscreenplanets', 'viewscreensaturn', 'sciwallpanel', 'scidisplaybank', 'turbolift', 'phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder', 'manuals', 'scannerscope', 'medscanner', 'powercell', 'datapads', 'equipcase', 'sciscanner', 'turboliftopen', 'insigniaphoenix', 'insigniadelta', 'insigniaship', 'insigniacomet', 'insigniastar']);
+  const SCIFI_KINDS = new Set(['bridgeconsole', 'engstation', 'tacticalstation', 'sciterminal', 'sensordisplay', 'captainchair', 'helmchair', 'labstool', 'crewseat', 'navlog', 'engstatus', 'bridgeroster', 'viewscreenplanets', 'viewscreensaturn', 'sciwallpanel', 'scidisplaybank', 'turbolift', 'phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder', 'manuals', 'scannerscope', 'medscanner', 'powercell', 'datapads', 'equipcase', 'sciscanner', 'turboliftopen', 'insigniaphoenix', 'insigniadelta', 'insigniaship', 'insigniacomet', 'insigniastar', 'crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops', 'saurianbrute', 'saurianmarksman', 'saurianstealth', 'scavenger', 'saboteur', 'swarmdrone', 'alienwarlord']);
   function locOf(kind) {
     if (SCIFI_KINDS.has(kind)) return 'SCI-FI';
     for (const [pre, loc] of LOCATION_PREFIXES) if (kind.startsWith(pre)) return loc;
     return 'GENERAL';
   }
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
+  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops']);      // neutral — placed with a default wander behavior
   const WEAPON_KINDS = new Set(['medkit', 'ammo', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden', 'camera', 'disguise']);  // pulled out of PERSONNEL & PROPS into their own WEAPONS & POWER-UPS palette
-  const PERSONNEL_KINDS = new Set(['goon', 'gunman', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist', 'maheen', 'reza', 'rostam']);
+  const PERSONNEL_KINDS = new Set(['goon', 'gunman', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist', 'maheen', 'reza', 'rostam', 'crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops', 'saurianbrute', 'saurianmarksman', 'saurianstealth', 'scavenger', 'saboteur', 'swarmdrone', 'alienwarlord']);
   const ITEM_KINDS = new Set(['phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder', 'manuals', 'powercell', 'scannerscope', 'medscanner', 'tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'sheetmusic', 'keycard', 'stdkey', 'brothersphoto', 'tehranuniform']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 

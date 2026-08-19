@@ -147,7 +147,7 @@ const Adventure = (() => {
     'curtainrods',
     'phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder',
     'manuals', 'powercell', 'scannerscope', 'medscanner']);
-  const USABLE_KINDS = new Set(['desk', 'safe', 'bar', 'tvconsole', 'goon', 'gunman', 'brute', 'sniper', 'blackbelt',
+  const USABLE_KINDS = new Set(['crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops', 'desk', 'safe', 'bar', 'tvconsole', 'goon', 'gunman', 'brute', 'sniper', 'blackbelt',
     'soviet', 'spy', 'agent', 'tube', 'flowergirl', 'carlotta', 'ciphermachine', 'drz', 'bomb', 'defector', 'maheen',
     'reza', 'rostam', 'phonebooth', 'microfichemachine', 'agent005', 'boss005', 'sportscar', 'streetartist', 'matron',
     'metroentrance', 'maskstand', 'laundrylady', 'double', 'patsy', 'curtainrods', 'vendingmachine', 'tv', 'baldini',
@@ -261,7 +261,7 @@ const Adventure = (() => {
   function lookEnt(e) {
     // generic props don't have their own dead-state line (characters below do) —
     // one shared "wrecked" fallback covers every destructible object
-    if (e.dead && e.hp != null && !['goon', 'gunman', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'iransoldier', 'hkcop', 'elpresidente', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'nyofficer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'hkgangster', 'maheen', 'reza', 'rostam'].includes(e.kind)) {
+    if (e.dead && e.hp != null && !['crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops', 'saurianbrute', 'saurianmarksman', 'saurianstealth', 'scavenger', 'saboteur', 'swarmdrone', 'alienwarlord', 'goon', 'gunman', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'iransoldier', 'hkcop', 'elpresidente', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'nyofficer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'boss005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'hkgangster', 'maheen', 'reza', 'rostam'].includes(e.kind)) {
       return 'Shot to pieces. Whatever it was, it isn’t anymore.';
     }
     switch (e.kind) {
@@ -582,6 +582,54 @@ const Adventure = (() => {
       case 'tehranuniform': return "It looks like Reza's uniform.";
       case 'metroticket': return 'A single Métro ticket. One ride, one way.';
       // --- sci-fi set ---
+      case 'crewcommand': return e.dead
+        ? 'The command officer, down. Somebody is getting a field promotion.'
+        : 'A command officer, red tunic, hands behind his back. He is waiting for someone to give him something to decide.';
+      case 'crewscience': return e.dead
+        ? 'The science officer, dead. The padd is still running its report.'
+        : 'A science officer. She is reading something on a padd and has not looked up once.';
+      case 'crewengineer': return e.dead
+        ? 'The engineer, dead. Nobody left aboard understands the reactor now.'
+        : 'An engineering officer in a gold tunic, sleeves already dirty. She actually knows how the ship works.';
+      case 'crewsecurity': return e.dead
+        ? 'The security officer, dead. His sidearm never cleared the holster.'
+        : 'A security officer, gray fatigues, sidearm holstered. He is looking at you a little too long.';
+      case 'crewmedic': return e.dead
+        ? 'The orderly, dead. The one person here who could have helped.'
+        : 'A medical orderly in surgical blue. Calm in the way that only comes from practice.';
+      case 'crewtech': return e.dead
+        ? 'The technician, dead. The work order stays open.'
+        : 'A maintenance technician, tool roll on his hip, expression of a man behind schedule.';
+      case 'crewmember': return e.dead
+        ? 'A dead crew member. She was not even on duty.'
+        : 'A crew member off shift, no department colour on her at all.';
+      case 'crewalien': return e.dead
+        ? 'The alien crewman, slumped at his console. The console keeps running.'
+        : 'An alien crewman working a console. Four fingers, no wasted motion, and he does not look up.';
+      case 'crewops': return e.dead
+        ? 'The ops crewman, dead. His headset is still chattering at nobody.'
+        : 'An ops crewman on the headset, running traffic for a ship that is not going anywhere.';
+      case 'saurianbrute': return e.dead
+        ? 'The brute, down. The axe took two of you to lift and it swung it one-handed.'
+        : 'A saurian brute with a war axe. It has noticed you, and it is in no hurry.';
+      case 'saurianmarksman': return e.dead
+        ? 'The marksman, dead. It never had to get close, and that was the plan.'
+        : 'A saurian marksman with a long rifle. It prefers range, and it is a good shot.';
+      case 'saurianstealth': return e.dead
+        ? 'The stalker, dead. It nearly got behind you, which was the whole idea.'
+        : 'A saurian stalker, dark scaled and low to the ground. It moves faster than it should.';
+      case 'scavenger': return e.dead
+        ? 'The scavenger, dead. It was only ever after the scrap.'
+        : 'A scavenger, insectile and twitchy, dragging a hammer it barely lifts.';
+      case 'saboteur': return e.dead
+        ? 'The saboteur, dead. Whatever it had already cut stays cut.'
+        : 'A saboteur with a cutting hook. It has been going through the conduits, not the corridors.';
+      case 'swarmdrone': return e.dead
+        ? 'A dead drone. There are more of them, and they do not mourn.'
+        : 'A swarm drone, small and quick and entirely without second thoughts.';
+      case 'alienwarlord': return e.dead
+        ? 'The warlord is dead. Whatever it was holding together comes apart now.'
+        : 'The warlord, armoured and horned, staff in one hand. Everything else here answers to this.';
       case 'datapads': return 'A stack of datapads, each one showing a different unread report.';
       case 'equipcase': return 'A field recorder, spools still loaded. Someone was taking notes and stopped.';
       case 'sciscanner': return 'A wall scanner, screen washed pale green. It reads the room and keeps its opinion to itself.';
@@ -1293,7 +1341,8 @@ const Adventure = (() => {
       addItem('love', 'LOVE');
       return 'Fiona sits, barks once, and looks up at you like you invented dogs. You feel a little better about all this.';
     }
-    if (['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman',
+    if (['crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops',
+      'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman',
       'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer',
       'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician',
       'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist',

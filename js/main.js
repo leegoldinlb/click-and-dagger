@@ -75,6 +75,16 @@ const Game = (() => {
   // once in rangedRange (with LOS), only closing distance to get there; everyone else
   // rushes to meleeRange. aggroR is how close (with LOS) wakes them from idle.
   const HOSTILE = {
+    // --- sci-fi hostiles ---
+    saurianbrute: { speed: 1.3, meleeRange: 1.0,  meleeDmg: [12, 20], aggroR: 7,  atkCd: 1.1 },
+    saurianmarksman: { speed: 1.4, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 10, atkCd: 1.3,
+                       ranged: true, rangedRange: 7, rangedDmg: [10, 16] },
+    saurianstealth: { speed: 2.0, meleeRange: 0.85, meleeDmg: [9, 15],  aggroR: 8,  atkCd: 0.8 },
+    scavenger: { speed: 1.8, meleeRange: 0.8,  meleeDmg: [5, 9],   aggroR: 8,  atkCd: 0.8 },
+    saboteur: { speed: 1.8, meleeRange: 0.8,  meleeDmg: [6, 11],  aggroR: 8,  atkCd: 0.85 },
+    swarmdrone: { speed: 2.1, meleeRange: 0.75, meleeDmg: [4, 8],   aggroR: 9,  atkCd: 0.7 },
+    alienwarlord: { speed: 1.3, meleeRange: 1.0,  meleeDmg: [10, 18], aggroR: 14, atkCd: 0.45,
+                       ranged: true, rangedRange: 8, rangedDmg: [9, 16] },
     goon:   { speed: 1.7, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 9, atkCd: 0.95 },
     gunman: { speed: 1.7, meleeRange: 0.85, meleeDmg: [7, 13],  aggroR: 9, atkCd: 0.95 },
     brute:  { speed: 1.3, meleeRange: 1.0,  meleeDmg: [12, 20], aggroR: 7, atkCd: 1.1 },
@@ -100,7 +110,7 @@ const Game = (() => {
     // El Presidente: a boss — hits harder and closes faster than a regular henchman
     elpresidente: { speed: 1.4, meleeRange: 1.1, meleeDmg: [16, 26], aggroR: 12, atkCd: 0.75 },
   };
-  const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'hkgangster', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
+  const CIVILIAN_KINDS = new Set(['crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'hkgangster', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
   const totalHostiles = World.ents.filter(e => HOSTILE[e.kind]).length;
   // Quest-critical kinds never take damage — destroying 004's body, the vacuum
   // tube, or Volkov's desk could strand the puzzle chain with no way to recover.
