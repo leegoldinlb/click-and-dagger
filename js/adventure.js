@@ -144,7 +144,9 @@ const Adventure = (() => {
   const TAKEABLE_KINDS = new Set(['agent', 'tube', 'keycard', 'stdkey', 'letter', 'telegram', 'businesscard',
     'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'sheetmusic', 'headshot', 'brothersphoto',
     'tehranuniform', 'metroticket', 'easel', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'suitrack',
-    'curtainrods']);
+    'curtainrods',
+    'phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder',
+    'manuals', 'powercell', 'scannerscope', 'medscanner']);
   const USABLE_KINDS = new Set(['desk', 'safe', 'bar', 'tvconsole', 'goon', 'gunman', 'brute', 'sniper', 'blackbelt',
     'soviet', 'spy', 'agent', 'tube', 'flowergirl', 'carlotta', 'ciphermachine', 'drz', 'bomb', 'defector', 'maheen',
     'reza', 'rostam', 'phonebooth', 'microfichemachine', 'agent005', 'boss005', 'sportscar', 'streetartist', 'matron',
@@ -579,6 +581,34 @@ const Adventure = (() => {
       case 'brothersphoto': return 'Reza and Rostam as boys, they look so happy together.';
       case 'tehranuniform': return "It looks like Reza's uniform.";
       case 'metroticket': return 'A single Métro ticket. One ride, one way.';
+      // --- sci-fi set ---
+      case 'bridgeconsole': return 'A bank of screens and toggles, all of it humming. Someone flew a ship with this.';
+      case 'engstation': return 'The engineering station. Readouts scroll past faster than anyone could actually read them.';
+      case 'tacticalstation': return 'A tactical board, a ship diagram glowing green across it. Nothing is currently shooting at you.';
+      case 'sciterminal': return 'A computer terminal, keys worn smooth. It is waiting for a question.';
+      case 'sensordisplay': return 'A sensor display on a pedestal, contacts drifting across a starfield.';
+      case 'captainchair': return 'The captain’s chair. Armrest controls, a good view, and nobody sitting in it.';
+      case 'helmchair': return 'A helm chair, console wrapped around both arms. Flying is done sitting down here.';
+      case 'labstool': return 'A lab stool on castors. Adjustable, uncomfortable, standard issue.';
+      case 'crewseat': return 'A plain crew seat, bolted down for the rough parts.';
+      case 'navlog': return 'The navigation log, signed off by an Ensign Chek. Neat handwriting, dull reading.';
+      case 'engstatus': return 'An engineering status sheet initialled LT. COMM. SPOC. Every figure is exactly in tolerance.';
+      case 'bridgeroster': return 'The bridge roster. Names, shifts, and one line scratched out and not replaced.';
+      case 'viewscreenplanets': return 'A viewscreen: two planets, a long way off, and a great deal of nothing between.';
+      case 'viewscreensaturn': return 'A viewscreen showing a ringed world, turning slowly. Nobody on the bridge is watching it.';
+      case 'sciwallpanel': return 'A control panel of coloured switches. Not one of them is labelled.';
+      case 'scidisplaybank': return 'A bank of displays, four readouts running side by side in green.';
+      case 'turbolift': return 'A turbolift door. It would open, if the ship it belongs to were anywhere nearby.';
+      case 'phaser': return 'A phaser. Lighter than a Walther and considerably less subtle.';
+      case 'bone': return 'A femur, cleaned and polished. Somebody labelled it and then forgot which dig it came from.';
+      case 'starfleetbadge': return 'A delta insignia on a gold backing. A prop, a pin, or a credential — hard to say which.';
+      case 'scidagger': return 'An ornamental dagger, jewelled hilt, edge still sharp enough to matter.';
+      case 'communicator': return 'A flip communicator. It chirps when opened, which is the opposite of tradecraft.';
+      case 'tricorder': return 'A tricorder, screen dim. It reads everything and explains nothing.';
+      case 'manuals': return 'A stack of technical manuals. Spines uncracked — nobody has ever needed page one.';
+      case 'scannerscope': return 'A scanner scope, heavy as a thermos and twice as awkward to carry.';
+      case 'medscanner': return 'A medical scanner. Point, squeeze, and it tells you how bad it is.';
+      case 'powercell': return 'A power cell, warm to the touch. The casing says do not open. The casing is right.';
       case 'fabergeegg': return flags.hasEgg
         ? 'The case stands empty. You already have what you came for.'
         : 'A Romanov Fabergé egg, gold and jeweled, behind glass. The Matron\'s prize possession, and yours, if she ever lets you close enough.';
@@ -764,6 +794,57 @@ const Adventure = (() => {
         flags.gotCoins = true;
         addItem('coins', 'LOOSE COINS');
         return 'You fish a handful of coins out from among the rods. Somebody\'s exact change for something.';
+      // --- sci-fi set: plain field-kit pickups, no puzzle wiring of their own ---
+      case 'phaser':
+        if (inv.some(i => i.id === 'phaser')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('phaser', 'PHASER');
+        return "You pocket the phaser. Heavier than it looks, and no safety catch that you can find.";
+      case 'bone':
+        if (inv.some(i => i.id === 'bone')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('bone', 'BONE');
+        return "You take the bone. Explaining this one, if you are searched, is going to be interesting.";
+      case 'starfleetbadge':
+        if (inv.some(i => i.id === 'badge')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('badge', 'INSIGNIA');
+        return "You take the insignia. Worn on the right chest, it might even pass.";
+      case 'scidagger':
+        if (inv.some(i => i.id === 'scidagger')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('scidagger', 'CEREMONIAL DAGGER');
+        return "You take the dagger. Ceremonial, supposedly. It is still a knife.";
+      case 'communicator':
+        if (inv.some(i => i.id === 'communicator')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('communicator', 'COMMUNICATOR');
+        return "You take the communicator. It chirps once as it closes, which you could have done without.";
+      case 'tricorder':
+        if (inv.some(i => i.id === 'tricorder')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('tricorder', 'TRICORDER');
+        return "You take the tricorder. It immediately begins measuring something and declines to say what.";
+      case 'manuals':
+        if (inv.some(i => i.id === 'manuals')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('manuals', 'TECHNICAL MANUALS');
+        return "You take a manual off the top of the stack. Nobody notices, because nobody ever reads them.";
+      case 'powercell':
+        if (inv.some(i => i.id === 'powercell')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('powercell', 'POWER CELL');
+        return "You take the power cell. Still warm. The casing says do not open, and you do not.";
+      case 'scannerscope':
+        if (inv.some(i => i.id === 'scannerscope')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('scannerscope', 'SCANNER SCOPE');
+        return "You take the scope. It is the size of a thermos and twice as awkward under a coat.";
+      case 'medscanner':
+        if (inv.some(i => i.id === 'medscanner')) return 'You already have it.';
+        World.removeEnt(e);
+        addItem('medscanner', 'MEDICAL SCANNER');
+        return "You take the medical scanner. It reports, cheerfully, that you are fine.";
     }
     return 'You can’t take that.';
   }

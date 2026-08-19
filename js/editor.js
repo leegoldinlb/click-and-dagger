@@ -24,6 +24,34 @@ const Editor = (() => {
   const FLOORNAME = { r: 'metal', p: 'lounge', l: 'carpet', o: 'ground', w: 'helipad' };
   const ENTS = [
     { kind: 'goon', name: 'HENCHMAN', spr: 'goon' },
+    // --- sci-fi set ---
+    { kind: 'bridgeconsole', name: 'BRIDGE CONSOLE', spr: 'bridgeconsole' },
+    { kind: 'engstation', name: 'ENGINEERING STATION', spr: 'engstation' },
+    { kind: 'tacticalstation', name: 'TACTICAL STATION', spr: 'tacticalstation' },
+    { kind: 'sciterminal', name: 'COMPUTER TERMINAL', spr: 'sciterminal' },
+    { kind: 'sensordisplay', name: 'SENSOR DISPLAY', spr: 'sensordisplay' },
+    { kind: 'captainchair', name: "CAPTAIN'S CHAIR", spr: 'captainchair' },
+    { kind: 'helmchair', name: 'HELM CHAIR', spr: 'helmchair' },
+    { kind: 'labstool', name: 'LAB STOOL', spr: 'labstool' },
+    { kind: 'crewseat', name: 'CREW SEAT', spr: 'crewseat' },
+    { kind: 'navlog', name: 'NAVIGATION LOG', spr: 'navlog' },
+    { kind: 'engstatus', name: 'ENGINEERING STATUS', spr: 'engstatus' },
+    { kind: 'bridgeroster', name: 'BRIDGE ROSTER', spr: 'bridgeroster' },
+    { kind: 'viewscreenplanets', name: 'VIEWSCREEN - PLANETS', spr: 'viewscreenplanets' },
+    { kind: 'viewscreensaturn', name: 'VIEWSCREEN - SATURN', spr: 'viewscreensaturn' },
+    { kind: 'sciwallpanel', name: 'CONTROL PANEL', spr: 'sciwallpanel' },
+    { kind: 'scidisplaybank', name: 'DISPLAY BANK', spr: 'scidisplaybank' },
+    { kind: 'turbolift', name: 'TURBOLIFT DOOR', spr: 'turbolift' },
+    { kind: 'phaser', name: 'PHASER', spr: 'phaser' },
+    { kind: 'bone', name: 'BONE', spr: 'bone' },
+    { kind: 'starfleetbadge', name: 'INSIGNIA', spr: 'starfleetbadge' },
+    { kind: 'scidagger', name: 'CEREMONIAL DAGGER', spr: 'scidagger' },
+    { kind: 'communicator', name: 'COMMUNICATOR', spr: 'communicator' },
+    { kind: 'tricorder', name: 'TRICORDER', spr: 'tricorder' },
+    { kind: 'manuals', name: 'TECHNICAL MANUALS', spr: 'manuals' },
+    { kind: 'scannerscope', name: 'SCANNER SCOPE', spr: 'scannerscope' },
+    { kind: 'medscanner', name: 'MEDICAL SCANNER', spr: 'medscanner' },
+    { kind: 'powercell', name: 'POWER CELL', spr: 'powercell' },
     { kind: 'gunman', name: 'GUNMAN', spr: 'gunman' },
     { kind: 'agent', name: 'AGENT 004', spr: 'agentCase' },
     { kind: 'desk', name: 'DESK', spr: 'desk' },
@@ -380,14 +408,18 @@ const Editor = (() => {
     ['moscow', 'MOSCOW'], ['soviet', 'MOSCOW'], ['cosmonaut', 'MOSCOW'], ['hk', 'HONG KONG'],
     ['dallas', 'DALLAS'],
   ];
+  // The sci-fi props have no shared name prefix (phaser, tricorder, bone...),
+  // so they're grouped by an explicit set rather than LOCATION_PREFIXES.
+  const SCIFI_KINDS = new Set(['bridgeconsole', 'engstation', 'tacticalstation', 'sciterminal', 'sensordisplay', 'captainchair', 'helmchair', 'labstool', 'crewseat', 'navlog', 'engstatus', 'bridgeroster', 'viewscreenplanets', 'viewscreensaturn', 'sciwallpanel', 'scidisplaybank', 'turbolift', 'phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder', 'manuals', 'scannerscope', 'medscanner', 'powercell']);
   function locOf(kind) {
+    if (SCIFI_KINDS.has(kind)) return 'SCI-FI';
     for (const [pre, loc] of LOCATION_PREFIXES) if (kind.startsWith(pre)) return loc;
     return 'GENERAL';
   }
   const CIVILIAN_KINDS = new Set(['civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy']);      // neutral — placed with a default wander behavior
   const WEAPON_KINDS = new Set(['medkit', 'ammo', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden', 'camera', 'disguise']);  // pulled out of PERSONNEL & PROPS into their own WEAPONS & POWER-UPS palette
   const PERSONNEL_KINDS = new Set(['goon', 'gunman', 'agent', 'brute', 'sniper', 'blackbelt', 'soviet', 'spy', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'officer', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'agent005', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'fiona', 'nyofficer', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist', 'maheen', 'reza', 'rostam']);
-  const ITEM_KINDS = new Set(['tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'sheetmusic', 'keycard', 'stdkey', 'brothersphoto', 'tehranuniform']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
+  const ITEM_KINDS = new Set(['phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder', 'manuals', 'powercell', 'scannerscope', 'medscanner', 'tube', 'letter', 'telegram', 'businesscard', 'watch', 'personnelfile', 'microfiche', 'screwdriver', 'pliers', 'headshot', 'metroticket', 'fabergeegg', 'nixonmask', 'laundryticket', 'package', 'sheetmusic', 'keycard', 'stdkey', 'brothersphoto', 'tehranuniform']);  // small TAKE-able objects that end up in the field kit — everything else placeable is a fixed prop
   const CHTEX = { '#': T.TEAK, '%': T.LAIR, 'C': T.RADIO, 'E': T.EXIT, 'F': T.MAINFRAME, 'P': T.POSTER };
 
   // ---- state ----
@@ -573,6 +605,24 @@ const Editor = (() => {
     return b;
   }
 
+  // Palette thumbnails are painted once, at build time — but shipped PNG art
+  // loads asynchronously and replaces SPR[name] afterwards, so every prop with
+  // shipped art used to end up with a permanently blank swatch (only the
+  // procedural-art props ever showed). Keep a repaint hook per sprite and run
+  // it when world.js announces that sprite's art has landed.
+  const thumbRepaint = new Map();
+  function drawEntThumb(canvas, spr) { drawEntThumb.paint(canvas.getContext('2d'), spr); }
+  drawEntThumb.paint = (gg, spr) => {
+    gg.imageSmoothingEnabled = false;
+    gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
+    const tx = World.SPR[spr];
+    if (tx) gg.drawImage(tx, 0, 0, tx.width, tx.height, 1, 1, 28, 28);   // sample the sprite's OWN size, not a
+  };                                                                       // hardcoded 64x64 — art can be far bigger
+  window.addEventListener('spriteart', ev => {
+    const fn = thumbRepaint.get(ev.detail && ev.detail.name);
+    if (fn) fn();
+  });
+
   function buildPalette() {
     const tilesEl = document.getElementById('tiles');
     for (const t of TILES) {
@@ -596,14 +646,10 @@ const Editor = (() => {
     const itemsEl = document.getElementById('itemsPal');
     const wpnEl = document.getElementById('wpnPal');
     entBtns = ENTS.map(e => {
-      const tc = thumb(gg => {
-        gg.imageSmoothingEnabled = false;
-        gg.fillStyle = '#241d18'; gg.fillRect(0, 0, 30, 30);
-        const tx = World.SPR[e.spr];
-        gg.drawImage(tx, 0, 0, tx.width, tx.height, 1, 1, 28, 28);   // sample the sprite's OWN size, not a hardcoded
-      });                                                              // 64x64 — shipped art can be much bigger than that
+      const tc = thumb(gg => drawEntThumb.paint(gg, e.spr));
       const parent = WEAPON_KINDS.has(e.kind) ? wpnEl : PERSONNEL_KINDS.has(e.kind) ? personnelEl : ITEM_KINDS.has(e.kind) ? itemsEl : propsEl;
       const b = toolBtn(parent, e.name, tc, () => { tool = { t: 'ent', v: e.kind }; });
+      thumbRepaint.set(e.spr, () => drawEntThumb(tc, e.spr));   // see the 'spriteart' listener below
       if (e.kind === tool.v) b.classList.add('sel');
       b.dataset.searchName = (e.name + ' ' + e.kind).toLowerCase();
       b.dataset.loc = locOf(e.kind);

@@ -10600,6 +10600,35 @@ const World = (() => {
     havanarow: 'assets/sprites/havanarow.png?v=1',
     tehranmosquebuilding: 'assets/sprites/tehranmosquebuilding.png?v=1',
     tehranoffice: 'assets/sprites/tehranoffice.png?v=1',
+    // --- sci-fi set (shipped art only; no procedural placeholders, which the
+    // loader above now tolerates) ---
+    bridgeconsole: 'assets/sprites/bridgeconsole.png?v=1',
+    engstation: 'assets/sprites/engstation.png?v=1',
+    tacticalstation: 'assets/sprites/tacticalstation.png?v=1',
+    sciterminal: 'assets/sprites/sciterminal.png?v=1',
+    sensordisplay: 'assets/sprites/sensordisplay.png?v=1',
+    captainchair: 'assets/sprites/captainchair.png?v=1',
+    helmchair: 'assets/sprites/helmchair.png?v=1',
+    labstool: 'assets/sprites/labstool.png?v=1',
+    crewseat: 'assets/sprites/crewseat.png?v=1',
+    navlog: 'assets/sprites/navlog.png?v=1',
+    engstatus: 'assets/sprites/engstatus.png?v=1',
+    bridgeroster: 'assets/sprites/bridgeroster.png?v=1',
+    viewscreenplanets: 'assets/sprites/viewscreenplanets.png?v=1',
+    viewscreensaturn: 'assets/sprites/viewscreensaturn.png?v=1',
+    sciwallpanel: 'assets/sprites/sciwallpanel.png?v=1',
+    scidisplaybank: 'assets/sprites/scidisplaybank.png?v=1',
+    turbolift: 'assets/sprites/turbolift.png?v=1',
+    phaser: 'assets/sprites/phaser.png?v=1',
+    bone: 'assets/sprites/bone.png?v=1',
+    starfleetbadge: 'assets/sprites/starfleetbadge.png?v=1',
+    scidagger: 'assets/sprites/scidagger.png?v=1',
+    communicator: 'assets/sprites/communicator.png?v=1',
+    tricorder: 'assets/sprites/tricorder.png?v=1',
+    manuals: 'assets/sprites/manuals.png?v=1',
+    scannerscope: 'assets/sprites/scannerscope.png?v=1',
+    medscanner: 'assets/sprites/medscanner.png?v=1',
+    powercell: 'assets/sprites/powercell.png?v=1',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
     blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash', gunman: 'gunmanFlash',
@@ -10679,9 +10708,14 @@ const World = (() => {
                                                                // no upside to downscaling detailed art to 64x64 first
   function blankCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
   for (const [name, path] of Object.entries(ART_ASSETS)) {
-    if (!SPR[name]) continue;
     const w = ART_RES, h = ART_RES;
-    const placeholder = SPR[name];   // the old procedural/default sprite — kept only for the file:// tainted-canvas fallback below
+    // A procedural placeholder is OPTIONAL. Props that never had a hand-drawn
+    // fallback and only ever ship real art (the sci-fi set) would otherwise be
+    // skipped here and silently render nothing — a trap this codebase has
+    // already fallen into once, with the tree sprites. Missing placeholder
+    // just means the file:// tainted-canvas path below has nothing to fall
+    // back TO, which is the correct behaviour: a blank sprite, not a crash.
+    const placeholder = SPR[name] || null;
     SPR[name] = blankCanvas(w, h);   // invisible until the real shipped art loads, instead of flashing the outdated placeholder
     const img = new Image();
     img.onload = () => {
@@ -10691,16 +10725,21 @@ const World = (() => {
       // mid-frame and blanks the whole screen, not just this one character.
       if (isTainted(img)) {
         console.warn('Shipped character art blocked by the browser (canvas tainted — this happens opening index.html via file://; serve it from a local server instead, e.g. `python3 -m http.server`). Keeping the built-in art for:', path);
-        SPR[name] = placeholder;
+        if (placeholder) SPR[name] = placeholder;
         return;
       }
       try {
         const fit = WEAPON_SPRITE_NAMES.has(name) ? fitWeapon : fitCharacter;
         SPR[name] = fit(trimTransparent(img), w, h);
         if (FLASH_OF[name]) SPR[FLASH_OF[name]] = whiteOf(SPR[name]);
-      } catch (e) { console.warn('Failed to apply shipped character art:', path, e); SPR[name] = placeholder; }
+        // Shipped art lands asynchronously, long after anything that drew a
+        // one-off copy of the sprite (the editor's palette thumbnails) has
+        // already painted — those would keep the blank placeholder forever.
+        // Announce each load so such consumers can repaint just that one.
+        try { window.dispatchEvent(new CustomEvent('spriteart', { detail: { name } })); } catch (e) { /* no DOM (tests) */ }
+      } catch (e) { console.warn('Failed to apply shipped character art:', path, e); if (placeholder) SPR[name] = placeholder; }
     };
-    img.onerror = () => { console.warn('Failed to load shipped character art (check the path/file exists):', path); SPR[name] = placeholder; };
+    img.onerror = () => { console.warn('Failed to load shipped character art (check the path/file exists):', path); if (placeholder) SPR[name] = placeholder; };
     img.src = path;
   }
 
@@ -11461,6 +11500,34 @@ const World = (() => {
     havanarow: (x, y) => prop('havanarow', 'HAVANA COLONIAL ROW', x, y, 1.4, true),
     tehranmosquebuilding: (x, y) => prop('tehranmosquebuilding', 'TEHRAN TILED BUILDING', x, y, 1.6, true),
     tehranoffice: (x, y) => prop('tehranoffice', 'TEHRAN OFFICE TOWER', x, y, 2.0, true),
+    // --- sci-fi set ---
+    bridgeconsole: (x, y) => prop('bridgeconsole', "BRIDGE CONSOLE", x, y, 1.0, true),
+    engstation: (x, y) => prop('engstation', "ENGINEERING STATION", x, y, 0.95, true),
+    tacticalstation: (x, y) => prop('tacticalstation', "TACTICAL STATION", x, y, 0.95, true),
+    sciterminal: (x, y) => prop('sciterminal', "COMPUTER TERMINAL", x, y, 0.85, true),
+    sensordisplay: (x, y) => prop('sensordisplay', "SENSOR DISPLAY", x, y, 0.8, true),
+    captainchair: (x, y) => prop('captainchair', "CAPTAIN'S CHAIR", x, y, 0.8, true),
+    helmchair: (x, y) => prop('helmchair', "HELM CHAIR", x, y, 0.85, true),
+    labstool: (x, y) => prop('labstool', "LAB STOOL", x, y, 0.55, true),
+    crewseat: (x, y) => prop('crewseat', "CREW SEAT", x, y, 0.7, true),
+    navlog: (x, y) => prop('navlog', "NAVIGATION LOG", x, y, 0.75, false),
+    engstatus: (x, y) => prop('engstatus', "ENGINEERING STATUS", x, y, 0.75, false),
+    bridgeroster: (x, y) => prop('bridgeroster', "BRIDGE ROSTER", x, y, 0.6, false),
+    viewscreenplanets: (x, y) => prop('viewscreenplanets', "VIEWSCREEN - PLANETS", x, y, 1.6, false),
+    viewscreensaturn: (x, y) => prop('viewscreensaturn', "VIEWSCREEN - SATURN", x, y, 1.4, false),
+    sciwallpanel: (x, y) => prop('sciwallpanel', "CONTROL PANEL", x, y, 1.0, false),
+    scidisplaybank: (x, y) => prop('scidisplaybank', "DISPLAY BANK", x, y, 0.9, false),
+    turbolift: (x, y) => prop('turbolift', "TURBOLIFT DOOR", x, y, 2.2, false),
+    phaser: (x, y) => prop('phaser', "PHASER", x, y, 0.4, false),
+    bone: (x, y) => prop('bone', "BONE", x, y, 0.35, false),
+    starfleetbadge: (x, y) => prop('starfleetbadge', "INSIGNIA", x, y, 0.3, false),
+    scidagger: (x, y) => prop('scidagger', "CEREMONIAL DAGGER", x, y, 0.45, false),
+    communicator: (x, y) => prop('communicator', "COMMUNICATOR", x, y, 0.34, false),
+    tricorder: (x, y) => prop('tricorder', "TRICORDER", x, y, 0.38, false),
+    manuals: (x, y) => prop('manuals', "TECHNICAL MANUALS", x, y, 0.36, false),
+    scannerscope: (x, y) => prop('scannerscope', "SCANNER SCOPE", x, y, 0.55, false),
+    medscanner: (x, y) => prop('medscanner', "MEDICAL SCANNER", x, y, 0.45, false),
+    powercell: (x, y) => prop('powercell', "POWER CELL", x, y, 0.42, false),
     // Paris Catacombs
     skull: (x, y) => prop('skull', 'SKULL', x, y, 0.3, false),
     skullpile: (x, y) => prop('skullpile', 'PILE OF SKULLS', x, y, 0.55, true),
