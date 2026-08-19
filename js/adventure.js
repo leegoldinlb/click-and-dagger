@@ -582,6 +582,14 @@ const Adventure = (() => {
       case 'tehranuniform': return "It looks like Reza's uniform.";
       case 'metroticket': return 'A single Métro ticket. One ride, one way.';
       // --- sci-fi set ---
+      case 'eyepod': return 'A squat green thing with one wet eye. It tracks you, and does nothing else.';
+      case 'redcrystal': return 'A cluster of red crystal, grown straight out of the rock. Warm to stand near.';
+      case 'tendrilplant': return 'A knot of purple tendrils, each one ending in a small pale sucker. They lean toward you.';
+      case 'alienrocks': return 'A heap of pale rounded stones. Weathered by something, on some world, a long time ago.';
+      case 'stalkeyes': return 'Two eyes on green stalks, blinking out of phase with each other.';
+      case 'bluecrystal': return 'Blue crystal spines, cold enough to ache. They ring faintly if you get close.';
+      case 'bulbcluster': return 'A low plant hung with fat orange bulbs. Do not step on them.';
+      case 'pinkcrystal': return 'Pink crystal, grown in slabs. It takes the light and gives back almost none of it.';
       case 'crewcommand': return e.dead
         ? 'The command officer, down. Somebody is getting a field promotion.'
         : 'A command officer, red tunic, hands behind his back. He is waiting for someone to give him something to decide.';

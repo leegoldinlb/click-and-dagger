@@ -25,6 +25,14 @@ const Editor = (() => {
   const ENTS = [
     { kind: 'goon', name: 'HENCHMAN', spr: 'goon' },
     // --- sci-fi set ---
+    { kind: 'eyepod', name: 'EYE POD', spr: 'eyepod' },
+    { kind: 'redcrystal', name: 'RED CRYSTAL', spr: 'redcrystal' },
+    { kind: 'tendrilplant', name: 'TENDRIL PLANT', spr: 'tendrilplant' },
+    { kind: 'alienrocks', name: 'ALIEN ROCKS', spr: 'alienrocks' },
+    { kind: 'stalkeyes', name: 'STALK EYES', spr: 'stalkeyes' },
+    { kind: 'bluecrystal', name: 'BLUE CRYSTAL', spr: 'bluecrystal' },
+    { kind: 'bulbcluster', name: 'BULB CLUSTER', spr: 'bulbcluster' },
+    { kind: 'pinkcrystal', name: 'PINK CRYSTAL', spr: 'pinkcrystal' },
     { kind: 'crewcommand', name: 'COMMAND OFFICER', spr: 'crewcommand' },
     { kind: 'crewscience', name: 'SCIENCE OFFICER', spr: 'crewscience' },
     { kind: 'crewengineer', name: 'ENGINEERING OFFICER', spr: 'crewengineer' },
@@ -435,7 +443,7 @@ const Editor = (() => {
   ];
   // The sci-fi props have no shared name prefix (phaser, tricorder, bone...),
   // so they're grouped by an explicit set rather than LOCATION_PREFIXES.
-  const SCIFI_KINDS = new Set(['bridgeconsole', 'engstation', 'tacticalstation', 'sciterminal', 'sensordisplay', 'captainchair', 'helmchair', 'labstool', 'crewseat', 'navlog', 'engstatus', 'bridgeroster', 'viewscreenplanets', 'viewscreensaturn', 'sciwallpanel', 'scidisplaybank', 'turbolift', 'phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder', 'manuals', 'scannerscope', 'medscanner', 'powercell', 'datapads', 'equipcase', 'sciscanner', 'turboliftopen', 'insigniaphoenix', 'insigniadelta', 'insigniaship', 'insigniacomet', 'insigniastar', 'crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops', 'saurianbrute', 'saurianmarksman', 'saurianstealth', 'scavenger', 'saboteur', 'swarmdrone', 'alienwarlord']);
+  const SCIFI_KINDS = new Set(['bridgeconsole', 'engstation', 'tacticalstation', 'sciterminal', 'sensordisplay', 'captainchair', 'helmchair', 'labstool', 'crewseat', 'navlog', 'engstatus', 'bridgeroster', 'viewscreenplanets', 'viewscreensaturn', 'sciwallpanel', 'scidisplaybank', 'turbolift', 'phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder', 'manuals', 'scannerscope', 'medscanner', 'powercell', 'datapads', 'equipcase', 'sciscanner', 'turboliftopen', 'insigniaphoenix', 'insigniadelta', 'insigniaship', 'insigniacomet', 'insigniastar', 'crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops', 'saurianbrute', 'saurianmarksman', 'saurianstealth', 'scavenger', 'saboteur', 'swarmdrone', 'alienwarlord', 'eyepod', 'redcrystal', 'tendrilplant', 'alienrocks', 'stalkeyes', 'bluecrystal', 'bulbcluster', 'pinkcrystal']);
   function locOf(kind) {
     if (SCIFI_KINDS.has(kind)) return 'SCI-FI';
     for (const [pre, loc] of LOCATION_PREFIXES) if (kind.startsWith(pre)) return loc;

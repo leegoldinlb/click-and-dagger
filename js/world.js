@@ -5806,6 +5806,21 @@ const World = (() => {
   TX.scidoorpanel = TX.metal;
   TX.scipanelbank = TX.panel;
   TX.scipipes = TX.concrete;
+  // alien-world tiles — same again
+  TX.lavarock = TX.rockwall;
+  TX.lavacracked = TX.rockwall;
+  TX.crystalrock = TX.rockwall;
+  TX.crystalstrata = TX.rockwall;
+  TX.fungalterrain = TX.ground;
+  TX.fungalspores = TX.ground;
+  TX.redcracked = TX.ground;
+  TX.aliensoil = TX.ground;
+  TX.aliensoilveined = TX.ground;
+  TX.bulkhead = TX.metal;
+  TX.conduitruns = TX.metal;
+  TX.floorgrating = TX.metal;
+  TX.hatchpanel = TX.metal;
+  TX.buttonconsole = TX.panel;
   // ordered list the editor shows as a palette
   const TXNAMES = ['lair', 'teak', 'brick', 'stucco', 'stuccob', 'stuccop', 'panel', 'tile',
     'cobble', 'wood', 'marble', 'concrete', 'water', 'metal', 'vent', 'carpet', 'lounge',
@@ -5828,6 +5843,7 @@ const World = (() => {
     'warehousebrick', 'depositorywindow', 'depositorycorner', 'concretepergola', 'lawngrass', 'roadway', 'sidewalk',
     'catacombwall',
     'scigrating', 'scidoorpanel', 'scipanelbank', 'scipipes',
+    'lavarock', 'lavacracked', 'crystalrock', 'crystalstrata', 'fungalterrain', 'fungalspores', 'redcracked', 'aliensoil', 'aliensoilveined', 'bulkhead', 'conduitruns', 'floorgrating', 'hatchpanel', 'buttonconsole',
     'radio', 'blast', 'mainframe', 'poster', 'keycard', 'stdkey'];
   const WALLTX = { 1: 'teak', 2: 'lair', 3: 'blast', 4: 'radio', 5: 'mainframe', 6: 'poster', 7: 'keycard', 8: 'stdkey' };
   const wallTexName = (x, y) => {
@@ -10608,6 +10624,29 @@ const World = (() => {
     tehranoffice: 'assets/sprites/tehranoffice.png?v=1',
     // --- sci-fi set (shipped art only; no procedural placeholders, which the
     // loader above now tolerates) ---
+    // alien-world tiles + flora
+    lavarock: 'assets/sprites/lavarock.png?v=1',
+    lavacracked: 'assets/sprites/lavacracked.png?v=1',
+    crystalrock: 'assets/sprites/crystalrock.png?v=1',
+    crystalstrata: 'assets/sprites/crystalstrata.png?v=1',
+    fungalterrain: 'assets/sprites/fungalterrain.png?v=1',
+    fungalspores: 'assets/sprites/fungalspores.png?v=1',
+    redcracked: 'assets/sprites/redcracked.png?v=1',
+    aliensoil: 'assets/sprites/aliensoil.png?v=1',
+    aliensoilveined: 'assets/sprites/aliensoilveined.png?v=1',
+    bulkhead: 'assets/sprites/bulkhead.png?v=1',
+    conduitruns: 'assets/sprites/conduitruns.png?v=1',
+    floorgrating: 'assets/sprites/floorgrating.png?v=1',
+    hatchpanel: 'assets/sprites/hatchpanel.png?v=1',
+    buttonconsole: 'assets/sprites/buttonconsole.png?v=1',
+    eyepod: 'assets/sprites/eyepod.png?v=1',
+    redcrystal: 'assets/sprites/redcrystal.png?v=1',
+    tendrilplant: 'assets/sprites/tendrilplant.png?v=1',
+    alienrocks: 'assets/sprites/alienrocks.png?v=1',
+    stalkeyes: 'assets/sprites/stalkeyes.png?v=1',
+    bluecrystal: 'assets/sprites/bluecrystal.png?v=1',
+    bulbcluster: 'assets/sprites/bulbcluster.png?v=1',
+    pinkcrystal: 'assets/sprites/pinkcrystal.png?v=1',
     // crew + hostiles
     crewcommand: 'assets/sprites/crewcommand.png?v=1',
     crewscience: 'assets/sprites/crewscience.png?v=1',
@@ -10832,7 +10871,8 @@ const World = (() => {
 
   // General shipped wall materials — same PNG-tile pipeline as DOOR_SKINS above,
   // but for ordinary wallTex/floorTex/ceilTex picks (not door-specific skins).
-  const SHIPPED_WALL_TEX = ['catacombwall', 'scigrating', 'scidoorpanel', 'scipanelbank', 'scipipes'];
+  const SHIPPED_WALL_TEX = ['catacombwall', 'scigrating', 'scidoorpanel', 'scipanelbank', 'scipipes',
+    'lavarock', 'lavacracked', 'crystalrock', 'crystalstrata', 'fungalterrain', 'fungalspores', 'redcracked', 'aliensoil', 'aliensoilveined', 'bulkhead', 'conduitruns', 'floorgrating', 'hatchpanel', 'buttonconsole'];
   for (const name of SHIPPED_WALL_TEX) {
     const path = ART_ASSETS[name];
     if (!path) continue;
@@ -11538,6 +11578,15 @@ const World = (() => {
     tehranmosquebuilding: (x, y) => prop('tehranmosquebuilding', 'TEHRAN TILED BUILDING', x, y, 1.6, true),
     tehranoffice: (x, y) => prop('tehranoffice', 'TEHRAN OFFICE TOWER', x, y, 2.0, true),
     // --- sci-fi set ---
+    // alien flora and minerals
+    eyepod: (x, y) => prop('eyepod', 'EYE POD', x, y, 0.55, false),
+    redcrystal: (x, y) => prop('redcrystal', 'RED CRYSTAL', x, y, 0.6, true),
+    tendrilplant: (x, y) => prop('tendrilplant', 'TENDRIL PLANT', x, y, 0.6, false),
+    alienrocks: (x, y) => prop('alienrocks', 'ALIEN ROCKS', x, y, 0.5, true),
+    stalkeyes: (x, y) => prop('stalkeyes', 'STALK EYES', x, y, 0.55, false),
+    bluecrystal: (x, y) => prop('bluecrystal', 'BLUE CRYSTAL', x, y, 0.6, true),
+    bulbcluster: (x, y) => prop('bulbcluster', 'BULB CLUSTER', x, y, 0.55, false),
+    pinkcrystal: (x, y) => prop('pinkcrystal', 'PINK CRYSTAL', x, y, 0.55, true),
     // crew (civilian behaviour) and hostiles
     crewcommand: (x, y, e) => ({
       kind: 'crewcommand', name: 'COMMAND OFFICER', x, y, solid: false, scale: 0.72, hp: 1, dead: false, flash: 0,
