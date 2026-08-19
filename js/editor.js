@@ -25,6 +25,15 @@ const Editor = (() => {
   const ENTS = [
     { kind: 'goon', name: 'HENCHMAN', spr: 'goon' },
     // --- sci-fi set ---
+    { kind: 'datapads', name: 'DATAPAD STACK', spr: 'datapads' },
+    { kind: 'equipcase', name: 'FIELD RECORDER', spr: 'equipcase' },
+    { kind: 'sciscanner', name: 'WALL SCANNER', spr: 'sciscanner' },
+    { kind: 'turboliftopen', name: 'TURBOLIFT (OPEN)', spr: 'turboliftopen' },
+    { kind: 'insigniaphoenix', name: 'PHOENIX INSIGNIA', spr: 'insigniaphoenix' },
+    { kind: 'insigniadelta', name: 'DELTA INSIGNIA', spr: 'insigniadelta' },
+    { kind: 'insigniaship', name: 'SHIP PATCH', spr: 'insigniaship' },
+    { kind: 'insigniacomet', name: 'COMET PATCH', spr: 'insigniacomet' },
+    { kind: 'insigniastar', name: 'STAR PATCH', spr: 'insigniastar' },
     { kind: 'bridgeconsole', name: 'BRIDGE CONSOLE', spr: 'bridgeconsole' },
     { kind: 'engstation', name: 'ENGINEERING STATION', spr: 'engstation' },
     { kind: 'tacticalstation', name: 'TACTICAL STATION', spr: 'tacticalstation' },
@@ -410,7 +419,7 @@ const Editor = (() => {
   ];
   // The sci-fi props have no shared name prefix (phaser, tricorder, bone...),
   // so they're grouped by an explicit set rather than LOCATION_PREFIXES.
-  const SCIFI_KINDS = new Set(['bridgeconsole', 'engstation', 'tacticalstation', 'sciterminal', 'sensordisplay', 'captainchair', 'helmchair', 'labstool', 'crewseat', 'navlog', 'engstatus', 'bridgeroster', 'viewscreenplanets', 'viewscreensaturn', 'sciwallpanel', 'scidisplaybank', 'turbolift', 'phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder', 'manuals', 'scannerscope', 'medscanner', 'powercell']);
+  const SCIFI_KINDS = new Set(['bridgeconsole', 'engstation', 'tacticalstation', 'sciterminal', 'sensordisplay', 'captainchair', 'helmchair', 'labstool', 'crewseat', 'navlog', 'engstatus', 'bridgeroster', 'viewscreenplanets', 'viewscreensaturn', 'sciwallpanel', 'scidisplaybank', 'turbolift', 'phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder', 'manuals', 'scannerscope', 'medscanner', 'powercell', 'datapads', 'equipcase', 'sciscanner', 'turboliftopen', 'insigniaphoenix', 'insigniadelta', 'insigniaship', 'insigniacomet', 'insigniastar']);
   function locOf(kind) {
     if (SCIFI_KINDS.has(kind)) return 'SCI-FI';
     for (const [pre, loc] of LOCATION_PREFIXES) if (kind.startsWith(pre)) return loc;

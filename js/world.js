@@ -5801,6 +5801,11 @@ const World = (() => {
     speck(gt, 55, 'rgba(255,246,220,0.04)', c.width, c.height);
   }
   TX.catacombwall = TX.rockwall;   // placeholder until the shipped PNG loads (ART_ASSETS/SHIPPED_WALL_TEX below)
+  // sci-fi tiles — same deal: a stand-in until the shipped PNG replaces it
+  TX.scigrating = TX.metal;
+  TX.scidoorpanel = TX.metal;
+  TX.scipanelbank = TX.panel;
+  TX.scipipes = TX.concrete;
   // ordered list the editor shows as a palette
   const TXNAMES = ['lair', 'teak', 'brick', 'stucco', 'stuccob', 'stuccop', 'panel', 'tile',
     'cobble', 'wood', 'marble', 'concrete', 'water', 'metal', 'vent', 'carpet', 'lounge',
@@ -5822,6 +5827,7 @@ const World = (() => {
     'concreteblock', 'redbanner', 'domemosaic', 'parquet', 'muralsoviet',
     'warehousebrick', 'depositorywindow', 'depositorycorner', 'concretepergola', 'lawngrass', 'roadway', 'sidewalk',
     'catacombwall',
+    'scigrating', 'scidoorpanel', 'scipanelbank', 'scipipes',
     'radio', 'blast', 'mainframe', 'poster', 'keycard', 'stdkey'];
   const WALLTX = { 1: 'teak', 2: 'lair', 3: 'blast', 4: 'radio', 5: 'mainframe', 6: 'poster', 7: 'keycard', 8: 'stdkey' };
   const wallTexName = (x, y) => {
@@ -10602,33 +10608,46 @@ const World = (() => {
     tehranoffice: 'assets/sprites/tehranoffice.png?v=1',
     // --- sci-fi set (shipped art only; no procedural placeholders, which the
     // loader above now tolerates) ---
-    bridgeconsole: 'assets/sprites/bridgeconsole.png?v=1',
-    engstation: 'assets/sprites/engstation.png?v=1',
-    tacticalstation: 'assets/sprites/tacticalstation.png?v=1',
-    sciterminal: 'assets/sprites/sciterminal.png?v=1',
-    sensordisplay: 'assets/sprites/sensordisplay.png?v=1',
-    captainchair: 'assets/sprites/captainchair.png?v=1',
-    helmchair: 'assets/sprites/helmchair.png?v=1',
-    labstool: 'assets/sprites/labstool.png?v=1',
-    crewseat: 'assets/sprites/crewseat.png?v=1',
-    navlog: 'assets/sprites/navlog.png?v=1',
-    engstatus: 'assets/sprites/engstatus.png?v=1',
-    bridgeroster: 'assets/sprites/bridgeroster.png?v=1',
-    viewscreenplanets: 'assets/sprites/viewscreenplanets.png?v=1',
-    viewscreensaturn: 'assets/sprites/viewscreensaturn.png?v=1',
-    sciwallpanel: 'assets/sprites/sciwallpanel.png?v=1',
-    scidisplaybank: 'assets/sprites/scidisplaybank.png?v=1',
-    turbolift: 'assets/sprites/turbolift.png?v=1',
-    phaser: 'assets/sprites/phaser.png?v=1',
-    bone: 'assets/sprites/bone.png?v=1',
-    starfleetbadge: 'assets/sprites/starfleetbadge.png?v=1',
-    scidagger: 'assets/sprites/scidagger.png?v=1',
-    communicator: 'assets/sprites/communicator.png?v=1',
-    tricorder: 'assets/sprites/tricorder.png?v=1',
-    manuals: 'assets/sprites/manuals.png?v=1',
-    scannerscope: 'assets/sprites/scannerscope.png?v=1',
-    medscanner: 'assets/sprites/medscanner.png?v=1',
-    powercell: 'assets/sprites/powercell.png?v=1',
+    datapads: 'assets/sprites/datapads.png?v=2',
+    equipcase: 'assets/sprites/equipcase.png?v=2',
+    sciscanner: 'assets/sprites/sciscanner.png?v=2',
+    turboliftopen: 'assets/sprites/turboliftopen.png?v=2',
+    insigniaphoenix: 'assets/sprites/insigniaphoenix.png?v=2',
+    insigniadelta: 'assets/sprites/insigniadelta.png?v=2',
+    insigniaship: 'assets/sprites/insigniaship.png?v=2',
+    insigniacomet: 'assets/sprites/insigniacomet.png?v=2',
+    insigniastar: 'assets/sprites/insigniastar.png?v=2',
+    scigrating: 'assets/sprites/scigrating.png?v=2',
+    scidoorpanel: 'assets/sprites/scidoorpanel.png?v=2',
+    scipanelbank: 'assets/sprites/scipanelbank.png?v=2',
+    scipipes: 'assets/sprites/scipipes.png?v=2',
+    bridgeconsole: 'assets/sprites/bridgeconsole.png?v=3',
+    engstation: 'assets/sprites/engstation.png?v=2',
+    tacticalstation: 'assets/sprites/tacticalstation.png?v=2',
+    sciterminal: 'assets/sprites/sciterminal.png?v=2',
+    sensordisplay: 'assets/sprites/sensordisplay.png?v=2',
+    captainchair: 'assets/sprites/captainchair.png?v=3',
+    helmchair: 'assets/sprites/helmchair.png?v=2',
+    labstool: 'assets/sprites/labstool.png?v=2',
+    crewseat: 'assets/sprites/crewseat.png?v=2',
+    navlog: 'assets/sprites/navlog.png?v=2',
+    engstatus: 'assets/sprites/engstatus.png?v=2',
+    bridgeroster: 'assets/sprites/bridgeroster.png?v=2',
+    viewscreenplanets: 'assets/sprites/viewscreenplanets.png?v=2',
+    viewscreensaturn: 'assets/sprites/viewscreensaturn.png?v=3',
+    sciwallpanel: 'assets/sprites/sciwallpanel.png?v=3',
+    scidisplaybank: 'assets/sprites/scidisplaybank.png?v=2',
+    turbolift: 'assets/sprites/turbolift.png?v=2',
+    phaser: 'assets/sprites/phaser.png?v=2',
+    bone: 'assets/sprites/bone.png?v=2',
+    starfleetbadge: 'assets/sprites/starfleetbadge.png?v=2',
+    scidagger: 'assets/sprites/scidagger.png?v=2',
+    communicator: 'assets/sprites/communicator.png?v=2',
+    tricorder: 'assets/sprites/tricorder.png?v=2',
+    manuals: 'assets/sprites/manuals.png?v=2',
+    scannerscope: 'assets/sprites/scannerscope.png?v=2',
+    medscanner: 'assets/sprites/medscanner.png?v=2',
+    powercell: 'assets/sprites/powercell.png?v=2',
   };
   const FLASH_OF = { goon: 'goonFlash', brute: 'bruteFlash', sniper: 'sniperFlash',
     blackbelt: 'blackbeltFlash', soviet: 'sovietFlash', spy: 'spyFlash', gunman: 'gunmanFlash',
@@ -10795,7 +10814,7 @@ const World = (() => {
 
   // General shipped wall materials — same PNG-tile pipeline as DOOR_SKINS above,
   // but for ordinary wallTex/floorTex/ceilTex picks (not door-specific skins).
-  const SHIPPED_WALL_TEX = ['catacombwall'];
+  const SHIPPED_WALL_TEX = ['catacombwall', 'scigrating', 'scidoorpanel', 'scipanelbank', 'scipipes'];
   for (const name of SHIPPED_WALL_TEX) {
     const path = ART_ASSETS[name];
     if (!path) continue;
@@ -11501,6 +11520,15 @@ const World = (() => {
     tehranmosquebuilding: (x, y) => prop('tehranmosquebuilding', 'TEHRAN TILED BUILDING', x, y, 1.6, true),
     tehranoffice: (x, y) => prop('tehranoffice', 'TEHRAN OFFICE TOWER', x, y, 2.0, true),
     // --- sci-fi set ---
+    datapads: (x, y) => prop('datapads', 'DATAPAD STACK', x, y, 0.42, false),
+    equipcase: (x, y) => prop('equipcase', 'FIELD RECORDER', x, y, 0.34, false),
+    sciscanner: (x, y) => prop('sciscanner', 'WALL SCANNER', x, y, 0.8, false),
+    turboliftopen: (x, y) => prop('turboliftopen', 'TURBOLIFT (OPEN)', x, y, 2.2, false),
+    insigniaphoenix: (x, y) => prop('insigniaphoenix', 'PHOENIX INSIGNIA', x, y, 0.26, false),
+    insigniadelta: (x, y) => prop('insigniadelta', 'DELTA INSIGNIA', x, y, 0.26, false),
+    insigniaship: (x, y) => prop('insigniaship', 'SHIP PATCH', x, y, 0.26, false),
+    insigniacomet: (x, y) => prop('insigniacomet', 'COMET PATCH', x, y, 0.26, false),
+    insigniastar: (x, y) => prop('insigniastar', 'STAR PATCH', x, y, 0.26, false),
     bridgeconsole: (x, y) => prop('bridgeconsole', "BRIDGE CONSOLE", x, y, 1.0, true),
     engstation: (x, y) => prop('engstation', "ENGINEERING STATION", x, y, 0.95, true),
     tacticalstation: (x, y) => prop('tacticalstation', "TACTICAL STATION", x, y, 0.95, true),

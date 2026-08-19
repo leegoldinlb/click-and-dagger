@@ -582,6 +582,15 @@ const Adventure = (() => {
       case 'tehranuniform': return "It looks like Reza's uniform.";
       case 'metroticket': return 'A single Métro ticket. One ride, one way.';
       // --- sci-fi set ---
+      case 'datapads': return 'A stack of datapads, each one showing a different unread report.';
+      case 'equipcase': return 'A field recorder, spools still loaded. Someone was taking notes and stopped.';
+      case 'sciscanner': return 'A wall scanner, screen washed pale green. It reads the room and keeps its opinion to itself.';
+      case 'turboliftopen': return 'An open turbolift. The car is not here, and the shaft goes down further than it should.';
+      case 'insigniaphoenix': return 'A phoenix crest on a blue shield. Somebody was proud of something.';
+      case 'insigniadelta': return 'A delta insignia, gold-winged. The same mark is stamped on half the equipment here.';
+      case 'insigniaship': return 'A ship patch, gold thread on navy. Issued, worn, and never taken off.';
+      case 'insigniacomet': return 'A comet patch, blue and white. A flight badge, at a guess.';
+      case 'insigniastar': return 'A star patch. Five points, no explanation.';
       case 'bridgeconsole': return 'A bank of screens and toggles, all of it humming. Someone flew a ship with this.';
       case 'engstation': return 'The engineering station. Readouts scroll past faster than anyone could actually read them.';
       case 'tacticalstation': return 'A tactical board, a ship diagram glowing green across it. Nothing is currently shooting at you.';
