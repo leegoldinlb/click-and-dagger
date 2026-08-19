@@ -87,9 +87,9 @@
   },
   {
    "kind": "laundryticket",
-   "x": 20.19,
-   "y": 28.54,
-   "scale": 1.52,
+   "x": 18.49,
+   "y": 28.34,
+   "scale": 0.6,
    "flat": true,
    "flatGround": false,
    "flatAngle": 0
@@ -364,13 +364,13 @@
   },
   {
    "kind": "lawnmower",
-   "x": 18.51,
-   "y": 29.55
+   "x": 20.28,
+   "y": 29.43
   },
   {
    "kind": "vespa",
-   "x": 21.4,
-   "y": 29.75
+   "x": 21.86,
+   "y": 29.44
   },
   {
    "kind": "oaktree",
@@ -560,6 +560,26 @@
    "flatGround": false,
    "flatAngle": 4.71238898038469,
    "zOff": 0.1
+  },
+  {
+   "kind": "nyconstruction",
+   "x": 19.08,
+   "y": 24.26
+  },
+  {
+   "kind": "nyfirefighter",
+   "x": 13.71,
+   "y": 20.42
+  },
+  {
+   "kind": "nybusinessman",
+   "x": 16.46,
+   "y": 20.4
+  },
+  {
+   "kind": "nypainter",
+   "x": 13.25,
+   "y": 14.22
   }
  ],
  "blown": false,
@@ -1734,6 +1754,22 @@
    {
     "x": 10,
     "y": 22
+   },
+   {
+    "x": 18,
+    "y": 28.5
+   },
+   {
+    "x": 19,
+    "y": 28.5
+   },
+   {
+    "x": 18,
+    "y": 28.25
+   },
+   {
+    "x": 19,
+    "y": 28.25
    }
   ],
   "sectors": [
@@ -2877,7 +2913,7 @@
      69
     ],
     "floor": 0,
-    "ceil": 1.5,
+    "ceil": 1.9,
     "floorTex": "sandbag",
     "ceilTex": "ceiltile",
     "sky": false,
@@ -2982,7 +3018,7 @@
     "floor": 0.4,
     "ceil": 1.1,
     "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "ceilTex": "woodpaneling",
     "sky": false,
     "win": false,
     "hostile": false,
@@ -2996,6 +3032,16 @@
      true,
      true,
      true
+    ],
+    "wallTex": [
+     null,
+     "woodpaneling",
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
     ],
     "parent": 22
    },
@@ -3090,7 +3136,7 @@
     "texScale": 1,
     "wallTex": [
      "clapboard",
-     null,
+     "clapboardyellow",
      "clapboard",
      null
     ],
@@ -3107,6 +3153,8 @@
      131,
      133,
      134,
+     292,
+     293,
      135,
      136,
      132
@@ -3119,21 +3167,42 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallBlock": [
+     false,
+     false,
+     true,
+     false,
+     false,
+     false
+    ],
     "wallTex": [
      "woodpaneling",
      "woodpaneling",
      "woodpaneling",
      "woodpaneling",
      "woodpaneling",
-     null
+     "woodpaneling",
+     "woodpaneling"
     ],
     "wallStepTex": [
      null,
      null,
      null,
+     "woodpaneling",
      null,
+     "woodpaneling",
      null,
      "woodpaneling"
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     "woodpaneling",
+     null,
+     null,
+     null,
+     null
     ],
     "parent": -1
    },
@@ -4464,6 +4533,29 @@
     ],
     "parent": -1,
     "missionLink": "hub"
+   },
+   {
+    "loop": [
+     292,
+     294,
+     295,
+     293
+    ],
+    "floor": 0.8,
+    "ceil": 1.5,
+    "floorTex": "woodpaneling",
+    "ceilTex": "woodpaneling",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "woodpaneling",
+     "woodpaneling",
+     "woodpaneling",
+     null
+    ],
+    "parent": -1
    }
   ]
  }
