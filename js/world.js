@@ -5575,6 +5575,369 @@ const World = (() => {
     speck(g, 50, 'rgba(50,46,34,0.1)');
   });
 
+
+  // ---- sci-fi ship interiors + alien world surfaces -----------------------
+  // Drawn here rather than shipped as PNGs, like every other surface in this
+  // file: a 64x64 canvas tiles exactly, costs nothing to download, and can be
+  // tweaked by editing numbers instead of re-exporting art.
+  // wrapRect/wrapCirc draw a shape and ALSO redraw it shifted by one tile in
+  // each direction it overhangs, so features that cross an edge continue on
+  // the opposite side and the texture repeats without a visible seam.
+  // A full-height vgrad can never tile: its first and last rows are different
+  // colours by construction, so every repeat shows a hard band. vgradWrap
+  // returns to its starting colour at the bottom, giving the same soft shading
+  // with row 63 meeting row 0 seamlessly.
+  function vgradWrap(g, edge, mid) {
+    const gr = g.createLinearGradient(0, 0, 0, 64);
+    gr.addColorStop(0, edge); gr.addColorStop(0.5, mid); gr.addColorStop(1, edge);
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+  }
+  function wrapRect(g, x, y, w, h) {
+    for (const dx of [0, -64, 64]) for (const dy of [0, -64, 64]) {
+      if (x + dx > 64 || x + dx + w < 0 || y + dy > 64 || y + dy + h < 0) continue;
+      g.fillRect(x + dx, y + dy, w, h);
+    }
+  }
+  function wrapCirc(g, x, y, r) {
+    for (const dx of [0, -64, 64]) for (const dy of [0, -64, 64]) {
+      if (x + dx > 64 + r || x + dx < -r || y + dy > 64 + r || y + dy < -r) continue;
+      g.beginPath(); g.arc(x + dx, y + dy, r, 0, 7); g.fill();
+    }
+  }
+  // Irregular closed cell shapes (basalt plates, dried-mud crazing, soil
+  // mottling) — the shared skeleton behind lava/cracked/soil below. `cells`
+  // returns polygon rings on a jittered grid so the crack network reads as
+  // natural rather than square.
+  function cells(n, jitter) {
+    const out = [], step = 64 / n;
+    for (let iy = 0; iy < n; iy++) for (let ix = 0; ix < n; ix++) {
+      const cx = (ix + 0.5) * step + (Math.random() - 0.5) * jitter;
+      const cy = (iy + 0.5) * step + (Math.random() - 0.5) * jitter;
+      const pts = [], sides = 5 + ((Math.random() * 3) | 0);
+      for (let k = 0; k < sides; k++) {
+        const a = (k / sides) * Math.PI * 2 + Math.random() * 0.3;
+        const rr = step * (0.42 + Math.random() * 0.26);
+        pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]);
+      }
+      out.push(pts);
+    }
+    return out;
+  }
+  // Draws the ring at all nine torus offsets. A cell straddling an edge is
+  // therefore also drawn on the far side, so the crack network runs continuously
+  // across the tile boundary rather than being sliced off at it.
+  function poly(g, pts) {
+    g.beginPath();
+    for (const dx of [0, -64, 64]) for (const dy of [0, -64, 64]) {
+      let any = false;
+      for (const [x, y] of pts) if (x + dx > -20 && x + dx < 84 && y + dy > -20 && y + dy < 84) { any = true; break; }
+      if (!any) continue;
+      pts.forEach(([x, y], i) => i ? g.lineTo(x + dx, y + dy) : g.moveTo(x + dx, y + dy));
+      g.closePath();
+    }
+  }
+
+  // Molten basalt: dark crust plates floating on a glowing interior. The heat
+  // reads by drawing the glow FIRST as a full bright underlayer and then
+  // laying opaque crust on top, leaving the gaps lit — the same way the real
+  // thing looks, and cheaper than stroking every crack with a gradient.
+  function lavaBase(g, plates, jitter, glowLo, glowHi) {
+    vgradWrap(g, glowLo, glowHi);
+    speck(g, 120, 'rgba(255,240,150,0.5)');
+    const crust = ['#3a3330', '#2e2825', '#453c37', '#241f1d', '#4e4540'];
+    for (const p of cells(plates, jitter)) {
+      g.fillStyle = crust[(Math.random() * crust.length) | 0];
+      poly(g, p); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 0.7; g.stroke();
+      // a cooler ashen highlight on the plate's upper edge
+      g.strokeStyle = 'rgba(190,180,170,0.10)'; g.lineWidth = 0.6;
+      g.beginPath(); g.moveTo(p[0][0], p[0][1]); g.lineTo(p[1][0], p[1][1]); g.stroke();
+    }
+    speck(g, 80, 'rgba(0,0,0,0.25)');
+    speck(g, 26, 'rgba(255,170,60,0.35)');
+  }
+  FLOOR.lavarock = cnv(g => lavaBase(g, 7, 5, '#7a1c06', '#ff8a2a'));      // fine crust, lots of glowing seams
+  FLOOR.lavacracked = cnv(g => lavaBase(g, 4, 9, '#5e1604', '#e8641a'));   // bigger plates, wider cooled channels
+
+  // Crystal-bearing rock: dull stone with faceted growths pushing out of it.
+  // Each crystal is a flat kite with one lit face and one shaded, which is
+  // enough to read as a 3D facet at this size.
+  function crystalCluster(g, x, y, s, hue) {
+    const spikes = 3 + ((Math.random() * 3) | 0);
+    for (let i = 0; i < spikes; i++) {
+      const a = -Math.PI / 2 + (i - spikes / 2) * 0.45 + Math.random() * 0.2;
+      const len = s * (0.7 + Math.random() * 0.6), wid = s * 0.24;
+      const tx = x + Math.cos(a) * len, ty = y + Math.sin(a) * len;
+      const px = Math.cos(a + Math.PI / 2) * wid, py = Math.sin(a + Math.PI / 2) * wid;
+      g.fillStyle = hue[0];
+      g.beginPath(); g.moveTo(tx, ty); g.lineTo(x + px, y + py); g.lineTo(x - px, y - py); g.closePath(); g.fill();
+      g.fillStyle = hue[1];                                   // lit half, split down the spine
+      g.beginPath(); g.moveTo(tx, ty); g.lineTo(x + px, y + py); g.lineTo(x, y); g.closePath(); g.fill();
+      g.fillStyle = hue[2];
+      g.beginPath(); g.moveTo(tx, ty); g.lineTo(x, y); g.lineTo(x - px * 0.5, y - py * 0.5); g.closePath(); g.fill();
+    }
+  }
+  FLOOR.crystalrock = cnv(g => {                        // grey rock studded with teal/violet crystal
+    vgradWrap(g, '#5a5665', '#8b8794');
+    const rock = ['#7b7686', '#666172', '#8f8a99', '#544f5e'];
+    for (const p of cells(5, 7)) {
+      g.fillStyle = rock[(Math.random() * rock.length) | 0];
+      poly(g, p); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.26)'; g.lineWidth = 0.8; g.stroke();
+    }
+    const teal = ['#2f8f86', '#7fe6d8', '#4fb8ab'], violet = ['#6a4a9c', '#c9a6f2', '#8f68c4'];
+    for (let i = 0; i < 7; i++) {
+      const x = Math.random() * 64, y = Math.random() * 64;
+      crystalCluster(g, x, y, 5 + Math.random() * 5, Math.random() < 0.55 ? teal : violet);
+    }
+    speck(g, 70, 'rgba(0,0,0,0.16)'); speck(g, 40, 'rgba(220,240,255,0.09)');
+  });
+  FLOOR.crystalstrata = cnv(g => {                      // bedded sedimentary rock, crystal seam along a bed
+    const bands = [['#8a8496', 0, 9], ['#6f6a7c', 9, 8], ['#9a94a6', 17, 7], ['#5d5868', 24, 9],
+                   ['#847e90', 33, 8], ['#6a6576', 41, 9], ['#918b9d', 50, 7], ['#5a5566', 57, 7]];
+    for (const [c, y, h] of bands) {
+      g.fillStyle = c; g.fillRect(0, y, 64, h);
+      g.fillStyle = 'rgba(0,0,0,0.16)'; g.fillRect(0, y + h - 1, 64, 1);
+      g.fillStyle = 'rgba(255,255,255,0.06)'; g.fillRect(0, y, 64, 1);
+      g.fillStyle = 'rgba(0,0,0,0.10)';                 // grain within the bed
+      for (let i = 0; i < 14; i++) g.fillRect((Math.random() * 64) | 0, y + ((Math.random() * h) | 0), 2 + ((Math.random() * 4) | 0), 1);
+    }
+    const teal = ['#2f8f86', '#7fe6d8', '#4fb8ab'];
+    for (let i = 0; i < 9; i++) crystalCluster(g, Math.random() * 64, 17 + Math.random() * 10, 3 + Math.random() * 3, teal);
+    speck(g, 60, 'rgba(0,0,0,0.14)');
+  });
+
+  // Fungal ground: damp organic mat. The rings are colonies seen from above —
+  // drawn as annuli so they read as growth edges rather than flat blobs.
+  function fungalBase(g, top, bot, ringCol, capCol, caps) {
+    vgradWrap(g, bot, top);
+    stains(g, 10, [ringCol, bot]);
+    g.lineWidth = 1.6;
+    for (let i = 0; i < 9; i++) {
+      const x = Math.random() * 64, y = Math.random() * 64, r = 3 + Math.random() * 8;
+      g.strokeStyle = ringCol; g.globalAlpha = 0.5 + Math.random() * 0.3;
+      for (const dx of [0, -64, 64]) for (const dy of [0, -64, 64]) {
+        if (x + dx > 64 + r || x + dx < -r || y + dy > 64 + r || y + dy < -r) continue;
+        g.beginPath(); g.arc(x + dx, y + dy, r, 0, 7); g.stroke();
+      }
+    }
+    g.globalAlpha = 1;
+    for (let i = 0; i < caps; i++) {                    // fruiting bodies, lit from upper-left
+      const x = Math.random() * 64, y = Math.random() * 64, r = 1.6 + Math.random() * 3;
+      g.fillStyle = capCol; wrapCirc(g, x, y, r);
+      g.fillStyle = 'rgba(255,255,255,0.18)'; wrapCirc(g, x - r * 0.3, y - r * 0.3, r * 0.4);
+      g.fillStyle = 'rgba(0,0,0,0.22)'; wrapCirc(g, x + r * 0.35, y + r * 0.4, r * 0.3);
+    }
+    speck(g, 70, 'rgba(0,0,0,0.14)'); speck(g, 40, 'rgba(255,255,220,0.07)');
+  }
+  FLOOR.fungalterrain = cnv(g => fungalBase(g, '#9aa055', '#5f6633', 'rgba(60,70,25,0.5)', '#c2b46e', 22));
+  FLOOR.fungalspores = cnv(g => fungalBase(g, '#9a7648', '#5e4526', 'rgba(70,45,20,0.55)', '#d8c48a', 26));
+
+  // Dried-out cracked ground. Crazing is the same cell network as the basalt,
+  // but here the gaps are dark shadow rather than glow, and the plates are
+  // domed with a soft highlight so the surface reads as baked, not molten.
+  function crackedBase(g, top, bot, plate, crackA) {
+    g.fillStyle = crackA; g.fillRect(0, 0, 64, 64);
+    for (const p of cells(6, 6)) {
+      const t = Math.random();
+      g.fillStyle = plate[(t * plate.length) | 0];
+      poly(g, p); g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.28)'; g.lineWidth = 0.6; g.stroke();
+      g.strokeStyle = 'rgba(255,255,255,0.09)'; g.lineWidth = 0.5;
+      g.beginPath(); g.moveTo(p[0][0], p[0][1]); g.lineTo(p[1][0], p[1][1]); g.stroke();
+    }
+    const gr = g.createLinearGradient(0, 0, 0, 64);      // light fall-off, periodic so it tiles
+    gr.addColorStop(0, bot); gr.addColorStop(0.5, top); gr.addColorStop(1, bot);
+    g.globalAlpha = 0.22; g.fillStyle = gr; g.fillRect(0, 0, 64, 64); g.globalAlpha = 1;
+    speck(g, 90, 'rgba(0,0,0,0.16)'); speck(g, 45, 'rgba(255,235,200,0.08)');
+  }
+  FLOOR.redcracked = cnv(g => crackedBase(g, '#ffb488', '#5e1a10', ['#b8442a', '#a63a24', '#c95034', '#94301e'], '#3a140c'));
+  FLOOR.aliensoil = cnv(g => crackedBase(g, '#e0a0d8', '#3a1c3e', ['#8a4a6e', '#7a3f60', '#9c5880', '#6a3352'], '#2e1226'));
+  FLOOR.aliensoilveined = cnv(g => {                    // olive soil shot through with dark mineral veins
+    crackedBase(g, '#d8dc9a', '#33361c', ['#7c8248', '#6b7040', '#8c9254', '#5c6136'], '#2a2c16');
+    g.strokeStyle = 'rgba(30,20,45,0.5)';               // meandering veins, wrapped at the edges
+    for (let i = 0; i < 5; i++) {
+      g.lineWidth = 0.8 + Math.random();
+      let x = Math.random() * 64, y = Math.random() * 64;
+      g.beginPath(); g.moveTo(x, y);
+      for (let k = 0; k < 7; k++) { x += Math.random() * 16 - 8; y += Math.random() * 16 - 8; g.lineTo(x, y); }
+      g.stroke();
+    }
+    speck(g, 30, 'rgba(150,220,180,0.10)');
+  });
+
+  // ---- ship interior panelling ----
+  // Bulkhead: near-black composite with a recessed channel carrying a lit
+  // strip. The strip is drawn as three passes (wide dim, medium, hot core) so
+  // it blooms without needing a real blur.
+  function litLine(g, pts, cool) {
+    const passes = cool ? [[5, 'rgba(90,190,220,0.10)'], [3, 'rgba(120,220,245,0.28)'], [1.2, 'rgba(215,250,255,0.95)']]
+                        : [[5, 'rgba(220,150,60,0.10)'], [3, 'rgba(245,180,80,0.28)'], [1.2, 'rgba(255,235,190,0.95)']];
+    for (const [w, c] of passes) {
+      g.strokeStyle = c; g.lineWidth = w; g.lineCap = 'round'; g.lineJoin = 'round';
+      g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke();
+    }
+    g.lineCap = 'butt';
+  }
+  FLOOR.bulkhead = cnv(g => {
+    vgradWrap(g, '#0d1014', '#1c2026');
+    g.fillStyle = 'rgba(255,255,255,0.03)';             // faint brushed grain
+    for (let i = 0; i < 40; i++) g.fillRect(0, (Math.random() * 64) | 0, 64, 1);
+    g.fillStyle = '#141820';                            // recessed channel the strip sits in
+    g.fillRect(0, 12, 64, 5); g.fillRect(30, 17, 5, 34); g.fillRect(35, 47, 29, 5);
+    bevel(g, 0, 12, 64, 5, 'rgba(0,0,0,0.5)', 'rgba(255,255,255,0.06)');
+    litLine(g, [[0, 14.5], [26, 14.5], [32.5, 21], [32.5, 45], [39, 49.5], [64, 49.5]], true);
+    [[10, 32], [54, 32], [10, 58], [54, 58]].forEach(([x, y]) => {   // recessed bolts
+      g.fillStyle = '#0a0c10'; g.beginPath(); g.arc(x, y, 2.2, 0, 7); g.fill();
+      g.fillStyle = 'rgba(150,190,210,0.25)'; g.beginPath(); g.arc(x - 0.5, y - 0.6, 0.9, 0, 7); g.fill();
+    });
+    speck(g, 40, 'rgba(0,0,0,0.3)'); speck(g, 18, 'rgba(160,210,235,0.06)');
+  });
+  FLOOR.conduitruns = cnv(g => {                        // bundled pipe runs over a dark chase
+    g.fillStyle = '#15181d'; g.fillRect(0, 0, 64, 64);
+    speck(g, 60, 'rgba(255,255,255,0.03)');
+    const runs = [[9, '#8a7038', '#d8b45e'], [17, '#4a5560', '#93a7b6'], [25, '#8a7038', '#d8b45e'],
+                  [40, '#4a5560', '#93a7b6'], [48, '#7a6a48', '#c2ae76'], [56, '#4a5560', '#93a7b6']];
+    for (const [y, dark, lit] of runs) {                // horizontal bundle
+      g.fillStyle = dark; g.fillRect(0, y, 64, 6);
+      g.fillStyle = lit; g.fillRect(0, y, 64, 2);
+      g.fillStyle = 'rgba(0,0,0,0.4)'; g.fillRect(0, y + 5, 64, 1);
+      for (let x = 6; x < 64; x += 21) { g.fillStyle = '#2a2f36'; g.fillRect(x, y - 1, 3, 8); }  // clamps
+    }
+    for (const [x, dark, lit] of [[31, '#4a5560', '#93a7b6'], [60, '#8a7038', '#d8b45e']]) {     // a couple of risers crossing
+      g.fillStyle = dark; wrapRect(g, x, 0, 6, 64);     // wrapped: the x=60 riser continues onto the left edge
+      g.fillStyle = lit; wrapRect(g, x, 0, 2, 64);
+      g.fillStyle = 'rgba(0,0,0,0.4)'; wrapRect(g, x + 5, 0, 1, 64);
+    }
+    litLine(g, [[0, 34], [64, 34]], true);              // one live line among the dead pipes
+    speck(g, 50, 'rgba(0,0,0,0.25)');
+  });
+  FLOOR.floorgrating = cnv(g => {                       // hex deck plate, walkable
+    vgradWrap(g, '#5c626a', '#7e848c');
+    // A true hexagon's spacing (dx = 1.732R, dy = 1.5R) does not divide 64, so a
+    // geometrically-exact grid cannot tile — the plates drift and the tile edge
+    // shows. Decoupling the two radii lets both periods land on 16px exactly;
+    // the hexes end up very slightly squashed, which is invisible here and
+    // tiles perfectly.
+    const dx = 16, dy = 16, RX = 9.24, RY = 10.0;
+    for (let row = -1; row * dy < 74; row++) for (let col = -1; col * dx < 74; col++) {
+      const cx = col * dx + (row % 2 ? dx / 2 : 0), cy = row * dy;
+      g.beginPath();
+      for (let k = 0; k < 6; k++) { const a = Math.PI / 180 * (60 * k - 30); const px = cx + Math.cos(a) * (RX - 1), py = cy + Math.sin(a) * (RY - 1); k ? g.lineTo(px, py) : g.moveTo(px, py); }
+      g.closePath();
+      g.fillStyle = '#6c727a'; g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 1.2; g.stroke();
+      g.strokeStyle = 'rgba(255,255,255,0.10)'; g.lineWidth = 0.7;
+      g.beginPath(); g.moveTo(cx - RX * 0.5, cy - RY * 0.72); g.lineTo(cx + RX * 0.5, cy - RY * 0.72); g.stroke();
+      g.fillStyle = 'rgba(0,0,0,0.30)';                 // drainage slot in each plate
+      g.fillRect(cx - 3, cy - 0.5, 6, 1.5);
+    }
+    speck(g, 70, 'rgba(0,0,0,0.16)'); speck(g, 34, 'rgba(255,255,255,0.07)');
+  });
+  FLOOR.hatchpanel = cnv(g => {                         // pressure hatch, rounded corners, lit seam
+    g.fillStyle = '#0e1116'; g.fillRect(0, 0, 64, 64);
+    const r = 12;                                       // rounded plate inset from the frame
+    g.fillStyle = '#232830';
+    g.beginPath(); g.moveTo(4 + r, 4); g.arcTo(60, 4, 60, 60, r); g.arcTo(60, 60, 4, 60, r);
+    g.arcTo(4, 60, 4, 4, r); g.arcTo(4, 4, 60, 4, r); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.10)'; g.lineWidth = 1; g.stroke();
+    vgrad(g, 6, 6, 52, 24, 'rgba(255,255,255,0.05)', 'rgba(255,255,255,0)');
+    litLine(g, [[24, 6], [24, 26], [40, 38], [40, 58]], true);   // the dogleg seam where the halves meet
+    g.fillStyle = 'rgba(0,0,0,0.45)'; g.fillRect(6, 30, 52, 1);
+    [[12, 12], [52, 12], [12, 52], [52, 52]].forEach(([x, y]) => {
+      g.fillStyle = '#12151a'; g.beginPath(); g.arc(x, y, 2.6, 0, 7); g.fill();
+      g.fillStyle = 'rgba(170,210,230,0.3)'; g.beginPath(); g.arc(x - 0.6, y - 0.7, 1, 0, 7); g.fill();
+    });
+    speck(g, 34, 'rgba(0,0,0,0.28)');
+  });
+  FLOOR.buttonconsole = cnv(g => {                      // wall of small lit controls
+    g.fillStyle = '#161a20'; g.fillRect(0, 0, 64, 64);
+    const lit = ['#66d9e8', '#e8b44c', '#7de08a', '#e05c5c', '#b98ce8'];
+    for (let ry = 0; ry < 4; ry++) for (let rx = 0; rx < 4; rx++) {
+      const x = rx * 16 + 1, y = ry * 16 + 1;
+      g.fillStyle = '#1e242c'; g.fillRect(x, y, 14, 14);
+      bevel(g, x, y, 14, 14, 'rgba(255,255,255,0.09)', 'rgba(0,0,0,0.5)');
+      const kind = (rx + ry * 2) % 3;
+      if (kind === 0) {                                 // 3x3 keypad
+        for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) {
+          g.fillStyle = Math.random() < 0.25 ? lit[(Math.random() * lit.length) | 0] : '#39414c';
+          g.fillRect(x + 2 + b * 4, y + 2 + a * 4, 3, 3);
+        }
+      } else if (kind === 1) {                          // stacked readout bars
+        for (let a = 0; a < 4; a++) {
+          g.fillStyle = a === 1 ? lit[(Math.random() * lit.length) | 0] : '#39414c';
+          g.fillRect(x + 2, y + 2 + a * 3, 10 - ((Math.random() * 4) | 0), 2);
+        }
+      } else {                                          // dial + indicator
+        g.fillStyle = '#2c333c'; g.beginPath(); g.arc(x + 7, y + 7, 4.5, 0, 7); g.fill();
+        g.strokeStyle = lit[(Math.random() * lit.length) | 0]; g.lineWidth = 1.2;
+        const a = Math.random() * 7;
+        g.beginPath(); g.moveTo(x + 7, y + 7); g.lineTo(x + 7 + Math.cos(a) * 3.4, y + 7 + Math.sin(a) * 3.4); g.stroke();
+      }
+    }
+    speck(g, 30, 'rgba(0,0,0,0.3)');
+  });
+
+  // ---- the four earlier sci-fi tiles, now drawn rather than shipped ----
+  FLOOR.scigrating = cnv(g => {                         // slatted catwalk grating, dark void beneath
+    g.fillStyle = '#101317'; g.fillRect(0, 0, 64, 64);
+    for (let x = 0; x < 64; x += 6) {                   // bearing bars
+      g.fillStyle = '#767c85'; g.fillRect(x, 0, 4, 64);
+      g.fillStyle = '#9aa1ab'; g.fillRect(x, 0, 1, 64);
+      g.fillStyle = 'rgba(0,0,0,0.45)'; g.fillRect(x + 3, 0, 1, 64);
+    }
+    for (let y = 0; y < 64; y += 16) {                  // cross ties, sitting proud of the bars
+      g.fillStyle = '#5e646c'; g.fillRect(0, y, 64, 3);
+      g.fillStyle = 'rgba(255,255,255,0.12)'; g.fillRect(0, y, 64, 1);
+      g.fillStyle = 'rgba(0,0,0,0.4)'; g.fillRect(0, y + 2, 64, 1);
+    }
+    speck(g, 60, 'rgba(0,0,0,0.25)'); speck(g, 26, 'rgba(255,255,255,0.06)');
+  });
+  FLOOR.scidoorpanel = cnv(g => {                       // heavy sliding door leaf
+    vgradWrap(g, '#666c74', '#8d939b');
+    g.fillStyle = 'rgba(0,0,0,0.5)'; g.fillRect(31, 0, 2, 64);      // centre parting line
+    g.fillStyle = 'rgba(255,255,255,0.12)'; g.fillRect(33, 0, 1, 64);
+    [[4, 6, 24, 22], [36, 6, 24, 22], [4, 36, 24, 22], [36, 36, 24, 22]].forEach(([x, y, w, h]) => {
+      g.fillStyle = '#7b818a'; g.fillRect(x, y, w, h);
+      bevel(g, x, y, w, h, 'rgba(255,255,255,0.14)', 'rgba(0,0,0,0.4)');
+    });
+    g.fillStyle = '#c8a53a'; g.fillRect(0, 30, 64, 4);              // hazard stripe across the join
+    g.fillStyle = 'rgba(0,0,0,0.35)';
+    for (let x = -8; x < 64; x += 8) { g.beginPath(); g.moveTo(x, 34); g.lineTo(x + 4, 30); g.lineTo(x + 8, 30); g.lineTo(x + 4, 34); g.closePath(); g.fill(); }
+    speck(g, 50, 'rgba(0,0,0,0.16)'); speck(g, 24, 'rgba(255,255,255,0.07)');
+  });
+  FLOOR.scipanelbank = cnv(g => {                       // bank of instrument panels
+    g.fillStyle = '#3c434b'; g.fillRect(0, 0, 64, 64);
+    for (let ry = 0; ry < 2; ry++) for (let rx = 0; rx < 2; rx++) {
+      const x = rx * 32 + 2, y = ry * 32 + 2;
+      g.fillStyle = '#2a3038'; g.fillRect(x, y, 28, 28);
+      bevel(g, x, y, 28, 28, 'rgba(255,255,255,0.10)', 'rgba(0,0,0,0.45)');
+      g.fillStyle = '#16303a'; g.fillRect(x + 3, y + 3, 22, 12);    // screen
+      g.fillStyle = 'rgba(120,240,200,0.75)';
+      for (let i = 0; i < 5; i++) g.fillRect(x + 5, y + 5 + i * 2, 4 + ((Math.random() * 14) | 0), 1);
+      for (let i = 0; i < 8; i++) {                                  // switch row
+        g.fillStyle = ['#e8b44c', '#66d9e8', '#e05c5c', '#7de08a'][(Math.random() * 4) | 0];
+        g.fillRect(x + 3 + i * 3, y + 18, 2, 2);
+      }
+      g.fillStyle = '#4c545e'; g.fillRect(x + 3, y + 22, 22, 3);
+    }
+    speck(g, 40, 'rgba(0,0,0,0.22)');
+  });
+  FLOOR.scipipes = cnv(g => {                           // pipe junction with a wheel valve
+    vgradWrap(g, '#4b5056', '#6b7076');
+    speck(g, 70, 'rgba(0,0,0,0.14)');
+    g.fillStyle = '#3f444a'; g.fillRect(0, 26, 64, 12); g.fillRect(26, 0, 12, 64);   // cross of pipes
+    for (const [x, y, w, h] of [[0, 26, 64, 3], [26, 0, 3, 64]]) { g.fillStyle = 'rgba(255,255,255,0.10)'; g.fillRect(x, y, w, h); }
+    g.fillStyle = 'rgba(0,0,0,0.4)'; g.fillRect(0, 36, 64, 2); g.fillRect(36, 0, 2, 64);
+    g.fillStyle = '#c07a2a'; g.fillRect(0, 30, 64, 3);              // rust-orange marker band
+    g.fillStyle = '#8f8a80'; g.beginPath(); g.arc(32, 32, 11, 0, 7); g.fill();       // valve body
+    g.strokeStyle = '#2e3238'; g.lineWidth = 2; g.beginPath(); g.arc(32, 32, 11, 0, 7); g.stroke();
+    g.strokeStyle = '#a9a49a'; g.lineWidth = 2.4;
+    for (let k = 0; k < 4; k++) { const a = k * Math.PI / 4; g.beginPath(); g.moveTo(32 - Math.cos(a) * 9, 32 - Math.sin(a) * 9); g.lineTo(32 + Math.cos(a) * 9, 32 + Math.sin(a) * 9); g.stroke(); }
+    g.fillStyle = '#5a5f66'; g.beginPath(); g.arc(32, 32, 3.4, 0, 7); g.fill();
+    speck(g, 40, 'rgba(0,0,0,0.2)'); speck(g, 20, 'rgba(255,255,255,0.06)');
+  });
+
   // ---- parallax sky (wide; sampled by view angle): warm Havana afternoon ----
   const SKY = cnv(g => {
     // deep zenith blue → pale atmospheric haze at the horizon (Rayleigh-scatter feel,
@@ -5801,26 +6164,6 @@ const World = (() => {
     speck(gt, 55, 'rgba(255,246,220,0.04)', c.width, c.height);
   }
   TX.catacombwall = TX.rockwall;   // placeholder until the shipped PNG loads (ART_ASSETS/SHIPPED_WALL_TEX below)
-  // sci-fi tiles — same deal: a stand-in until the shipped PNG replaces it
-  TX.scigrating = TX.metal;
-  TX.scidoorpanel = TX.metal;
-  TX.scipanelbank = TX.panel;
-  TX.scipipes = TX.concrete;
-  // alien-world tiles — same again
-  TX.lavarock = TX.rockwall;
-  TX.lavacracked = TX.rockwall;
-  TX.crystalrock = TX.rockwall;
-  TX.crystalstrata = TX.rockwall;
-  TX.fungalterrain = TX.ground;
-  TX.fungalspores = TX.ground;
-  TX.redcracked = TX.ground;
-  TX.aliensoil = TX.ground;
-  TX.aliensoilveined = TX.ground;
-  TX.bulkhead = TX.metal;
-  TX.conduitruns = TX.metal;
-  TX.floorgrating = TX.metal;
-  TX.hatchpanel = TX.metal;
-  TX.buttonconsole = TX.panel;
   // ordered list the editor shows as a palette
   const TXNAMES = ['lair', 'teak', 'brick', 'stucco', 'stuccob', 'stuccop', 'panel', 'tile',
     'cobble', 'wood', 'marble', 'concrete', 'water', 'metal', 'vent', 'carpet', 'lounge',
@@ -10624,21 +10967,7 @@ const World = (() => {
     tehranoffice: 'assets/sprites/tehranoffice.png?v=1',
     // --- sci-fi set (shipped art only; no procedural placeholders, which the
     // loader above now tolerates) ---
-    // alien-world tiles + flora
-    lavarock: 'assets/sprites/lavarock.png?v=1',
-    lavacracked: 'assets/sprites/lavacracked.png?v=1',
-    crystalrock: 'assets/sprites/crystalrock.png?v=1',
-    crystalstrata: 'assets/sprites/crystalstrata.png?v=1',
-    fungalterrain: 'assets/sprites/fungalterrain.png?v=1',
-    fungalspores: 'assets/sprites/fungalspores.png?v=1',
-    redcracked: 'assets/sprites/redcracked.png?v=1',
-    aliensoil: 'assets/sprites/aliensoil.png?v=1',
-    aliensoilveined: 'assets/sprites/aliensoilveined.png?v=1',
-    bulkhead: 'assets/sprites/bulkhead.png?v=1',
-    conduitruns: 'assets/sprites/conduitruns.png?v=1',
-    floorgrating: 'assets/sprites/floorgrating.png?v=1',
-    hatchpanel: 'assets/sprites/hatchpanel.png?v=1',
-    buttonconsole: 'assets/sprites/buttonconsole.png?v=1',
+    // alien flora (the matching TILES are drawn in code, see FLOOR.* above)
     eyepod: 'assets/sprites/eyepod.png?v=1',
     redcrystal: 'assets/sprites/redcrystal.png?v=1',
     tendrilplant: 'assets/sprites/tendrilplant.png?v=1',
@@ -10673,10 +11002,6 @@ const World = (() => {
     insigniaship: 'assets/sprites/insigniaship.png?v=2',
     insigniacomet: 'assets/sprites/insigniacomet.png?v=2',
     insigniastar: 'assets/sprites/insigniastar.png?v=2',
-    scigrating: 'assets/sprites/scigrating.png?v=2',
-    scidoorpanel: 'assets/sprites/scidoorpanel.png?v=2',
-    scipanelbank: 'assets/sprites/scipanelbank.png?v=2',
-    scipipes: 'assets/sprites/scipipes.png?v=2',
     bridgeconsole: 'assets/sprites/bridgeconsole.png?v=3',
     engstation: 'assets/sprites/engstation.png?v=2',
     tacticalstation: 'assets/sprites/tacticalstation.png?v=2',
@@ -10871,8 +11196,7 @@ const World = (() => {
 
   // General shipped wall materials — same PNG-tile pipeline as DOOR_SKINS above,
   // but for ordinary wallTex/floorTex/ceilTex picks (not door-specific skins).
-  const SHIPPED_WALL_TEX = ['catacombwall', 'scigrating', 'scidoorpanel', 'scipanelbank', 'scipipes',
-    'lavarock', 'lavacracked', 'crystalrock', 'crystalstrata', 'fungalterrain', 'fungalspores', 'redcracked', 'aliensoil', 'aliensoilveined', 'bulkhead', 'conduitruns', 'floorgrating', 'hatchpanel', 'buttonconsole'];
+  const SHIPPED_WALL_TEX = ['catacombwall'];
   for (const name of SHIPPED_WALL_TEX) {
     const path = ART_ASSETS[name];
     if (!path) continue;
