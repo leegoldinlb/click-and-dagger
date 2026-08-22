@@ -258,6 +258,15 @@ const Editor = (() => {
     { kind: 'visitdallas', name: 'VISIT DALLAS POSTER', spr: 'visitdallas' },
     { kind: 'visitmoscow', name: 'VISIT MOSCOW POSTER', spr: 'visitmoscow' },
     { kind: 'visitlondon', name: 'VISIT LONDON POSTER', spr: 'visitlondon' },
+    { kind: 'decalCosmosPoster', name: 'COSMOS POSTER', spr: 'decalCosmosPoster' },
+    { kind: 'decalFactoryPoster', name: 'FACTORY POSTER', spr: 'decalFactoryPoster' },
+    { kind: 'decalRedSquareSign', name: 'RED SQUARE SIGN', spr: 'decalRedSquareSign' },
+    { kind: 'decalGroceryPoster', name: 'GROCERY SIGN', spr: 'decalGroceryPoster' },
+    { kind: 'decalTramStopSign', name: 'TRAM STOP SIGN', spr: 'decalTramStopSign' },
+    { kind: 'decalCinemaPoster', name: 'CINEMA POSTER', spr: 'decalCinemaPoster' },
+    { kind: 'decalCautionSign', name: 'CAUTION SIGN', spr: 'decalCautionSign' },
+    { kind: 'decalBankPlaque', name: 'BANK PLAQUE', spr: 'decalBankPlaque' },
+    { kind: 'decalMetroSign', name: 'METRO SIGN', spr: 'decalMetroSign' },
     { kind: 'doorred', name: 'RED PANELED DOOR', spr: 'doorred' },
     { kind: 'doorelevatorplain', name: 'ELEVATOR DOOR', spr: 'doorelevatorplain' },
     { kind: 'doortehranarch', name: 'TILED ARCHWAY DOOR', spr: 'doortehranarch' },
@@ -359,6 +368,10 @@ const Editor = (() => {
     { kind: 'arcdetriomphe', name: 'ARC DE TRIOMPHE', spr: 'arcdetriomphe' },
     { kind: 'notredame', name: 'NOTRE-DAME', spr: 'notredame' },
     { kind: 'parisoperahouse', name: 'PALAIS GARNIER', spr: 'parisoperahouse' },
+    { kind: 'kremlin', name: 'THE KREMLIN', spr: 'kremlin' },
+    { kind: 'stbasils', name: "ST. BASIL'S CATHEDRAL", spr: 'stbasils' },
+    { kind: 'bolshoitheatre', name: 'BOLSHOI THEATRE', spr: 'bolshoitheatre' },
+    { kind: 'leninstatue', name: 'LENIN STATUE', spr: 'leninstatue' },
     { kind: 'louvrepyramid', name: 'LOUVRE PYRAMID', spr: 'louvrepyramid' },
     { kind: 'moulinrouge', name: 'MOULIN ROUGE', spr: 'moulinrouge' },
     { kind: 'sacrecoeur', name: 'SACRÉ-CŒUR', spr: 'sacrecoeur' },
@@ -1739,7 +1752,9 @@ const Editor = (() => {
     'decalHavanaTravel', 'decalWantedSpanish', 'decalRugWall', 'decalBrassPlaque', 'decalGalleryPoster', 'decalMetroMap',
     'decalFamilyPhoto', 'decalForSale', 'decalPropagandaPoster', 'decalPravda', 'decalWantedTreason', 'decalCampaignPoster',
     'decalBroadwayPoster', 'decalSubwayMap', 'decalCouplets', 'decalKungFuPoster',
-    'visittehran', 'visitparis', 'visitcuba', 'visitnewyork', 'visithongkong', 'visitdallas', 'visitmoscow', 'visitlondon'];
+    'visittehran', 'visitparis', 'visitcuba', 'visitnewyork', 'visithongkong', 'visitdallas', 'visitmoscow', 'visitlondon',
+    'decalCosmosPoster', 'decalFactoryPoster', 'decalRedSquareSign', 'decalGroceryPoster', 'decalTramStopSign',
+    'decalCinemaPoster', 'decalCautionSign', 'decalBankPlaque', 'decalMetroSign'];
   function geoWallDecal() {
     const hit = pickGeoWall(); if (!hit) { status('LOOK AT A WALL.'); return; }
     const sec = geo.sectors[hit.s];
