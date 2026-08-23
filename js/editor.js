@@ -491,6 +491,8 @@ const Editor = (() => {
   let draft = [];                                               // vertex indices of the sector being drawn
   let selectMode = false;                                       // 2D SELECT SECTOR(S) tool
   let selSectors = [];                                          // indices into geo.sectors, current 2D selection
+  let selectWallMode = false;                                   // 2D SELECT WALL tool
+  let selWall = null;                                           // {s, i} the one selected wall, or null
   const gcur = { x: 0, y: 0, vi: -1 };                          // snapped world cursor + snapped-vertex index
   let hoverEdge = null;                                         // {s, i} hovered wall for I-insert
   let draggingVert = -1;                                        // vertex index being dragged, or -1
@@ -1003,6 +1005,20 @@ const Editor = (() => {
   }
 
   cvs.addEventListener('mousedown', e => {
+    if (selectWallMode && !previewOn) {               // 2D: click a line to select it for the WALL EDIT panel
+      if (e.button === 2) {                          // right-click: reset out of SELECT WALL mode to plain idle
+        selWall = null; selectWallMode = false;
+        document.getElementById('wallselectbtn').classList.remove('active');
+        updateWallPanel(); render();
+        status('RESET TO IDLE — click to draw, or use SELECT WALL.');
+        return;
+      }
+      const w = worldFromEvent(e);
+      selWall = findNearestEdge(w.x, w.y);
+      updateWallPanel();
+      render();
+      return;
+    }
     if (selectMode && !previewOn) {                  // 2D: click to select sector(s) for the SECTOR EDIT panel
       if (e.button === 2) {                          // right-click: reset out of SELECT mode to plain idle
         selSectors = []; selectMode = false;
@@ -2616,18 +2632,25 @@ const Editor = (() => {
     }
     const sp = snapWorld(w.x, w.y);
     gcur.x = sp.x; gcur.y = sp.y; gcur.vi = sp.vi;
-    hoverEdge = null; let bd = 0.5;
+    hoverEdge = findNearestEdge(w.x, w.y);
+    coordsEl.textContent = 'DRAW  x ' + gcur.x.toFixed(1) + '  y ' + gcur.y.toFixed(1) +
+      (draft.length ? '  · ' + draft.length + ' verts' : '') + (hoverEdge ? '  · [V] split wall · [I] invisible wall' : '');
+    render();
+  }
+  // shared nearest-edge lookup — used by the hover highlight above (which
+  // drives the V/I keyboard shortcuts) and by the SELECT WALL click tool
+  // below, so both agree on which wall the cursor is closest to.
+  function findNearestEdge(x, y) {
+    let best = null, bd = 0.5;
     for (let s = 0; s < geo.sectors.length; s++) {
       const L = geo.sectors[s].loop;
       for (let i = 0; i < L.length; i++) {
         const A = geo.verts[L[i]], B = geo.verts[L[(i + 1) % L.length]];
-        const cp = distToSeg(w.x, w.y, A.x, A.y, B.x, B.y);
-        if (cp.d < bd) { bd = cp.d; hoverEdge = { s, i }; }
+        const cp = distToSeg(x, y, A.x, A.y, B.x, B.y);
+        if (cp.d < bd) { bd = cp.d; best = { s, i }; }
       }
     }
-    coordsEl.textContent = 'DRAW  x ' + gcur.x.toFixed(1) + '  y ' + gcur.y.toFixed(1) +
-      (draft.length ? '  · ' + draft.length + ' verts' : '') + (hoverEdge ? '  · [V] split wall · [I] invisible wall' : '');
-    render();
+    return best;
   }
 
   function renderGeo() {
@@ -2666,6 +2689,11 @@ const Editor = (() => {
     if (hoverEdge) {
       const L = geo.sectors[hoverEdge.s].loop, A = geo.verts[L[hoverEdge.i]], B = geo.verts[L[(hoverEdge.i + 1) % L.length]];
       g.strokeStyle = '#7fe0d8'; g.lineWidth = 4;
+      g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
+    }
+    if (selWall && geo.sectors[selWall.s]) {                   // SELECT WALL tool: persistent highlight, distinct from hover
+      const L = geo.sectors[selWall.s].loop, A = geo.verts[L[selWall.i]], B = geo.verts[L[(selWall.i + 1) % L.length]];
+      g.strokeStyle = '#ff5ee0'; g.lineWidth = 5;
       g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
     }
     if (selSectors.length) {                                   // SELECT tool: highlight chosen sector(s)
@@ -2713,6 +2741,7 @@ const Editor = (() => {
     lv.spawn = s.spawn; lv.ents = s.ents;
     geo.verts = s.geo.verts; geo.sectors = s.geo.sectors; draft = s.draft;
     selSectors = []; updateSectorPanel();
+    selWall = null; updateWallPanel();
     fitCanvas();
     if (previewOn) { if (usePortal) portalGraph = Engine.buildGraph(geo); else World.load(toLevel()); }
     render(); status('UNDO.');
@@ -2756,6 +2785,7 @@ const Editor = (() => {
     reindexAfterRemoved(vi);
     pruneVerts(); rebuildParents();
     selSectors = []; updateSectorPanel();
+    selWall = null; updateWallPanel();
   }
   function deleteSectorAt(x, y) {
     let best = -1, ba = Infinity;
@@ -2764,6 +2794,7 @@ const Editor = (() => {
     if (best < 0) return false;
     geo.sectors.splice(best, 1); pruneVerts(); rebuildParents();
     selSectors = []; updateSectorPanel();
+    selWall = null; updateWallPanel();
     return true;
   }
 
@@ -2838,10 +2869,90 @@ const Editor = (() => {
   document.getElementById('selectbtn').onclick = () => {
     selectMode = !selectMode;
     document.getElementById('selectbtn').classList.toggle('active', selectMode);
-    if (selectMode) { draft = []; if (previewOn) exitPreview(); }
-    else { selSectors = []; }
+    if (selectMode) {
+      draft = []; if (previewOn) exitPreview();
+      selectWallMode = false; selWall = null;
+      document.getElementById('wallselectbtn').classList.remove('active'); updateWallPanel();
+    } else { selSectors = []; }
     updateSectorPanel();
     status(selectMode ? 'SELECT MODE — click a sector, shift-click to add more.' : 'SELECT MODE OFF.');
+    render();
+  };
+
+  // ---- 2D SELECT WALL tool: click a line in the top-down view to select it,
+  // then set its texture, toggle it as an invisible wall, or link it to
+  // another city (the same doorway-triggers-a-mission-transition mechanism as
+  // geoMissionLink, just tagged from the 2D map instead of aiming in 3D — it
+  // marks the wall's OWNING sector, which is what the game engine actually
+  // reads at runtime; main.js only ever checks the sector the player is
+  // standing in, not the wall itself).
+  function wallPanelEls() {
+    return {
+      panel: document.getElementById('wallEdit'),
+      label: document.getElementById('wallEditLabel'),
+      tex: document.getElementById('wallTexSel'),
+      invisible: document.getElementById('wallInvisible'),
+      link: document.getElementById('wallMissionLink'),
+    };
+  }
+  function updateWallPanel() {
+    const el = wallPanelEls();
+    if (!el.panel) return;
+    el.panel.hidden = !selectWallMode;
+    if (!selectWallMode) return;
+    if (!selWall || !geo.sectors[selWall.s]) { el.label.textContent = 'CLICK A LINE TO SELECT.'; el.tex.disabled = el.invisible.disabled = el.link.disabled = true; return; }
+    el.tex.disabled = el.invisible.disabled = el.link.disabled = false;
+    const sec = geo.sectors[selWall.s], i = selWall.i;
+    el.label.textContent = 'WALL ' + (i + 1) + ' OF SECTOR ' + (selWall.s + 1);
+    el.tex.value = (sec.wallTex && sec.wallTex[i]) || 'brick';
+    el.invisible.classList.toggle('active', !!(sec.wallBlock && sec.wallBlock[i]));
+    el.link.value = sec.missionLink || '';
+  }
+  (function initWallPanel() {
+    const el = wallPanelEls();
+    if (!el.panel) return;
+    World.TXNAMES.forEach(n => el.tex.appendChild(new Option(n.toUpperCase(), n)));
+    MISSION_CITIES.forEach(c => el.link.appendChild(new Option(c ? c.toUpperCase() : 'NONE', c || '')));
+    el.tex.onchange = () => {
+      if (!selWall) return;
+      pushUndo();
+      const sec = geo.sectors[selWall.s];
+      if (!sec.wallTex) sec.wallTex = new Array(sec.loop.length).fill(null);
+      sec.wallTex[selWall.i] = el.tex.value;
+      portalGraph = Engine.buildGraph(geo);
+      status('WALL ' + (selWall.i + 1) + ' → ' + el.tex.value.toUpperCase());
+      render();
+    };
+    el.invisible.onclick = () => {
+      if (!selWall) return;
+      pushUndo();
+      const sec = geo.sectors[selWall.s];
+      const next = !(sec.wallBlock && sec.wallBlock[selWall.i]);
+      setWallBlock(selWall.s, selWall.i, next);
+      portalGraph = Engine.buildGraph(geo);
+      status('WALL ' + (selWall.i + 1) + ' → ' + (next ? 'INVISIBLE WALL ON' : 'INVISIBLE WALL OFF'));
+      updateWallPanel();
+      render();
+    };
+    el.link.onchange = () => {
+      if (!selWall) return;
+      pushUndo();
+      const sec = geo.sectors[selWall.s];
+      sec.missionLink = el.link.value || null;
+      status('SECTOR ' + (selWall.s + 1) + ' MISSION LINK → ' + (sec.missionLink ? sec.missionLink.toUpperCase() : 'NONE'));
+      render();
+    };
+  })();
+  document.getElementById('wallselectbtn').onclick = () => {
+    selectWallMode = !selectWallMode;
+    document.getElementById('wallselectbtn').classList.toggle('active', selectWallMode);
+    if (selectWallMode) {
+      draft = []; if (previewOn) exitPreview();
+      selectMode = false; selSectors = [];
+      document.getElementById('selectbtn').classList.remove('active'); updateSectorPanel();
+    } else { selWall = null; }
+    updateWallPanel();
+    status(selectWallMode ? 'SELECT WALL — click a line to select it.' : 'SELECT WALL OFF.');
     render();
   };
   function handleDelete() {

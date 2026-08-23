@@ -72,6 +72,7 @@
         <button id="rectbtn" hidden>&#9646;&#9646; RECT FILL</button>
         <button id="drawbtn" hidden>&#9998; DRAW SECTORS</button>
         <button id="selectbtn">&#9671; SELECT SECTOR(S)</button>
+        <button id="wallselectbtn">&#9585; SELECT WALL</button>
         <span id="viewhint">Draw sectors &middot; place agents &middot; preview in 3D</span>
       </div>
       <div id="preview3d" hidden>
@@ -115,6 +116,19 @@
         <div class="row"><button id="secSolid">TOGGLE SOLID / WALKTHROUGH</button></div>
         <div class="row"><button id="secHostile">TOGGLE HOSTILE AREA</button></div>
         <div class="row"><button id="secWin">TOGGLE WIN SECTOR</button></div>
+      </div>
+      <h2>WALL EDIT</h2>
+      <div id="wallEdit" hidden>
+        <p class="hint" id="wallEditLabel">CLICK A LINE TO SELECT.</p>
+        <div class="row">
+          <label>TEXTURE</label>
+          <select id="wallTexSel"></select>
+        </div>
+        <div class="row"><button id="wallInvisible">TOGGLE INVISIBLE WALL</button></div>
+        <div class="row">
+          <label>MISSION LINK</label>
+          <select id="wallMissionLink"></select>
+        </div>
       </div>
       <h2>SPECIAL</h2>
       <div id="specials" class="tools"></div>
@@ -180,6 +194,6 @@
 <script src="js/missions.js?v=26"></script>
 <script src="js/world.js?v=167"></script>
 <script src="js/engine.js?v=86"></script>
-<script src="js/editor.js?v=131"></script>
+<script src="js/editor.js?v=132"></script>
 </body>
 </html>
