@@ -371,6 +371,7 @@ const Editor = (() => {
     { kind: 'kremlin', name: 'THE KREMLIN', spr: 'kremlin' },
     { kind: 'stbasils', name: "ST. BASIL'S CATHEDRAL", spr: 'stbasils' },
     { kind: 'bolshoitheatre', name: 'BOLSHOI THEATRE', spr: 'bolshoitheatre' },
+    { kind: 'kgbheadquarters', name: 'KGB HEADQUARTERS', spr: 'kgbheadquarters' },
     { kind: 'leninstatue', name: 'LENIN STATUE', spr: 'leninstatue' },
     { kind: 'louvrepyramid', name: 'LOUVRE PYRAMID', spr: 'louvrepyramid' },
     { kind: 'moulinrouge', name: 'MOULIN ROUGE', spr: 'moulinrouge' },
@@ -492,7 +493,7 @@ const Editor = (() => {
   let selectMode = false;                                       // 2D SELECT SECTOR(S) tool
   let selSectors = [];                                          // indices into geo.sectors, current 2D selection
   let selectWallMode = false;                                   // 2D SELECT WALL tool
-  let selWall = null;                                           // {s, i} the one selected wall, or null
+  let selWalls = [];                                            // [{s, i}, …] current wall selection, shift-click to add
   const gcur = { x: 0, y: 0, vi: -1 };                          // snapped world cursor + snapped-vertex index
   let hoverEdge = null;                                         // {s, i} hovered wall for I-insert
   let draggingVert = -1;                                        // vertex index being dragged, or -1
@@ -1007,14 +1008,19 @@ const Editor = (() => {
   cvs.addEventListener('mousedown', e => {
     if (selectWallMode && !previewOn) {               // 2D: click a line to select it for the WALL EDIT panel
       if (e.button === 2) {                          // right-click: reset out of SELECT WALL mode to plain idle
-        selWall = null; selectWallMode = false;
+        selWalls = []; selectWallMode = false;
         document.getElementById('wallselectbtn').classList.remove('active');
         updateWallPanel(); render();
         status('RESET TO IDLE — click to draw, or use SELECT WALL.');
         return;
       }
       const w = worldFromEvent(e);
-      selWall = findNearestEdge(w.x, w.y);
+      const hit = findNearestEdge(w.x, w.y);
+      if (!hit) { if (!e.shiftKey) selWalls = []; }
+      else if (e.shiftKey) {
+        const k = selWalls.findIndex(x => x.s === hit.s && x.i === hit.i);
+        if (k >= 0) selWalls.splice(k, 1); else selWalls.push(hit);
+      } else selWalls = [hit];
       updateWallPanel();
       render();
       return;
@@ -2691,10 +2697,13 @@ const Editor = (() => {
       g.strokeStyle = '#7fe0d8'; g.lineWidth = 4;
       g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
     }
-    if (selWall && geo.sectors[selWall.s]) {                   // SELECT WALL tool: persistent highlight, distinct from hover
-      const L = geo.sectors[selWall.s].loop, A = geo.verts[L[selWall.i]], B = geo.verts[L[(selWall.i + 1) % L.length]];
+    if (selWalls.length) {                                     // SELECT WALL tool: persistent highlight, distinct from hover
       g.strokeStyle = '#ff5ee0'; g.lineWidth = 5;
-      g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
+      for (const { s, i } of selWalls) {
+        if (!geo.sectors[s]) continue;
+        const L = geo.sectors[s].loop, A = geo.verts[L[i]], B = geo.verts[L[(i + 1) % L.length]];
+        g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
+      }
     }
     if (selSectors.length) {                                   // SELECT tool: highlight chosen sector(s)
       g.fillStyle = 'rgba(255,215,94,0.25)'; g.strokeStyle = '#ffd75e'; g.lineWidth = 3;
@@ -2741,7 +2750,7 @@ const Editor = (() => {
     lv.spawn = s.spawn; lv.ents = s.ents;
     geo.verts = s.geo.verts; geo.sectors = s.geo.sectors; draft = s.draft;
     selSectors = []; updateSectorPanel();
-    selWall = null; updateWallPanel();
+    selWalls = []; updateWallPanel();
     fitCanvas();
     if (previewOn) { if (usePortal) portalGraph = Engine.buildGraph(geo); else World.load(toLevel()); }
     render(); status('UNDO.');
@@ -2785,7 +2794,7 @@ const Editor = (() => {
     reindexAfterRemoved(vi);
     pruneVerts(); rebuildParents();
     selSectors = []; updateSectorPanel();
-    selWall = null; updateWallPanel();
+    selWalls = []; updateWallPanel();
   }
   function deleteSectorAt(x, y) {
     let best = -1, ba = Infinity;
@@ -2794,7 +2803,7 @@ const Editor = (() => {
     if (best < 0) return false;
     geo.sectors.splice(best, 1); pruneVerts(); rebuildParents();
     selSectors = []; updateSectorPanel();
-    selWall = null; updateWallPanel();
+    selWalls = []; updateWallPanel();
     return true;
   }
 
@@ -2871,7 +2880,7 @@ const Editor = (() => {
     document.getElementById('selectbtn').classList.toggle('active', selectMode);
     if (selectMode) {
       draft = []; if (previewOn) exitPreview();
-      selectWallMode = false; selWall = null;
+      selectWallMode = false; selWalls = [];
       document.getElementById('wallselectbtn').classList.remove('active'); updateWallPanel();
     } else { selSectors = []; }
     updateSectorPanel();
@@ -2900,13 +2909,21 @@ const Editor = (() => {
     if (!el.panel) return;
     el.panel.hidden = !selectWallMode;
     if (!selectWallMode) return;
-    if (!selWall || !geo.sectors[selWall.s]) { el.label.textContent = 'CLICK A LINE TO SELECT.'; el.tex.disabled = el.invisible.disabled = el.link.disabled = true; return; }
+    selWalls = selWalls.filter(w => geo.sectors[w.s]);
+    if (!selWalls.length) { el.label.textContent = 'CLICK A LINE TO SELECT.'; el.tex.disabled = el.invisible.disabled = el.link.disabled = true; return; }
     el.tex.disabled = el.invisible.disabled = el.link.disabled = false;
-    const sec = geo.sectors[selWall.s], i = selWall.i;
-    el.label.textContent = 'WALL ' + (i + 1) + ' OF SECTOR ' + (selWall.s + 1);
-    el.tex.value = (sec.wallTex && sec.wallTex[i]) || 'brick';
-    el.invisible.classList.toggle('active', !!(sec.wallBlock && sec.wallBlock[i]));
-    el.link.value = sec.missionLink || '';
+    const first = geo.sectors[selWalls[0].s];
+    el.label.textContent = selWalls.length + ' WALL' + (selWalls.length > 1 ? 'S' : '') + ' SELECTED';
+    el.tex.value = (first.wallTex && first.wallTex[selWalls[0].i]) || 'brick';
+    el.invisible.classList.toggle('active', selWalls.every(({ s, i }) => geo.sectors[s].wallBlock && geo.sectors[s].wallBlock[i]));
+    el.link.value = first.missionLink || '';
+  }
+  function applyToSelectedWalls(fn) {
+    if (!selWalls.length) return;
+    pushUndo();
+    selWalls.forEach(({ s, i }) => fn(geo.sectors[s], i, s));
+    portalGraph = Engine.buildGraph(geo);
+    render();
   }
   (function initWallPanel() {
     const el = wallPanelEls();
@@ -2914,33 +2931,22 @@ const Editor = (() => {
     World.TXNAMES.forEach(n => el.tex.appendChild(new Option(n.toUpperCase(), n)));
     MISSION_CITIES.forEach(c => el.link.appendChild(new Option(c ? c.toUpperCase() : 'NONE', c || '')));
     el.tex.onchange = () => {
-      if (!selWall) return;
-      pushUndo();
-      const sec = geo.sectors[selWall.s];
-      if (!sec.wallTex) sec.wallTex = new Array(sec.loop.length).fill(null);
-      sec.wallTex[selWall.i] = el.tex.value;
-      portalGraph = Engine.buildGraph(geo);
-      status('WALL ' + (selWall.i + 1) + ' → ' + el.tex.value.toUpperCase());
-      render();
+      applyToSelectedWalls((sec, i) => {
+        if (!sec.wallTex) sec.wallTex = new Array(sec.loop.length).fill(null);
+        sec.wallTex[i] = el.tex.value;
+      });
+      status(selWalls.length + ' WALL' + (selWalls.length > 1 ? 'S' : '') + ' → ' + el.tex.value.toUpperCase());
     };
     el.invisible.onclick = () => {
-      if (!selWall) return;
-      pushUndo();
-      const sec = geo.sectors[selWall.s];
-      const next = !(sec.wallBlock && sec.wallBlock[selWall.i]);
-      setWallBlock(selWall.s, selWall.i, next);
-      portalGraph = Engine.buildGraph(geo);
-      status('WALL ' + (selWall.i + 1) + ' → ' + (next ? 'INVISIBLE WALL ON' : 'INVISIBLE WALL OFF'));
+      const allOn = selWalls.every(({ s, i }) => geo.sectors[s].wallBlock && geo.sectors[s].wallBlock[i]);
+      applyToSelectedWalls((sec, i, s) => setWallBlock(s, i, !allOn));
+      status((allOn ? 'INVISIBLE WALL OFF' : 'INVISIBLE WALL ON') + ' — ' + selWalls.length + ' WALL' + (selWalls.length > 1 ? 'S' : '') + '.');
       updateWallPanel();
-      render();
     };
     el.link.onchange = () => {
-      if (!selWall) return;
-      pushUndo();
-      const sec = geo.sectors[selWall.s];
-      sec.missionLink = el.link.value || null;
-      status('SECTOR ' + (selWall.s + 1) + ' MISSION LINK → ' + (sec.missionLink ? sec.missionLink.toUpperCase() : 'NONE'));
-      render();
+      applyToSelectedWalls(sec => { sec.missionLink = el.link.value || null; });
+      status((el.link.value ? 'MISSION LINK → ' + el.link.value.toUpperCase() : 'MISSION LINK CLEARED') +
+        ' — ' + new Set(selWalls.map(w => w.s)).size + ' SECTOR(S).');
     };
   })();
   document.getElementById('wallselectbtn').onclick = () => {
@@ -2950,9 +2956,9 @@ const Editor = (() => {
       draft = []; if (previewOn) exitPreview();
       selectMode = false; selSectors = [];
       document.getElementById('selectbtn').classList.remove('active'); updateSectorPanel();
-    } else { selWall = null; }
+    } else { selWalls = []; }
     updateWallPanel();
-    status(selectWallMode ? 'SELECT WALL — click a line to select it.' : 'SELECT WALL OFF.');
+    status(selectWallMode ? 'SELECT WALL — click a line, shift-click to add more.' : 'SELECT WALL OFF.');
     render();
   };
   function handleDelete() {
