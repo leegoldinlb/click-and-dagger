@@ -154,14 +154,14 @@ input[type="number"] { width: 52px; }
   background: linear-gradient(160deg, #2e4a2e, #142c14); color: var(--green-bright); border-color: var(--green);
   box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo);
 }
-#rectbtn, #drawbtn, #selectbtn {
+#rectbtn, #drawbtn, #selectbtn, #wallselectbtn {
   font-family: inherit; font-size: 13px; letter-spacing: 1px; padding: 8px 13px;
 }
 #rectbtn.active {
   background: linear-gradient(160deg, #5a4614, #2e2508); color: var(--gold-bright); border-color: var(--gold);
   box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo);
 }
-#drawbtn.active, #selectbtn.active {
+#drawbtn.active, #selectbtn.active, #wallselectbtn.active {
   background: linear-gradient(160deg, #2e4a2e, #142c14); color: var(--green-bright); border-color: var(--green);
   box-shadow: inset -1px -1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-lo);
 }

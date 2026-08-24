@@ -1083,8 +1083,9 @@ const Editor = (() => {
         pushUndo();
         const placedName = (ENTS.find(e => e.kind === tool.v) || {}).name || tool.v;
         lv.ents.push(Object.assign({ kind: tool.v, x: +w.x.toFixed(2), y: +w.y.toFixed(2) }, CIVILIAN_KINDS.has(tool.v) ? { behavior: 'wander' } : null));
-        deselectEntTool(true);                          // one prop per pick — no accidental continuous stamping
-        status('PLACED ' + placedName + '.');
+        // stay armed with the same kind — keep clicking to stamp more, right-click
+        // or Esc to leave prop-placement mode (see deselectEntTool)
+        status('PLACED ' + placedName + ' — click to place another, right-click to stop.');
         render();
         return;
       }
