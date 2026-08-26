@@ -496,6 +496,7 @@ const Editor = (() => {
   let selWalls = [];                                            // [{s, i}, …] current wall selection, shift-click to add
   const gcur = { x: 0, y: 0, vi: -1 };                          // snapped world cursor + snapped-vertex index
   let hoverEdge = null;                                         // {s, i} hovered wall for I-insert
+  let snapPreview = null;                                       // where SNAP TO WALL would drop the sprite under the cursor
   let draggingVert = -1;                                        // vertex index being dragged, or -1
   let draggingEnt = null;                                       // placed entity object being dragged, or null (vector map)
   let draggingGridEnt = null;                                   // same, for the legacy grid map
@@ -568,6 +569,7 @@ const Editor = (() => {
       wallStepFloorTex: s.wallStepFloorTex ? s.wallStepFloorTex.slice() : null,
       wallDecal: s.wallDecal ? s.wallDecal.slice() : null,
       solid: !!s.solid, missionLink: s.missionLink || null,
+      warpTo: s.warpTo == null ? null : s.warpTo,        // `== null`: sector 0 is a valid warp target
     })) : [];
     draft = [];
     document.getElementById('mw').value = lv.w;
@@ -618,7 +620,8 @@ const Editor = (() => {
           wallStepTex: (s.wallStepTex && s.wallStepTex.some(Boolean)) ? s.wallStepTex.slice() : undefined,
           wallStepFloorTex: (s.wallStepFloorTex && s.wallStepFloorTex.some(Boolean)) ? s.wallStepFloorTex.slice() : undefined,
           wallDecal: (s.wallDecal && s.wallDecal.some(Boolean)) ? s.wallDecal.slice() : undefined,
-          parent: s.parent, solid: s.solid || undefined, missionLink: s.missionLink || undefined })),
+          parent: s.parent, solid: s.solid || undefined, missionLink: s.missionLink || undefined,
+          warpTo: s.warpTo == null ? undefined : s.warpTo })),
       };
       out.v = Math.max(out.v, 5);
     }
@@ -2578,7 +2581,7 @@ const Editor = (() => {
   function closeSector() {
     const loop = draft.slice();
     if (polyArea(loop) < 0) loop.reverse();                    // normalise to CCW
-    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, skyTex: null, win: false, hostile: false, texScale: 1, wallDoor: null, wallDoorSkin: null, wallBlock: null, wallOpen: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false, missionLink: null };
+    const sec = { loop, floor: 0, ceil: 1, floorTex: 'carpet', ceilTex: 'ceiltile', sky: false, skyTex: null, win: false, hostile: false, texScale: 1, wallDoor: null, wallDoorSkin: null, wallBlock: null, wallOpen: null, wallTex: null, wallTexScale: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null, parent: -1, solid: false, missionLink: null, warpTo: null };
     const c = interiorPoint(loop);
     for (let s = 0; s < geo.sectors.length; s++)
       if (pointInLoop(c.x, c.y, geo.sectors[s].loop)) { sec.parent = s; break; }  // nested → sub-sector
@@ -2631,6 +2634,7 @@ const Editor = (() => {
     if (draggingEnt) {                                // move the dragged entity, snapping to a nearby wall if close
       const sp = snapEntToWall(w.x, w.y);
       draggingEnt.x = sp.x; draggingEnt.y = sp.y;
+      snapPreview = sp.snapped ? sp : null;
       render(); return;
     }
     if (draggingVert >= 0) {                          // move the dragged vertex, snapped to the GRID
@@ -2642,15 +2646,23 @@ const Editor = (() => {
     const sp = snapWorld(w.x, w.y);
     gcur.x = sp.x; gcur.y = sp.y; gcur.vi = sp.vi;
     hoverEdge = findNearestEdge(w.x, w.y);
+    // with a sprite armed, show where SNAP TO WALL would actually drop it
+    const snap = tool.t === 'ent' ? snapEntToWall(w.x, w.y) : null;
+    snapPreview = (snap && snap.snapped) ? snap : null;
     coordsEl.textContent = 'DRAW  x ' + gcur.x.toFixed(1) + '  y ' + gcur.y.toFixed(1) +
-      (draft.length ? '  · ' + draft.length + ' verts' : '') + (hoverEdge ? '  · [V] split wall · [I] invisible wall' : '');
+      (draft.length ? '  · ' + draft.length + ' verts' : '') +
+      (snapPreview ? '  · SNAP TO WALL' : '') +
+      (hoverEdge ? '  · [V] split wall · [I] invisible wall' : '');
     render();
   }
   // shared nearest-edge lookup — used by the hover highlight above (which
   // drives the V/I keyboard shortcuts) and by the SELECT WALL click tool
   // below, so both agree on which wall the cursor is closest to.
-  function findNearestEdge(x, y) {
-    let best = null, bd = 0.5;
+  // maxDist defaults to the hover-highlight radius; the wall snap passes its own
+  // (larger) reach — the two were sharing this 0.5 before, which silently capped
+  // the snap and made it look dead anywhere past half a cell from the wall.
+  function findNearestEdge(x, y, maxDist = 0.5) {
+    let best = null, bd = maxDist;
     for (let s = 0; s < geo.sectors.length; s++) {
       const L = geo.sectors[s].loop;
       for (let i = 0; i < L.length; i++) {
@@ -2676,16 +2688,15 @@ const Editor = (() => {
   let snapToWallEnabled = true;
   function snapEntToWall(x, y) {
     if (!snapToWallEnabled) return { x, y };
-    const hit = findNearestEdge(x, y);
+    const hit = findNearestEdge(x, y, WALL_SNAP_DIST);
     if (!hit) return { x, y };
     const sec = geo.sectors[hit.s], L = sec.loop;
     const A = geo.verts[L[hit.i]], B = geo.verts[L[(hit.i + 1) % L.length]];
     const cp = distToSeg(x, y, A.x, A.y, B.x, B.y);
-    if (cp.d > WALL_SNAP_DIST) return { x, y };
     const dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy) || 1;
     let nx = -dy / len, ny = dx / len;                          // perpendicular to the wall, one of two directions
     if (!pointInLoop(cp.x + nx * 0.05, cp.y + ny * 0.05, L)) { nx = -nx; ny = -ny; }  // pick the side that's actually inside the room
-    return { x: +(cp.x + nx * WALL_SNAP_OFFSET).toFixed(2), y: +(cp.y + ny * WALL_SNAP_OFFSET).toFixed(2) };
+    return { x: +(cp.x + nx * WALL_SNAP_OFFSET).toFixed(2), y: +(cp.y + ny * WALL_SNAP_OFFSET).toFixed(2), snapped: true };
   }
 
   function renderGeo() {
@@ -2700,6 +2711,7 @@ const Editor = (() => {
       g.fill();
       if (geo.sectors[s].hostile) { g.fillStyle = 'rgba(220,40,30,0.16)'; g.fill(); }  // hostile-area tint, on top
       if (geo.sectors[s].win) { g.fillStyle = 'rgba(40,220,90,0.28)'; g.fill(); }      // win sector — green, on top
+      if (geo.sectors[s].warpTo != null) { g.fillStyle = 'rgba(90,220,255,0.20)'; g.fill(); }  // warp-linked — cyan
     }
     g.lineWidth = 2.5; g.lineCap = 'round';                    // walls: white solid, red portal
     const invisibleEdges = [];                                 // collected and drawn after, dashed gold on top —
@@ -2712,6 +2724,20 @@ const Editor = (() => {
         g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
         if (sec.wallBlock && sec.wallBlock[i]) invisibleEdges.push({ A, B });
       }
+    }
+    {                                                          // warp links: dashed cyan tether between each linked pair
+      g.save();
+      g.strokeStyle = '#5ee0ff'; g.lineWidth = 2; g.setLineDash([5, 4]);
+      for (let s = 0; s < geo.sectors.length; s++) {
+        const t = geo.sectors[s].warpTo;
+        if (t == null || t <= s || !geo.sectors[t]) continue;   // t <= s: draw each pair once
+        const A = interiorPoint(geo.sectors[s].loop), B = interiorPoint(geo.sectors[t].loop);
+        g.beginPath(); g.moveTo(A.x * c, A.y * c); g.lineTo(B.x * c, B.y * c); g.stroke();
+        g.setLineDash([]);
+        for (const P of [A, B]) { g.beginPath(); g.arc(P.x * c, P.y * c, 4, 0, 7); g.stroke(); }
+        g.setLineDash([5, 4]);
+      }
+      g.restore();
     }
     if (invisibleEdges.length) {
       g.save();
@@ -2760,6 +2786,12 @@ const Editor = (() => {
     }
     g.strokeStyle = gcur.vi >= 0 ? '#ffd75e' : '#8fd6ff'; g.lineWidth = 2;
     g.beginPath(); g.arc(gcur.x * c, gcur.y * c, 4, 0, 7); g.stroke();
+    if (snapPreview) {                                         // SNAP TO WALL: ghost of where the sprite will actually land
+      g.strokeStyle = '#7fffd0'; g.lineWidth = 2;
+      g.beginPath(); g.arc(snapPreview.x * c, snapPreview.y * c, 6, 0, 7); g.stroke();
+      g.beginPath(); g.moveTo(snapPreview.x * c - 9, snapPreview.y * c); g.lineTo(snapPreview.x * c + 9, snapPreview.y * c);
+      g.moveTo(snapPreview.x * c, snapPreview.y * c - 9); g.lineTo(snapPreview.x * c, snapPreview.y * c + 9); g.stroke();
+    }
   }
 
   // ---- undo stack (snapshots the whole edited level; grouped per action) ----
@@ -2816,12 +2848,32 @@ const Editor = (() => {
     draft.forEach(i => used.add(i));
     for (let i = geo.verts.length - 1; i >= 0; i--) if (!used.has(i)) reindexAfterRemoved(i);
   }
+  // Warp links are stored as plain sector INDICES, so deleting a sector
+  // renumbers every sector after it and would silently repoint the surviving
+  // links at the wrong rooms. Tag each sector with its index, run the deletion,
+  // then rewrite every warpTo through the old→new map; a link pointing at a
+  // sector that's now gone is dropped rather than left dangling.
+  function withWarpLinksPreserved(mutate) {
+    geo.sectors.forEach((sec, i) => { sec.__oldIdx = i; });
+    mutate();
+    const newIdx = new Map();
+    geo.sectors.forEach((sec, i) => newIdx.set(sec.__oldIdx, i));
+    for (const sec of geo.sectors) {
+      if (sec.warpTo != null) {
+        const t = newIdx.get(sec.warpTo);
+        sec.warpTo = t == null ? null : t;
+      }
+      delete sec.__oldIdx;
+    }
+  }
   function deleteVertex(vi) {
-    geo.sectors.forEach(sec => { const k = sec.loop.indexOf(vi); if (k >= 0) sec.loop.splice(k, 1); });
-    const dk = draft.indexOf(vi); if (dk >= 0) draft.splice(dk, 1);
-    geo.sectors = geo.sectors.filter(sec => sec.loop.length >= 3);
-    reindexAfterRemoved(vi);
-    pruneVerts(); rebuildParents();
+    withWarpLinksPreserved(() => {
+      geo.sectors.forEach(sec => { const k = sec.loop.indexOf(vi); if (k >= 0) sec.loop.splice(k, 1); });
+      const dk = draft.indexOf(vi); if (dk >= 0) draft.splice(dk, 1);
+      geo.sectors = geo.sectors.filter(sec => sec.loop.length >= 3);
+      reindexAfterRemoved(vi);
+      pruneVerts(); rebuildParents();
+    });
     selSectors = []; updateSectorPanel();
     selWalls = []; updateWallPanel();
   }
@@ -2830,7 +2882,7 @@ const Editor = (() => {
     for (let s = 0; s < geo.sectors.length; s++)
       if (pointInLoop(x, y, geo.sectors[s].loop)) { const a = Math.abs(polyArea(geo.sectors[s].loop)); if (a < ba) { ba = a; best = s; } }
     if (best < 0) return false;
-    geo.sectors.splice(best, 1); pruneVerts(); rebuildParents();
+    withWarpLinksPreserved(() => { geo.sectors.splice(best, 1); pruneVerts(); rebuildParents(); });
     selSectors = []; updateSectorPanel();
     selWalls = []; updateWallPanel();
     return true;
@@ -2850,6 +2902,8 @@ const Editor = (() => {
       solid: document.getElementById('secSolid'),
       hostile: document.getElementById('secHostile'),
       win: document.getElementById('secWin'),
+      warp: document.getElementById('secWarp'),
+      warpHint: document.getElementById('secWarpHint'),
     };
   }
   function updateSectorPanel() {
@@ -2857,8 +2911,9 @@ const Editor = (() => {
     if (!el.panel) return;
     el.panel.hidden = !selectMode;
     if (!selectMode) return;
-    if (!selSectors.length) { el.label.textContent = 'CLICK A SECTOR TO SELECT.'; return; }
+    if (!selSectors.length) { el.label.textContent = 'CLICK A SECTOR TO SELECT.'; updateWarpButton(); return; }
     el.label.textContent = selSectors.length + ' SECTOR' + (selSectors.length > 1 ? 'S' : '') + ' SELECTED';
+    updateWarpButton();
     const first = geo.sectors[selSectors[0]];
     el.floor.value = first.floor.toFixed(1);
     el.ceil.value = first.ceil.toFixed(1);
@@ -2867,6 +2922,35 @@ const Editor = (() => {
     el.solid.disabled = !selSectors.every(s => geo.sectors[s].parent >= 0);
     el.hostile.classList.toggle('active', selSectors.every(s => geo.sectors[s].hostile));
     el.win.classList.toggle('active', selSectors.every(s => geo.sectors[s].win));
+  }
+  // ---- sector WARP links: pair two sectors so entering either drops the player
+  // into the other. Stored as a mutual pair of sector indices (a.warpTo = b and
+  // b.warpTo = a) — used to fake elevators, portals and the like.
+  function updateWarpButton() {
+    const el = sectorPanelEls();
+    if (!el.warp) return;
+    const one = selSectors.length === 1 ? geo.sectors[selSectors[0]] : null;
+    if (selSectors.length === 2) {
+      el.warp.disabled = false;
+      el.warp.textContent = 'LINK WARP: SECTOR ' + (selSectors[0] + 1) + ' ↔ ' + (selSectors[1] + 1);
+      el.warpHint.textContent = 'Entering either sector warps the player to the other.';
+    } else if (one && one.warpTo != null) {
+      el.warp.disabled = false;
+      el.warp.textContent = 'UNLINK WARP (→ SECTOR ' + (one.warpTo + 1) + ')';
+      el.warpHint.textContent = 'This sector is warp-linked. Unlinking clears both ends.';
+    } else {
+      el.warp.disabled = true;
+      el.warp.textContent = 'LINK WARP (2 SECTORS)';
+      el.warpHint.textContent = 'Select exactly two sectors to link them — entering either warps the player to the other.';
+    }
+  }
+  // drop a sector's link, clearing the far end too so no half-link is left behind
+  function clearWarp(s) {
+    const sec = geo.sectors[s];
+    if (!sec || sec.warpTo == null) return;
+    const other = geo.sectors[sec.warpTo];
+    if (other && other.warpTo === s) other.warpTo = null;
+    sec.warpTo = null;
   }
   function applyToSelected(fn) {
     if (!selSectors.length) return;
@@ -2902,6 +2986,23 @@ const Editor = (() => {
       applyToSelected(sec => { sec.win = !allOn; });
       status((allOn ? 'WIN SECTOR OFF' : 'WIN SECTOR ON') + ' — ' + selSectors.length + ' SECTOR' + (selSectors.length > 1 ? 'S' : '') + '.');
       updateSectorPanel();
+    };
+    el.warp.onclick = () => {
+      if (selSectors.length === 2) {
+        const [a, b] = selSectors;
+        if (a === b) return;
+        pushUndo();
+        clearWarp(a); clearWarp(b);       // drop any older pairing first, so nothing is left half-linked
+        geo.sectors[a].warpTo = b; geo.sectors[b].warpTo = a;
+        status('WARP LINKED — SECTOR ' + (a + 1) + ' ↔ ' + (b + 1) + '.');
+      } else if (selSectors.length === 1 && geo.sectors[selSectors[0]].warpTo != null) {
+        const a = selSectors[0], b = geo.sectors[a].warpTo;
+        pushUndo();
+        clearWarp(a);
+        status('WARP UNLINKED — SECTOR ' + (a + 1) + ' and ' + (b + 1) + '.');
+      } else return;
+      updateSectorPanel();
+      render();
     };
   })();
   document.getElementById('selectbtn').onclick = () => {

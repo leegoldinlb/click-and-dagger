@@ -61,6 +61,7 @@ const Game = (() => {
     started: false,
     over: false,
     bobT: 0, bobAmt: 0, fireT: 0,
+    warpLock: -1,                      // sector a warp just dropped us into — see warpPlayer()
     kills: 0, civKills: 0, t0: 0,
     blown: World.startBlown,          // Cover status: false = Undercover (hostiles ignore you), true = Blown (one-way door for the level)
     invuln: false,                     // MOM cheat — hostile melee/ranged hits are gated out in update(), no other damage source exists
@@ -699,6 +700,56 @@ const Game = (() => {
       else if (performance.now() - winBlockT > 4000) { winBlockT = performance.now(); Adventure.msg(block, 3.5); }  // throttled: this runs every frame you stand there
     }
     if (cs >= 0 && geo.sectors[cs].missionLink && !G.transitioning) enterGate(geo.sectors[cs].missionLink);
+    // Warp sectors come in linked pairs, so the sector you land in points right
+    // back at the one you left — firing again on the very next frame would
+    // ping-pong you forever. Latch the sector we arrived in and stay quiet until
+    // the player actually walks out of it.
+    if (cs !== G.warpLock) {
+      G.warpLock = -1;
+      if (cs >= 0 && geo.sectors[cs].warpTo != null && !G.transitioning) warpPlayer(cs, geo.sectors[cs].warpTo);
+    }
+  }
+
+  // ---- sector warp: a linked pair of sectors behaves as one place in two
+  // spots — step into either and you come out of the other. Built for faking
+  // elevators (two identical rooms on "different floors"), but works for any
+  // portal-style shortcut.
+  function sectorCentre(s) {
+    const L = geo.sectors[s].loop;
+    let x = 0, y = 0;
+    for (const vi of L) { x += geo.verts[vi].x; y += geo.verts[vi].y; }
+    return { x: x / L.length, y: y / L.length };
+  }
+  // A point guaranteed to be inside sector s. The vertex average is inside any
+  // convex room, but an L-shaped one can put its own average outside itself —
+  // fall back to creeping in from a corner toward that average.
+  function safePointIn(s) {
+    const c = sectorCentre(s);
+    if (Engine.sectorAt(c.x, c.y, geo) === s) return c;
+    for (const vi of geo.sectors[s].loop) {
+      const v = geo.verts[vi];
+      for (const t of [0.25, 0.5, 0.75]) {
+        const q = { x: v.x + (c.x - v.x) * t, y: v.y + (c.y - v.y) * t };
+        if (Engine.sectorAt(q.x, q.y, geo) === s) return q;
+      }
+    }
+    return c;
+  }
+  function warpPlayer(from, to) {
+    if (!geo.sectors[to]) return;
+    const p = G.player, a = sectorCentre(from), b = sectorCentre(to);
+    // Carry the player's offset from the centre across, so a matched pair of
+    // rooms reads as the room having moved rather than the player being flung
+    // into the middle of it. Differently-shaped rooms may not fit that offset —
+    // drop to a known-inside point when it lands outside the destination.
+    let nx = b.x + (p.x - a.x), ny = b.y + (p.y - a.y);
+    if (Engine.sectorAt(nx, ny, geo) !== to) { const q = safePointIn(to); nx = q.x; ny = q.y; }
+    p.x = nx; p.y = ny;
+    p.sector = to;                                              // localSector caches the last sector — hand it the new one
+    p.eyeZ = Engine.geoFloorAtXY(geo, graph, nx, ny, to) + 0.5;  // arrive standing, rather than falling in
+    p.vz = 0;
+    G.warpLock = to;
+    Sfx.power();
   }
 
   // Hub airport: walking into a gate sector either boots that city's shipped

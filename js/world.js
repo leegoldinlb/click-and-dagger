@@ -12301,6 +12301,10 @@ const World = (() => {
         wallStepFloorTex: s.wallStepFloorTex ? s.wallStepFloorTex.slice() : undefined,
         wallDecal: s.wallDecal ? s.wallDecal.slice() : undefined,
         parent: s.parent == null ? -1 : s.parent, solid: !!s.solid, missionLink: s.missionLink || null,
+        // sector index this one warps the player to (see the warp handling in
+        // main.js). `== null` rather than `||` — sector 0 is a valid target and
+        // would be thrown away by a truthiness check.
+        warpTo: s.warpTo == null ? null : s.warpTo,
       })),
     } : null;
     startBlown = !!level.blown;
