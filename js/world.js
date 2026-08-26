@@ -4552,6 +4552,165 @@ const World = (() => {
     bevel(g, 4, 50, 56, 4, 'rgba(200,220,170,0.2)', 'rgba(0,0,0,0.3)');
   });
 
+  // ---------------------------------------------------------------------------
+  // Shop & business interiors — shelving and appliance fronts, sized so the
+  // shelf boards land on the tile edges and keep lining up when repeated.
+  // ---------------------------------------------------------------------------
+  FLOOR.bookshelf = cnv(g => {                          // shelved books — dark carcass, spines of mixed heights
+    vgrad(g, 0, 0, 64, 64, '#4a3524', '#2e2015');                       // shadowed inside of the case
+    const spine = ['#8a2f2a', '#2f4f7a', '#3f6a3a', '#8a6a22', '#5a2f6a', '#a8543a', '#2f6a6a', '#7a3a52'];
+    for (const y of [15, 31, 47, 63]) {
+      let x = 2;
+      while (x < 62) {
+        const w = 3 + ((Math.random() * 4) | 0), h = 10 + ((Math.random() * 4) | 0);
+        if (x + w > 62) break;
+        g.fillStyle = spine[(Math.random() * spine.length) | 0];
+        g.fillRect(x, y - h, w, h);
+        bevel(g, x, y - h, w, h, 'rgba(255,235,200,0.16)', 'rgba(0,0,0,0.45)');
+        if (w > 4) {                                                     // gilt title bands
+          g.fillStyle = 'rgba(226,196,120,0.6)';
+          g.fillRect(x + 1, y - h + 3, w - 2, 1); g.fillRect(x + 1, y - 4, w - 2, 1);
+        }
+        x += w;
+      }
+      g.fillStyle = '#6a4c30'; g.fillRect(0, y, 64, 2);                  // the shelf board
+      bevel(g, 0, y, 64, 2, 'rgba(255,225,180,0.25)', 'rgba(0,0,0,0.5)');
+    }
+    g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(0, 0, 2, 64); g.fillRect(62, 0, 2, 64);  // side uprights
+    speck(g, 30, 'rgba(0,0,0,0.2)');
+  });
+
+  FLOOR.groceryshelf = cnv(g => {                       // supermarket gondola — cartons, tins and price strips
+    vgrad(g, 0, 0, 64, 64, '#9aa0a2', '#6e7476');                       // pale metal shelving
+    const box = ['#c4452f', '#d8912a', '#2f6aa8', '#3f8a4a', '#c9a227', '#a8452f', '#6a4a8a'];
+    for (const y of [15, 31, 47, 63]) {                                 // last board on the tile edge, so it survives tiling
+      let x = 2;
+      while (x < 62) {
+        const w = 5 + ((Math.random() * 5) | 0), h = 8 + ((Math.random() * 4) | 0);
+        if (x + w > 62) break;
+        const c = box[(Math.random() * box.length) | 0];
+        if (Math.random() < 0.35) {                                      // tin can — bare metal above and below the label
+          g.fillStyle = '#b8bcc0'; g.fillRect(x, y - h, w, h);
+          g.fillStyle = c; g.fillRect(x, y - h + 3, w, h - 6);
+          g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(x + 1, y - h, 1, h);
+        } else {                                                         // carton — flat face with a label patch
+          g.fillStyle = c; g.fillRect(x, y - h, w, h);
+          g.fillStyle = 'rgba(255,250,235,0.75)'; g.fillRect(x + 1, y - h + 2, w - 2, 3);
+          bevel(g, x, y - h, w, h, 'rgba(255,255,255,0.2)', 'rgba(0,0,0,0.4)');
+        }
+        x += w + 1;
+      }
+      g.fillStyle = '#c8ccce'; g.fillRect(0, y, 64, 2);                  // shelf lip
+      g.fillStyle = '#e8ecee'; g.fillRect(0, y, 64, 1);
+      g.fillStyle = 'rgba(40,60,90,0.5)';                                // price tags along the strip
+      for (let px = 2; px < 62; px += 9) g.fillRect(px, y, 5, 1);
+    }
+    speck(g, 24, 'rgba(0,0,0,0.15)');
+  });
+
+  FLOOR.washer = cnv(g => {                             // laundromat bank of front-loaders, 2x2 to the tile
+    vgrad(g, 0, 0, 64, 64, '#d8dade', '#a8acb2');                       // enamel bodies
+    for (const [ox, oy] of [[0, 0], [32, 0], [0, 32], [32, 32]]) {
+      g.fillStyle = 'rgba(0,0,0,0.28)'; g.fillRect(ox + 31, oy, 1, 32); g.fillRect(ox, oy + 31, 32, 1);  // seams
+      g.fillStyle = '#c2c6ca'; g.fillRect(ox + 2, oy + 2, 28, 7);        // control panel
+      bevel(g, ox + 2, oy + 2, 28, 7, 'rgba(255,255,255,0.5)', 'rgba(0,0,0,0.3)');
+      g.fillStyle = '#2f4f6a'; g.fillRect(ox + 4, oy + 4, 9, 3);         // cycle selector
+      g.fillStyle = '#c9a227'; g.fillRect(ox + 22, oy + 4, 2, 3);        // coin slot
+      g.fillStyle = '#8a1f1f'; g.fillRect(ox + 26, oy + 4, 2, 2);        // running lamp
+      g.fillStyle = '#3a3f44';                                            // porthole — dark drum behind glass
+      g.beginPath(); g.arc(ox + 16, oy + 21, 9, 0, 7); g.fill();
+      const gl = g.createRadialGradient(ox + 13, oy + 18, 1, ox + 16, oy + 21, 9);
+      gl.addColorStop(0, 'rgba(210,230,240,0.55)'); gl.addColorStop(1, 'rgba(90,120,140,0.15)');
+      g.fillStyle = gl; g.beginPath(); g.arc(ox + 16, oy + 21, 9, 0, 7); g.fill();
+      g.strokeStyle = '#8a8f94'; g.lineWidth = 2;                         // chrome bezel
+      g.beginPath(); g.arc(ox + 16, oy + 21, 9, 0, 7); g.stroke();
+      g.strokeStyle = 'rgba(255,255,255,0.5)'; g.lineWidth = 1;           // glass glint
+      g.beginPath(); g.arc(ox + 16, oy + 21, 7, 3.5, 5); g.stroke();
+    }
+    speck(g, 20, 'rgba(0,0,0,0.12)');
+  });
+
+  FLOOR.dryer = cnv(g => {                              // laundromat dryers — wider doors, warm drums, vent grilles
+    vgrad(g, 0, 0, 64, 64, '#cfd2d6', '#9ea2a8');
+    for (const [ox, oy] of [[0, 0], [32, 0], [0, 32], [32, 32]]) {
+      g.fillStyle = 'rgba(0,0,0,0.28)'; g.fillRect(ox + 31, oy, 1, 32); g.fillRect(ox, oy + 31, 32, 1);
+      g.fillStyle = '#b6babe'; g.fillRect(ox + 2, oy + 2, 28, 6);        // slimmer panel than the washers'
+      bevel(g, ox + 2, oy + 2, 28, 6, 'rgba(255,255,255,0.45)', 'rgba(0,0,0,0.3)');
+      g.fillStyle = '#6a4a1f'; g.fillRect(ox + 4, oy + 3, 7, 3);         // timer dial
+      g.fillStyle = '#c9a227'; g.fillRect(ox + 24, oy + 3, 2, 3);        // coin slot
+      g.fillStyle = '#2f2f33';
+      g.beginPath(); g.arc(ox + 16, oy + 18, 10, 0, 7); g.fill();
+      const warm = g.createRadialGradient(ox + 16, oy + 18, 1, ox + 16, oy + 18, 10);
+      warm.addColorStop(0, 'rgba(240,200,140,0.35)'); warm.addColorStop(1, 'rgba(120,90,60,0.1)');
+      g.fillStyle = warm; g.beginPath(); g.arc(ox + 16, oy + 18, 10, 0, 7); g.fill();
+      ['#c4452f', '#2f6aa8', '#e8e2d0'].forEach((c, k) => {               // laundry mid-tumble
+        g.fillStyle = c; g.beginPath();
+        g.ellipse(ox + 12 + k * 4, oy + 16 + (k % 2) * 5, 3.5, 2.5, k, 0, 7); g.fill();
+      });
+      g.strokeStyle = '#82878c'; g.lineWidth = 2;
+      g.beginPath(); g.arc(ox + 16, oy + 18, 10, 0, 7); g.stroke();
+      g.strokeStyle = 'rgba(60,60,64,0.6)'; g.lineWidth = 1;              // vent grille under the door
+      for (let vy = oy + 28; vy < oy + 31; vy++) { g.beginPath(); g.moveTo(ox + 8, vy); g.lineTo(ox + 24, vy); g.stroke(); }
+    }
+    speck(g, 18, 'rgba(0,0,0,0.12)');
+  });
+
+  FLOOR.fridge = cnv(g => {                             // glass-door cooler — bottles and cartons under cold light
+    vgrad(g, 0, 0, 64, 64, '#2a3f4a', '#16242c');                       // dim chilled interior
+    g.fillStyle = '#8a9298'; g.fillRect(0, 0, 64, 3); g.fillRect(0, 61, 64, 3);   // cabinet frame
+    g.fillStyle = '#9aa2a8'; g.fillRect(0, 0, 3, 64); g.fillRect(61, 0, 3, 64);
+    const drink = ['#c4452f', '#2f8a4a', '#d8a52a', '#8a2f5a', '#2f6aa8', '#e8e2d0'];
+    for (const y of [22, 40, 58]) {
+      let x = 5;
+      while (x < 59) {
+        const w = 4 + ((Math.random() * 3) | 0), h = 11 + ((Math.random() * 3) | 0);
+        if (x + w > 59) break;
+        const c = drink[(Math.random() * drink.length) | 0];
+        g.fillStyle = c; g.fillRect(x, y - h, w, h);
+        g.fillStyle = 'rgba(255,255,255,0.28)'; g.fillRect(x, y - h, 1, h);        // chilled highlight
+        g.fillStyle = 'rgba(255,250,240,0.6)'; g.fillRect(x, y - h + 4, w, 2);     // label band
+        if (h > 12 && y - h > 5) { g.fillStyle = c; g.fillRect(x + 1, y - h - 2, w - 2, 2); }  // bottle neck
+        x += w + 1;
+      }
+      g.fillStyle = 'rgba(190,215,225,0.5)'; g.fillRect(4, y, 56, 1);    // glass shelf
+    }
+    g.fillStyle = 'rgba(150,210,235,0.10)'; g.fillRect(3, 3, 58, 58);    // cold cast over the glass
+    g.fillStyle = 'rgba(255,255,255,0.13)';                               // reflection streak down the door
+    g.beginPath(); g.moveTo(10, 3); g.lineTo(24, 3); g.lineTo(12, 61); g.lineTo(3, 61); g.closePath(); g.fill();
+    g.fillStyle = '#b8c0c6'; g.fillRect(56, 20, 3, 24);                   // door handle
+    bevel(g, 56, 20, 3, 24, 'rgba(255,255,255,0.5)', 'rgba(0,0,0,0.4)');
+  });
+
+  FLOOR.freezer = cnv(g => {                            // frozen-food case — flat packs behind heavily iced glass
+    vgrad(g, 0, 0, 64, 64, '#2c4450', '#132028');
+    g.fillStyle = '#8a9298'; g.fillRect(0, 0, 64, 3); g.fillRect(0, 61, 64, 3);
+    g.fillStyle = '#9aa2a8'; g.fillRect(0, 0, 3, 64); g.fillRect(61, 0, 3, 64);
+    const pack = ['#2f6aa8', '#3f8ab8', '#c4452f', '#e8e2d0', '#5a7a3a'];
+    for (const y of [22, 40, 58]) {
+      let x = 5;
+      while (x < 59) {
+        const w = 6 + ((Math.random() * 4) | 0), h = 9 + ((Math.random() * 3) | 0);
+        if (x + w > 59) break;
+        g.fillStyle = pack[(Math.random() * pack.length) | 0];
+        g.fillRect(x, y - h, w, h);
+        g.fillStyle = 'rgba(255,255,255,0.55)'; g.fillRect(x + 1, y - h + 2, w - 2, 2);
+        bevel(g, x, y - h, w, h, 'rgba(255,255,255,0.3)', 'rgba(0,0,0,0.45)');
+        x += w + 1;
+      }
+      g.fillStyle = 'rgba(200,230,245,0.45)'; g.fillRect(4, y, 56, 1);
+    }
+    g.fillStyle = 'rgba(190,235,255,0.22)'; g.fillRect(3, 3, 58, 58);     // heavier cold cast than the fridge
+    g.fillStyle = 'rgba(255,255,255,0.16)';                                // frost blooms creeping over the glass
+    for (let i = 0; i < 26; i++) {
+      g.beginPath();
+      g.ellipse(3 + Math.random() * 58, 3 + Math.random() * 58, 2 + Math.random() * 4, 1 + Math.random() * 3, Math.random() * 3, 0, 7);
+      g.fill();
+    }
+    speck(g, 140, 'rgba(255,255,255,0.5)'); speck(g, 60, 'rgba(210,240,255,0.7)');   // ice crystals
+    g.fillStyle = '#b8c0c6'; g.fillRect(56, 20, 3, 24);
+    bevel(g, 56, 20, 3, 24, 'rgba(255,255,255,0.5)', 'rgba(0,0,0,0.4)');
+  });
+
   FLOOR.rockwall = cnv(g => {                           // rough natural stone / cliff face
     vgrad(g, 0, 0, 64, 64, '#8c887e', '#5e5a52');
     const cols = ['#7a7668', '#67635a', '#918c7e', '#544f47', '#847e70'];
@@ -6172,6 +6331,7 @@ const World = (() => {
     'doorwood', 'doorarch', 'doubledoor', 'windowbars', 'windowshut',
     'adobewall', 'talaverafloor', 'courtyardtile', 'spanisharch',
     'churchdoor', 'stainedglasswindow', 'balconydoors', 'gardengate',
+    'bookshelf', 'groceryshelf', 'washer', 'dryer', 'fridge', 'freezer',
     'rockwall', 'mossyrock', 'pond', 'wetstone',
     'sandstone', 'zellige', 'mashrabiya', 'kilim', 'sandfloor', 'orosiwindow', 'tehranbalcony',
     'haussmann', 'wroughtiron', 'opart', 'toile', 'zincroof',

@@ -171,6 +171,11 @@ input[type="number"] { width: 52px; }
 #drawhelp b { color: var(--gold-bright); }
 #drawhelp a, #pcontrols a { color: var(--gold-bright); }
 #viewhint { color: #8a7a58; font-size: 11px; letter-spacing: 1px; }
+#snapWallLabel {
+  display: flex; align-items: center; gap: 5px; color: var(--parchment-dim);
+  font-size: 11px; letter-spacing: 1px; cursor: pointer; user-select: none;
+}
+#snapWallLabel input { cursor: pointer; }
 #gridscroll {
   display: flex;
   width: 100%;

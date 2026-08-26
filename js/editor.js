@@ -1082,7 +1082,8 @@ const Editor = (() => {
       if (tool.t === 'ent') {
         pushUndo();
         const placedName = (ENTS.find(e => e.kind === tool.v) || {}).name || tool.v;
-        lv.ents.push(Object.assign({ kind: tool.v, x: +w.x.toFixed(2), y: +w.y.toFixed(2) }, CIVILIAN_KINDS.has(tool.v) ? { behavior: 'wander' } : null));
+        const sp = snapEntToWall(w.x, w.y);
+        lv.ents.push(Object.assign({ kind: tool.v, x: sp.x, y: sp.y }, CIVILIAN_KINDS.has(tool.v) ? { behavior: 'wander' } : null));
         // stay armed with the same kind — keep clicking to stamp more, right-click
         // or Esc to leave prop-placement mode (see deselectEntTool)
         status('PLACED ' + placedName + ' — click to place another, right-click to stop.');
@@ -2627,8 +2628,9 @@ const Editor = (() => {
 
   function updateDrawHover(e) {
     const w = worldFromEvent(e);
-    if (draggingEnt) {                                // move the dragged entity, free placement (not grid-snapped)
-      draggingEnt.x = +w.x.toFixed(2); draggingEnt.y = +w.y.toFixed(2);
+    if (draggingEnt) {                                // move the dragged entity, snapping to a nearby wall if close
+      const sp = snapEntToWall(w.x, w.y);
+      draggingEnt.x = sp.x; draggingEnt.y = sp.y;
       render(); return;
     }
     if (draggingVert >= 0) {                          // move the dragged vertex, snapped to the GRID
@@ -2658,6 +2660,32 @@ const Editor = (() => {
       }
     }
     return best;
+  }
+  // SNAP TO WALL: when placing/dragging a sprite (prop or personnel) within
+  // WALL_SNAP_DIST of a wall, pin it to the closest point on that wall's face
+  // instead of leaving it exactly where the mouse landed — the fiddly part of
+  // wall-mounted props was always getting them close enough to read as flush
+  // against the wall without clipping through it or floating off it. Nudges
+  // the sprite a fixed distance off the wall along its INWARD normal (found by
+  // testing which side of the wall lands inside the owning sector), the same
+  // side the room's floor is on. A click far from any wall (mid-room) is
+  // untouched — this only kicks in near a wall, so free placement elsewhere
+  // isn't affected.
+  const WALL_SNAP_DIST = 0.9;
+  const WALL_SNAP_OFFSET = 0.15;
+  let snapToWallEnabled = true;
+  function snapEntToWall(x, y) {
+    if (!snapToWallEnabled) return { x, y };
+    const hit = findNearestEdge(x, y);
+    if (!hit) return { x, y };
+    const sec = geo.sectors[hit.s], L = sec.loop;
+    const A = geo.verts[L[hit.i]], B = geo.verts[L[(hit.i + 1) % L.length]];
+    const cp = distToSeg(x, y, A.x, A.y, B.x, B.y);
+    if (cp.d > WALL_SNAP_DIST) return { x, y };
+    const dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy) || 1;
+    let nx = -dy / len, ny = dx / len;                          // perpendicular to the wall, one of two directions
+    if (!pointInLoop(cp.x + nx * 0.05, cp.y + ny * 0.05, L)) { nx = -nx; ny = -ny; }  // pick the side that's actually inside the room
+    return { x: +(cp.x + nx * WALL_SNAP_OFFSET).toFixed(2), y: +(cp.y + ny * WALL_SNAP_OFFSET).toFixed(2) };
   }
 
   function renderGeo() {
@@ -2962,6 +2990,7 @@ const Editor = (() => {
     status(selectWallMode ? 'SELECT WALL — click a line, shift-click to add more.' : 'SELECT WALL OFF.');
     render();
   };
+  document.getElementById('snapWallToggle').onchange = e => { snapToWallEnabled = e.target.checked; };
   function handleDelete() {
     if (drawMode) {
       if (draft.length) { pushUndo(); draft.pop(); status('REMOVED LAST VERTEX.'); render(); }
