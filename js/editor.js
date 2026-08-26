@@ -1086,7 +1086,9 @@ const Editor = (() => {
         pushUndo();
         const placedName = (ENTS.find(e => e.kind === tool.v) || {}).name || tool.v;
         const sp = snapEntToWall(w.x, w.y);
-        lv.ents.push(Object.assign({ kind: tool.v, x: sp.x, y: sp.y }, CIVILIAN_KINDS.has(tool.v) ? { behavior: 'wander' } : null));
+        const ent = Object.assign({ kind: tool.v, x: sp.x, y: sp.y }, CIVILIAN_KINDS.has(tool.v) ? { behavior: 'wander' } : null);
+        applyWallMount(ent, sp);                        // snapped → mounted flat on the wall, like a decal
+        lv.ents.push(ent);
         // stay armed with the same kind — keep clicking to stamp more, right-click
         // or Esc to leave prop-placement mode (see deselectEntTool)
         status('PLACED ' + placedName + ' — click to place another, right-click to stop.');
@@ -2634,6 +2636,7 @@ const Editor = (() => {
     if (draggingEnt) {                                // move the dragged entity, snapping to a nearby wall if close
       const sp = snapEntToWall(w.x, w.y);
       draggingEnt.x = sp.x; draggingEnt.y = sp.y;
+      applyWallMount(draggingEnt, sp);                  // re-align to whatever wall it's dragged onto
       snapPreview = sp.snapped ? sp : null;
       render(); return;
     }
@@ -2678,13 +2681,17 @@ const Editor = (() => {
   // instead of leaving it exactly where the mouse landed — the fiddly part of
   // wall-mounted props was always getting them close enough to read as flush
   // against the wall without clipping through it or floating off it. Nudges
-  // the sprite a fixed distance off the wall along its INWARD normal (found by
-  // testing which side of the wall lands inside the owning sector), the same
-  // side the room's floor is on. A click far from any wall (mid-room) is
-  // untouched — this only kicks in near a wall, so free placement elsewhere
-  // isn't affected.
+  // the sprite a hair off the wall along its INWARD normal (found by testing
+  // which side of the wall lands inside the owning sector), the same side the
+  // room's floor is on. A click far from any wall (mid-room) is untouched —
+  // this only kicks in near a wall, so free placement elsewhere isn't affected.
+  //
+  // The returned `angle` is the wall's own direction. A flattened sprite is a
+  // plane spanning its width along flatAngle, so handing it the wall angle lays
+  // it ALONG the wall like a decal; left at the default 0 it juts straight out
+  // of any wall that isn't horizontal, which is what read as "floating".
   const WALL_SNAP_DIST = 0.9;
-  const WALL_SNAP_OFFSET = 0.15;
+  const WALL_SNAP_OFFSET = 0.05;      // just enough clearance to not z-fight the wall it's mounted on
   let snapToWallEnabled = true;
   function snapEntToWall(x, y) {
     if (!snapToWallEnabled) return { x, y };
@@ -2696,7 +2703,16 @@ const Editor = (() => {
     const dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy) || 1;
     let nx = -dy / len, ny = dx / len;                          // perpendicular to the wall, one of two directions
     if (!pointInLoop(cp.x + nx * 0.05, cp.y + ny * 0.05, L)) { nx = -nx; ny = -ny; }  // pick the side that's actually inside the room
-    return { x: +(cp.x + nx * WALL_SNAP_OFFSET).toFixed(2), y: +(cp.y + ny * WALL_SNAP_OFFSET).toFixed(2), snapped: true };
+    return { x: +(cp.x + nx * WALL_SNAP_OFFSET).toFixed(3), y: +(cp.y + ny * WALL_SNAP_OFFSET).toFixed(3),
+             snapped: true, angle: Math.atan2(dy, dx) };
+  }
+  // A snapped sprite is a wall decal by default: flattened, and lying along the
+  // wall it landed on. An explicit FLAT ON GROUND sprite (a rug, a body) keeps
+  // that — dragging one past a wall shouldn't stand it up.
+  function applyWallMount(ent, sp) {
+    if (!sp.snapped || ent.flatGround) return;
+    ent.flat = true;
+    ent.flatAngle = sp.angle;
   }
 
   function renderGeo() {
