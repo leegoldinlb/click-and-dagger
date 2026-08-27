@@ -66,7 +66,8 @@
   {
    "kind": "soviet",
    "x": 22.74,
-   "y": 12.23
+   "y": 12.23,
+   "zOff": -0.2
   },
   {
    "kind": "soviet",
@@ -90,8 +91,8 @@
   },
   {
    "kind": "spy",
-   "x": 30.7,
-   "y": 11.07
+   "x": 30.69724784562018,
+   "y": 10.695869779181779
   },
   {
    "kind": "defector",
@@ -416,18 +417,19 @@
   },
   {
    "kind": "stdkey",
-   "x": 32.53607313368055,
-   "y": 12.30802476671007,
+   "x": 31.563538967459774,
+   "y": 10.537677616398406,
    "flat": false,
    "flatAngle": 1.5707963267948966,
    "flatGround": true
   },
   {
    "kind": "safe",
-   "x": 24.072005019371787,
-   "y": 1.6751431784768398,
-   "flat": true,
-   "flatAngle": 0
+   "x": 24.39903564453125,
+   "y": 1.6981480916341145,
+   "flat": false,
+   "flatAngle": 0,
+   "flatGround": true
   },
   {
    "kind": "wpn_ar7",
@@ -452,13 +454,13 @@
   },
   {
    "kind": "microfichemachine",
-   "x": 19.641011555989582,
-   "y": 0.8648147583007812
+   "x": 32.53671668137126,
+   "y": 1.6208331031269645
   },
   {
    "kind": "ciphermachine",
-   "x": 20.71878933376736,
-   "y": 1.5203703138563367
+   "x": 20.72372775607639,
+   "y": 1.4092592027452258
   },
   {
    "kind": "agent",
@@ -542,8 +544,8 @@
   },
   {
    "kind": "pinetree",
-   "x": 35.48867149525559,
-   "y": 16.22594647095195
+   "x": 36.461849964025426,
+   "y": 14.758021693024173
   },
   {
    "kind": "pinetree",
@@ -608,13 +610,46 @@
   },
   {
    "kind": "agent005",
-   "x": 34.01040147228323,
-   "y": 10.820115288605196
+   "x": 32.13792755049243,
+   "y": 12.492482117022467
+  },
+  {
+   "kind": "letter",
+   "x": 30.62945115362619,
+   "y": 11.272141661130679
+  },
+  {
+   "kind": "personnelfile",
+   "x": 19.7574980659246,
+   "y": 0.675141971565514
   },
   {
    "kind": "sportscar",
-   "x": 37.923469180151244,
-   "y": 19.43127995938041
+   "x": 32.495743482377115,
+   "y": 12.951993377849972
+  },
+  {
+   "kind": "moscowblock",
+   "x": 29.953367532602552,
+   "y": 17.13090591281376,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0,
+   "scale": 4.42
+  },
+  {
+   "kind": "moscowblock",
+   "x": 33.30930378630497,
+   "y": 17.097007566816767,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0,
+   "scale": 4.77
+  },
+  {
+   "kind": "microfiche",
+   "x": 35.84979643716328,
+   "y": 4.221285693755906
   }
  ],
  "blown": false,
@@ -1087,12 +1122,12 @@
     "y": 14.5
    },
    {
-    "x": 33.5,
-    "y": 16.75
+    "x": 36,
+    "y": 16.5
    },
    {
-    "x": 35.5,
-    "y": 18
+    "x": 36.5,
+    "y": 17.25
    },
    {
     "x": 41.5,
@@ -1207,12 +1242,12 @@
     "y": 18
    },
    {
-    "x": 35.25,
-    "y": 19.25
+    "x": 38,
+    "y": 20.75
    },
    {
-    "x": 35,
-    "y": 20.25
+    "x": 36.25,
+    "y": 22
    },
    {
     "x": 34,
@@ -1391,12 +1426,12 @@
     "y": 11.5
    },
    {
-    "x": 32,
-    "y": 13
+    "x": 31.25,
+    "y": 14
    },
    {
-    "x": 33,
-    "y": 13
+    "x": 33.75,
+    "y": 14
    },
    {
     "x": 33,
@@ -1461,6 +1496,62 @@
    {
     "x": 20,
     "y": 2
+   },
+   {
+    "x": 33.75,
+    "y": 23
+   },
+   {
+    "x": 24,
+    "y": 19.25
+   },
+   {
+    "x": 24,
+    "y": 19.75
+   },
+   {
+    "x": 33,
+    "y": 25.25
+   },
+   {
+    "x": 35,
+    "y": 26
+   },
+   {
+    "x": 39,
+    "y": 25.5
+   },
+   {
+    "x": 31,
+    "y": 23.25
+   },
+   {
+    "x": 28.25,
+    "y": 27.25
+   },
+   {
+    "x": 41.5,
+    "y": 30.25
+   },
+   {
+    "x": 42.5,
+    "y": 24.5
+   },
+   {
+    "x": 26.75,
+    "y": 18
+   },
+   {
+    "x": 36.25,
+    "y": 17.75
+   },
+   {
+    "x": 25.75,
+    "y": 19
+   },
+   {
+    "x": 36.75,
+    "y": 18.75
    }
   ],
   "sectors": [
@@ -1494,6 +1585,8 @@
      4,
      3,
      2,
+     211,
+     212,
      1,
      0
     ],
@@ -2208,7 +2301,7 @@
     "floorTex": "lawngrass",
     "ceilTex": "ceiltile",
     "sky": true,
-    "skyTex": "sunset",
+    "skyTex": "havana",
     "win": false,
     "hostile": false,
     "texScale": 1,
@@ -2303,7 +2396,7 @@
     "floorTex": "water",
     "ceilTex": "ceiltile",
     "sky": true,
-    "skyTex": "sunset",
+    "skyTex": "havana",
     "win": false,
     "hostile": false,
     "texScale": 1,
@@ -2408,6 +2501,7 @@
      151,
      150,
      149,
+     210,
      148,
      147,
      146,
@@ -2418,8 +2512,8 @@
     "floorTex": "water",
     "ceilTex": "ceiltile",
     "sky": true,
-    "skyTex": "sunset",
-    "win": false,
+    "skyTex": "havana",
+    "win": true,
     "hostile": false,
     "texScale": 1,
     "wallTex": [
@@ -2431,6 +2525,30 @@
      "rockwall",
      "rockwall",
      "rockwall",
+     "rockwall"
+    ],
+    "wallStepTex": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     "rockwall",
+     null,
+     null,
+     null,
+     null
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     "rockwall",
+     null,
+     null,
+     null,
      null
     ],
     "parent": -1
@@ -2460,7 +2578,7 @@
     "floorTex": "carpet",
     "ceilTex": "ceiltile",
     "sky": true,
-    "skyTex": "sunset",
+    "skyTex": "havana",
     "win": false,
     "hostile": false,
     "texScale": 1,
@@ -2475,7 +2593,7 @@
      "rockwall",
      "rockwall",
      "rockwall",
-     null,
+     "rockwall",
      "rockwall",
      "rockwall",
      "rockwall",
@@ -2628,12 +2746,28 @@
     ],
     "floor": -0.2,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "brownstone",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallBlock": [
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     true,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
     "wallTex": [
      "brownstone",
      "brownstone",
@@ -2649,6 +2783,22 @@
      "brownstone",
      "brownstone",
      "brownstone"
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     "concrete",
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
     ],
     "parent": -1
    },
@@ -2708,6 +2858,123 @@
      "redbanner",
      null
     ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     211,
+     148,
+     210,
+     212
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     150,
+     151,
+     215,
+     214,
+     213,
+     149
+    ],
+    "floor": -0.7,
+    "ceil": 2.8,
+    "floorTex": "water",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     null,
+     "rockwall",
+     null,
+     null,
+     "rockwall",
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     214,
+     215,
+     219,
+     218,
+     217,
+     216,
+     213
+    ],
+    "floor": -0.7,
+    "ceil": -0.49999999999999994,
+    "floorTex": "water",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     193,
+     221,
+     220,
+     192
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "concrete",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "skyTex": "nycday",
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallBlock": [
+     false,
+     false,
+     false,
+     true
+    ],
+    "wallTex": [
+     "brownstone",
+     null,
+     "brownstone",
+     null
+    ],
+    "wallTexScale": [
+     0.5,
+     1,
+     0.5,
+     1
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     221,
+     223,
+     222,
+     220
+    ],
+    "floor": -0.2,
+    "ceil": 0,
+    "floorTex": "concrete",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
     "parent": -1
    }
   ]
