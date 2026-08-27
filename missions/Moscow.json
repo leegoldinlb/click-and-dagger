@@ -53,55 +53,40 @@
   "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
  ],
  "spawn": {
-  "x": 23.58,
-  "y": 19.66,
-  "a": -1.5707963
+  "x": 25.79,
+  "y": 6.37,
+  "a": 0
  },
  "ents": [
   {
-   "kind": "spy",
-   "x": 22.77,
-   "y": 18.75
-  },
-  {
-   "kind": "spy",
-   "x": 24.21,
-   "y": 17.23
-  },
-  {
    "kind": "wpn_sterling",
    "x": 24.21,
-   "y": 18.75
+   "y": 18.55
   },
   {
    "kind": "soviet",
-   "x": 22.57,
-   "y": 11.05
-  },
-  {
-   "kind": "spy",
-   "x": 23.4,
-   "y": 11.13
+   "x": 22.74,
+   "y": 12.23
   },
   {
    "kind": "soviet",
-   "x": 23.45,
-   "y": 9.47
+   "x": 22.85,
+   "y": 9.65
   },
   {
    "kind": "soviet",
-   "x": 24.63,
-   "y": 11.13
+   "x": 24.39,
+   "y": 12.18
   },
   {
    "kind": "soviet",
-   "x": 27.68,
-   "y": 10.2
+   "x": 24.33,
+   "y": 9.63
   },
   {
    "kind": "soviet",
-   "x": 29.23,
-   "y": 10.3
+   "x": 31.01739935092309,
+   "y": 9.185510374351134
   },
   {
    "kind": "spy",
@@ -116,16 +101,6 @@
   },
   {
    "kind": "soviet",
-   "x": 24.52,
-   "y": 6.58
-  },
-  {
-   "kind": "blackbelt",
-   "x": 21.75,
-   "y": 7.33
-  },
-  {
-   "kind": "soviet",
    "x": 22.8,
    "y": 14.54
   },
@@ -137,12 +112,12 @@
   {
    "kind": "medkit",
    "x": 24.2,
-   "y": 15.73
+   "y": 15.58
   },
   {
    "kind": "ammo",
-   "x": 22.72,
-   "y": 15.76
+   "x": 22.76,
+   "y": 15.55
   },
   {
    "kind": "medkit",
@@ -151,13 +126,495 @@
   },
   {
    "kind": "disguise",
-   "x": 21.96,
-   "y": 8.52
+   "x": 21.58047607134501,
+   "y": 7.6318358379904305,
+   "flat": true,
+   "flatAngle": 1.5707963267948966
   },
   {
    "kind": "wpn_sterling",
    "x": 21.09,
    "y": 7.96
+  },
+  {
+   "kind": "soviet",
+   "x": 22.82,
+   "y": 17.26
+  },
+  {
+   "kind": "soviet",
+   "x": 24.24,
+   "y": 17.25
+  },
+  {
+   "kind": "leninstatue",
+   "x": 29.95,
+   "y": 5.93,
+   "scale": 1.72
+  },
+  {
+   "kind": "bolshoitheatre",
+   "x": 30.51,
+   "y": 12.39,
+   "scale": 6,
+   "zOff": 0.8,
+   "solid": false,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0
+  },
+  {
+   "kind": "kremlin",
+   "x": 30.03,
+   "y": 0.71,
+   "zOff": 1.2,
+   "scale": 6,
+   "solid": false,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0
+  },
+  {
+   "kind": "stbasils",
+   "x": 36.47,
+   "y": 6.03,
+   "scale": 6,
+   "zOff": 1.2,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 4.71238898038469,
+   "solid": false
+  },
+  {
+   "kind": "moscowblock",
+   "x": 34.95,
+   "y": 2.04,
+   "zOff": 1.4,
+   "scale": 6,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0.7853981633974483,
+   "solid": false
+  },
+  {
+   "kind": "moscowblock",
+   "x": 34.23,
+   "y": 9.4,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 2.356194490192344,
+   "zOff": 1.3,
+   "scale": 4.04,
+   "solid": false
+  },
+  {
+   "kind": "moscowblock",
+   "x": 25.68,
+   "y": 3.07,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 5.497787143782138,
+   "scale": 3.46,
+   "zOff": 1.8,
+   "solid": false
+  },
+  {
+   "kind": "decalTramStopSign",
+   "x": 25.15,
+   "y": 4.81,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 1.5707963267948966,
+   "zOff": 0.5
+  },
+  {
+   "kind": "decalCinemaPoster",
+   "x": 30.697,
+   "y": 2.55,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0,
+   "zOff": 0.6
+  },
+  {
+   "kind": "decalBankPlaque",
+   "x": 34.46,
+   "y": 4.59,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 4.71238898038469,
+   "zOff": 0.6
+  },
+  {
+   "kind": "decalFactoryPoster",
+   "x": 31.997,
+   "y": 2.55,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0,
+   "zOff": 0.8
+  },
+  {
+   "kind": "decalCosmosPoster",
+   "x": 28.029,
+   "y": 2.55,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0,
+   "zOff": 0.1,
+   "scale": 1.66
+  },
+  {
+   "kind": "decalMetroSign",
+   "x": 24.03,
+   "y": 6.51,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 1.5707963267948966,
+   "zOff": 1.5
+  },
+  {
+   "kind": "decalBankPlaque",
+   "x": 30.97,
+   "y": 9.85,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 3.141592653589793,
+   "zOff": 0.5
+  },
+  {
+   "kind": "phonebooth",
+   "x": 26.37,
+   "y": 8.62
+  },
+  {
+   "kind": "businesscard",
+   "x": 21.69,
+   "y": 6.46
+  },
+  {
+   "kind": "watch",
+   "x": 25.78387149221999,
+   "y": 1.6242956594813487
+  },
+  {
+   "kind": "kgbheadquarters",
+   "x": 25.14,
+   "y": 8.91,
+   "scale": 6,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0.7853981633974483,
+   "zOff": 1,
+   "solid": false
+  },
+  {
+   "kind": "book",
+   "x": 41.54,
+   "y": 0.4
+  },
+  {
+   "kind": "oaktree",
+   "x": 24.49269419727723,
+   "y": 4.289364507697022,
+   "zOff": 0.8,
+   "solid": false
+  },
+  {
+   "kind": "oaktree",
+   "x": 24.50658312737439,
+   "y": 4.886588501874929,
+   "zOff": 0.8,
+   "solid": false
+  },
+  {
+   "kind": "oaktree",
+   "x": 23.481751844618056,
+   "y": 6.400617472330729,
+   "zOff": 1.1,
+   "solid": false
+  },
+  {
+   "kind": "decalRedSquareSign",
+   "x": 28.597,
+   "y": 10.55,
+   "flat": true,
+   "flatGround": false,
+   "flatAngle": 0,
+   "scale": 1.41,
+   "zOff": 1
+  },
+  {
+   "kind": "sovietofficial",
+   "x": 27.593666405226685,
+   "y": 3.641247246302498,
+   "behavior": "stationary",
+   "scale": 0.85
+  },
+  {
+   "kind": "sovietscientist",
+   "x": 29.322482051073386,
+   "y": 1.1836171615204254,
+   "behavior": "stationary"
+  },
+  {
+   "kind": "sovietcitizen",
+   "x": 33.40723274371118,
+   "y": 8.353117339884678,
+   "behavior": "stationary"
+  },
+  {
+   "kind": "sovietshopper",
+   "x": 25.644511510399525,
+   "y": 7.370065305971848,
+   "behavior": "stationary"
+  },
+  {
+   "kind": "soviet",
+   "x": 26.814004447295822,
+   "y": 3.1327720563475863
+  },
+  {
+   "kind": "soviet",
+   "x": 27.220784599259748,
+   "y": 9.48871193078398
+  },
+  {
+   "kind": "soviet",
+   "x": 33.64452116569013,
+   "y": 4.471756723228853
+  },
+  {
+   "kind": "soviet",
+   "x": 34.06825049065256,
+   "y": 7.607353727950808
+  },
+  {
+   "kind": "decalCosmosPoster",
+   "x": 33.791,
+   "y": 8.862,
+   "flat": true,
+   "flatAngle": 2.214297435588181,
+   "zOff": 0.1,
+   "scale": 1.76
+  },
+  {
+   "kind": "decalBankPlaque",
+   "x": 34.45,
+   "y": 7.506,
+   "flat": true,
+   "flatAngle": 1.5707963267948966,
+   "zOff": 0.6
+  },
+  {
+   "kind": "decalCosmosPoster",
+   "x": 33.815,
+   "y": 3.386,
+   "flat": true,
+   "flatAngle": 0.7853981633974483,
+   "scale": 1.93
+  },
+  {
+   "kind": "stdkey",
+   "x": 32.53607313368055,
+   "y": 12.30802476671007,
+   "flat": false,
+   "flatAngle": 1.5707963267948966,
+   "flatGround": true
+  },
+  {
+   "kind": "safe",
+   "x": 24.072005019371787,
+   "y": 1.6751431784768398,
+   "flat": true,
+   "flatAngle": 0
+  },
+  {
+   "kind": "wpn_ar7",
+   "x": 25.021158707287622,
+   "y": 0.7090403175625081
+  },
+  {
+   "kind": "medkit",
+   "x": 24.12285253836728,
+   "y": 3.0480261913551012
+  },
+  {
+   "kind": "desk",
+   "x": 18.541011555989584,
+   "y": 0.742592536078559
+  },
+  {
+   "kind": "bar",
+   "x": 17.463233778211805,
+   "y": 1.3537036471896702,
+   "zOff": 0
+  },
+  {
+   "kind": "microfichemachine",
+   "x": 19.641011555989582,
+   "y": 0.8648147583007812
+  },
+  {
+   "kind": "ciphermachine",
+   "x": 20.71878933376736,
+   "y": 1.5203703138563367
+  },
+  {
+   "kind": "agent",
+   "x": 23.541011555989584,
+   "y": 11.09321017795139
+  },
+  {
+   "kind": "pinetree",
+   "x": 42.33653998402461,
+   "y": 18.139001794798535
+  },
+  {
+   "kind": "pinetree",
+   "x": 44.11915971760893,
+   "y": 17.921609144361422
+  },
+  {
+   "kind": "pinetree",
+   "x": 44.98873031935737,
+   "y": 16.856385157219574
+  },
+  {
+   "kind": "pinetree",
+   "x": 45.79308312597469,
+   "y": 13.9868021714497
+  },
+  {
+   "kind": "pinetree",
+   "x": 47.05396049850993,
+   "y": 11.660700811772605
+  },
+  {
+   "kind": "pinetree",
+   "x": 45.466994150319024,
+   "y": 15.508550724509481
+  },
+  {
+   "kind": "pinetree",
+   "x": 46.22786842684891,
+   "y": 16.682471036869885
+  },
+  {
+   "kind": "pinetree",
+   "x": 45.18438370475077,
+   "y": 19.247704312027803
+  },
+  {
+   "kind": "pinetree",
+   "x": 44.293073837958616,
+   "y": 19.573793287683472
+  },
+  {
+   "kind": "pinetree",
+   "x": 43.40176397116646,
+   "y": 19.18248651689667
+  },
+  {
+   "kind": "pinetree",
+   "x": 43.532199561428726,
+   "y": 17.312909723137512
+  },
+  {
+   "kind": "pinetree",
+   "x": 45.42351562023159,
+   "y": 17.70421649392431
+  },
+  {
+   "kind": "pinetree",
+   "x": 46.314825487023754,
+   "y": 18.921615336372135
+  },
+  {
+   "kind": "pinetree",
+   "x": 45.40177635518789,
+   "y": 20.595538744737897
+  },
+  {
+   "kind": "pinetree",
+   "x": 37.010420048315375,
+   "y": 17.073777807656686
+  },
+  {
+   "kind": "pinetree",
+   "x": 35.48867149525559,
+   "y": 16.22594647095195
+  },
+  {
+   "kind": "pinetree",
+   "x": 36.48867768726631,
+   "y": 15.791161170077727
+  },
+  {
+   "kind": "pinetree",
+   "x": 36.40172062709146,
+   "y": 13.530277605531765
+  },
+  {
+   "kind": "pinetree",
+   "x": 37.162594903621354,
+   "y": 14.769415713023301
+  },
+  {
+   "kind": "pinetree",
+   "x": 38.336515215981755,
+   "y": 13.160710099788675
+  },
+  {
+   "kind": "pinetree",
+   "x": 39.57565332347329,
+   "y": 12.030268317515695
+  },
+  {
+   "kind": "pinetree",
+   "x": 37.66259799962671,
+   "y": 11.986789787428272
+  },
+  {
+   "kind": "pinetree",
+   "x": 39.2060858177302,
+   "y": 10.725912414893024
+  },
+  {
+   "kind": "pinetree",
+   "x": 41.98871174332523,
+   "y": 10.725912414893024
+  },
+  {
+   "kind": "pinetree",
+   "x": 43.51046029638502,
+   "y": 10.334605644106222
+  },
+  {
+   "kind": "pinetree",
+   "x": 40.314788334959474,
+   "y": 10.573737559587046
+  },
+  {
+   "kind": "pinetree",
+   "x": 40.51044172035287,
+   "y": 11.638961546728895,
+   "zOff": -0.1
+  },
+  {
+   "kind": "guardpost",
+   "x": 46.42352181224231,
+   "y": 12.378096558215072
+  },
+  {
+   "kind": "agent005",
+   "x": 34.01040147228323,
+   "y": 10.820115288605196
+  },
+  {
+   "kind": "sportscar",
+   "x": 37.923469180151244,
+   "y": 19.43127995938041
   }
  ],
  "blown": false,
@@ -520,6 +977,490 @@
    {
     "x": 30,
     "y": 10
+   },
+   {
+    "x": 26,
+    "y": 3
+   },
+   {
+    "x": 25.44,
+    "y": 3.67
+   },
+   {
+    "x": 25,
+    "y": 3.25
+   },
+   {
+    "x": 25.75,
+    "y": 2.75
+   },
+   {
+    "x": 34.5,
+    "y": 5.5
+   },
+   {
+    "x": 34.5,
+    "y": 7
+   },
+   {
+    "x": 35,
+    "y": 5.5
+   },
+   {
+    "x": 35,
+    "y": 7
+   },
+   {
+    "x": 35,
+    "y": 5.75
+   },
+   {
+    "x": 35,
+    "y": 6.75
+   },
+   {
+    "x": 35.25,
+    "y": 6.75
+   },
+   {
+    "x": 35.25,
+    "y": 5.75
+   },
+   {
+    "x": 35.25,
+    "y": 6
+   },
+   {
+    "x": 35.25,
+    "y": 6.5
+   },
+   {
+    "x": 35.5,
+    "y": 6.5
+   },
+   {
+    "x": 35.5,
+    "y": 6
+   },
+   {
+    "x": 35.5,
+    "y": 4
+   },
+   {
+    "x": 42.5,
+    "y": 4
+   },
+   {
+    "x": 42.5,
+    "y": 9
+   },
+   {
+    "x": 40,
+    "y": 9
+   },
+   {
+    "x": 35.5,
+    "y": 9
+   },
+   {
+    "x": 39,
+    "y": 9
+   },
+   {
+    "x": 39,
+    "y": 9.5
+   },
+   {
+    "x": 40,
+    "y": 9.5
+   },
+   {
+    "x": 38,
+    "y": 10.5
+   },
+   {
+    "x": 35.25,
+    "y": 12.25
+   },
+   {
+    "x": 35.25,
+    "y": 14.5
+   },
+   {
+    "x": 33.5,
+    "y": 16.75
+   },
+   {
+    "x": 35.5,
+    "y": 18
+   },
+   {
+    "x": 41.5,
+    "y": 18.75
+   },
+   {
+    "x": 45.25,
+    "y": 22
+   },
+   {
+    "x": 47.25,
+    "y": 19.5
+   },
+   {
+    "x": 47,
+    "y": 16.75
+   },
+   {
+    "x": 46.75,
+    "y": 12.75
+   },
+   {
+    "x": 48,
+    "y": 11.25
+   },
+   {
+    "x": 45.5,
+    "y": 10.25
+   },
+   {
+    "x": 44,
+    "y": 9.5
+   },
+   {
+    "x": 37.008,
+    "y": 18.188
+   },
+   {
+    "x": 39.5,
+    "y": 18.5
+   },
+   {
+    "x": 47.181,
+    "y": 10.922
+   },
+   {
+    "x": 37.75,
+    "y": 17.25
+   },
+   {
+    "x": 38,
+    "y": 16.5
+   },
+   {
+    "x": 39,
+    "y": 15.25
+   },
+   {
+    "x": 39.25,
+    "y": 14.5
+   },
+   {
+    "x": 39.5,
+    "y": 14
+   },
+   {
+    "x": 40.5,
+    "y": 13.25
+   },
+   {
+    "x": 41.25,
+    "y": 12
+   },
+   {
+    "x": 42.75,
+    "y": 11.5
+   },
+   {
+    "x": 46,
+    "y": 11.75
+   },
+   {
+    "x": 45.75,
+    "y": 13
+   },
+   {
+    "x": 45.25,
+    "y": 14
+   },
+   {
+    "x": 44.75,
+    "y": 15.25
+   },
+   {
+    "x": 44,
+    "y": 16.25
+   },
+   {
+    "x": 42.75,
+    "y": 17
+   },
+   {
+    "x": 42.25,
+    "y": 17.25
+   },
+   {
+    "x": 41,
+    "y": 17.5
+   },
+   {
+    "x": 40,
+    "y": 18
+   },
+   {
+    "x": 35.25,
+    "y": 19.25
+   },
+   {
+    "x": 35,
+    "y": 20.25
+   },
+   {
+    "x": 34,
+    "y": 22.25
+   },
+   {
+    "x": 33.25,
+    "y": 24.75
+   },
+   {
+    "x": 35,
+    "y": 25.5
+   },
+   {
+    "x": 39,
+    "y": 25
+   },
+   {
+    "x": 39.75,
+    "y": 21
+   },
+   {
+    "x": 45.25,
+    "y": 9.5
+   },
+   {
+    "x": 44.75,
+    "y": 9.25
+   },
+   {
+    "x": 45.25,
+    "y": 8.25
+   },
+   {
+    "x": 45,
+    "y": 6.75
+   },
+   {
+    "x": 45.75,
+    "y": 5.75
+   },
+   {
+    "x": 46,
+    "y": 4.5
+   },
+   {
+    "x": 45.25,
+    "y": 2.75
+   },
+   {
+    "x": 46.25,
+    "y": 1.75
+   },
+   {
+    "x": 47.25,
+    "y": 1.25
+   },
+   {
+    "x": 47.75,
+    "y": 2
+   },
+   {
+    "x": 47.75,
+    "y": 2.75
+   },
+   {
+    "x": 47.5,
+    "y": 4.5
+   },
+   {
+    "x": 47.5,
+    "y": 6.25
+   },
+   {
+    "x": 47.5,
+    "y": 8.75
+   },
+   {
+    "x": 48,
+    "y": 9.75
+   },
+   {
+    "x": 24,
+    "y": 3.75
+   },
+   {
+    "x": 22.5,
+    "y": 2
+   },
+   {
+    "x": 25,
+    "y": 0.25
+   },
+   {
+    "x": 26.5,
+    "y": 1.75
+   },
+   {
+    "x": 29,
+    "y": 2.5
+   },
+   {
+    "x": 30,
+    "y": 2.5
+   },
+   {
+    "x": 29,
+    "y": 2.25
+   },
+   {
+    "x": 30,
+    "y": 2.25
+   },
+   {
+    "x": 28.75,
+    "y": 2.25
+   },
+   {
+    "x": 28.75,
+    "y": 0.75
+   },
+   {
+    "x": 31.75,
+    "y": 0.75
+   },
+   {
+    "x": 31.75,
+    "y": 0.25
+   },
+   {
+    "x": 42,
+    "y": 0.25
+   },
+   {
+    "x": 33,
+    "y": 2.25
+   },
+   {
+    "x": 33,
+    "y": 1
+   },
+   {
+    "x": 42,
+    "y": 1
+   },
+   {
+    "x": 31.5,
+    "y": 10
+   },
+   {
+    "x": 32.5,
+    "y": 10
+   },
+   {
+    "x": 31.5,
+    "y": 10.25
+   },
+   {
+    "x": 32.5,
+    "y": 10.25
+   },
+   {
+    "x": 31.25,
+    "y": 10.5
+   },
+   {
+    "x": 31.25,
+    "y": 11.25
+   },
+   {
+    "x": 31.5,
+    "y": 11.5
+   },
+   {
+    "x": 32,
+    "y": 11.5
+   },
+   {
+    "x": 32,
+    "y": 13
+   },
+   {
+    "x": 33,
+    "y": 13
+   },
+   {
+    "x": 33,
+    "y": 11.5
+   },
+   {
+    "x": 34,
+    "y": 11.5
+   },
+   {
+    "x": 35,
+    "y": 11
+   },
+   {
+    "x": 35,
+    "y": 10
+   },
+   {
+    "x": 34,
+    "y": 10
+   },
+   {
+    "x": 33,
+    "y": 10.25
+   },
+   {
+    "x": 18.5,
+    "y": 2.75
+   },
+   {
+    "x": 19.5,
+    "y": 2.75
+   },
+   {
+    "x": 18,
+    "y": 2
+   },
+   {
+    "x": 17,
+    "y": 2
+   },
+   {
+    "x": 17,
+    "y": 0.75
+   },
+   {
+    "x": 18,
+    "y": 0.25
+   },
+   {
+    "x": 20,
+    "y": 0.25
+   },
+   {
+    "x": 21,
+    "y": 1
+   },
+   {
+    "x": 21,
+    "y": 2
+   },
+   {
+    "x": 20,
+    "y": 2
    }
   ],
   "sectors": [
@@ -557,7 +1498,7 @@
      0
     ],
     "floor": 0.5,
-    "ceil": 1.9,
+    "ceil": 2.3,
     "floorTex": "carpet",
     "ceilTex": "riverstone",
     "sky": true,
@@ -774,7 +1715,7 @@
     "ceilTex": "riverstone",
     "sky": true,
     "win": false,
-    "hostile": false,
+    "hostile": true,
     "texScale": 1,
     "wallTex": [
      "riverstone",
@@ -859,6 +1800,18 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "redbanner",
+     "redbanner",
+     null,
+     "redbanner",
+     null,
+     null,
+     null,
+     "redbanner",
+     "redbanner",
+     null
+    ],
     "parent": -1
    },
    {
@@ -884,6 +1837,20 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "redbanner",
+     "redbanner",
+     null,
+     "redbanner",
+     "redbanner",
+     null,
+     "redbanner",
+     "redbanner",
+     null,
+     "redbanner",
+     "redbanner",
+     null
+    ],
     "parent": -1
    },
    {
@@ -926,6 +1893,16 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     null,
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     null
+    ],
     "parent": -1
    },
    {
@@ -947,6 +1924,16 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     null
+    ],
     "parent": -1
    },
    {
@@ -959,22 +1946,768 @@
      76,
      81,
      82,
+     90,
+     89,
      83,
+     172,
+     173,
      84,
      85,
+     93,
+     94,
      86,
      87,
+     185,
+     184,
      88,
      75
     ],
     "floor": -0.4,
     "ceil": 1.6,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": true,
     "win": false,
     "hostile": false,
+    "texScale": 0.5,
+    "wallTex": [
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     null,
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     null,
+     "brownstone",
+     "brownstone"
+    ],
+    "wallStepTex": [
+     null,
+     null,
+     null,
+     null,
+     "brownstone",
+     null,
+     null,
+     null,
+     "brownstone",
+     null,
+     null,
+     "brownstone",
+     null,
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     null,
+     null,
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     null,
+     "brownstone"
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     null,
+     "brownstone",
+     null,
+     null,
+     null,
+     "brownstone",
+     null,
+     null,
+     "brownstone",
+     null,
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     null,
+     null,
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     null,
+     "brownstone"
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     90,
+     91,
+     92,
+     89
+    ],
+    "floor": -0.3,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
     "texScale": 1,
+    "wallDoor": [
+     null,
+     "stdkey",
+     null,
+     null
+    ],
+    "wallDoorSkin": [
+     null,
+     "doorred",
+     null,
+     null
+    ],
+    "wallTex": [
+     "brownstone",
+     null,
+     "brownstone",
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     93,
+     95,
+     97,
+     98,
+     96,
+     94
+    ],
+    "floor": -0.2,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     null,
+     "brownstone",
+     null,
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     97,
+     100,
+     101,
+     102,
+     99,
+     98
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     101,
+     104,
+     103,
+     102
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     104,
+     105,
+     106,
+     107,
+     108,
+     110,
+     109,
+     103
+    ],
+    "floor": -0.1,
+    "ceil": 1.1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     108,
+     112,
+     111,
+     110
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     112,
+     125,
+     124,
+     128,
+     123,
+     122,
+     121,
+     120,
+     119,
+     118,
+     127,
+     126,
+     117,
+     116,
+     115,
+     114,
+     113,
+     111
+    ],
+    "floor": -0.6,
+    "ceil": 2.8,
+    "floorTex": "lawngrass",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "skyTex": "sunset",
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "rockwall",
+     "rockwall",
+     null,
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     null,
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     null
+    ],
+    "wallStepTex": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     "rockwall"
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     "rockwall"
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     126,
+     129,
+     130,
+     131,
+     132,
+     133,
+     134,
+     135,
+     136,
+     124,
+     128,
+     137,
+     138,
+     139,
+     140,
+     141,
+     142,
+     143,
+     144,
+     145,
+     127
+    ],
+    "floor": -0.7,
+    "ceil": 2.8,
+    "floorTex": "water",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "skyTex": "sunset",
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallOpen": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     false,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true
+    ],
+    "wallTex": [
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     null,
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     null
+    ],
+    "wallStepTex": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     "rockwall"
+    ],
+    "wallStepFloorTex": [
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     null,
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall"
+    ],
+    "parent": 16
+   },
+   {
+    "loop": [
+     127,
+     152,
+     151,
+     150,
+     149,
+     148,
+     147,
+     146,
+     126
+    ],
+    "floor": -0.7,
+    "ceil": 2.8,
+    "floorTex": "water",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "skyTex": "sunset",
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     124,
+     153,
+     154,
+     155,
+     156,
+     157,
+     158,
+     159,
+     160,
+     161,
+     162,
+     163,
+     164,
+     165,
+     166,
+     167,
+     128
+    ],
+    "floor": -6,
+    "ceil": 2.9,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": true,
+    "skyTex": "sunset",
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     null,
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     "rockwall",
+     null
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     "water"
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     91,
+     168,
+     169,
+     170,
+     171,
+     92
+    ],
+    "floor": -0.2,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     172,
+     174,
+     175,
+     173
+    ],
+    "floor": -0.2,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallStepFloorTex": [
+     null,
+     "brownstone",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     174,
+     176,
+     177,
+     178,
+     179,
+     180,
+     183,
+     182,
+     181,
+     175
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "wood",
+    "ceilTex": "woodpaneling",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 0.5,
+    "wallTex": [
+     null,
+     "bookshelf",
+     "bookshelf",
+     "bookshelf",
+     "bookshelf",
+     "bookshelf",
+     "bookshelf",
+     "bookshelf",
+     "bookshelf"
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     185,
+     187,
+     186,
+     184
+    ],
+    "floor": -0.3,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "brownstone",
+     null,
+     "brownstone",
+     null
+    ],
+    "wallStepFloorTex": [
+     null,
+     "brownstone",
+     null,
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     187,
+     199,
+     198,
+     197,
+     196,
+     195,
+     194,
+     193,
+     192,
+     191,
+     190,
+     189,
+     188,
+     186
+    ],
+    "floor": -0.2,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "brownstone",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone"
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     50,
+     200,
+     201,
+     51
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "redbanner",
+     null,
+     "redbanner",
+     null
+    ],
+    "parent": -1
+   },
+   {
+    "loop": [
+     200,
+     202,
+     203,
+     204,
+     205,
+     206,
+     207,
+     208,
+     209,
+     201
+    ],
+    "floor": 0,
+    "ceil": 2,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     "redbanner",
+     null
+    ],
     "parent": -1
    }
   ]
