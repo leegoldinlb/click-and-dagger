@@ -221,16 +221,17 @@
   },
   {
    "kind": "decalTramStopSign",
-   "x": 25.15,
-   "y": 4.81,
+   "x": 25.05,
+   "y": 4.885,
    "flat": true,
    "flatGround": false,
-   "flatAngle": 1.5707963267948966,
-   "zOff": 0.5
+   "flatAngle": -1.5707963267948966,
+   "zOff": 0.5,
+   "scale": 0.96
   },
   {
    "kind": "decalCinemaPoster",
-   "x": 30.697,
+   "x": 32.449,
    "y": 2.55,
    "flat": true,
    "flatGround": false,
@@ -248,16 +249,17 @@
   },
   {
    "kind": "decalFactoryPoster",
-   "x": 31.997,
+   "x": 28.5,
    "y": 2.55,
    "flat": true,
    "flatGround": false,
    "flatAngle": 0,
-   "zOff": 0.8
+   "zOff": 1.5,
+   "scale": 0.89
   },
   {
    "kind": "decalCosmosPoster",
-   "x": 28.029,
+   "x": 30.026,
    "y": 2.55,
    "flat": true,
    "flatGround": false,
@@ -276,12 +278,13 @@
   },
   {
    "kind": "decalBankPlaque",
-   "x": 30.97,
-   "y": 9.85,
+   "x": 30.731,
+   "y": 9.95,
    "flat": true,
    "flatGround": false,
    "flatAngle": 3.141592653589793,
-   "zOff": 0.5
+   "zOff": 0.5,
+   "scale": 1.04
   },
   {
    "kind": "phonebooth",
@@ -295,8 +298,8 @@
   },
   {
    "kind": "watch",
-   "x": 25.78387149221999,
-   "y": 1.6242956594813487
+   "x": 28.94871794871795,
+   "y": 0.717948717948718
   },
   {
    "kind": "kgbheadquarters",
@@ -310,16 +313,13 @@
    "solid": false
   },
   {
-   "kind": "book",
-   "x": 41.54,
-   "y": 0.4
-  },
-  {
    "kind": "oaktree",
-   "x": 24.49269419727723,
-   "y": 4.289364507697022,
+   "x": 24.433,
+   "y": 3.478,
    "zOff": 0.8,
-   "solid": false
+   "solid": false,
+   "flat": true,
+   "flatAngle": 2.677945044588987
   },
   {
    "kind": "oaktree",
@@ -354,8 +354,8 @@
   },
   {
    "kind": "sovietscientist",
-   "x": 29.322482051073386,
-   "y": 1.1836171615204254,
+   "x": 32.743589743589745,
+   "y": 1.5769230769230769,
    "behavior": "stationary"
   },
   {
@@ -424,22 +424,14 @@
    "flatGround": true
   },
   {
-   "kind": "safe",
-   "x": 24.39903564453125,
-   "y": 1.6981480916341145,
-   "flat": false,
-   "flatAngle": 0,
-   "flatGround": true
-  },
-  {
    "kind": "wpn_ar7",
-   "x": 25.021158707287622,
-   "y": 0.7090403175625081
+   "x": 24.94871794871795,
+   "y": 0.7435897435897436
   },
   {
    "kind": "medkit",
-   "x": 24.12285253836728,
-   "y": 3.0480261913551012
+   "x": 24.07638888888889,
+   "y": 2.9027777777777777
   },
   {
    "kind": "desk",
@@ -454,13 +446,13 @@
   },
   {
    "kind": "microfichemachine",
-   "x": 32.53671668137126,
-   "y": 1.6208331031269645
+   "x": 37.51282051282051,
+   "y": 1.4743589743589745
   },
   {
    "kind": "ciphermachine",
-   "x": 20.72372775607639,
-   "y": 1.4092592027452258
+   "x": 23.520833333333332,
+   "y": 1.9166666666666667
   },
   {
    "kind": "agent",
@@ -544,8 +536,8 @@
   },
   {
    "kind": "pinetree",
-   "x": 36.461849964025426,
-   "y": 14.758021693024173
+   "x": 35.96153846153846,
+   "y": 14.378205128205128
   },
   {
    "kind": "pinetree",
@@ -554,54 +546,43 @@
   },
   {
    "kind": "pinetree",
-   "x": 36.40172062709146,
-   "y": 13.530277605531765
+   "x": 35.76923076923077,
+   "y": 12.89102564102564
   },
   {
    "kind": "pinetree",
-   "x": 37.162594903621354,
-   "y": 14.769415713023301
+   "x": 38.15384615384615,
+   "y": 15.416666666666666
   },
   {
    "kind": "pinetree",
-   "x": 38.336515215981755,
-   "y": 13.160710099788675
+   "x": 38.705128205128204,
+   "y": 14.647435897435898
   },
   {
    "kind": "pinetree",
-   "x": 39.57565332347329,
-   "y": 12.030268317515695
+   "x": 37.46153846153846,
+   "y": 11.467948717948717
   },
   {
    "kind": "pinetree",
-   "x": 37.66259799962671,
-   "y": 11.986789787428272
+   "x": 39.02564102564103,
+   "y": 11.467948717948717
   },
   {
    "kind": "pinetree",
-   "x": 39.2060858177302,
-   "y": 10.725912414893024
+   "x": 41.98717948717949,
+   "y": 10.89102564102564
   },
   {
    "kind": "pinetree",
-   "x": 41.98871174332523,
-   "y": 10.725912414893024
+   "x": 43.41025641025641,
+   "y": 10.429487179487179
   },
   {
    "kind": "pinetree",
-   "x": 43.51046029638502,
-   "y": 10.334605644106222
-  },
-  {
-   "kind": "pinetree",
-   "x": 40.314788334959474,
-   "y": 10.573737559587046
-  },
-  {
-   "kind": "pinetree",
-   "x": 40.51044172035287,
-   "y": 11.638961546728895,
-   "zOff": -0.1
+   "x": 40.5,
+   "y": 11.416666666666666
   },
   {
    "kind": "guardpost",
@@ -615,13 +596,13 @@
   },
   {
    "kind": "letter",
-   "x": 30.62945115362619,
-   "y": 11.272141661130679
+   "x": 41.5,
+   "y": 0.5897435897435898
   },
   {
    "kind": "personnelfile",
-   "x": 19.7574980659246,
-   "y": 0.675141971565514
+   "x": 20.41025641025641,
+   "y": 1.2692307692307692
   },
   {
    "kind": "sportscar",
@@ -648,8 +629,153 @@
   },
   {
    "kind": "microfiche",
-   "x": 35.84979643716328,
-   "y": 4.221285693755906
+   "x": 19.243589743589745,
+   "y": 1.564102564102564
+  },
+  {
+   "kind": "soviet",
+   "x": 42.08974358974359,
+   "y": 9.788461538461538
+  },
+  {
+   "kind": "soviet",
+   "x": 43.87179487179487,
+   "y": 9.775641025641026
+  },
+  {
+   "kind": "soviet",
+   "x": 46.42307692307692,
+   "y": 13.51923076923077
+  },
+  {
+   "kind": "soviet",
+   "x": 46.46153846153846,
+   "y": 15.423076923076923
+  },
+  {
+   "kind": "soviet",
+   "x": 46.02564102564103,
+   "y": 19.884615384615383
+  },
+  {
+   "kind": "soviet",
+   "x": 37.69230769230769,
+   "y": 16.53205128205128
+  },
+  {
+   "kind": "soviet",
+   "x": 36.62820512820513,
+   "y": 13.647435897435898
+  },
+  {
+   "kind": "soviet",
+   "x": 36.55128205128205,
+   "y": 12.384615384615385
+  },
+  {
+   "kind": "soviet",
+   "x": 38.256410256410255,
+   "y": 11.064102564102564
+  },
+  {
+   "kind": "soviet",
+   "x": 39.61538461538461,
+   "y": 13.057692307692308
+  },
+  {
+   "kind": "soviet",
+   "x": 42.85897435897436,
+   "y": 9.775641025641026
+  },
+  {
+   "kind": "soviet",
+   "x": 44.37179487179487,
+   "y": 16.852564102564102
+  },
+  {
+   "kind": "soviet",
+   "x": 44.87179487179487,
+   "y": 18.185897435897434
+  },
+  {
+   "kind": "soviet",
+   "x": 41.38461538461539,
+   "y": 18.096153846153847
+  },
+  {
+   "kind": "soviet",
+   "x": 43.47435897435897,
+   "y": 18.326923076923077
+  },
+  {
+   "kind": "soviet",
+   "x": 46.217948717948715,
+   "y": 17.814102564102566
+  },
+  {
+   "kind": "soviet",
+   "x": 36.69871794871795,
+   "y": 7.487179487179487
+  },
+  {
+   "kind": "soviet",
+   "x": 36.67307692307692,
+   "y": 5
+  },
+  {
+   "kind": "soviet",
+   "x": 38.3974358974359,
+   "y": 4.961538461538462
+  },
+  {
+   "kind": "soviet",
+   "x": 38.3525641025641,
+   "y": 7.461538461538462
+  },
+  {
+   "kind": "brute",
+   "x": 39.955128205128204,
+   "y": 6.294871794871795
+  },
+  {
+   "kind": "microfichemachine",
+   "x": 39.51282051282051,
+   "y": 1.4487179487179487
+  },
+  {
+   "kind": "soviet",
+   "x": 39.92948717948718,
+   "y": 4.961538461538462
+  },
+  {
+   "kind": "soviet",
+   "x": 40.044871794871796,
+   "y": 7.512820512820513
+  },
+  {
+   "kind": "medkit",
+   "x": 41.75,
+   "y": 2.423076923076923
+  },
+  {
+   "kind": "ammo",
+   "x": 40.62179487179487,
+   "y": 2.448717948717949
+  },
+  {
+   "kind": "medkit",
+   "x": 39.62179487179487,
+   "y": 2.448717948717949
+  },
+  {
+   "kind": "keycard",
+   "x": 25.79861111111111,
+   "y": 1.7083333333333333
+  },
+  {
+   "kind": "wpn_golden",
+   "x": 18.564102564102566,
+   "y": 1.435897435897436
   }
  ],
  "blown": false,
@@ -875,7 +1001,7 @@
    },
    {
     "x": 20.5,
-    "y": 4.5
+    "y": 4.75
    },
    {
     "x": 20.5,
@@ -886,8 +1012,8 @@
     "y": 5.5
    },
    {
-    "x": 24,
-    "y": 4.5
+    "x": 23.5,
+    "y": 4.75
    },
    {
     "x": 17.5,
@@ -1046,63 +1172,63 @@
     "y": 7
    },
    {
-    "x": 35,
-    "y": 5.75
-   },
-   {
-    "x": 35,
-    "y": 6.75
+    "x": 35.25,
+    "y": 5.25
    },
    {
     "x": 35.25,
-    "y": 6.75
-   },
-   {
-    "x": 35.25,
-    "y": 5.75
-   },
-   {
-    "x": 35.25,
-    "y": 6
-   },
-   {
-    "x": 35.25,
-    "y": 6.5
+    "y": 7.5
    },
    {
     "x": 35.5,
-    "y": 6.5
+    "y": 7.5
    },
    {
     "x": 35.5,
-    "y": 6
+    "y": 5.25
    },
    {
-    "x": 35.5,
-    "y": 4
+    "x": 35.75,
+    "y": 5.25
    },
    {
-    "x": 42.5,
-    "y": 4
+    "x": 35.75,
+    "y": 7.75
    },
    {
-    "x": 42.5,
-    "y": 9
+    "x": 36,
+    "y": 7.75
+   },
+   {
+    "x": 36,
+    "y": 5.25
+   },
+   {
+    "x": 36,
+    "y": 5
+   },
+   {
+    "x": 41,
+    "y": 4.75
+   },
+   {
+    "x": 41,
+    "y": 8
    },
    {
     "x": 40,
     "y": 9
    },
    {
-    "x": 35.5,
+    "x": 36,
+    "y": 8
+   },
+   {
+    "x": 37,
     "y": 9
    },
    {
-    "x": 39,
-    "y": 9
-   },
-   {
-    "x": 39,
+    "x": 37.25,
     "y": 9.5
    },
    {
@@ -1346,27 +1472,27 @@
     "y": 1.75
    },
    {
-    "x": 29,
+    "x": 31,
     "y": 2.5
    },
    {
-    "x": 30,
+    "x": 32,
     "y": 2.5
    },
    {
-    "x": 29,
+    "x": 31,
     "y": 2.25
    },
    {
-    "x": 30,
+    "x": 32,
     "y": 2.25
    },
    {
-    "x": 28.75,
+    "x": 30.75,
     "y": 2.25
    },
    {
-    "x": 28.75,
+    "x": 30.75,
     "y": 0.75
    },
    {
@@ -1552,6 +1678,206 @@
    {
     "x": 36.75,
     "y": 18.75
+   },
+   {
+    "x": 37,
+    "y": 4
+   },
+   {
+    "x": 40,
+    "y": 4
+   },
+   {
+    "x": 37,
+    "y": 5
+   },
+   {
+    "x": 37,
+    "y": 5.25
+   },
+   {
+    "x": 37.25,
+    "y": 5.25
+   },
+   {
+    "x": 37.25,
+    "y": 5
+   },
+   {
+    "x": 39,
+    "y": 5
+   },
+   {
+    "x": 39,
+    "y": 5.25
+   },
+   {
+    "x": 39.25,
+    "y": 5.25
+   },
+   {
+    "x": 39.25,
+    "y": 5
+   },
+   {
+    "x": 37,
+    "y": 7.5
+   },
+   {
+    "x": 37,
+    "y": 7.75
+   },
+   {
+    "x": 37.25,
+    "y": 7.75
+   },
+   {
+    "x": 37.25,
+    "y": 7.5
+   },
+   {
+    "x": 39,
+    "y": 7.5
+   },
+   {
+    "x": 39,
+    "y": 7.75
+   },
+   {
+    "x": 39.25,
+    "y": 7.75
+   },
+   {
+    "x": 39.25,
+    "y": 7.5
+   },
+   {
+    "x": 37,
+    "y": 2
+   },
+   {
+    "x": 38,
+    "y": 1
+   },
+   {
+    "x": 37,
+    "y": 1
+   },
+   {
+    "x": 38,
+    "y": 2
+   },
+   {
+    "x": 39,
+    "y": 1
+   },
+   {
+    "x": 40,
+    "y": 1
+   },
+   {
+    "x": 39,
+    "y": 2
+   },
+   {
+    "x": 40,
+    "y": 2
+   },
+   {
+    "x": 28,
+    "y": 2.5
+   },
+   {
+    "x": 29,
+    "y": 2.5
+   },
+   {
+    "x": 28,
+    "y": 2.25
+   },
+   {
+    "x": 29,
+    "y": 2.25
+   },
+   {
+    "x": 26.5,
+    "y": 0.25
+   },
+   {
+    "x": 29.75,
+    "y": 0.25
+   },
+   {
+    "x": 29.75,
+    "y": 1.75
+   },
+   {
+    "x": 29,
+    "y": 1.75
+   },
+   {
+    "x": 38,
+    "y": 4
+   },
+   {
+    "x": 39,
+    "y": 4
+   },
+   {
+    "x": 38,
+    "y": 2.25
+   },
+   {
+    "x": 42.25,
+    "y": 2.25
+   },
+   {
+    "x": 41,
+    "y": 6
+   },
+   {
+    "x": 41,
+    "y": 7
+   },
+   {
+    "x": 44,
+    "y": 7
+   },
+   {
+    "x": 44,
+    "y": 0.75
+   },
+   {
+    "x": 43,
+    "y": 6
+   },
+   {
+    "x": 43,
+    "y": 0.75
+   },
+   {
+    "x": 39,
+    "y": 3
+   },
+   {
+    "x": 42.25,
+    "y": 3
+   },
+   {
+    "x": 36.25,
+    "y": 8.25
+   },
+   {
+    "x": 36.75,
+    "y": 8.75
+   },
+   {
+    "x": 34.75,
+    "y": 9.5
+   },
+   {
+    "x": 35.25,
+    "y": 9.75
    }
   ],
   "sectors": [
@@ -1592,7 +1918,7 @@
     ],
     "floor": 0.5,
     "ceil": 2.3,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "riverstone",
     "sky": true,
     "win": false,
@@ -1658,6 +1984,8 @@
      "riverstone",
      "riverstone",
      "redbanner",
+     "riverstone",
+     "riverstone",
      "riverstone"
     ],
     "wallTexScale": [
@@ -1721,7 +2049,7 @@
      null,
      null,
      null,
-     null,
+     "riverstone",
      null
     ],
     "wallDecal": [
@@ -1767,7 +2095,7 @@
     ],
     "floor": 0,
     "ceil": 1.4,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "riverstone",
     "sky": false,
     "win": false,
@@ -1804,7 +2132,7 @@
     ],
     "floor": 0,
     "ceil": 2,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "riverstone",
     "sky": true,
     "win": false,
@@ -1864,12 +2192,20 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     null,
+     null,
+     null,
+     null,
+     "brownstone",
+     null
+    ],
     "parent": -1
    },
    {
@@ -1887,7 +2223,7 @@
     ],
     "floor": 0.1,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
@@ -1899,7 +2235,7 @@
      null,
      "redbanner",
      null,
-     null,
+     "brownstone",
      null,
      "redbanner",
      "redbanner",
@@ -1924,12 +2260,40 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallDoor": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     "keycard",
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
+    "wallDoorSkin": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     "doorelevatorplain",
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ],
     "wallTex": [
      "redbanner",
      "redbanner",
@@ -1959,12 +2323,22 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
-    "ceilTex": "ceiltile",
+    "floorTex": "concrete",
+    "ceilTex": "brownstone",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     null,
+     "brownstone",
+     "brownstone",
+     null
+    ],
     "parent": -1
    },
    {
@@ -1980,7 +2354,7 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
@@ -2011,7 +2385,7 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
@@ -2042,6 +2416,8 @@
      90,
      89,
      83,
+     250,
+     251,
      172,
      173,
      84,
@@ -2058,7 +2434,7 @@
     "floor": -0.4,
     "ceil": 1.6,
     "floorTex": "concrete",
-    "ceilTex": "ceiltile",
+    "ceilTex": "brownstone",
     "sky": true,
     "win": false,
     "hostile": false,
@@ -2083,7 +2459,9 @@
      "brownstone",
      "brownstone",
      "brownstone",
-     null,
+     "brownstone",
+     "brownstone",
+     "brownstone",
      "brownstone",
      "brownstone"
     ],
@@ -2105,7 +2483,9 @@
      "brownstone",
      "brownstone",
      null,
-     null,
+     "brownstone",
+     "brownstone",
+     "brownstone",
      "brownstone",
      "brownstone",
      "brownstone",
@@ -2130,7 +2510,9 @@
      "brownstone",
      "brownstone",
      null,
-     null,
+     "brownstone",
+     "brownstone",
+     "brownstone",
      "brownstone",
      "brownstone",
      "brownstone",
@@ -2148,7 +2530,7 @@
     ],
     "floor": -0.3,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
@@ -2185,12 +2567,20 @@
     ],
     "floor": -0.2,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "brownstone",
+     "brownstone",
+     null,
+     "brownstone",
+     "brownstone",
+     null
+    ],
     "wallStepFloorTex": [
      null,
      null,
@@ -2212,12 +2602,20 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     "brownstone",
+     null
+    ],
     "parent": -1
    },
    {
@@ -2229,33 +2627,112 @@
     ],
     "floor": 0,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     null,
+     null,
+     "brownstone",
+     null
+    ],
     "parent": -1
    },
    {
     "loop": [
      104,
      105,
+     224,
+     258,
+     260,
+     261,
+     269,
+     268,
+     259,
+     225,
      106,
+     262,
+     266,
+     267,
+     265,
+     264,
+     263,
      107,
      108,
      110,
+     271,
+     273,
+     272,
+     270,
      109,
      103
     ],
     "floor": -0.1,
     "ceil": 1.1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
-    "hostile": false,
+    "hostile": true,
     "texScale": 1,
+    "wallTex": [
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     null,
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair",
+     "lair"
+    ],
+    "wallStepFloorTex": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     "lair",
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     "lair"
+    ],
     "parent": -1
    },
    {
@@ -2273,6 +2750,12 @@
     "win": false,
     "hostile": false,
     "texScale": 1,
+    "wallTex": [
+     null,
+     null,
+     "lair",
+     null
+    ],
     "parent": -1
    },
    {
@@ -2633,7 +3116,7 @@
     ],
     "floor": -0.2,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
@@ -2650,7 +3133,7 @@
     ],
     "floor": -0.2,
     "ceil": 1,
-    "floorTex": "carpet",
+    "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": false,
     "win": false,
@@ -2673,6 +3156,14 @@
      179,
      180,
      183,
+     247,
+     249,
+     248,
+     246,
+     243,
+     245,
+     242,
+     244,
      182,
      181,
      175
@@ -2972,6 +3463,138 @@
     "floorTex": "concrete",
     "ceilTex": "ceiltile",
     "sky": true,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     229,
+     228,
+     227,
+     226
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "lair",
+     "lair",
+     "lair",
+     "lair"
+    ],
+    "parent": 14,
+    "solid": true
+   },
+   {
+    "loop": [
+     233,
+     232,
+     231,
+     230
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "lair",
+     "lair",
+     "lair",
+     "lair"
+    ],
+    "parent": 14,
+    "solid": true
+   },
+   {
+    "loop": [
+     237,
+     236,
+     235,
+     234
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "lair",
+     "lair",
+     "lair",
+     "lair"
+    ],
+    "parent": 14,
+    "solid": true
+   },
+   {
+    "loop": [
+     241,
+     240,
+     239,
+     238
+    ],
+    "floor": 0,
+    "ceil": 1,
+    "floorTex": "carpet",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "wallTex": [
+     "lair",
+     "lair",
+     "lair",
+     "lair"
+    ],
+    "parent": 14,
+    "solid": true
+   },
+   {
+    "loop": [
+     250,
+     252,
+     253,
+     251
+    ],
+    "floor": -0.3,
+    "ceil": 1,
+    "floorTex": "concrete",
+    "ceilTex": "ceiltile",
+    "sky": false,
+    "win": false,
+    "hostile": false,
+    "texScale": 1,
+    "parent": -1
+   },
+   {
+    "loop": [
+     252,
+     254,
+     255,
+     256,
+     257,
+     253
+    ],
+    "floor": -0.2,
+    "ceil": 1,
+    "floorTex": "concrete",
+    "ceilTex": "ceiltile",
+    "sky": false,
     "win": false,
     "hostile": false,
     "texScale": 1,
