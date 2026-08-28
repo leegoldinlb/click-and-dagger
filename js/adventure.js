@@ -48,6 +48,8 @@ const Adventure = (() => {
     switch (World.currentMission) {
       case 'cuba':                                          // escort the defector out
         return flags.defectorFollowing ? null : 'Not without the defector. He is why you came.';
+      case 'moscow':                                        // same escort, different city
+        return flags.defectorFollowing ? null : 'Not without the defector. You do not get a second trip to Moscow.';
       case 'tehran':                                        // escort Rostam out
         return flags.rostamFollowing ? null : 'Not without Rostam. Maheen is waiting on a husband.';
       case 'paris':                                         // leave with the egg
