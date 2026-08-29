@@ -32,6 +32,7 @@ const Editor = (() => {
     { kind: 'londonposterforeverday', name: 'FOREVER AND A DAY POSTER', spr: 'londonposterforeverday' },
     { kind: 'londonposterprivate', name: 'PRIVATE PERMISSION POSTER', spr: 'londonposterprivate' },
     { kind: 'londonposterthunderpussy', name: 'DR. THUNDERPUSSY POSTER', spr: 'londonposterthunderpussy' },
+    { kind: 'londonpostersloths', name: 'PLANET OF THE SLOTHS POSTER', spr: 'londonpostersloths' },
     // --- paris opera set ---
     { kind: 'parisphantom', name: 'THE PHANTOM', spr: 'parisphantom1' },
     { kind: 'parisoperachandelier', name: 'CRYSTAL CHANDELIER', spr: 'parisoperachandelier' },

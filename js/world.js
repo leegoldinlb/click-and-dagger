@@ -10839,6 +10839,7 @@ const World = (() => {
     londonposterforeverday: 'assets/sprites/londonposterforeverday.png?v=1',
     londonposterprivate: 'assets/sprites/londonposterprivate.png?v=1',
     londonposterthunderpussy: 'assets/sprites/londonposterthunderpussy.png?v=1',
+    londonpostersloths: 'assets/sprites/londonpostersloths.png?v=1',
     // --- paris opera set ---
     parisphantom1: 'assets/sprites/parisphantom1.png?v=1',
     parisphantom2: 'assets/sprites/parisphantom2.png?v=1',
@@ -12144,6 +12145,7 @@ const World = (() => {
     londonposterforeverday: (x, y) => prop('londonposterforeverday', 'FOREVER AND A DAY POSTER', x, y, 1.0, false),
     londonposterprivate: (x, y) => prop('londonposterprivate', 'PRIVATE PERMISSION POSTER', x, y, 1.0, false),
     londonposterthunderpussy: (x, y) => prop('londonposterthunderpussy', 'DR. THUNDERPUSSY POSTER', x, y, 1.0, false),
+    londonpostersloths: (x, y) => prop('londonpostersloths', 'PLANET OF THE SLOTHS POSTER', x, y, 1.0, false),
     // --- paris opera set ---
     parisphantom: (x, y) => prop('parisphantom', 'THE PHANTOM', x, y, 3.5, true, { pose: 1,
       getTex() { return SPR['parisphantom' + this.pose]; } }),

@@ -648,6 +648,7 @@ const Adventure = (() => {
       case 'londonposterforeverday': return 'A cinema poster: FOREVER AND A DAY, a grand romance across generations. Not your kind of picture.';
       case 'londonposterprivate': return 'A cinema poster: PRIVATE PERMISSION, A DOUBLE DEUCE ADVENTURE. The poster\'s idea of espionage involves considerably more tuxedo than yours does.';
       case 'londonposterthunderpussy': return 'A cinema poster: DR. THUNDERPUSSY, a spy-fi extravaganza. Somebody in this business has a bigger budget than you do.';
+      case 'londonpostersloths': return 'A cinema poster: PLANET OF THE SLOTHS, an apocalyptic vision of a world turned upside down. A statue in the sand, and not a fast animal in sight.';
       // --- paris opera set ---
       case 'parisphantom':
         if (e.pose === 3) return 'The mask hangs from his fingers. The face he was hiding is worse than the mask ever was, and he has stopped pretending otherwise.';
