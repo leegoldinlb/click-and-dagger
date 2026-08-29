@@ -10831,6 +10831,14 @@ const World = (() => {
   // arriving a few frames late just pops in with no special handling needed.
   // -------------------------------------------------------------------------
   const ART_ASSETS = {                                      // bump a path's ?v= whenever that file on disk changes
+    // --- london set ---
+    londonbigben: 'assets/sprites/londonbigben.png?v=1',
+    londonbuckingham: 'assets/sprites/londonbuckingham.png?v=1',
+    londonbus: 'assets/sprites/londonbus.png?v=1',
+    londontardis: 'assets/sprites/londontardis.png?v=1',
+    londonposterforeverday: 'assets/sprites/londonposterforeverday.png?v=1',
+    londonposterprivate: 'assets/sprites/londonposterprivate.png?v=1',
+    londonposterthunderpussy: 'assets/sprites/londonposterthunderpussy.png?v=1',
     // --- paris opera set ---
     parisphantom1: 'assets/sprites/parisphantom1.png?v=1',
     parisphantom2: 'assets/sprites/parisphantom2.png?v=1',
@@ -12128,6 +12136,14 @@ const World = (() => {
     bluecrystal: (x, y) => prop('bluecrystal', 'BLUE CRYSTAL', x, y, 0.6, true),
     bulbcluster: (x, y) => prop('bulbcluster', 'BULB CLUSTER', x, y, 0.55, false),
     pinkcrystal: (x, y) => prop('pinkcrystal', 'PINK CRYSTAL', x, y, 0.55, true),
+    // --- london set ---
+    londonbigben: (x, y) => prop('londonbigben', 'BIG BEN', x, y, 2.2, true),
+    londonbuckingham: (x, y) => prop('londonbuckingham', 'BUCKINGHAM PALACE', x, y, 2.4, true),
+    londonbus: (x, y) => prop('londonbus', 'LONDON BUS', x, y, 1.6, true),
+    londontardis: (x, y) => prop('londontardis', 'THE TARDIS', x, y, 0.95, true),
+    londonposterforeverday: (x, y) => prop('londonposterforeverday', 'FOREVER AND A DAY POSTER', x, y, 1.0, false),
+    londonposterprivate: (x, y) => prop('londonposterprivate', 'PRIVATE PERMISSION POSTER', x, y, 1.0, false),
+    londonposterthunderpussy: (x, y) => prop('londonposterthunderpussy', 'DR. THUNDERPUSSY POSTER', x, y, 1.0, false),
     // --- paris opera set ---
     parisphantom: (x, y) => prop('parisphantom', 'THE PHANTOM', x, y, 3.5, true, { pose: 1,
       getTex() { return SPR['parisphantom' + this.pose]; } }),

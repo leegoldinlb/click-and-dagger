@@ -24,6 +24,14 @@ const Editor = (() => {
   const FLOORNAME = { r: 'metal', p: 'lounge', l: 'carpet', o: 'ground', w: 'helipad' };
   const ENTS = [
     { kind: 'goon', name: 'HENCHMAN', spr: 'goon' },
+    // --- london set ---
+    { kind: 'londonbigben', name: 'BIG BEN', spr: 'londonbigben' },
+    { kind: 'londonbuckingham', name: 'BUCKINGHAM PALACE', spr: 'londonbuckingham' },
+    { kind: 'londonbus', name: 'LONDON BUS', spr: 'londonbus' },
+    { kind: 'londontardis', name: 'THE TARDIS', spr: 'londontardis' },
+    { kind: 'londonposterforeverday', name: 'FOREVER AND A DAY POSTER', spr: 'londonposterforeverday' },
+    { kind: 'londonposterprivate', name: 'PRIVATE PERMISSION POSTER', spr: 'londonposterprivate' },
+    { kind: 'londonposterthunderpussy', name: 'DR. THUNDERPUSSY POSTER', spr: 'londonposterthunderpussy' },
     // --- paris opera set ---
     { kind: 'parisphantom', name: 'THE PHANTOM', spr: 'parisphantom1' },
     { kind: 'parisoperachandelier', name: 'CRYSTAL CHANDELIER', spr: 'parisoperachandelier' },

@@ -640,6 +640,14 @@ const Adventure = (() => {
       case 'alienwarlord': return e.dead
         ? 'The warlord is dead. Whatever it was holding together comes apart now.'
         : 'The warlord, armoured and horned, staff in one hand. Everything else here answers to this.';
+      // --- london set ---
+      case 'londonbigben': return 'Big Ben, keeping time over Westminster whether anyone below is keeping theirs.';
+      case 'londonbuckingham': return 'Buckingham Palace, flag up, guards marching the same line they marched yesterday.';
+      case 'londonbus': return 'A red double-decker, an ad for "TARDIS TRAVEL" running the length of it. Someone in booking has a sense of humour.';
+      case 'londontardis': return 'A police box, 1960s vintage, parked where a police box has no real business being. It is, regrettably, exactly as big as it looks.';
+      case 'londonposterforeverday': return 'A cinema poster: FOREVER AND A DAY, a grand romance across generations. Not your kind of picture.';
+      case 'londonposterprivate': return 'A cinema poster: PRIVATE PERMISSION, A DOUBLE DEUCE ADVENTURE. The poster\'s idea of espionage involves considerably more tuxedo than yours does.';
+      case 'londonposterthunderpussy': return 'A cinema poster: DR. THUNDERPUSSY, a spy-fi extravaganza. Somebody in this business has a bigger budget than you do.';
       // --- paris opera set ---
       case 'parisphantom':
         if (e.pose === 3) return 'The mask hangs from his fingers. The face he was hiding is worse than the mask ever was, and he has stopped pretending otherwise.';
