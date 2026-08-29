@@ -25,6 +25,7 @@ const Editor = (() => {
   const ENTS = [
     { kind: 'goon', name: 'HENCHMAN', spr: 'goon' },
     // --- paris opera set ---
+    { kind: 'parisphantom', name: 'THE PHANTOM', spr: 'parisphantom1' },
     { kind: 'parisoperachandelier', name: 'CRYSTAL CHANDELIER', spr: 'parisoperachandelier' },
     { kind: 'parisoperarailing', name: 'GILDED BALCONY RAIL', spr: 'parisoperarailing' },
     { kind: 'parisoperacurtain', name: 'STAGE CURTAIN', spr: 'parisoperacurtain' },

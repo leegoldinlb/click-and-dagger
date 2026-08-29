@@ -149,7 +149,7 @@ const Adventure = (() => {
     'curtainrods',
     'phaser', 'bone', 'starfleetbadge', 'scidagger', 'communicator', 'tricorder',
     'manuals', 'powercell', 'scannerscope', 'medscanner']);
-  const USABLE_KINDS = new Set(['crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops', 'desk', 'safe', 'bar', 'tvconsole', 'goon', 'gunman', 'brute', 'sniper', 'blackbelt',
+  const USABLE_KINDS = new Set(['parisphantom', 'crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops', 'desk', 'safe', 'bar', 'tvconsole', 'goon', 'gunman', 'brute', 'sniper', 'blackbelt',
     'soviet', 'spy', 'agent', 'tube', 'flowergirl', 'carlotta', 'ciphermachine', 'drz', 'bomb', 'defector', 'maheen',
     'reza', 'rostam', 'phonebooth', 'microfichemachine', 'agent005', 'boss005', 'sportscar', 'streetartist', 'matron',
     'metroentrance', 'maskstand', 'laundrylady', 'double', 'patsy', 'curtainrods', 'vendingmachine', 'tv', 'baldini',
@@ -641,6 +641,10 @@ const Adventure = (() => {
         ? 'The warlord is dead. Whatever it was holding together comes apart now.'
         : 'The warlord, armoured and horned, staff in one hand. Everything else here answers to this.';
       // --- paris opera set ---
+      case 'parisphantom':
+        if (e.pose === 3) return 'The mask hangs from his fingers. The face he was hiding is worse than the mask ever was, and he has stopped pretending otherwise.';
+        if (e.pose === 2) return 'He has turned to face you, mid-phrase, a smooth white mask where his face should be. He has not moved since.';
+        return 'A hooded organist plays with his back to the room, sheet music for DON JUAN TRIUMPHANT propped in front of him. He has not noticed you.';
       case 'parisoperachandelier': return 'A crystal chandelier, dozens of candles lit though nobody is here to light them.';
       case 'parisoperarailing': return 'A gilded balcony rail, a lyre worked into the ironwork. Old money, older taste.';
       case 'parisoperacurtain': return 'A stage curtain, deep red and tasselled in gold. Whatever was behind it has already gone on.';
@@ -963,6 +967,21 @@ const Adventure = (() => {
       addItem('lettersoftransit', 'LETTERS OF TRANSIT');
       Sfx.pick();
       return 'You dial 11.22.63. The tumblers fall into place. Inside: a thick envelope, LETTERS OF TRANSIT, signed and stamped.';
+    }
+    if (e.kind === 'parisphantom') {
+      // One-way reveal, not a toggle — pose only ever advances 1 -> 2 -> 3 and
+      // stops, same shape as tvconsole's on/off flip but without the loop back.
+      if (e.pose === 1) {
+        e.pose = 2;
+        Sfx.pick();
+        return 'The music stops mid-phrase. He turns on the bench, unhurried, and the candlelight finds a mask — smooth, white, expressionless — where his face should be.';
+      }
+      if (e.pose === 2) {
+        e.pose = 3;
+        Sfx.pick();
+        return 'In one motion he peels the mask away. What is underneath does not improve on the mask.';
+      }
+      return 'He watches you, mask loose in one hand, waiting to see what you will do about any of this.';
     }
     if (e.kind === 'bar') return 'You mix a quick martini. Shaken, given the circumstances. Morale restored; aim unaffected, officially.';
     if (e.kind === 'tvconsole') {

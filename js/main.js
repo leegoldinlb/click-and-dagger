@@ -122,7 +122,7 @@ const Game = (() => {
   // Every other entity with an `hp` field (every plain prop, via World.js's
   // `prop()` factory) is fair game — "make all sprites destructible."
   const NO_DAMAGE = new Set(['agent', 'tube', 'desk', 'wpn_sterling', 'wpn_ar7', 'wpn_laser', 'wpn_golden',
-    'agent005', 'ciphermachine', 'bomb', 'microfichemachine',
+    'agent005', 'ciphermachine', 'bomb', 'microfichemachine', 'parisphantom',
     'fiona',    // this ain't that kind of game — Fiona the dog can never be hurt
     'memother']);  // nor children — the mother/daughter pair (one sprite) is always off-limits
 

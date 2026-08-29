@@ -10832,6 +10832,9 @@ const World = (() => {
   // -------------------------------------------------------------------------
   const ART_ASSETS = {                                      // bump a path's ?v= whenever that file on disk changes
     // --- paris opera set ---
+    parisphantom1: 'assets/sprites/parisphantom1.png?v=1',
+    parisphantom2: 'assets/sprites/parisphantom2.png?v=1',
+    parisphantom3: 'assets/sprites/parisphantom3.png?v=1',
     parisoperachandelier: 'assets/sprites/parisoperachandelier.png?v=1',
     parisoperarailing: 'assets/sprites/parisoperarailing.png?v=1',
     parisoperacurtain: 'assets/sprites/parisoperacurtain.png?v=1',
@@ -12126,6 +12129,8 @@ const World = (() => {
     bulbcluster: (x, y) => prop('bulbcluster', 'BULB CLUSTER', x, y, 0.55, false),
     pinkcrystal: (x, y) => prop('pinkcrystal', 'PINK CRYSTAL', x, y, 0.55, true),
     // --- paris opera set ---
+    parisphantom: (x, y) => prop('parisphantom', 'THE PHANTOM', x, y, 3.5, true, { pose: 1,
+      getTex() { return SPR['parisphantom' + this.pose]; } }),
     parisoperachandelier: (x, y) => prop('parisoperachandelier', 'CRYSTAL CHANDELIER', x, y, 1.3, false),
     parisoperarailing: (x, y) => prop('parisoperarailing', 'GILDED BALCONY RAIL', x, y, 1.2, true),
     parisoperacurtain: (x, y) => prop('parisoperacurtain', 'STAGE CURTAIN', x, y, 1.6, false),
