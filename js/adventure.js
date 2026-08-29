@@ -640,6 +640,32 @@ const Adventure = (() => {
       case 'alienwarlord': return e.dead
         ? 'The warlord is dead. Whatever it was holding together comes apart now.'
         : 'The warlord, armoured and horned, staff in one hand. Everything else here answers to this.';
+      // --- paris opera set ---
+      case 'parisoperachandelier': return 'A crystal chandelier, dozens of candles lit though nobody is here to light them.';
+      case 'parisoperarailing': return 'A gilded balcony rail, a lyre worked into the ironwork. Old money, older taste.';
+      case 'parisoperacurtain': return 'A stage curtain, deep red and tasselled in gold. Whatever was behind it has already gone on.';
+      case 'parisoperabust1': return 'A marble bust on a plinth. Nobody remembers who, exactly, but she looks important.';
+      case 'parisoperabust2': return 'Another marble bust, a companion to the first. The opera keeps its ancestors close.';
+      case 'parisoperamusicstand': return 'An empty brass music stand, pages open to a piece nobody is playing.';
+      case 'parisoperadrape': return 'A fragment of draped marble, carved so the folds look soft. They are not.';
+      case 'parisoperaapollo': return 'A statue of Apollo, robe slipping from one shoulder. Classical, and pointedly undressed.';
+      case 'parisoperachair': return 'A velvet armchair, gilt-framed. Somebody important sat here, once an act.';
+      case 'parisoperaharp': return 'A gilded concert harp, strings still faintly humming from the last piece played.';
+      case 'parisoperaceiling': return 'A ceiling fresco, cherubs chasing each other across a painted sky.';
+      case 'parisoperasign': return 'A brass plaque: LOGE 1 — ORCHESTRE. Best seats in the house, if you can afford them.';
+      case 'parisoperarigging': return 'The fly system — ropes and pulleys hauling scenery up into the dark above the stage.';
+      case 'parisoperaprogramstand': return 'A stand holding tonight\'s program, opera glasses set beside it for anyone who forgot theirs.';
+      case 'parisoperastatuegroup': return 'An allegorical marble group — one figure crowning another, a third looking on. The theme is always the same.';
+      case 'parisoperatapestry': return 'A tapestry of a garden dance, cherubs looping ribbon overhead. Woven, not painted.';
+      case 'parisoperamannequin': return 'A dressmaker\'s form, still wearing the costume from tonight\'s finale.';
+      case 'parisoperasconce': return 'A brass wall sconce, three candles burning low.';
+      case 'parisoperafan': return 'A painted hand fan, folded on a side table. Dropped, or set down on purpose.';
+      case 'parisoperadoor': return 'A private loge door, the number worn shiny by a hundred gloved hands.';
+      case 'parisoperaclock': return 'An ornate mantel clock, rococo gilt, running a few minutes fast — or the opera is running late.';
+      case 'parisoperascorestand': return 'A music stand, open to a page of handwritten score. Somebody\'s own composition, by the look of it.';
+      case 'parisoperapanel': return 'A gilded relief panel — violins and mandolins crossed above a lyre. Purely decorative, gloriously so.';
+      case 'parisoperatrunk': return 'A battered travel trunk, stage labels layered on top of each other from a dozen cities.';
+      case 'parisoperaseatrow': return 'A row of theater seats, velvet worn thin in the middle two.';
       case 'datapads': return 'A stack of datapads, each one showing a different unread report.';
       case 'equipcase': return 'A field recorder, spools still loaded. Someone was taking notes and stopped.';
       case 'sciscanner': return 'A wall scanner, screen washed pale green. It reads the room and keeps its opinion to itself.';
