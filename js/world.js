@@ -12355,6 +12355,9 @@ const World = (() => {
       // per-instance vertical offset (editor's PgUp/PgDn-over-a-sprite) — purely
       // visual, lets one placed copy hang/sit higher or lower than its floor
       if (e.zOff) ent.zOff = e.zOff;
+      // per-instance horizontal flip (editor's X toggle) — samples the sprite's
+      // texture mirrored, for an asymmetric prop that needs to face the other way
+      if (e.mirror) ent.mirror = true;
       ents.push(ent);
     }
     spawn.x = level.spawn.x; spawn.y = level.spawn.y; spawn.a = level.spawn.a;

@@ -924,7 +924,9 @@ const Engine = (() => {
           const yTop = yc1 + (yc2 - yc1) * f, yBot = yf1 + (yf2 - yf1) * f;
           const zdist = 1 / (iz1 + (iz2 - iz1) * f);
           const u = (uz1 + (uz2 - uz1) * f) * zdist;
-          const texU = clamp(((u / sc) * tex.w) | 0, 0, tex.w - 1);
+          let texU = clamp(((u / sc) * tex.w) | 0, 0, tex.w - 1);
+          if (e.mirror) texU = tex.w - 1 - texU;   // a curtain (or anything else asymmetric) mounted
+                                                    // facing the other way — swap the sample, not the art
           const y0i = Math.max(0, Math.ceil(yTop)), y1i = Math.min(H - 1, Math.floor(yBot));
           const fog = fogAt(zdist);
           for (let y = y0i; y <= y1i; y++) {
@@ -977,7 +979,8 @@ const Engine = (() => {
             if (lx < -hw || lx > hw || ly < -hw || ly > hw) continue;
             const idx = y * W + x;
             if (rd > depth[idx] + 0.05) continue;
-            const texU = clamp((((lx + hw) / sc) * tex.w) | 0, 0, tex.w - 1);
+            let texU = clamp((((lx + hw) / sc) * tex.w) | 0, 0, tex.w - 1);
+            if (e.mirror) texU = tex.w - 1 - texU;
             const texV = clamp((((ly + hw) / sc) * tex.h) | 0, 0, tex.h - 1);
             const c = tex.u32[texV * tex.w + texU];
             if ((c >>> 24) < 128) continue;
@@ -1004,7 +1007,8 @@ const Engine = (() => {
       const fog = fogAt(d);
       let drawn = false;
       for (let x = x0; x <= x1; x++) {
-        const texX = clamp((((x - left) / wdt) * tex.w) | 0, 0, tex.w - 1);
+        let texX = clamp((((x - left) / wdt) * tex.w) | 0, 0, tex.w - 1);
+        if (e.mirror) texX = tex.w - 1 - texX;
         for (let yy = y0i; yy <= y1i; yy++) {
           const idx = yy * W + x;
           if (d > depth[idx] + 0.05) continue;

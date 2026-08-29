@@ -1864,6 +1864,21 @@ const Editor = (() => {
     if (idx >= 0 && lv.ents[idx]) lv.ents[idx].behavior = ent.behavior;
     status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + ent.behavior.toUpperCase());
   }
+  // X: mirrors the entity under the crosshair horizontally — for an asymmetric
+  // sprite (a curtain gathered to one side, a sconce with an offset arm) that
+  // needs to face the opposite way on the other side of a doorway/stage without
+  // a second, pre-flipped copy of the art. Flips which edge of the texture the
+  // renderer samples from (see the e.mirror check in engine.js's sprite draw
+  // paths) rather than touching the image itself, so it works on any sprite —
+  // billboard, flattened, or flat-on-ground — with no new art required.
+  function geoToggleEntMirror() {
+    const r = pickEntNear();
+    if (!r) { status('LOOK AT AN OBJECT.'); return; }
+    const ent = r.ent, idx = World.ents.indexOf(ent);
+    ent.mirror = !ent.mirror;
+    if (idx >= 0 && lv.ents[idx]) lv.ents[idx].mirror = ent.mirror;
+    status((ent.name || ent.kind || 'OBJECT').toUpperCase() + ' → ' + (ent.mirror ? 'MIRRORED' : 'NORMAL'));
+  }
   // M: cycles the entity under the crosshair through three states — ordinary
   // camera-facing BILLBOARD, FLATTENED (a fixed vertical 2D plane at
   // flatAngle, e.g. a poster mounted on a wall), and FLAT ON GROUND (the same
@@ -1931,8 +1946,9 @@ const Editor = (() => {
     if (ent.flat) { newEnt.flat = true; newEnt.flatAngle = ent.flatAngle || 0; }
     if (ent.flatGround) { newEnt.flatGround = true; newEnt.flatAngle = ent.flatAngle || 0; }
     if (ent.zOff) newEnt.zOff = ent.zOff;
+    if (ent.mirror) newEnt.mirror = true;
     World.ents[idx] = newEnt;
-    if (lv.ents[idx]) lv.ents[idx].kind = spec.kind;
+    if (lv.ents[idx]) { lv.ents[idx].kind = spec.kind; if (ent.mirror) lv.ents[idx].mirror = true; }
     status(spec.name.toUpperCase() + ' (' + (next + 1) + '/' + ENTS.length + ')');
     return true;
   }
@@ -2436,6 +2452,7 @@ const Editor = (() => {
     if (e.code === 'KeyJ') { if (!e.repeat) pushUndo(); geoToggleEntSolid(); e.preventDefault(); return; }
     if (e.code === 'KeyB') { if (!e.repeat) pushUndo(); geoToggleEntWander(); e.preventDefault(); return; }
     if (e.code === 'KeyM') { if (!e.repeat) pushUndo(); geoToggleEntFlat(); e.preventDefault(); return; }
+    if (e.code === 'KeyX') { if (!e.repeat) pushUndo(); geoToggleEntMirror(); e.preventDefault(); return; }
     if (e.code === 'Comma') { if (!e.repeat) pushUndo(); geoRotateEntFlat(-1); e.preventDefault(); return; }
     if (e.code === 'Period') { if (!e.repeat) pushUndo(); geoRotateEntFlat(+1); e.preventDefault(); return; }
     if (e.code === 'PageUp' || e.code === 'PageDown') {
