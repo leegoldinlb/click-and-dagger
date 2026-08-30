@@ -2650,6 +2650,23 @@ const Editor = (() => {
       (sec.parent >= 0 ? ' · SOLID (H in 3D preview to make it walkable)' : ''));
     render();
   }
+  // Every per-wall override array is indexed BY WALL, and wall i runs from
+  // loop[i] to loop[i+1] — so inserting a vertex inserts a wall too, and any of
+  // these arrays that isn't grown at the same index silently slides every
+  // override past the split onto the wrong wall. Both halves inherit the wall
+  // they were cut from, which keeps a plain retexture-free split invisible.
+  const WALL_ARRAY_FILL = {
+    wallTex: null, wallStepTex: null, wallStepFloorTex: null, wallDecal: null,
+    wallDoor: null, wallDoorSkin: null, wallTexScale: 1, wallBlock: false, wallOpen: false,
+  };
+  function splitWallData(sec, j, wallCount) {
+    for (const [key, fill] of Object.entries(WALL_ARRAY_FILL)) {
+      const arr = sec[key];
+      if (!arr) continue;                                      // never set on this sector — nothing to keep aligned
+      while (arr.length < wallCount) arr.push(fill);           // older maps stored only a prefix; pad so j+1 lands right
+      arr.splice(j + 1, 0, arr[j]);
+    }
+  }
   function insertVertexOnWall() {
     if (!hoverEdge) { status('HOVER A WALL, THEN PRESS V.'); return; }
     const { s, i } = hoverEdge, loop = geo.sectors[s].loop;
@@ -2661,7 +2678,11 @@ const Editor = (() => {
       const L = sec.loop;
       for (let j = 0; j < L.length; j++) {
         const x = L[j], y = L[(j + 1) % L.length];
-        if ((x === a && y === b) || (x === b && y === a)) { L.splice(j + 1, 0, nv); break; }
+        if ((x === a && y === b) || (x === b && y === a)) {
+          splitWallData(sec, j, L.length);                     // grow the per-wall arrays alongside the loop
+          L.splice(j + 1, 0, nv);
+          break;
+        }
       }
     }
     status('VERTEX INSERTED ON WALL.'); render();
