@@ -11320,6 +11320,18 @@ const World = (() => {
                                                                // their own texture size now (see engine.js), so there's
                                                                // no upside to downscaling detailed art to 64x64 first
   function blankCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+  // Shipped art (character sprites, door skins, wall textures — all three
+  // loops below) loads asynchronously, well after the mission itself is
+  // already running: on a slow connection the player could be moving around
+  // for a couple of seconds with several sprites still showing their
+  // placeholder canvas. pendingAssets counts every image still in flight —
+  // main.js gates the "you may now move" moment on it reaching 0 rather than
+  // just on G.started, so a fresh boot (or a hub→level jump before the
+  // FIRST load has ever finished) waits for a real frame instead of an
+  // arbitrary delay. Counted once per image kicked off; decremented on
+  // settle — success or failure both count, since a failed load still
+  // resolves to a stable (if fallback) sprite.
+  let pendingAssets = 0;
   for (const [name, path] of Object.entries(ART_ASSETS)) {
     const w = ART_RES, h = ART_RES;
     // A procedural placeholder is OPTIONAL. Props that never had a hand-drawn
@@ -11331,7 +11343,9 @@ const World = (() => {
     const placeholder = SPR[name] || null;
     SPR[name] = blankCanvas(w, h);   // invisible until the real shipped art loads, instead of flashing the outdated placeholder
     const img = new Image();
+    pendingAssets++;
     img.onload = () => {
+      pendingAssets--;   // settled — decremented up front so no branch below can skip it
       // A tainted canvas must NEVER reach SPR — the renderer's own texture
       // cache (cacheOf in engine.js) reads pixel data from every sprite it
       // draws, with no guard of its own; handing it a tainted canvas throws
@@ -11352,7 +11366,7 @@ const World = (() => {
         try { window.dispatchEvent(new CustomEvent('spriteart', { detail: { name } })); } catch (e) { /* no DOM (tests) */ }
       } catch (e) { console.warn('Failed to apply shipped character art:', path, e); if (placeholder) SPR[name] = placeholder; }
     };
-    img.onerror = () => { console.warn('Failed to load shipped character art (check the path/file exists):', path); if (placeholder) SPR[name] = placeholder; };
+    img.onerror = () => { pendingAssets--; console.warn('Failed to load shipped character art (check the path/file exists):', path); if (placeholder) SPR[name] = placeholder; };
     img.src = path;
   }
 
@@ -11399,10 +11413,13 @@ const World = (() => {
     const path = ART_ASSETS[name];
     if (!path) continue;
     const img = new Image();
+    pendingAssets++;
     img.onload = () => {
+      pendingAssets--;
       if (isTainted(img)) return;
       try { TX[name] = fitCanvasZoomed(img, 64, 64, 1.3); } catch (e) { console.warn('Failed to build door-skin wall texture:', path, e); }
     };
+    img.onerror = () => { pendingAssets--; console.warn('Failed to load door-skin wall texture (check the path/file exists):', path); };
     img.src = path;
   }
 
@@ -11413,10 +11430,13 @@ const World = (() => {
     const path = ART_ASSETS[name];
     if (!path) continue;
     const img = new Image();
+    pendingAssets++;
     img.onload = () => {
+      pendingAssets--;
       if (isTainted(img)) return;
       try { TX[name] = fitCanvasZoomed(img, 64, 64, 1.0); } catch (e) { console.warn('Failed to build shipped wall texture:', path, e); }
     };
+    img.onerror = () => { pendingAssets--; console.warn('Failed to load shipped wall texture (check the path/file exists):', path); };
     img.src = path;
   }
 
@@ -12428,6 +12448,31 @@ const World = (() => {
   } catch (e) { console.warn('Custom level failed to load, using default.', e); }
   load(boot);
 
+  // Runtime mission switch — the in-place counterpart to the ?mission=/?episode=
+  // boot logic above, for main.js's seamless hub<->level transitions (no page
+  // reload, so no title screen and no lost Fullscreen-API state). Mirrors
+  // exactly what a fresh boot with that query param would set up, including
+  // history.replaceState so the address bar (and a refresh) stays honest
+  // without actually navigating anywhere.
+  function loadMissionByName(name) {
+    if (!hasMission(name)) return false;
+    boot = MISSIONS[name]; isCustom = true; currentMission = name;
+    episodeSlot = 0; episodeHasNext = false;
+    load(boot);
+    try { history.replaceState(null, '', 'index.html?mission=' + name); } catch (e) { /* no history (tests) */ }
+    return true;
+  }
+  function loadEpisodeSlot(n) {
+    let slots;
+    try { slots = JSON.parse(localStorage.getItem('cloakclick.episode') || '[]'); } catch (e) { return false; }
+    if (!slots[n - 1]) return false;
+    boot = slots[n - 1]; isCustom = true; currentMission = null;
+    episodeSlot = n; episodeHasNext = !!slots[n];
+    load(boot);
+    try { history.replaceState(null, '', 'index.html?episode=' + n); } catch (e) { /* no history (tests) */ }
+    return true;
+  }
+
   return {
     T, CH, SURF, get, set, isSolid, winAt, charAt, surfAt, floorZAt,
     setFloorZ, setCeilZ, setSurfTex, setCeilTex, setFloorSlope, compileGeo, getGeo,
@@ -12440,6 +12485,8 @@ const World = (() => {
     get episodeTotal() { return episodeTotal; },
     get episodeHasNext() { return episodeHasNext; },
     hasMission, get currentMission() { return currentMission; },
+    loadMissionByName, loadEpisodeSlot,
+    get assetsReady() { return pendingAssets <= 0; },
     get bootLevel() { return boot; },   // the exact level JSON this session booted with — see main.js's "EDIT THIS LEVEL"
     get startBlown() { return startBlown; },
     get musicUndercover() { return musicUndercover; },

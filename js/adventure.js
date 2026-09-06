@@ -38,6 +38,20 @@ const Adventure = (() => {
   function setWinTrigger(fn) { winFn = fn; }
   function setLoseTrigger(fn) { loseFn = fn; }
   function setBlowTrigger(fn) { blowFn = fn; }
+  // Clears every puzzle flag and empties the field kit — every value in
+  // `flags` starts false, so putting it back there needs no separate
+  // snapshot. Without this, an in-place mission switch (main.js's seamless
+  // hub<->level transition, which never reloads the page and so never gets
+  // a fresh JS context to reset this for free) would carry a flag across
+  // into a mission that reuses its name — familySmuggled/defectorFollowing
+  // are shared verbatim between Havana and Moscow — and could satisfy a
+  // win gate before the player has done anything in the new mission at all.
+  function resetForMission() {
+    for (const k in flags) flags[k] = false;
+    inv.length = 0;
+    selected = null;
+    hlIndex = -1;
+  }
   // A win sector is the mission's EXTRACTION POINT, not the win itself —
   // reaching it only counts once the objective is actually done. main.js used
   // to fire win() the instant you stepped into any sector flagged `win`, with
@@ -1548,6 +1562,7 @@ const Adventure = (() => {
 
   renderInv();
   return { flags, msg, clickAt, lookAt, nameAt, hudAt, resolveAt, addItem, cycleInv, confirmInv,
-    setWinTrigger, setLoseTrigger, setBlowTrigger, winSectorBlock, cheatCollectAll, get selected() { return selected; },
+    setWinTrigger, setLoseTrigger, setBlowTrigger, winSectorBlock, cheatCollectAll, resetForMission,
+    get selected() { return selected; },
     get selectedName() { const it = inv.find(x => x.id === selected); return it ? it.name : null; } };
 })();

@@ -4,13 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>CLICK &amp; DAGGER</title>
-<link rel="stylesheet" href="style.css?v=24">
+<link rel="stylesheet" href="style.css?v=25">
 </head>
 <body>
 <div id="game">
   <div id="viewwrap">
     <canvas id="view" width="640" height="360"></canvas>
     <div id="message"></div>
+    <!-- Shown only for an in-place mission switch (hub<->level, episode
+         advance) — the title screen (#overlay below) never reappears for
+         those, so this is the only feedback the player gets while the next
+         mission's geometry/assets settle. Hidden the rest of the time. -->
+    <div id="loadingOverlay" hidden><span>LOADING</span></div>
     <div id="overlay">
       <img class="splashart" src="assets/ui/splash.png?v=1" alt="CLICK AND DAGGER">
       <p class="tag" id="customtag" style="display:none">&#9656; CUSTOM MISSION LOADED &#9666;</p>
@@ -62,9 +67,9 @@
 <script src="js/audio.js?v=8"></script>
 <script src="js/music.js?v=5"></script>
 <script src="js/missions.js?v=30"></script>
-<script src="js/world.js?v=176"></script>
+<script src="js/world.js?v=177"></script>
 <script src="js/engine.js?v=87"></script>
-<script src="js/adventure.js?v=56"></script>
-<script src="js/main.js?v=77"></script>
+<script src="js/adventure.js?v=57"></script>
+<script src="js/main.js?v=78"></script>
 </body>
 </html>

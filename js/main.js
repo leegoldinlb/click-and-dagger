@@ -60,6 +60,7 @@ const Game = (() => {
     reticule: null,               // 'look' | 'use' | 'take' | null — what the crosshair shows while holstered
     started: false,
     over: false,
+    loadingMission: false,        // true while a seamless hub<->level switch is settling — see transitionToMission()
     bobT: 0, bobAmt: 0, fireT: 0,
     warpLock: -1,                      // sector a warp just dropped us into — see warpPlayer()
     kills: 0, civKills: 0, t0: 0,
@@ -112,7 +113,10 @@ const Game = (() => {
     elpresidente: { speed: 1.4, meleeRange: 1.1, meleeDmg: [16, 26], aggroR: 12, atkCd: 0.75 },
   };
   const CIVILIAN_KINDS = new Set(['crewcommand', 'crewscience', 'crewengineer', 'crewsecurity', 'crewmedic', 'crewtech', 'crewmember', 'crewalien', 'crewops', 'civilianM', 'civilianF', 'vendor', 'waiter', 'tourist', 'fisherman', 'flowergirl', 'carlotta', 'drz', 'defector', 'matron', 'streetartist', 'laundrylady', 'double', 'patsy', 'lao', 'baldini', 'wilson', 'hkgangster', 'nyfirefighter', 'nyconstruction', 'nybeatnik', 'nybusinessman', 'nysocialite', 'nypainter', 'nyoldtimer', 'meprofessor', 'mestudent', 'meelder', 'memother', 'mejournalist', 'mesocialite', 'meantiquedealer', 'meteacher', 'memusician', 'londonmod', 'londonmodgirl', 'londongangster', 'londonpensioner', 'londonartist', 'militiaman', 'havanaofficial', 'havanafarmer', 'havanacanecutter', 'havanawriter', 'cosmonaut', 'sovietofficial', 'sovietcitizen', 'sovietshopper', 'sovietscientist']);
-  const totalHostiles = World.ents.filter(e => HOSTILE[e.kind]).length;
+  // A `let`, not a `const`: a seamless mission switch (transitionToMission)
+  // recomputes this for the new level's own entity list rather than reusing
+  // whatever the PREVIOUS mission's hostile count happened to be.
+  let totalHostiles = World.ents.filter(e => HOSTILE[e.kind]).length;
   // Quest-critical kinds never take damage — destroying 004's body, the vacuum
   // tube, or Volkov's desk could strand the puzzle chain with no way to recover.
   // Weapon pickups are similarly protected: a stray shot near a case (especially
@@ -228,7 +232,7 @@ const Game = (() => {
   // contextmenu is still suppressed so it doesn't pop the native menu.
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('mousedown', e => {
-    if (e.button !== 2 || !G.started || G.over) return;
+    if (e.button !== 2 || !G.started || G.over || G.loadingMission) return;
     if (!G.locked) { requestLock(); return; }
     Adventure.lookAt(Engine.W / 2, Engine.H / 2);
   });
@@ -267,7 +271,7 @@ const Game = (() => {
   document.addEventListener('keydown', e => {
     keys[e.code] = true;
     if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault();
-    if (G.started && !G.over) {
+    if (G.started && !G.over && !G.loadingMission) {
       const wi = WEAPON_KEYS.indexOf(e.code);
       if (wi >= 0) switchWeapon(WEAPON_ORDER[wi]);
       if (e.code === 'Tab' || e.code === 'KeyF') { e.preventDefault(); if (!e.repeat) toggleMode(); }   // faster than right-click for switching combat <-> adventure
@@ -293,14 +297,14 @@ const Game = (() => {
   // holstering no longer frees the cursor, it just changes what a left-click
   // on the crosshair's target does (see mousedown below).
   document.addEventListener('mousemove', e => {
-    if (!G.locked) return;
+    if (!G.locked || G.loadingMission) return;
     G.player.a += e.movementX * 0.0022;
     const pLim = pitchLimit();
     G.player.pitch = Math.max(-pLim, Math.min(pLim, G.player.pitch - e.movementY * 0.35));
   });
 
   canvas.addEventListener('mousedown', e => {
-    if (!G.started || G.over || e.button !== 0) return;
+    if (!G.started || G.over || G.loadingMission || e.button !== 0) return;
     if (!G.locked) { requestLock(); return; }
     if (G.combat) { mouseDown = true; shoot(); }
     else Adventure.clickAt(Engine.W / 2, Engine.H / 2);   // crosshair-center hit test — LOOK/TAKE/USE, context-sensitive
@@ -329,7 +333,7 @@ const Game = (() => {
       touchLookEl.setPointerCapture(e.pointerId);
     });
     touchLookEl.addEventListener('pointermove', e => {
-      if (e.pointerId !== lookPid || !G.locked) return;
+      if (e.pointerId !== lookPid || !G.locked || G.loadingMission) return;
       const dx = e.clientX - lookX, dy = e.clientY - lookY;
       lookX = e.clientX; lookY = e.clientY;
       G.player.a += dx * 0.006;
@@ -360,13 +364,13 @@ const Game = (() => {
     document.getElementById('tMode').addEventListener('pointerdown', e => { e.preventDefault(); toggleMode(); });
     document.getElementById('tLook').addEventListener('pointerdown', e => {
       e.preventDefault();
-      if (!G.started || G.over || !G.locked) return;
+      if (!G.started || G.over || G.loadingMission || !G.locked) return;
       Adventure.lookAt(Engine.W / 2, Engine.H / 2);
     });
     const fireEl = document.getElementById('tFire');
     fireEl.addEventListener('pointerdown', e => {
       e.preventDefault();
-      if (!G.started || G.over) return;
+      if (!G.started || G.over || G.loadingMission) return;
       if (!G.locked) { requestLock(); return; }
       if (G.combat) { mouseDown = true; shoot(); }
       else Adventure.clickAt(Engine.W / 2, Engine.H / 2);
@@ -499,6 +503,7 @@ const Game = (() => {
 
   // --------------------------------------------------------------- update --
   function update(dt) {
+    if (G.loadingMission) return;   // a seamless mission switch is settling — freeze simulation, keep rendering
     const p = G.player;
 
     // turning (arrow keys as fallback to mouse-look)
@@ -699,14 +704,14 @@ const Game = (() => {
       if (!block) win();
       else if (performance.now() - winBlockT > 4000) { winBlockT = performance.now(); Adventure.msg(block, 3.5); }  // throttled: this runs every frame you stand there
     }
-    if (cs >= 0 && geo.sectors[cs].missionLink && !G.transitioning) enterGate(geo.sectors[cs].missionLink);
+    if (cs >= 0 && geo.sectors[cs].missionLink && !G.loadingMission) enterGate(geo.sectors[cs].missionLink);
     // Warp sectors come in linked pairs, so the sector you land in points right
     // back at the one you left — firing again on the very next frame would
     // ping-pong you forever. Latch the sector we arrived in and stay quiet until
     // the player actually walks out of it.
     if (cs !== G.warpLock) {
       G.warpLock = -1;
-      if (cs >= 0 && geo.sectors[cs].warpTo != null && !G.transitioning) warpPlayer(cs, geo.sectors[cs].warpTo);
+      if (cs >= 0 && geo.sectors[cs].warpTo != null && !G.loadingMission) warpPlayer(cs, geo.sectors[cs].warpTo);
     }
   }
 
@@ -752,13 +757,87 @@ const Game = (() => {
     Sfx.power();
   }
 
+  // ---------------------------------------------------- seamless transitions --
+  // Every hub<->level and episode-advance transition used to be a full
+  // location.href reload: the whole page tore down and rebuilt, which meant
+  // the title screen every time (a second "BEGIN MISSION" click to get back
+  // into a game you were already playing), and — on the web build — lost the
+  // real Fullscreen API state, since browsers don't carry that across a
+  // navigation. `loaderFn` does whatever World.loadMissionByName /
+  // loadEpisodeSlot call is appropriate; this wraps it with everything a
+  // fresh page load would otherwise have given for free: resetting the
+  // player/HUD/puzzle-flag state for the new mission, waiting out any shipped
+  // art still in flight, and freezing input for exactly that long rather than
+  // an arbitrary delay.
+  const loadingEl = document.getElementById('loadingOverlay');
+  // Shows whichever of the two "what am I playing" banners applies to the
+  // CURRENT World state and hides the other — unlike a fresh page load,
+  // where only ever one of these could have been true for the whole session,
+  // an in-place switch can go from an episode mission to a hub gate (or vice
+  // versa) and needs both states resolved, not just the one that used to add
+  // its own tag and never had a reason to remove it.
+  function updateModeTags() {
+    const epTag = document.getElementById('episodetag'), customTag = document.getElementById('customtag');
+    if (World.isEpisode) {
+      epTag.textContent = '▶ MISSION ' + World.episodeSlot + ' OF ' + World.episodeTotal + ' ◀';
+      epTag.style.display = 'block';
+    } else {
+      epTag.style.display = 'none';
+    }
+    // shipped city/hub missions aren't "custom" — only a local editor level is
+    customTag.style.display = (World.isCustom && !World.currentMission) ? 'block' : 'none';
+  }
+  function applyNewMissionState() {
+    ensureGeo();                              // pulls in the geo/graph/geoRev World.load() just bumped
+    const p = G.player;
+    p.x = World.spawn.x; p.y = World.spawn.y; p.a = World.spawn.a;
+    p.hp = 100; p.hurtT = 0; p.pitch = 0; p.vz = 0;
+    p.eyeZ = Engine.geoFloorAtXY(geo, graph, p.x, p.y, p.sector) + 0.5;
+    G.over = false; G.blown = World.startBlown; G.kills = 0; G.civKills = 0;
+    G.warpLock = -1; G.fireT = 0; G.bobT = 0; G.bobAmt = 0; G.invuln = false;
+    G.combat = false; G.reticule = null; G.meleeSwingCd = 0;
+    G.weapon = 'walther'; G.gunSprite = 'gun'; G.meleeWeapon = false;
+    G.owned = { walther: true, sterling: false, ar7: false, laser: false, golden: false, fists: true };
+    G.ammo = { walther: 24, sterling: 0, ar7: 0, laser: 0, golden: 0 };
+    G.t0 = performance.now();
+    totalHostiles = World.ents.filter(e => HOSTILE[e.kind]).length;
+    Adventure.resetForMission();
+    Music.setTracks(World.musicUndercover, World.musicCoverBlown);
+    Music.setBlown(G.blown);
+    updateModeTags();
+    syncMode();
+  }
+  // Polls World.assetsReady instead of hooking the 'spriteart' event per
+  // image: after the very first mission this is already true (everything
+  // shipped loads once per page session, not per mission), so the common
+  // case is a same-frame resolve — a poll that can return immediately reads
+  // clearer here than a listener that has to handle "already true" as a
+  // separate case anyway.
+  function whenAssetsReady() {
+    return new Promise(resolve => {
+      if (World.assetsReady) { resolve(); return; }
+      const check = () => World.assetsReady ? resolve() : requestAnimationFrame(check);
+      requestAnimationFrame(check);
+    });
+  }
+  async function transitionToMission(loaderFn) {
+    if (G.loadingMission) return;
+    G.loadingMission = true;
+    loadingEl.hidden = false;
+    loaderFn();                 // synchronous — World.load() has already swapped in the new mission's data
+    applyNewMissionState();
+    await whenAssetsReady();
+    loadingEl.hidden = true;
+    G.loadingMission = false;
+    Adventure.msg('Eyes open. Cover’s thin and the clock is already running.', 5);
+  }
+
   // Hub airport: walking into a gate sector either boots that city's shipped
   // mission or, if it hasn't been authored yet, just says so and lets you
   // keep browsing — see missions/*.json + js/missions.js.
   function enterGate(city) {
     if (World.hasMission(city)) {
-      G.transitioning = true;
-      location.href = 'index.html?mission=' + city;
+      transitionToMission(() => World.loadMissionByName(city));
     } else {
       Adventure.msg(city.toUpperCase() + ' — MISSION COMING SOON.', 3);
     }
@@ -881,6 +960,17 @@ const Game = (() => {
     if (G.over || totalHostiles === 0) return;
     if (!World.ents.some(e => HOSTILE[e.kind] && !e.dead)) win();
   }
+  // The debrief screen (endOverlay, below) reuses #overlay — win() already
+  // hid the pointer and put that UI up, so continuing into the next mission
+  // means undoing both: hide the debrief, and re-request the lock from
+  // directly inside the button's own click handler, which is exactly the
+  // user-gesture context Pointer Lock requires (a plain call from
+  // transitionToMission itself, outside a click handler, would be refused).
+  function continueFromDebrief(loaderFn) {
+    overlay.classList.add('hidden');
+    requestLock();
+    transitionToMission(loaderFn);
+  }
   function win() {
     if (G.over) return;
     G.over = true;
@@ -896,7 +986,7 @@ const Game = (() => {
         endOverlay('MISSION COMPLETE', 'win',
           stats + 'London sends its regards. The next assignment is already waiting.',
           '[ NEXT MISSION: ' + next + ' OF ' + World.episodeTotal + ' ▶ ]',
-          () => { location.href = 'index.html?episode=' + next; }, banner);
+          () => continueFromDebrief(() => World.loadEpisodeSlot(next)), banner);
       } else {
         endOverlay('EPISODE COMPLETE', 'win',
           stats + 'The last gate closes behind you. London sends its regards — the episode is over.',
@@ -910,7 +1000,7 @@ const Game = (() => {
         'The extraction goes clean. Somewhere, the people who sent you exhale.<br><br>' +
         stats + 'London sends its regards.',
         '[ BACK TO THE AIRPORT ]',
-        () => { location.href = 'index.html?mission=hub'; }, banner);
+        () => continueFromDebrief(() => World.loadMissionByName('hub')), banner);
     } else {
       endOverlay('MISSION COMPLETE', 'win',
         'The extraction goes clean. Somewhere, the people who sent you exhale.<br><br>' +
@@ -931,7 +1021,12 @@ const Game = (() => {
     requestAnimationFrame(loop);
   }
 
-  function beginMission() {
+  async function beginMission() {
+    // Sfx/Music unlock and the pointer-lock request all need to fire
+    // synchronously, inside this actual click — browsers tie both
+    // permissions to a direct user gesture, and an `await` ahead of them
+    // (waiting on shipped art, say) can be enough to no longer count as one.
+    // The loading gate below only delays G.loadingMission, never these.
     Sfx.unlock();
     Music.unlock();
     Music.setTracks(World.musicUndercover, World.musicCoverBlown);
@@ -940,6 +1035,18 @@ const Game = (() => {
     G.t0 = performance.now();
     overlay.classList.add('hidden');
     requestLock();   // start holstered but pointer-locked — drawing happens on picking a weapon (1-5), TAB/F, or right-click
+    if (!World.assetsReady) {
+      // Same freeze transitionToMission uses for hub<->level, so a slow
+      // FIRST load can't be moved/shot through any more than a later one can
+      // — the loop already renders every frame regardless (ensureGeo/update/
+      // renderPortal), so the player sees the scene resolve in rather than a
+      // blank screen while this waits.
+      G.loadingMission = true;
+      loadingEl.hidden = false;
+      await whenAssetsReady();
+      loadingEl.hidden = true;
+      G.loadingMission = false;
+    }
     Adventure.msg('Eyes open. Cover’s thin and the clock is already running.', 5);
   }
   document.getElementById('startbtn').addEventListener('click', beginMission);
@@ -1004,13 +1111,7 @@ const Game = (() => {
     requestAnimationFrame(() => { resizeQueued = false; Engine.resize(); });
   });
 
-  if (World.isEpisode) {
-    const tag = document.getElementById('episodetag');
-    tag.textContent = '▶ MISSION ' + World.episodeSlot + ' OF ' + World.episodeTotal + ' ◀';
-    tag.style.display = 'block';
-  } else if (World.isCustom && !World.currentMission) {   // shipped city/hub missions aren't "custom" — only a local editor level is
-    document.getElementById('customtag').style.display = 'block';
-  }
+  updateModeTags();
   Adventure.setWinTrigger(win);   // lets a puzzle payoff (e.g. the sports car + keys) end the mission directly
   Adventure.setLoseTrigger(dieBomb);   // cutting the wrong wire on the bomb ends it too
   Adventure.setBlowTrigger(blowCover);   // getting caught red-handed (e.g. lifting the Fabergé egg) blows cover directly
