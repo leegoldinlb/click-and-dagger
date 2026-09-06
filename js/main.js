@@ -704,7 +704,16 @@ const Game = (() => {
       if (!block) win();
       else if (performance.now() - winBlockT > 4000) { winBlockT = performance.now(); Adventure.msg(block, 3.5); }  // throttled: this runs every frame you stand there
     }
-    if (cs >= 0 && geo.sectors[cs].missionLink && !G.loadingMission) enterGate(geo.sectors[cs].missionLink);
+    // enterGate can trigger a same-frame, synchronous mission swap
+    // (transitionToMission -> applyNewMissionState -> ensureGeo), which
+    // reassigns geo/graph/G.player right out from under this very call.
+    // Bailing out here matters: without it, the warpTo check just below kept
+    // running against the STALE cs against the NEW mission's geo.sectors —
+    // sometimes out of bounds (an uncaught exception that silently killed the
+    // requestAnimationFrame loop — hub music already playing from the swap,
+    // screen just frozen from then on), sometimes landing on an unrelated
+    // sector in the new mission and warping the player somewhere bogus.
+    if (cs >= 0 && geo.sectors[cs].missionLink && !G.loadingMission) { enterGate(geo.sectors[cs].missionLink); return; }
     // Warp sectors come in linked pairs, so the sector you land in points right
     // back at the one you left — firing again on the very next frame would
     // ping-pong you forever. Latch the sector we arrived in and stay quiet until
@@ -813,22 +822,47 @@ const Game = (() => {
   // case is a same-frame resolve — a poll that can return immediately reads
   // clearer here than a listener that has to handle "already true" as a
   // separate case anyway.
+  // Bounded so a stalled network fetch (a real risk on the web build — the
+  // desktop build's assets are all local and settle near-instantly) can
+  // never leave the player stuck in the loading gate forever. Belt-and-
+  // suspenders: by the time this runs post-boot, every shipped asset has
+  // long since settled one way or another, so the timeout branch below is
+  // not expected to fire — if it ever does, the console warning says which
+  // asset(s) never called back.
   function whenAssetsReady() {
     return new Promise(resolve => {
       if (World.assetsReady) { resolve(); return; }
-      const check = () => World.assetsReady ? resolve() : requestAnimationFrame(check);
+      const start = performance.now();
+      const check = () => {
+        if (World.assetsReady) { resolve(); return; }
+        if (performance.now() - start > 8000) {
+          console.warn('Shipped assets still pending after 8s — proceeding anyway. Outstanding:', World.pendingAssetNames);
+          resolve();
+          return;
+        }
+        requestAnimationFrame(check);
+      };
       requestAnimationFrame(check);
     });
   }
+  // try/finally so an unexpected exception in loaderFn/applyNewMissionState
+  // can't leave G.loadingMission stuck true (and the loading overlay stuck
+  // up) forever — the player always gets control back, even if something
+  // above logs an error instead of completing cleanly.
   async function transitionToMission(loaderFn) {
     if (G.loadingMission) return;
     G.loadingMission = true;
     loadingEl.hidden = false;
-    loaderFn();                 // synchronous — World.load() has already swapped in the new mission's data
-    applyNewMissionState();
-    await whenAssetsReady();
-    loadingEl.hidden = true;
-    G.loadingMission = false;
+    try {
+      loaderFn();                 // synchronous — World.load() has already swapped in the new mission's data
+      applyNewMissionState();
+      await whenAssetsReady();
+    } catch (e) {
+      console.error('Mission transition failed, recovering instead of hanging:', e);
+    } finally {
+      loadingEl.hidden = true;
+      G.loadingMission = false;
+    }
     Adventure.msg('Eyes open. Cover’s thin and the clock is already running.', 5);
   }
 
@@ -1043,9 +1077,12 @@ const Game = (() => {
       // blank screen while this waits.
       G.loadingMission = true;
       loadingEl.hidden = false;
-      await whenAssetsReady();
-      loadingEl.hidden = true;
-      G.loadingMission = false;
+      try {
+        await whenAssetsReady();
+      } finally {
+        loadingEl.hidden = true;
+        G.loadingMission = false;
+      }
     }
     Adventure.msg('Eyes open. Cover’s thin and the clock is already running.', 5);
   }

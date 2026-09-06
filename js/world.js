@@ -11332,6 +11332,7 @@ const World = (() => {
   // settle — success or failure both count, since a failed load still
   // resolves to a stable (if fallback) sprite.
   let pendingAssets = 0;
+  const pendingAssetNames = new Set();   // diagnostics only — lets a stuck transition's console warning name which asset(s) never called back
   for (const [name, path] of Object.entries(ART_ASSETS)) {
     const w = ART_RES, h = ART_RES;
     // A procedural placeholder is OPTIONAL. Props that never had a hand-drawn
@@ -11344,8 +11345,10 @@ const World = (() => {
     SPR[name] = blankCanvas(w, h);   // invisible until the real shipped art loads, instead of flashing the outdated placeholder
     const img = new Image();
     pendingAssets++;
+    pendingAssetNames.add(name);
     img.onload = () => {
       pendingAssets--;   // settled — decremented up front so no branch below can skip it
+      pendingAssetNames.delete(name);
       // A tainted canvas must NEVER reach SPR — the renderer's own texture
       // cache (cacheOf in engine.js) reads pixel data from every sprite it
       // draws, with no guard of its own; handing it a tainted canvas throws
@@ -11366,7 +11369,7 @@ const World = (() => {
         try { window.dispatchEvent(new CustomEvent('spriteart', { detail: { name } })); } catch (e) { /* no DOM (tests) */ }
       } catch (e) { console.warn('Failed to apply shipped character art:', path, e); if (placeholder) SPR[name] = placeholder; }
     };
-    img.onerror = () => { pendingAssets--; console.warn('Failed to load shipped character art (check the path/file exists):', path); if (placeholder) SPR[name] = placeholder; };
+    img.onerror = () => { pendingAssets--; pendingAssetNames.delete(name); console.warn('Failed to load shipped character art (check the path/file exists):', path); if (placeholder) SPR[name] = placeholder; };
     img.src = path;
   }
 
@@ -11414,12 +11417,14 @@ const World = (() => {
     if (!path) continue;
     const img = new Image();
     pendingAssets++;
+    pendingAssetNames.add(name);
     img.onload = () => {
       pendingAssets--;
+      pendingAssetNames.delete(name);
       if (isTainted(img)) return;
       try { TX[name] = fitCanvasZoomed(img, 64, 64, 1.3); } catch (e) { console.warn('Failed to build door-skin wall texture:', path, e); }
     };
-    img.onerror = () => { pendingAssets--; console.warn('Failed to load door-skin wall texture (check the path/file exists):', path); };
+    img.onerror = () => { pendingAssets--; pendingAssetNames.delete(name); console.warn('Failed to load door-skin wall texture (check the path/file exists):', path); };
     img.src = path;
   }
 
@@ -11431,12 +11436,14 @@ const World = (() => {
     if (!path) continue;
     const img = new Image();
     pendingAssets++;
+    pendingAssetNames.add(name);
     img.onload = () => {
       pendingAssets--;
+      pendingAssetNames.delete(name);
       if (isTainted(img)) return;
       try { TX[name] = fitCanvasZoomed(img, 64, 64, 1.0); } catch (e) { console.warn('Failed to build shipped wall texture:', path, e); }
     };
-    img.onerror = () => { pendingAssets--; console.warn('Failed to load shipped wall texture (check the path/file exists):', path); };
+    img.onerror = () => { pendingAssets--; pendingAssetNames.delete(name); console.warn('Failed to load shipped wall texture (check the path/file exists):', path); };
     img.src = path;
   }
 
@@ -12487,6 +12494,7 @@ const World = (() => {
     hasMission, get currentMission() { return currentMission; },
     loadMissionByName, loadEpisodeSlot,
     get assetsReady() { return pendingAssets <= 0; },
+    get pendingAssetNames() { return [...pendingAssetNames]; },
     get bootLevel() { return boot; },   // the exact level JSON this session booted with — see main.js's "EDIT THIS LEVEL"
     get startBlown() { return startBlown; },
     get musicUndercover() { return musicUndercover; },
