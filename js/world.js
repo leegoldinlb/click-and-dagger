@@ -6097,6 +6097,460 @@ const World = (() => {
     speck(g, 40, 'rgba(0,0,0,0.2)'); speck(g, 20, 'rgba(255,255,255,0.06)');
   });
 
+  // ===========================================================================
+  // THEME PARK SETS — four "lands" worth of surfaces, in the same storybook-
+  // exaggerated register a park uses: everything is a slightly heightened,
+  // cleaner version of the real thing (forced-perspective trim, saturated
+  // paint, no real decay), which is why these run brighter and higher-contrast
+  // than the grubby spy-fi sets above.
+  // ===========================================================================
+
+  // ---- MAIN STREET: turn-of-century American commercial block ----
+  FLOOR.mainstreetfront = cnv(g => {                    // emporium: display window, transom lights, gilt fascia
+    vgrad(g, 0, 0, 64, 64, '#2f5040', '#1d3327');                      // deep green painted joinery
+    vgrad(g, 0, 0, 64, 11, '#dcb954', '#a8862c');                      // signboard fascia
+    g.fillStyle = 'rgba(38,24,6,0.72)';                                // abstracted gilt lettering
+    for (let i = 0; i < 6; i++) g.fillRect(5 + i * 9, 3, 5, 5);
+    g.fillStyle = 'rgba(0,0,0,0.4)'; g.fillRect(0, 11, 64, 1);
+    for (let i = 0; i < 4; i++) {                                      // transom lights over the window
+      g.fillStyle = '#93b3aa'; g.fillRect(4 + i * 15, 14, 12, 7);
+      bevel(g, 4 + i * 15, 14, 12, 7, 'rgba(255,255,255,0.3)', 'rgba(0,0,0,0.45)');
+    }
+    const win = g.createLinearGradient(4, 24, 60, 50);                 // plate glass, warm shop light behind it
+    win.addColorStop(0, '#eed69b'); win.addColorStop(0.38, '#a08c5e');
+    win.addColorStop(0.7, '#4a4230'); win.addColorStop(1, '#221d15');
+    g.fillStyle = win; g.fillRect(4, 24, 56, 26);
+    g.fillStyle = 'rgba(255,255,255,0.16)';                            // glare bar
+    g.beginPath(); g.moveTo(10, 50); g.lineTo(20, 24); g.lineTo(25, 24); g.lineTo(15, 50); g.closePath(); g.fill();
+    bevel(g, 4, 24, 56, 26, 'rgba(0,0,0,0.45)', 'rgba(255,236,190,0.16)');
+    g.fillStyle = '#24382c'; g.fillRect(31, 24, 3, 26);                // centre mullion
+    vgrad(g, 0, 50, 64, 14, '#375a46', '#20372a');                     // panelled bulkhead below the glass
+    for (let i = 0; i < 3; i++) {
+      g.fillStyle = '#2a4636'; g.fillRect(4 + i * 20, 53, 16, 8);
+      bevel(g, 4 + i * 20, 53, 16, 8, 'rgba(255,240,200,0.12)', 'rgba(0,0,0,0.45)');
+    }
+    speck(g, 26, 'rgba(0,0,0,0.12)');
+  });
+  FLOOR.mainstreetbrick = cnv(g => {                    // upper-storey brick with a corbelled cornice band
+    vgrad(g, 0, 0, 64, 64, '#a85c44', '#7e402e');
+    g.strokeStyle = 'rgba(40,18,10,0.32)'; g.lineWidth = 1;
+    for (let ty = 0; ty < 8; ty++) {                                   // 16x8 running bond — wraps cleanly at 64
+      const y = ty * 8, off = (ty % 2) * 8;
+      g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke();
+      for (let x = -8 + off; x < 64; x += 16) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 8); g.stroke(); }
+    }
+    g.fillStyle = 'rgba(255,225,200,0.06)';                            // mortar catching light on course tops
+    for (let ty = 0; ty < 8; ty++) g.fillRect(0, ty * 8 + 1, 64, 1);
+    stains(g, 5, ['#5e2c1e', '#c07a58', '#8a4630']);
+    g.fillStyle = '#c9b48c'; g.fillRect(0, 0, 64, 6);                  // painted stone cornice
+    bevel(g, 0, 0, 64, 6, 'rgba(255,250,230,0.35)', 'rgba(0,0,0,0.4)');
+    for (let x = 0; x < 64; x += 8) {                                  // corbel teeth under the cornice
+      g.fillStyle = '#b8a179'; g.fillRect(x + 1, 6, 5, 3);
+      g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(x + 1, 9, 5, 1);
+    }
+    speck(g, 40, 'rgba(0,0,0,0.1)');
+  });
+  FLOOR.mainstreetawning = cnv(g => {                   // candy-striped canvas awning, scalloped valance
+    for (let x = 0; x < 64; x += 8) {                                  // red/cream stripes down the slope
+      g.fillStyle = '#b8352f'; g.fillRect(x, 0, 4, 52);
+      g.fillStyle = '#efe3cb'; g.fillRect(x + 4, 0, 4, 52);
+    }
+    vgrad(g, 0, 0, 64, 52, 'rgba(255,255,255,0.16)', 'rgba(0,0,0,0.3)');  // slope shading
+    g.fillStyle = 'rgba(0,0,0,0.18)';                                  // rib shadows
+    for (let x = 0; x < 64; x += 16) g.fillRect(x, 0, 1, 52);
+    for (let i = 0; i < 4; i++) {                                      // scalloped valance hanging below
+      const cx = 8 + i * 16;
+      g.fillStyle = i % 2 ? '#efe3cb' : '#b8352f';
+      g.beginPath(); g.moveTo(cx - 8, 52); g.lineTo(cx + 8, 52); g.lineTo(cx + 8, 56); g.arc(cx, 56, 8, 0, Math.PI); g.closePath(); g.fill();
+    }
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(0, 50, 64, 2);        // shadow under the fold
+    speck(g, 30, 'rgba(0,0,0,0.08)');
+  });
+  FLOOR.gingerbread = cnv(g => {                        // white Victorian eave trim: scrollwork brackets + spindles
+    vgrad(g, 0, 0, 64, 64, '#8fb8c4', '#5f8b9a');                      // sky/shadow behind the fretwork
+    g.fillStyle = '#f4efe2'; g.fillRect(0, 0, 64, 9);                  // fascia board
+    bevel(g, 0, 0, 64, 9, 'rgba(255,255,255,0.6)', 'rgba(90,70,50,0.4)');
+    g.fillStyle = '#efe8d8';
+    for (let i = 0; i < 8; i++) {                                      // turned spindles hanging off the fascia
+      const x = i * 8 + 3;
+      g.fillRect(x, 9, 2, 14);
+      g.beginPath(); g.arc(x + 1, 25, 3, 0, 7); g.fill();
+      g.fillRect(x - 1, 30, 4, 3);
+    }
+    for (let i = 0; i < 2; i++) {                                      // scroll brackets at the posts
+      const bx = i * 32 + 6;
+      g.strokeStyle = '#efe8d8'; g.lineWidth = 3;
+      g.beginPath(); g.moveTo(bx, 36); g.quadraticCurveTo(bx + 14, 40, bx + 18, 58); g.stroke();
+      g.lineWidth = 2;
+      g.beginPath(); g.arc(bx + 6, 46, 4, 1.2, 5.4); g.stroke();
+    }
+    g.fillStyle = '#f4efe2'; g.fillRect(0, 58, 64, 6);                 // top rail of the porch below
+    bevel(g, 0, 58, 64, 6, 'rgba(255,255,255,0.5)', 'rgba(60,45,30,0.4)');
+    speck(g, 20, 'rgba(0,0,0,0.07)');
+  });
+  FLOOR.mainstreetpaver = cnv(g => {                    // swept hex paving of the parade route
+    g.fillStyle = '#9b8a76'; g.fillRect(0, 0, 64, 64);
+    const hw = 16, hh = 10;                                            // half-drop rows read as hexes at texel scale
+    for (let ry = 0; ry < 7; ry++) for (let rx = -1; rx < 5; rx++) {
+      const x = rx * hw + (ry % 2) * (hw / 2), y = ry * hh;
+      g.fillStyle = ['#a89478', '#a3907a', '#b09c84', '#97846e', '#ab9880'][(rx + ry * 3 + 5) % 5];
+      g.beginPath();
+      g.moveTo(x + hw / 2, y); g.lineTo(x + hw, y + hh / 3); g.lineTo(x + hw, y + hh * 2 / 3);
+      g.lineTo(x + hw / 2, y + hh); g.lineTo(x, y + hh * 2 / 3); g.lineTo(x, y + hh / 3);
+      g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(60,50,38,0.35)'; g.lineWidth = 1; g.stroke();
+    }
+    stains(g, 6, ['#7d6c58', '#b5a288']);
+    speck(g, 70, 'rgba(0,0,0,0.1)'); speck(g, 30, 'rgba(255,248,230,0.07)');
+  });
+
+  // ---- FANTASY CASTLE ----
+  FLOOR.castleashlar = cnv(g => {                       // dressed grey ashlar, big storybook blocks
+    vgrad(g, 0, 0, 64, 64, '#9aa2ab', '#6d757e');
+    for (let ty = 0; ty < 4; ty++) {                                   // 32x16 courses, half-offset
+      const y = ty * 16, off = (ty % 2) * 16;
+      for (let x = -16 + off; x < 64; x += 32) {
+        const shade = ['#8e969f', '#98a0a9', '#848c95', '#9ca4ad'][(ty + (x / 16 | 0) + 4) % 4];
+        g.fillStyle = shade; g.fillRect(x + 1, y + 1, 30, 14);
+        bevel(g, x + 1, y + 1, 30, 14, 'rgba(255,255,255,0.22)', 'rgba(20,26,32,0.42)');
+        g.fillStyle = 'rgba(255,255,255,0.05)';                        // tooled chisel marks
+        for (let k = 0; k < 5; k++) g.fillRect(x + 3 + ((Math.random() * 24) | 0), y + 3 + ((Math.random() * 10) | 0), 3, 1);
+      }
+    }
+    stains(g, 6, ['#5c646d', '#aeb6bf', '#6f7a70']);
+    speck(g, 55, 'rgba(0,0,0,0.13)'); speck(g, 25, 'rgba(255,255,255,0.07)');
+  });
+  FLOOR.castlebattlement = cnv(g => {                   // crenellated parapet against sky
+    vgrad(g, 0, 0, 64, 26, '#7fb6d8', '#a9cfe4');                      // sky through the embrasures
+    for (let i = 0; i < 4; i++) {                                      // merlons
+      const x = i * 16;
+      vgrad(g, x, 4, 10, 22, '#9aa2ab', '#7b838c');
+      bevel(g, x, 4, 10, 22, 'rgba(255,255,255,0.3)', 'rgba(20,26,32,0.45)');
+      g.fillStyle = '#aab2bb'; g.fillRect(x, 4, 10, 2);                // lit cap
+    }
+    vgrad(g, 0, 26, 64, 38, '#8e969f', '#6a727b');                     // wall below the walkway
+    g.fillStyle = '#a4acb5'; g.fillRect(0, 26, 64, 3);                 // string course
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(0, 29, 64, 1);
+    g.strokeStyle = 'rgba(24,30,36,0.4)'; g.lineWidth = 1;
+    for (let ty = 0; ty < 3; ty++) {                                   // coursing on the lower wall
+      const y = 34 + ty * 10, off = (ty % 2) * 12;
+      g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke();
+      for (let x = -12 + off; x < 64; x += 24) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + 10); g.stroke(); }
+    }
+    speck(g, 45, 'rgba(0,0,0,0.12)');
+  });
+  FLOOR.castlebanner = cnv(g => {                       // heraldic banner hung on stone
+    vgrad(g, 0, 0, 64, 64, '#828a93', '#5f676f');                      // stone behind
+    g.strokeStyle = 'rgba(24,30,36,0.4)'; g.lineWidth = 1;
+    for (let y = 0; y < 64; y += 16) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.fillStyle = '#3a2a1a'; g.fillRect(6, 4, 52, 3);                  // hanging rod
+    bevel(g, 6, 4, 52, 3, 'rgba(226,190,120,0.5)', 'rgba(0,0,0,0.5)');
+    const cloth = g.createLinearGradient(0, 7, 0, 60);                 // the banner itself
+    cloth.addColorStop(0, '#8e2036'); cloth.addColorStop(0.5, '#6d1728'); cloth.addColorStop(1, '#4d0f1c');
+    g.fillStyle = cloth;
+    g.beginPath(); g.moveTo(14, 7); g.lineTo(50, 7); g.lineTo(50, 52); g.lineTo(32, 60); g.lineTo(14, 52); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(0,0,0,0.16)';                                  // fold shadows
+    for (const fx of [22, 32, 42]) { g.fillRect(fx, 7, 2, 46); }
+    g.fillStyle = '#d4af37';                                           // gold device: fleur-ish diamond + bar
+    g.beginPath(); g.moveTo(32, 16); g.lineTo(40, 28); g.lineTo(32, 40); g.lineTo(24, 28); g.closePath(); g.fill();
+    g.fillStyle = '#f0d572'; g.fillRect(26, 27, 12, 2);
+    g.fillStyle = '#d4af37'; g.fillRect(20, 44, 24, 2);
+    g.fillStyle = 'rgba(255,255,255,0.1)';                             // rim light down the left fold
+    g.fillRect(14, 7, 1, 45);
+    speck(g, 26, 'rgba(0,0,0,0.12)');
+  });
+  FLOOR.castlewindow = cnv(g => {                       // gothic arched window, leaded lights
+    vgrad(g, 0, 0, 64, 64, '#8a929b', '#666e77');                      // stone surround
+    g.strokeStyle = 'rgba(24,30,36,0.35)'; g.lineWidth = 1;
+    for (let y = 12; y < 64; y += 16) { g.beginPath(); g.moveTo(0, y); g.lineTo(64, y); g.stroke(); }
+    g.fillStyle = '#3a4149';                                           // recessed reveal
+    g.beginPath(); g.moveTo(16, 56); g.lineTo(16, 24); g.arc(32, 24, 16, Math.PI, 0); g.lineTo(48, 56); g.closePath(); g.fill();
+    const glass = () => { g.beginPath(); g.moveTo(20, 53); g.lineTo(20, 25); g.arc(32, 25, 12, Math.PI, 0); g.lineTo(44, 53); g.closePath(); };
+    const lead = g.createLinearGradient(20, 16, 44, 54);               // glass, cool with a warm inner glow
+    lead.addColorStop(0, '#cfe2ea'); lead.addColorStop(0.45, '#7fa3b4'); lead.addColorStop(1, '#3c5a68');
+    g.fillStyle = lead; glass(); g.fill();
+    g.save(); glass(); g.clip();                                       // leading only inside the glass, not over the stone
+    g.strokeStyle = 'rgba(26,32,38,0.75)'; g.lineWidth = 1;            // diamond quarrels
+    for (let d = -48; d < 64; d += 8) {
+      g.beginPath(); g.moveTo(20 + d, 56); g.lineTo(56 + d, 10); g.stroke();
+      g.beginPath(); g.moveTo(20 + d, 10); g.lineTo(56 + d, 56); g.stroke();
+    }
+    g.fillStyle = 'rgba(255,255,255,0.16)'; g.fillRect(22, 12, 6, 44); // glare down one light
+    g.restore();
+    g.fillStyle = '#4a525a'; g.fillRect(30, 20, 4, 34);                // centre mullion
+    g.fillStyle = '#8e969f'; g.fillRect(12, 54, 40, 4);                // sill
+    bevel(g, 12, 54, 40, 4, 'rgba(255,255,255,0.3)', 'rgba(0,0,0,0.5)');
+    speck(g, 30, 'rgba(0,0,0,0.12)');
+  });
+  FLOOR.portcullis = cnv(g => {                         // iron portcullis over a dark gate mouth
+    vgrad(g, 0, 0, 64, 64, '#241f1b', '#0e0c0a');                      // the dark beyond
+    g.fillStyle = 'rgba(120,90,50,0.10)';                              // torchlight bloom deeper in
+    g.beginPath(); g.ellipse(32, 44, 18, 14, 0, 0, 7); g.fill();
+    for (let x = 4; x < 64; x += 12) {                                 // vertical bars, spiked feet
+      vgrad(g, x, 0, 5, 58, '#5a5148', '#3a332c');
+      g.fillStyle = 'rgba(255,236,190,0.16)'; g.fillRect(x, 0, 1, 58);
+      g.fillStyle = 'rgba(0,0,0,0.5)'; g.fillRect(x + 4, 0, 1, 58);
+      g.fillStyle = '#4a423a';
+      g.beginPath(); g.moveTo(x, 58); g.lineTo(x + 5, 58); g.lineTo(x + 2.5, 64); g.closePath(); g.fill();
+    }
+    for (const y of [10, 30, 50]) {                                    // horizontal straps
+      vgrad(g, 0, y, 64, 5, '#655b50', '#3d362f');
+      g.fillStyle = 'rgba(255,236,190,0.14)'; g.fillRect(0, y, 64, 1);
+      g.fillStyle = 'rgba(0,0,0,0.5)'; g.fillRect(0, y + 4, 64, 1);
+      g.fillStyle = '#7d7264';                                         // rivets at each crossing
+      for (let x = 5; x < 64; x += 12) { g.beginPath(); g.arc(x + 1.5, y + 2.5, 1.4, 0, 7); g.fill(); }
+    }
+    speck(g, 50, 'rgba(0,0,0,0.2)'); speck(g, 20, 'rgba(255,220,170,0.06)');
+  });
+
+  // ---- JUNGLE COLONIAL ADVENTURE ----
+  FLOOR.junglefoliage = cnv(g => {                      // dense leaf wall, layered canopy depth
+    vgrad(g, 0, 0, 64, 64, '#12301c', '#081810');
+    // Drawn at every wrapped offset as well as in place: a leaf overhanging an
+    // edge comes back in on the opposite one, so the tile has no dead border
+    // and no visible seam line where the foliage stops.
+    const leaf = (x, y, r, a, col) => {
+      for (const dx of [0, -64, 64]) for (const dy of [0, -64, 64]) {
+        if (x + dx < -r || x + dx > 64 + r || y + dy < -r || y + dy > 64 + r) continue;
+        g.save(); g.translate(x + dx, y + dy); g.rotate(a);
+        g.fillStyle = col;
+        g.beginPath(); g.moveTo(0, -r); g.quadraticCurveTo(r * 0.6, 0, 0, r); g.quadraticCurveTo(-r * 0.6, 0, 0, -r); g.fill();
+        g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 1;
+        g.beginPath(); g.moveTo(0, -r); g.lineTo(0, r); g.stroke();
+        g.restore();
+      }
+    };
+    const cols = ['#1d4a28', '#265c31', '#2f6b39', '#173f22', '#3a7d44'];
+    for (let i = 0; i < 46; i++) {                                     // back layer, darker and smaller
+      const x = Math.random() * 64, y = Math.random() * 64;
+      leaf(x, y, 5 + Math.random() * 5, Math.random() * 6, cols[(Math.random() * 3) | 0]);
+    }
+    for (let i = 0; i < 22; i++) {                                     // foreground fronds catching light
+      const x = Math.random() * 64, y = Math.random() * 64;
+      leaf(x, y, 8 + Math.random() * 6, Math.random() * 6, cols[3 + ((Math.random() * 2) | 0)]);
+    }
+    g.fillStyle = 'rgba(190,230,150,0.10)';                            // dappled sun through the canopy
+    for (let i = 0; i < 10; i++) { g.beginPath(); g.arc(Math.random() * 64, Math.random() * 64, 2 + Math.random() * 4, 0, 7); g.fill(); }
+    speck(g, 40, 'rgba(0,0,0,0.2)');
+  });
+  FLOOR.templecarving = cnv(g => {                      // deep-cut relief frieze of a lost temple
+    vgrad(g, 0, 0, 64, 64, '#9c8c66', '#635840');                      // warm sandstone, not grey
+    speck(g, 90, 'rgba(70,58,34,0.22)');
+    // Relief is sold by the CUT, not the outline: every motif gets a dark
+    // recess, a lit top-left rim and a shadowed bottom-right, so the stone
+    // reads as carved into rather than drawn on.
+    const cut = (x, y, w, h) => {
+      g.fillStyle = 'rgba(28,22,10,0.42)'; g.fillRect(x, y, w, h);
+      g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(x, y, w, 1); g.fillRect(x, y, 1, h);
+      g.fillStyle = 'rgba(255,240,196,0.20)'; g.fillRect(x, y + h - 1, w, 1); g.fillRect(x + w - 1, y, 1, h);
+    };
+    for (let ty = 0; ty < 2; ty++) {                                   // two tall register bands
+      const y = ty * 32;
+      g.fillStyle = 'rgba(40,32,16,0.35)'; g.fillRect(0, y, 64, 2);    // band divider
+      g.fillStyle = 'rgba(255,240,196,0.16)'; g.fillRect(0, y + 2, 64, 1);
+      for (let i = 0; i < 4; i++) {                                    // stepped-fret motif, alternating handedness
+        const x = i * 16, flip = (i + ty) % 2;
+        cut(x + 2, y + 6, 12, 3);                                      // top bar
+        if (flip) { cut(x + 2, y + 9, 3, 10); cut(x + 5, y + 16, 8, 3); }
+        else { cut(x + 11, y + 9, 3, 10); cut(x + 3, y + 16, 8, 3); }
+        cut(x + 6, y + 22, 4, 4);                                      // boss/eye at the centre
+        g.fillStyle = 'rgba(255,240,196,0.13)'; g.fillRect(x + 7, y + 23, 2, 2);
+      }
+      g.fillStyle = 'rgba(40,32,16,0.3)'; g.fillRect(0, y + 29, 64, 2);
+    }
+    g.strokeStyle = 'rgba(34,26,12,0.4)'; g.lineWidth = 1;             // block joints cutting the frieze
+    for (const x of [0, 32]) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 64); g.stroke(); }
+    g.fillStyle = 'rgba(56,92,42,0.34)';                               // moss pooling in the recesses
+    for (let i = 0; i < 30; i++) { g.beginPath(); g.ellipse(Math.random() * 64, Math.random() * 64, 2 + Math.random() * 6, 1 + Math.random() * 3, Math.random() * 3, 0, 7); g.fill(); }
+    g.fillStyle = 'rgba(88,128,60,0.22)';                              // brighter moss on the lit rims
+    for (let i = 0; i < 12; i++) g.fillRect((Math.random() * 64) | 0, (Math.random() * 64) | 0, 3 + ((Math.random() * 5) | 0), 1);
+    stains(g, 5, ['#4a5a30', '#8a7a52']);
+    speck(g, 40, 'rgba(0,0,0,0.16)');
+  });
+  FLOOR.thatchroof = cnv(g => {                         // palm thatch in overlapping courses
+    vgrad(g, 0, 0, 64, 64, '#6b4f22', '#42300f');
+    for (let ty = 0; ty < 5; ty++) {                                   // each course overlaps the one below
+      const y = ty * 14;
+      for (let i = 0; i < 60; i++) {
+        const x = Math.random() * 68 - 2;
+        const len = 8 + Math.random() * 8;
+        g.strokeStyle = ['#b08a3c', '#96742d', '#c09340', '#7f6224', '#a8853a'][(Math.random() * 5) | 0];
+        g.lineWidth = 1 + Math.random();
+        g.beginPath(); g.moveTo(x, y); g.lineTo(x + (Math.random() * 3 - 1.5), y + len); g.stroke();
+      }
+      g.fillStyle = 'rgba(0,0,0,0.28)'; g.fillRect(0, y + 12, 64, 2);  // shadow line at the course edge
+      g.fillStyle = 'rgba(255,226,150,0.10)'; g.fillRect(0, y, 64, 1);
+    }
+    speck(g, 60, 'rgba(0,0,0,0.16)'); speck(g, 30, 'rgba(255,226,150,0.07)');
+  });
+  FLOOR.safaritent = cnv(g => {                         // khaki expedition canvas, slung between poles
+    vgradWrap(g, '#7d6e4b', '#a99871');
+    // Flat canvas reads as cardboard. What sells it is slack: soft vertical
+    // catenary shading between the tie points, so the cloth looks hung rather
+    // than painted on the wall.
+    for (const cx of [10, 32, 54]) {
+      const sag = g.createLinearGradient(cx - 11, 0, cx + 11, 0);
+      sag.addColorStop(0, 'rgba(0,0,0,0.20)'); sag.addColorStop(0.5, 'rgba(255,246,214,0.10)'); sag.addColorStop(1, 'rgba(0,0,0,0.20)');
+      g.fillStyle = sag; g.fillRect(cx - 11, 0, 22, 64);
+    }
+    g.fillStyle = 'rgba(255,248,220,0.05)';                            // weave
+    for (let y = 0; y < 64; y += 2) g.fillRect(0, y, 64, 1);
+    g.fillStyle = 'rgba(0,0,0,0.06)';
+    for (let x = 0; x < 64; x += 2) g.fillRect(x, 0, 1, 64);
+    for (const x of [21, 43]) {                                        // panel seams, double-stitched
+      g.fillStyle = 'rgba(48,38,18,0.35)'; g.fillRect(x, 0, 3, 64);
+      g.fillStyle = 'rgba(255,240,200,0.28)';
+      for (let y = 1; y < 64; y += 4) { g.fillRect(x - 1, y, 1, 2); g.fillRect(x + 3, y + 2, 1, 2); }
+    }
+    g.fillStyle = '#5f5334'; g.fillRect(0, 26, 64, 5);                 // reinforcing web strap
+    bevel(g, 0, 26, 64, 5, 'rgba(255,240,200,0.26)', 'rgba(0,0,0,0.45)');
+    g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(0, 31, 64, 2);         // strap shadow on the cloth
+    for (const [cx, cy] of [[10, 40], [32, 40], [54, 40]]) {           // brass grommets, guy ropes running off
+      g.strokeStyle = 'rgba(0,0,0,0.3)'; g.lineWidth = 3;
+      g.beginPath(); g.moveTo(cx, cy + 1); g.quadraticCurveTo(cx + 7, cy + 9, cx + 5, cy + 21); g.stroke();
+      g.strokeStyle = '#c4b285'; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(cx, cy); g.quadraticCurveTo(cx + 6, cy + 8, cx + 4, cy + 20); g.stroke();
+      g.fillStyle = '#8a6d22'; g.beginPath(); g.arc(cx, cy, 4, 0, 7); g.fill();
+      g.fillStyle = '#d8b451'; g.beginPath(); g.arc(cx, cy, 3, 0, 7); g.fill();
+      g.fillStyle = '#241e10'; g.beginPath(); g.arc(cx, cy, 1.5, 0, 7); g.fill();
+      g.fillStyle = 'rgba(255,244,206,0.5)'; g.fillRect(cx - 2, cy - 3, 3, 1);
+    }
+    stains(g, 7, ['#5e5132', '#c0b088', '#6b5c38']);                   // sun-bleach and travel dirt
+    speck(g, 45, 'rgba(0,0,0,0.11)');
+  });
+  FLOOR.bamboowall = cnv(g => {                         // lashed bamboo poles, an outpost wall
+    g.fillStyle = '#2a2a18'; g.fillRect(0, 0, 64, 64);                 // dark gaps between poles
+    for (let x = 0; x < 64; x += 8) {                                  // poles, lit left / shadowed right
+      const gr = g.createLinearGradient(x, 0, x + 7, 0);
+      gr.addColorStop(0, '#8f9a4e'); gr.addColorStop(0.35, '#b8c268'); gr.addColorStop(1, '#5f6a2f');
+      g.fillStyle = gr; g.fillRect(x, 0, 7, 64);
+      g.fillStyle = 'rgba(40,44,18,0.55)';                             // nodes
+      for (let y = ((x / 8) % 3) * 7; y < 64; y += 21) { g.fillRect(x, y, 7, 2); g.fillStyle = 'rgba(255,255,220,0.12)'; g.fillRect(x, y + 2, 7, 1); g.fillStyle = 'rgba(40,44,18,0.55)'; }
+      speck(g, 6, 'rgba(60,66,26,0.35)', 64, 64);
+    }
+    for (const y of [14, 46]) {                                        // rattan lashing bands
+      g.fillStyle = '#6b4a22'; g.fillRect(0, y, 64, 5);
+      g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(0, y + 4, 64, 1);
+      g.fillStyle = 'rgba(214,176,110,0.5)';
+      for (let x = -2; x < 64; x += 6) { g.beginPath(); g.moveTo(x, y + 5); g.lineTo(x + 4, y); g.lineTo(x + 6, y); g.lineTo(x + 2, y + 5); g.closePath(); g.fill(); }
+    }
+    speck(g, 40, 'rgba(0,0,0,0.14)');
+  });
+
+  // ---- WILD WEST ----
+  FLOOR.westfalsefront = cnv(g => {                     // false-front storefront: sun-bleached clapboard + sign board
+    vgrad(g, 0, 0, 64, 64, '#a8875e', '#7d6242');                      // weathered board wall
+    for (let y = 0; y < 64; y += 6) {                                  // lap siding shadows
+      g.fillStyle = 'rgba(0,0,0,0.22)'; g.fillRect(0, y + 5, 64, 1);
+      g.fillStyle = 'rgba(255,236,190,0.10)'; g.fillRect(0, y, 64, 1);
+      g.fillStyle = 'rgba(90,62,36,0.18)';                             // grain streaks
+      for (let i = 0; i < 5; i++) g.fillRect((Math.random() * 64) | 0, y + 1 + ((Math.random() * 3) | 0), 4 + ((Math.random() * 8) | 0), 1);
+    }
+    g.fillStyle = '#5c3a22'; g.fillRect(2, 8, 60, 18);                 // painted sign board
+    bevel(g, 2, 8, 60, 18, 'rgba(255,228,180,0.22)', 'rgba(0,0,0,0.5)');
+    g.fillStyle = '#e8d9a8';                                           // abstracted hand-painted lettering
+    for (let i = 0; i < 7; i++) g.fillRect(7 + i * 8, 13, 5, 8);
+    g.fillStyle = 'rgba(92,58,34,0.35)';                               // paint worn back to the wood
+    for (let i = 0; i < 14; i++) g.fillRect(4 + ((Math.random() * 56) | 0), 10 + ((Math.random() * 14) | 0), 3, 2);
+    g.fillStyle = '#6d5236'; g.fillRect(0, 30, 64, 3);                 // trim band under the sign
+    bevel(g, 0, 30, 64, 3, 'rgba(255,228,180,0.2)', 'rgba(0,0,0,0.4)');
+    stains(g, 6, ['#6a4d2e', '#c0a173']);
+    speck(g, 45, 'rgba(0,0,0,0.13)');
+  });
+  FLOOR.saloonfront = cnv(g => {                        // saloon: batwing doors, warm lamplight inside
+    vgrad(g, 0, 0, 64, 64, '#7c5a3a', '#543c26');                      // dark stained boards
+    for (let y = 0; y < 64; y += 8) { g.fillStyle = 'rgba(0,0,0,0.2)'; g.fillRect(0, y + 7, 64, 1); }
+    g.fillStyle = '#2a1c12'; g.fillRect(14, 16, 36, 48);               // door opening
+    const glow = g.createLinearGradient(0, 20, 0, 60);                 // lamplight spilling out
+    glow.addColorStop(0, '#e8b45c'); glow.addColorStop(0.6, '#a8722c'); glow.addColorStop(1, '#3c2612');
+    g.fillStyle = glow; g.fillRect(16, 18, 32, 44);
+    g.fillStyle = 'rgba(0,0,0,0.35)';                                  // silhouetted bar furniture within
+    g.fillRect(18, 40, 12, 22); g.fillRect(34, 34, 10, 28);
+    for (const dx of [16, 33]) {                                       // the batwings themselves
+      vgrad(g, dx, 24, 15, 26, '#8a6134', '#5e4020');
+      bevel(g, dx, 24, 15, 26, 'rgba(255,224,170,0.28)', 'rgba(0,0,0,0.5)');
+      g.fillStyle = 'rgba(0,0,0,0.3)';
+      for (let i = 0; i < 3; i++) g.fillRect(dx + 2, 28 + i * 8, 11, 2);
+      g.fillStyle = '#b9915a'; g.fillRect(dx, 24, 15, 2);
+    }
+    g.fillStyle = 'rgba(0,0,0,0.45)'; g.fillRect(14, 16, 36, 2);       // header shadow
+    g.fillStyle = '#6d5236'; g.fillRect(10, 10, 44, 6);                // lintel board
+    bevel(g, 10, 10, 44, 6, 'rgba(255,228,180,0.24)', 'rgba(0,0,0,0.45)');
+    speck(g, 40, 'rgba(0,0,0,0.14)');
+  });
+  FLOOR.boardwalk = cnv(g => {                          // dusty boardwalk planking
+    g.fillStyle = '#2b2018'; g.fillRect(0, 0, 64, 64);
+    for (let i = 0; i < 5; i++) {                                      // 5 planks with gaps
+      const y = i * 13;
+      const tone = ['#9c7b52', '#8b6c46', '#a8875e', '#7f6340', '#946f4a'][i];
+      g.fillStyle = tone; g.fillRect(0, y, 64, 12);
+      g.strokeStyle = 'rgba(60,40,22,0.35)'; g.lineWidth = 1;          // grain
+      for (let k = 0; k < 4; k++) {
+        const gy = y + 2 + k * 3;
+        g.beginPath(); g.moveTo(0, gy);
+        g.bezierCurveTo(20, gy + (Math.random() * 2 - 1), 44, gy + (Math.random() * 2 - 1), 64, gy); g.stroke();
+      }
+      g.fillStyle = 'rgba(255,232,190,0.12)'; g.fillRect(0, y, 64, 1);
+      g.fillStyle = 'rgba(0,0,0,0.4)'; g.fillRect(0, y + 11, 64, 1);
+      g.fillStyle = '#4a3826';                                         // square nail heads
+      for (const nx of [6, 56]) { g.fillRect(nx, y + 4, 2, 2); }
+    }
+    g.fillStyle = 'rgba(190,166,124,0.16)';                            // trail dust settled on top
+    for (let i = 0; i < 14; i++) { g.beginPath(); g.ellipse(Math.random() * 64, Math.random() * 64, 4 + Math.random() * 7, 2 + Math.random() * 4, 0, 0, 7); g.fill(); }
+    speck(g, 60, 'rgba(0,0,0,0.14)');
+  });
+  FLOOR.wantedboard = cnv(g => {                        // notice board papered with sun-curled bills
+    vgrad(g, 0, 0, 64, 64, '#6b5237', '#493623');
+    for (let y = 0; y < 64; y += 11) { g.fillStyle = 'rgba(0,0,0,0.26)'; g.fillRect(0, y + 10, 64, 1); }
+    const bill = (x, y, w, h, tilt, tone) => {
+      g.save(); g.translate(x + w / 2, y + h / 2); g.rotate(tilt); g.translate(-w / 2, -h / 2);
+      g.fillStyle = 'rgba(0,0,0,0.4)'; g.fillRect(1, 2, w, h);         // drop shadow
+      g.fillStyle = tone; g.fillRect(0, 0, w, h);
+      g.fillStyle = '#3a2a16'; g.fillRect(2, 2, w - 4, 4);             // "WANTED" header block, ink-dark
+      g.fillStyle = tone;                                              // knocked-out letterforms in the header
+      for (let i = 0; i < ((w - 6) / 3) | 0; i++) g.fillRect(3 + i * 3, 3, 1, 2);
+      g.fillStyle = '#6b5433'; g.fillRect(3, 8, w - 6, h - 16);        // portrait plate
+      g.fillStyle = '#4a3a22';                                         // crude engraved face: hat brim + jaw
+      g.fillRect(4, 9, w - 8, 3);
+      g.beginPath(); g.arc(w / 2 - 1, 13 + (h - 16) / 3, (w - 12) / 2, 0, 7); g.fill();
+      g.fillStyle = 'rgba(255,250,230,0.18)'; g.fillRect(4, 9, w - 8, 1);
+      g.fillStyle = '#3a2a16';                                         // reward line under the plate
+      for (let i = 0; i < 2; i++) g.fillRect(4, h - 6 + i * 2, w - 8 - ((Math.random() * 6) | 0), 1);
+      g.fillStyle = 'rgba(120,90,50,0.3)'; g.fillRect(0, 0, w, 1); g.fillRect(0, 0, 1, h);
+      g.fillStyle = 'rgba(90,66,34,0.22)';                             // sun-curl darkening at the edges
+      g.fillRect(0, h - 2, w, 2); g.fillRect(w - 2, 0, 2, h);
+      g.restore();
+    };
+    bill(4, 6, 22, 30, -0.06, '#d9c9a0');
+    bill(32, 3, 20, 27, 0.09, '#cdbb92');
+    bill(20, 34, 24, 26, 0.03, '#e0d0a8');
+    bill(48, 36, 16, 22, -0.11, '#cfbd94');
+    g.fillStyle = '#6a5a3a';                                           // tacks
+    for (const [tx, ty] of [[8, 9], [50, 6], [24, 37], [60, 39]]) { g.beginPath(); g.arc(tx, ty, 1.5, 0, 7); g.fill(); }
+    stains(g, 5, ['#8a6a3c', '#5a4326']);
+    speck(g, 40, 'rgba(0,0,0,0.12)');
+  });
+  FLOOR.corralfence = cnv(g => {                        // split-rail corral against open range
+    vgrad(g, 0, 0, 64, 30, '#c8b184', '#b49a6c');                      // dusty plain beyond
+    vgrad(g, 0, 30, 64, 34, '#a68d61', '#8a7349');
+    g.fillStyle = 'rgba(120,100,60,0.25)';                             // scrub
+    for (let i = 0; i < 16; i++) { g.beginPath(); g.arc(Math.random() * 64, 26 + Math.random() * 36, 1 + Math.random() * 3, 0, 7); g.fill(); }
+    for (const y of [12, 32]) {                                        // two rails
+      vgrad(g, 0, y, 64, 8, '#8f6f47', '#5f472a');
+      g.fillStyle = 'rgba(255,232,190,0.16)'; g.fillRect(0, y, 64, 1);
+      g.fillStyle = 'rgba(0,0,0,0.4)'; g.fillRect(0, y + 7, 64, 1);
+      g.strokeStyle = 'rgba(60,42,22,0.4)'; g.lineWidth = 1;
+      for (let k = 0; k < 3; k++) { const gy = y + 2 + k * 2; g.beginPath(); g.moveTo(0, gy); g.bezierCurveTo(22, gy - 1, 44, gy + 1, 64, gy); g.stroke(); }
+    }
+    for (const x of [8, 46]) {                                         // posts
+      vgrad(g, x, 2, 10, 62, '#7d5f3a', '#4e3a22');
+      bevel(g, x, 2, 10, 62, 'rgba(255,232,190,0.2)', 'rgba(0,0,0,0.45)');
+      g.fillStyle = 'rgba(0,0,0,0.25)';
+      for (let k = 0; k < 6; k++) g.fillRect(x + 1 + ((Math.random() * 7) | 0), 4 + k * 10, 2, 5);
+    }
+    speck(g, 50, 'rgba(0,0,0,0.13)'); speck(g, 22, 'rgba(255,240,200,0.06)');
+  });
+
   // ---- parallax sky (wide; sampled by view angle): warm Havana afternoon ----
   const SKY = cnv(g => {
     // deep zenith blue → pale atmospheric haze at the horizon (Rayleigh-scatter feel,
@@ -6347,6 +6801,10 @@ const World = (() => {
     'catacombwall',
     'scigrating', 'scidoorpanel', 'scipanelbank', 'scipipes',
     'lavarock', 'lavacracked', 'crystalrock', 'crystalstrata', 'fungalterrain', 'fungalspores', 'redcracked', 'aliensoil', 'aliensoilveined', 'bulkhead', 'conduitruns', 'floorgrating', 'hatchpanel', 'buttonconsole',
+    'mainstreetfront', 'mainstreetbrick', 'mainstreetawning', 'gingerbread', 'mainstreetpaver',
+    'castleashlar', 'castlebattlement', 'castlebanner', 'castlewindow', 'portcullis',
+    'junglefoliage', 'templecarving', 'thatchroof', 'safaritent', 'bamboowall',
+    'westfalsefront', 'saloonfront', 'boardwalk', 'wantedboard', 'corralfence',
     'radio', 'blast', 'mainframe', 'poster', 'keycard', 'stdkey'];
   const WALLTX = { 1: 'teak', 2: 'lair', 3: 'blast', 4: 'radio', 5: 'mainframe', 6: 'poster', 7: 'keycard', 8: 'stdkey' };
   const wallTexName = (x, y) => {
