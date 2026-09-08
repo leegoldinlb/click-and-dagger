@@ -33,6 +33,8 @@ const Editor = (() => {
     { kind: 'londonposterprivate', name: 'PRIVATE PERMISSION POSTER', spr: 'londonposterprivate' },
     { kind: 'londonposterthunderpussy', name: 'DR. THUNDERPUSSY POSTER', spr: 'londonposterthunderpussy' },
     { kind: 'londonpostersloths', name: 'PLANET OF THE SLOTHS POSTER', spr: 'londonpostersloths' },
+    // --- theme park set ---
+    { kind: 'parkcastle', name: 'FAIRYTALE CASTLE', spr: 'parkcastle' },
     // --- paris opera set ---
     { kind: 'parisphantom', name: 'THE PHANTOM', spr: 'parisphantom1' },
     { kind: 'parisoperachandelier', name: 'CRYSTAL CHANDELIER', spr: 'parisoperachandelier' },
@@ -489,7 +491,7 @@ const Editor = (() => {
     ['paris', 'PARIS'], ['matron', 'PARIS'], ['havana', 'HAVANA'], ['nyc', 'NEW YORK'], ['ny', 'NEW YORK'],
     ['tehran', 'TEHRAN'], ['iran', 'TEHRAN'], ['me', 'TEHRAN'], ['london', 'LONDON'],
     ['moscow', 'MOSCOW'], ['soviet', 'MOSCOW'], ['cosmonaut', 'MOSCOW'], ['hk', 'HONG KONG'],
-    ['dallas', 'DALLAS'],
+    ['dallas', 'DALLAS'], ['park', 'THEME PARK'],
   ];
   // The sci-fi props have no shared name prefix (phaser, tricorder, bone...),
   // so they're grouped by an explicit set rather than LOCATION_PREFIXES.

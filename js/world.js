@@ -11298,6 +11298,8 @@ const World = (() => {
     londonposterprivate: 'assets/sprites/londonposterprivate.png?v=1',
     londonposterthunderpussy: 'assets/sprites/londonposterthunderpussy.png?v=1',
     londonpostersloths: 'assets/sprites/londonpostersloths.png?v=1',
+    // --- theme park set ---
+    parkcastle: 'assets/sprites/parkcastle.png?v=1',
     // --- paris opera set ---
     parisphantom1: 'assets/sprites/parisphantom1.png?v=1',
     parisphantom2: 'assets/sprites/parisphantom2.png?v=1',
@@ -12631,6 +12633,11 @@ const World = (() => {
     londonposterprivate: (x, y) => prop('londonposterprivate', 'PRIVATE PERMISSION POSTER', x, y, 1.0, false),
     londonposterthunderpussy: (x, y) => prop('londonposterthunderpussy', 'DR. THUNDERPUSSY POSTER', x, y, 1.0, false),
     londonpostersloths: (x, y) => prop('londonpostersloths', 'PLANET OF THE SLOTHS POSTER', x, y, 1.0, false),
+    // --- theme park set ---
+    // Scale 3.2: the hero landmark of its land, so it has to out-top every
+    // other placeable skyline piece (Buckingham 2.4, Big Ben 2.2) the way the
+    // real thing terminates a park's main axis.
+    parkcastle: (x, y) => prop('parkcastle', 'FAIRYTALE CASTLE', x, y, 3.2, true),
     // --- paris opera set ---
     parisphantom: (x, y) => prop('parisphantom', 'THE PHANTOM', x, y, 3.5, true, { pose: 1,
       getTex() { return SPR['parisphantom' + this.pose]; } }),
