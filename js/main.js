@@ -216,6 +216,31 @@ const Game = (() => {
     Sfx.setVolume(settings.sfx / 100);
   }
 
+  // ---------------------------------------------------------- menu music --
+  // The DEFAULT undercover cue (MUSIC_TRACKS in music.js) plays under the
+  // title, mission select and settings. Both slots get the same key so that
+  // nothing — there is no cover to blow on a menu — can switch it.
+  const MENU_TRACK = 'undercover';
+  function playMenuMusic() {
+    Music.setTracks(MENU_TRACK, MENU_TRACK);
+    Music.setBlown(false);
+  }
+  // Audio can't start before a user gesture, and the menu deliberately doesn't
+  // require a click to sit on — so the first interaction of any kind, on any
+  // screen, is what opens the tap. Starting the cue from inside this handler
+  // (rather than queueing it at boot) means the crossfade runs with audio
+  // already unlocked, so it fades up properly instead of snapping to full
+  // volume the instant the browser relents.
+  function unlockAudioOnce() {
+    window.removeEventListener('pointerdown', unlockAudioOnce);
+    window.removeEventListener('keydown', unlockAudioOnce);
+    Sfx.unlock();
+    Music.unlock();
+    if (!G.started) playMenuMusic();   // mid-mission already has its own track
+  }
+  window.addEventListener('pointerdown', unlockAudioOnce);
+  window.addEventListener('keydown', unlockAudioOnce);
+
   // Touch devices get an on-screen control layer instead of mouse+keyboard —
   // see the #touchlook/#touchdpad/#touchkit/#touchactions wiring near the
   // bottom of this file. Every one of those controls calls the exact same
@@ -1262,7 +1287,7 @@ const Game = (() => {
     else if (World.currentMission) World.loadMissionByName(World.currentMission);
     else World.load(World.bootLevel);
     applyNewMissionState();
-    Music.stop();          // applyNewMissionState re-tracks the music; the title screen is silent, as on a cold boot
+    playMenuMusic();       // applyNewMissionState re-tracks to the mission's cue; cross back to the menu one
     showScreen('title');
   }
   document.getElementById('quitTitleBtn').addEventListener('click', quitToTitle);
