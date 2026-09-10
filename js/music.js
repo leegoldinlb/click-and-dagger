@@ -32,7 +32,12 @@ const MUSIC_TRACKS = {
 };
 
 const Music = (() => {
-  const VOL = 0.55, FADE_MS = 1400, STOP_MS = 600;
+  // BASE_VOL is the mix level these tracks were balanced at; VOL is that
+  // scaled by the player's music setting, and is what every fade targets.
+  // The crossfade step re-reads VOL each frame, so changing it mid-fade
+  // simply retargets the fade in flight rather than fighting it.
+  const BASE_VOL = 0.55, FADE_MS = 1400, STOP_MS = 600;
+  let VOL = BASE_VOL;
   const players = [new Audio(), new Audio()];
   players.forEach(p => { p.loop = true; p.volume = 0; p.preload = 'auto'; });
   let live = 0;                                   // index of the player currently fading in / audible
@@ -79,6 +84,13 @@ const Music = (() => {
     crossfadeTo(key);
   }
 
+  function setVolume(v) {
+    VOL = BASE_VOL * Math.max(0, Math.min(1, v));
+    // Only touch the live player when a track is actually meant to be
+    // sounding — after stop() everything is parked at 0 and should stay there.
+    if (targetKey !== null) players[live].volume = VOL;
+  }
+
   function stop() {
     cancelAnimationFrame(raf);
     targetKey = null;
@@ -91,5 +103,5 @@ const Music = (() => {
     })();
   }
 
-  return { setTracks, unlock, setBlown, stop };
+  return { setTracks, unlock, setBlown, stop, setVolume };
 })();

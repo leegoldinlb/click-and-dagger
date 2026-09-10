@@ -61,6 +61,7 @@ const Game = (() => {
     started: false,
     over: false,
     loadingMission: false,        // true while a seamless hub<->level switch is settling — see transitionToMission()
+    paused: false,                // pause menu is up — freezes the simulation, rendering carries on behind it
     bobT: 0, bobAmt: 0, fireT: 0,
     warpLock: -1,                      // sector a warp just dropped us into — see warpPlayer()
     kills: 0, civKills: 0, t0: 0,
@@ -141,7 +142,79 @@ const Game = (() => {
   const weaponEl = document.getElementById('weapon');
   const tModeEl = document.getElementById('tMode');
   const modeEl = document.getElementById('modeline');
-  const overlay = document.getElementById('overlay');
+
+  // ------------------------------------------------------------- screens --
+  // Exactly one full-screen panel is up at a time. Each lives in its own
+  // element (see index.html) rather than sharing one recycled div: the
+  // debrief used to be written into the title screen with innerHTML, which
+  // permanently deleted the splash, the start button and the mission tags,
+  // and left updateModeTags() throwing on a missing #episodetag afterwards.
+  const SCREENS = {
+    title: document.getElementById('titleScreen'),
+    mission: document.getElementById('missionScreen'),
+    debrief: document.getElementById('debriefScreen'),
+    pause: document.getElementById('pauseScreen'),
+    settings: document.getElementById('settingsScreen'),
+  };
+  let screenNow = 'title';            // key of the panel that's up, or null for "in the game"
+  let settingsBack = 'title';         // SETTINGS is reachable from two places; this is the way home
+  function showScreen(name) {
+    screenNow = name;
+    for (const k in SCREENS) SCREENS[k].hidden = (k !== name);
+    document.body.classList.toggle('menuopen', !!name);
+    if (name) {
+      const first = SCREENS[name].querySelector('.menuitem:not([disabled]), button');
+      if (first) first.focus();
+    }
+  }
+
+  // --------------------------------------------------------------- pause --
+  // keys[] is written OUTSIDE the input gate, so it keeps filling up while a
+  // menu is open. Clearing on the way in stops a key held when control was
+  // lost (alt-tabbing mid-stride, where no keyup ever arrives) from reading as
+  // held on resume; clearing on the way out stops the W/S used to walk the
+  // menu from doing the same.
+  function clearHeldInput() {
+    for (const k in keys) keys[k] = false;
+    ctrlDown = false; mouseDown = false;
+  }
+  function pauseGame() {
+    if (G.paused || !G.started || G.over || G.loadingMission) return;
+    G.paused = true;
+    clearHeldInput();
+    showScreen('pause');
+  }
+  function resumeGame() {
+    if (!G.paused) return;
+    G.paused = false;
+    clearHeldInput();
+    showScreen(null);
+  }
+
+  // ------------------------------------------------------------ settings --
+  // Persisted under the same cloakclick.* convention as the editor's level and
+  // episode slots. Volumes are percentages so the stored file reads plainly;
+  // the audio modules take 0..1.
+  const SETTINGS_KEY = 'cloakclick.settings';
+  const SETTINGS_DEFAULT = { music: 55, sfx: 100, sens: 100, invert: false };
+  const settings = { ...SETTINGS_DEFAULT };
+  function loadSettings() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+      for (const k in SETTINGS_DEFAULT) {
+        if (typeof raw[k] === typeof SETTINGS_DEFAULT[k]) settings[k] = raw[k];
+      }
+    } catch (e) { /* storage unavailable or corrupt — defaults stand */ }
+  }
+  function saveSettings() {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) { /* private mode, quota — not worth interrupting play for */ }
+  }
+  // Sensitivity and invert are read live by the look handlers, so only the two
+  // audio modules need telling.
+  function applySettings() {
+    Music.setVolume(settings.music / 100);
+    Sfx.setVolume(settings.sfx / 100);
+  }
 
   // Touch devices get an on-screen control layer instead of mouse+keyboard —
   // see the #touchlook/#touchdpad/#touchkit/#touchactions wiring near the
@@ -191,6 +264,7 @@ const Game = (() => {
     const p = canvas.requestPointerLock && canvas.requestPointerLock();
     if (p && p.catch) p.catch(() => {});
   }
+  let hadLock = false;              // previous G.locked, so syncMode can tell a loss from a refusal
   function syncMode() {
     if (!isTouch) G.locked = document.pointerLockElement === canvas;
     if (!G.locked) G.combat = false;
@@ -202,6 +276,24 @@ const Game = (() => {
         ? 'COMBAT MODE — TAB or F to holster · right-click to LOOK'
         : 'HOLSTERED — click to USE/TAKE, right-click to LOOK · Q/E or [ ] cycle kit, ENTER/R select · TAB or F to draw';
     }
+    // LOSING a lock we held is the pause trigger — not merely failing to hold
+    // one. Hooking it here rather than binding Escape covers every way control
+    // goes away at once (Escape, alt-tab, clicking off the window), and it's
+    // the only hook that can: the browser takes the lock back on Escape before
+    // our keydown runs. Until now that state was silent — the "CURSOR FREE"
+    // line above lives in #modeline, which is display:none — while the game
+    // carried on simulating underneath.
+    // The `had` check matters: pointerlockerror routes here too, and a REFUSED
+    // request (browser policy, unfocused document) would otherwise pause the
+    // instant a mission began, with a RESUME button that could only fail again.
+    const had = hadLock;
+    hadLock = G.locked;
+    if (had && !G.locked && !G.paused && G.started && !G.over && !G.loadingMission) pauseGame();
+    // Getting the lock back is what actually closes the menu — RESUME only
+    // *requests* it. Chrome refuses requestPointerLock for a moment after a
+    // user-initiated Escape, and closing optimistically would drop the player
+    // into a live mission with no mouse-look and no menu to fix it from.
+    if (G.locked && G.paused) resumeGame();
   }
   document.addEventListener('pointerlockchange', syncMode);
   document.addEventListener('pointerlockerror', syncMode);
@@ -219,8 +311,13 @@ const Game = (() => {
     return true;
   }
 
+  // The one condition that says "the player is actually driving right now".
+  // This used to be spelled out longhand in seven separate handlers, which is
+  // seven places a new state like `paused` would have had to be remembered.
+  function inputLive() { return G.started && !G.over && !G.loadingMission && !G.paused; }
+
   function toggleMode() {
-    if (!G.started || G.over) return;
+    if (!inputLive()) return;
     if (!G.locked) { requestLock(); return; }     // lost the lock (e.g. Esc) — re-engage it, holstered
     G.combat = !G.combat;
     syncMode();
@@ -232,7 +329,7 @@ const Game = (() => {
   // contextmenu is still suppressed so it doesn't pop the native menu.
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('mousedown', e => {
-    if (e.button !== 2 || !G.started || G.over || G.loadingMission) return;
+    if (e.button !== 2 || !inputLive()) return;
     if (!G.locked) { requestLock(); return; }
     Adventure.lookAt(Engine.W / 2, Engine.H / 2);
   });
@@ -271,7 +368,7 @@ const Game = (() => {
   document.addEventListener('keydown', e => {
     keys[e.code] = true;
     if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault();
-    if (G.started && !G.over && !G.loadingMission) {
+    if (inputLive()) {
       const wi = WEAPON_KEYS.indexOf(e.code);
       if (wi >= 0) switchWeapon(WEAPON_ORDER[wi]);
       if (e.code === 'Tab' || e.code === 'KeyF') { e.preventDefault(); if (!e.repeat) toggleMode(); }   // faster than right-click for switching combat <-> adventure
@@ -296,15 +393,18 @@ const Game = (() => {
   // Mouse-look always drives the view once locked, drawn or holstered alike —
   // holstering no longer frees the cursor, it just changes what a left-click
   // on the crosshair's target does (see mousedown below).
+  const YAW_PER_PX = 0.0022, PITCH_PER_PX = 0.35;   // 100%-sensitivity baselines; settings.sens scales both
   document.addEventListener('mousemove', e => {
-    if (!G.locked || G.loadingMission) return;
-    G.player.a += e.movementX * 0.0022;
+    if (!G.locked || !inputLive()) return;
+    const s = settings.sens / 100;
+    G.player.a += e.movementX * YAW_PER_PX * s;
     const pLim = pitchLimit();
-    G.player.pitch = Math.max(-pLim, Math.min(pLim, G.player.pitch - e.movementY * 0.35));
+    G.player.pitch = Math.max(-pLim, Math.min(pLim,
+      G.player.pitch - e.movementY * PITCH_PER_PX * s * (settings.invert ? -1 : 1)));
   });
 
   canvas.addEventListener('mousedown', e => {
-    if (!G.started || G.over || G.loadingMission || e.button !== 0) return;
+    if (!inputLive() || e.button !== 0) return;
     if (!G.locked) { requestLock(); return; }
     if (G.combat) { mouseDown = true; shoot(); }
     else Adventure.clickAt(Engine.W / 2, Engine.H / 2);   // crosshair-center hit test — LOOK/TAKE/USE, context-sensitive
@@ -327,18 +427,22 @@ const Game = (() => {
 
     const touchLookEl = document.getElementById('touchlook');
     let lookPid = -1, lookX = 0, lookY = 0;
+    const TOUCH_YAW = 0.006, TOUCH_PITCH = 0.6;
     touchLookEl.addEventListener('pointerdown', e => {
+      if (G.paused) return;                               // the pause panel owns the screen
       if (!G.started || G.over) { requestLock(); return; }
       lookPid = e.pointerId; lookX = e.clientX; lookY = e.clientY;
       touchLookEl.setPointerCapture(e.pointerId);
     });
     touchLookEl.addEventListener('pointermove', e => {
-      if (e.pointerId !== lookPid || !G.locked || G.loadingMission) return;
+      if (e.pointerId !== lookPid || !G.locked || !inputLive()) return;
       const dx = e.clientX - lookX, dy = e.clientY - lookY;
       lookX = e.clientX; lookY = e.clientY;
-      G.player.a += dx * 0.006;
+      const s = settings.sens / 100;
+      G.player.a += dx * TOUCH_YAW * s;
       const pLim = pitchLimit();
-      G.player.pitch = Math.max(-pLim, Math.min(pLim, G.player.pitch - dy * 0.6));
+      G.player.pitch = Math.max(-pLim, Math.min(pLim,
+        G.player.pitch - dy * TOUCH_PITCH * s * (settings.invert ? -1 : 1)));
     });
     const endLook = e => { if (e.pointerId === lookPid) lookPid = -1; };
     touchLookEl.addEventListener('pointerup', endLook);
@@ -364,17 +468,18 @@ const Game = (() => {
     document.getElementById('tMode').addEventListener('pointerdown', e => { e.preventDefault(); toggleMode(); });
     document.getElementById('tLook').addEventListener('pointerdown', e => {
       e.preventDefault();
-      if (!G.started || G.over || G.loadingMission || !G.locked) return;
+      if (!inputLive() || !G.locked) return;
       Adventure.lookAt(Engine.W / 2, Engine.H / 2);
     });
     const fireEl = document.getElementById('tFire');
     fireEl.addEventListener('pointerdown', e => {
       e.preventDefault();
-      if (!G.started || G.over || G.loadingMission) return;
+      if (!inputLive()) return;
       if (!G.locked) { requestLock(); return; }
       if (G.combat) { mouseDown = true; shoot(); }
       else Adventure.clickAt(Engine.W / 2, Engine.H / 2);
     });
+    document.getElementById('tPause').addEventListener('pointerdown', e => { e.preventDefault(); pauseGame(); });
     const fireRelease = () => { mouseDown = false; };
     fireEl.addEventListener('pointerup', fireRelease);
     fireEl.addEventListener('pointercancel', fireRelease);
@@ -503,7 +608,11 @@ const Game = (() => {
 
   // --------------------------------------------------------------- update --
   function update(dt) {
-    if (G.loadingMission) return;   // a seamless mission switch is settling — freeze simulation, keep rendering
+    // Both freeze the simulation while rendering carries on, so the world
+    // stays on screen behind the panel. Safe from a dt spike on resume:
+    // loop() reassigns `last` every frame before it gets here, so a paused
+    // frame accumulates nothing to catch up on.
+    if (G.loadingMission || G.paused) return;
     const p = G.player;
 
     // turning (arrow keys as fallback to mouse-look)
@@ -787,14 +896,10 @@ const Game = (() => {
   // its own tag and never had a reason to remove it.
   function updateModeTags() {
     const epTag = document.getElementById('episodetag'), customTag = document.getElementById('customtag');
-    if (World.isEpisode) {
-      epTag.textContent = '▶ MISSION ' + World.episodeSlot + ' OF ' + World.episodeTotal + ' ◀';
-      epTag.style.display = 'block';
-    } else {
-      epTag.style.display = 'none';
-    }
+    if (World.isEpisode) epTag.textContent = '▶ MISSION ' + World.episodeSlot + ' OF ' + World.episodeTotal + ' ◀';
+    epTag.hidden = !World.isEpisode;
     // shipped city/hub missions aren't "custom" — only a local editor level is
-    customTag.style.display = (World.isCustom && !World.currentMission) ? 'block' : 'none';
+    customTag.hidden = !(World.isCustom && !World.currentMission);
   }
   function applyNewMissionState() {
     ensureGeo();                              // pulls in the geo/graph/geoRev World.load() just bumped
@@ -913,11 +1018,13 @@ const Game = (() => {
     moscow: 'moscowsuccess.png',
   };
   function endOverlay(title, cls, body, btn, onClick, img) {
-    overlay.innerHTML =
+    // Safe to innerHTML now: #debriefScreen owns nothing but this, so wiping
+    // it can't take the title screen's splash/start button/tags with it.
+    SCREENS.debrief.innerHTML =
       (img ? '<img class="endart" src="assets/ui/' + img + '?v=1" alt="' + title + '">' : '<h1 class="' + cls + '">' + title + '</h1>') +
       '<p class="story">' + body + '</p>' +
       '<button id="againbtn">' + btn + '</button>';
-    overlay.classList.remove('hidden');
+    showScreen('debrief');
     // reloading the same URL re-runs the exact same boot logic (world.js), so it's
     // also the correct "retry" for a failed episode level — only win() overrides this
     document.getElementById('againbtn').onclick = onClick || (() => location.reload());
@@ -994,14 +1101,14 @@ const Game = (() => {
     if (G.over || totalHostiles === 0) return;
     if (!World.ents.some(e => HOSTILE[e.kind] && !e.dead)) win();
   }
-  // The debrief screen (endOverlay, below) reuses #overlay — win() already
-  // hid the pointer and put that UI up, so continuing into the next mission
-  // means undoing both: hide the debrief, and re-request the lock from
+  // win() already hid the pointer and put the debrief up, so continuing into
+  // the next mission means undoing both: drop the panel, and re-request the
+  // lock from
   // directly inside the button's own click handler, which is exactly the
   // user-gesture context Pointer Lock requires (a plain call from
   // transitionToMission itself, outside a click handler, would be refused).
   function continueFromDebrief(loaderFn) {
-    overlay.classList.add('hidden');
+    showScreen(null);
     requestLock();
     transitionToMission(loaderFn);
   }
@@ -1067,7 +1174,7 @@ const Game = (() => {
     Music.setBlown(G.blown);
     G.started = true;
     G.t0 = performance.now();
-    overlay.classList.add('hidden');
+    showScreen(null);
     requestLock();   // start holstered but pointer-locked — drawing happens on picking a weapon (1-5), TAB/F, or right-click
     if (!World.assetsReady) {
       // Same freeze transitionToMission uses for hub<->level, so a slow
@@ -1087,6 +1194,128 @@ const Game = (() => {
     Adventure.msg('Eyes open. Cover’s thin and the clock is already running.', 5);
   }
   document.getElementById('startbtn').addEventListener('click', beginMission);
+
+  // ------------------------------------------------------------ the menus --
+  // Rows are real <button>/<a> elements, so click, ENTER and focus come for
+  // free and this only has to handle arrow/W-S movement and backing out.
+  function backOut() {
+    if (screenNow === 'settings') { showScreen(settingsBack); return; }
+    if (screenNow === 'mission') { showScreen('title'); return; }
+    // Pause backs out by asking for the lock; syncMode closes the panel if and
+    // when the browser actually grants it (see the note there).
+    if (screenNow === 'pause') requestLock();
+  }
+  function openSettings() { settingsBack = screenNow; syncSettingsUI(); showScreen('settings'); }
+  for (const b of document.querySelectorAll('[data-back]')) b.addEventListener('click', backOut);
+
+  document.addEventListener('keydown', e => {
+    if (!screenNow) return;
+    if (e.code === 'Escape') { e.preventDefault(); backOut(); return; }
+    const el = document.activeElement;
+    // Left/right belong to whatever slider has focus, not to the menu.
+    if (el && el.tagName === 'INPUT' && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) return;
+    const d = (e.code === 'ArrowDown' || e.code === 'KeyS') ? 1
+            : (e.code === 'ArrowUp' || e.code === 'KeyW') ? -1 : 0;
+    if (!d) return;
+    const rows = [...SCREENS[screenNow].querySelectorAll('.menuitem:not([disabled]), .setrow input')]
+      .filter(r => r.offsetParent !== null);   // skip rows CSS has hidden (e.g. FULLSCREEN on desktop)
+    if (!rows.length) return;
+    e.preventDefault();
+    const i = rows.indexOf(el);
+    rows[i < 0 ? (d > 0 ? 0 : rows.length - 1) : (i + d + rows.length) % rows.length].focus();
+  });
+
+  // ---- pause menu ----
+  // Every one of these runs inside its own click, which is the user-gesture
+  // context requestPointerLock needs — the same constraint continueFromDebrief
+  // is built around.
+  function leavePauseInto(loaderFn) {
+    G.paused = false;
+    showScreen(null);
+    requestLock();
+    transitionToMission(loaderFn);
+  }
+  document.getElementById('resumeBtn').addEventListener('click', () => requestLock());
+  document.getElementById('pauseSettingsBtn').addEventListener('click', openSettings);
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    if (World.isEpisode) { leavePauseInto(() => World.loadEpisodeSlot(World.episodeSlot)); return; }
+    if (World.currentMission) { leavePauseInto(() => World.loadMissionByName(World.currentMission)); return; }
+    location.reload();   // an editor level has no name to reload by — booting the page is its restart
+  });
+  const quitBtn = document.getElementById('quitHubBtn');
+  quitBtn.addEventListener('click', () => leavePauseInto(() => World.loadMissionByName('hub')));
+
+  // ---- mission select ----
+  const MISSION_LABELS = {
+    hub: 'THE AIRPORT', cuba: 'HAVANA', hongkong: 'HONG KONG', paris: 'PARIS',
+    tehran: 'TEHRAN', newyork: 'NEW YORK', dallas: 'DALLAS', moscow: 'MOSCOW',
+  };
+  const missionSelectBtn = document.getElementById('missionSelectBtn');
+  (function buildMissionMenu() {
+    const nav = document.getElementById('missionMenu');
+    const keys = (typeof MISSIONS === 'object' && MISSIONS) ? Object.keys(MISSIONS) : [];
+    // hub first, then the cities alphabetically by their display name
+    keys.sort((a, b) => (a === 'hub' ? -1 : b === 'hub' ? 1 : 0)
+      || (MISSION_LABELS[a] || a).localeCompare(MISSION_LABELS[b] || b));
+    for (const key of keys) {
+      const b = document.createElement('button');
+      b.className = 'menuitem';
+      b.textContent = MISSION_LABELS[key] || key.toUpperCase();
+      b.addEventListener('click', () => {
+        if (!World.loadMissionByName(key)) return;
+        // Not started yet: beginMission does the Sfx/Music unlock and the lock
+        // request itself, all synchronously inside this click. Already playing:
+        // it's an ordinary in-place switch.
+        if (G.started) leavePauseInto(() => {});
+        else beginMission();
+      });
+      nav.appendChild(b);
+    }
+    missionSelectBtn.hidden = !keys.length;
+  })();
+  missionSelectBtn.addEventListener('click', () => showScreen('mission'));
+  document.getElementById('titleSettingsBtn').addEventListener('click', openSettings);
+
+  // ---- settings screen ----
+  const setEls = {
+    music: document.getElementById('setMusic'), musicVal: document.getElementById('setMusicVal'),
+    sfx: document.getElementById('setSfx'), sfxVal: document.getElementById('setSfxVal'),
+    sens: document.getElementById('setSens'), sensVal: document.getElementById('setSensVal'),
+    invert: document.getElementById('setInvert'), invertVal: document.getElementById('setInvertVal'),
+    fs: document.getElementById('setFs'), fsVal: document.getElementById('setFsVal'),
+    fsRow: document.getElementById('setFsRow'),
+  };
+  function syncSettingsUI() {
+    setEls.music.value = settings.music; setEls.musicVal.textContent = settings.music + '%';
+    setEls.sfx.value = settings.sfx; setEls.sfxVal.textContent = settings.sfx + '%';
+    setEls.sens.value = settings.sens; setEls.sensVal.textContent = settings.sens + '%';
+    setEls.invert.checked = settings.invert; setEls.invertVal.textContent = settings.invert ? 'ON' : 'OFF';
+    setEls.fs.checked = isFullscreen(); setEls.fsVal.textContent = isFullscreen() ? 'ON' : 'OFF';
+    // Electron runs fullscreen with nothing to toggle (see toggleFullscreen).
+    setEls.fsRow.hidden = !!window.CLICKDAGGER_DESKTOP;
+  }
+  function changeSetting(key, value) {
+    settings[key] = value;
+    applySettings();
+    saveSettings();
+    syncSettingsUI();
+  }
+  setEls.music.addEventListener('input', () => changeSetting('music', +setEls.music.value));
+  setEls.sfx.addEventListener('input', () => {
+    changeSetting('sfx', +setEls.sfx.value);
+    Sfx.pick();   // audible reference for what you just set it to
+  });
+  setEls.sens.addEventListener('input', () => changeSetting('sens', +setEls.sens.value));
+  setEls.invert.addEventListener('change', () => changeSetting('invert', setEls.invert.checked));
+  setEls.fs.addEventListener('change', () => { toggleFullscreen(); });   // fullscreenchange re-syncs the row
+  document.getElementById('setDefaults').addEventListener('click', () => {
+    Object.assign(settings, SETTINGS_DEFAULT);
+    applySettings(); saveSettings(); syncSettingsUI();
+  });
+
+  loadSettings();
+  applySettings();
+  syncSettingsUI();
 
   // Jump into LAIR ARCHITECT with the level currently being played already
   // loaded — same localStorage key/shape the editor's own "SAVE TO BROWSER"
@@ -1130,6 +1359,7 @@ const Game = (() => {
   }
   function syncFullscreenBtn() {
     fsBtn.textContent = isFullscreen() ? '⛶ EXIT FULLSCREEN' : '⛶ FULLSCREEN';
+    syncSettingsUI();                       // the settings screen mirrors this state in its own row
     requestAnimationFrame(Engine.resize);   // canvas's displayed CSS size just changed — rAF so layout's settled first
   }
   fsBtn.addEventListener('click', toggleFullscreen);
@@ -1149,6 +1379,9 @@ const Game = (() => {
   });
 
   updateModeTags();
+  // Quitting to the airport only makes sense if this build actually ships one.
+  quitBtn.disabled = !World.hasMission('hub');
+  showScreen('title');            // normalizes the body class and puts focus on BEGIN MISSION
   Adventure.setWinTrigger(win);   // lets a puzzle payoff (e.g. the sports car + keys) end the mission directly
   Adventure.setLoseTrigger(dieBomb);   // cutting the wrong wire on the bomb ends it too
   Adventure.setBlowTrigger(blowCover);   // getting caught red-handed (e.g. lifting the Fabergé egg) blows cover directly

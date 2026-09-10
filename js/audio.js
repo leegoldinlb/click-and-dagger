@@ -3,11 +3,25 @@
 // Tiny WebAudio synth — all sound effects are generated, no assets.
 const Sfx = (() => {
   let ac = null;
+  // Everything routes through one master gain instead of straight to
+  // destination, so the settings screen has a single knob to turn. Per-call
+  // `vol` arguments below stay exactly as they were — they set the relative
+  // loudness of each effect, this scales the lot.
+  let master = null, masterVol = 1;
   const A = () => {
-    if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
+    if (!ac) {
+      try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+      master = ac.createGain();
+      master.gain.value = masterVol;
+      master.connect(ac.destination);
+    }
     if (ac.state === 'suspended') ac.resume();
     return ac;
   };
+  function setVolume(v) {
+    masterVol = Math.max(0, Math.min(1, v));
+    if (master) master.gain.value = masterVol;   // no context yet? A() picks it up when one is made
+  }
 
   function tone(f0, f1, dur, type, vol, delay = 0) {
     const c = A(); if (!c) return;
@@ -18,7 +32,7 @@ const Sfx = (() => {
     o.frequency.exponentialRampToValueAtTime(Math.max(1, f1), t + dur);
     g.gain.setValueAtTime(vol, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    o.connect(g).connect(c.destination);
+    o.connect(g).connect(master);
     o.start(t); o.stop(t + dur + 0.05);
   }
 
@@ -34,12 +48,13 @@ const Sfx = (() => {
     f.frequency.setValueAtTime(fFrom, t);
     f.frequency.exponentialRampToValueAtTime(Math.max(40, fTo), t + dur);
     const g = c.createGain(); g.gain.value = vol;
-    src.connect(f).connect(g).connect(c.destination);
+    src.connect(f).connect(g).connect(master);
     src.start(t);
   }
 
   return {
     unlock: A,
+    setVolume,
     shoot()  { noise(0.09, 0.32, 1100, 140); tone(110, 45, 0.09, 'sine', 0.26); },       // suppressed
     dry()    { tone(900, 500, 0.05, 'square', 0.12); },
     hurt()   { tone(220, 90, 0.25, 'sawtooth', 0.28); },
