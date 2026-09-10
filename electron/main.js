@@ -1,5 +1,5 @@
 'use strict';
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
 
 // Customizes the native "About Click and Dagger" panel (the role:'about'
@@ -71,6 +71,12 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, '..', 'index.html'));
 }
+
+// The in-game QUIT GAME menu item (see the preload's CLICKDAGGER_QUIT).
+// app.quit() rather than closing the window: on macOS window-all-closed
+// deliberately leaves the app running, which for a fullscreen game would
+// look like nothing happened.
+ipcMain.on('clickdagger:quit', () => app.quit());
 
 app.whenReady().then(() => {
   createWindow();

@@ -352,6 +352,10 @@ body.adventure #modeline { color: #b09048; }
    happened to be, so the keyboard selection has to be legible on its own. */
 .menuitem:focus::before { content: '\25B8  '; color: var(--gold-bright); }
 .menuitem:focus::after { content: '  \25C2'; color: var(--gold-bright); }
+/* display:block above beats the `hidden` attribute's UA display:none, so
+   rows toggled with .hidden (QUIT GAME off the desktop build, MISSION SELECT
+   with no missions) need this to actually disappear. */
+.menuitem[hidden] { display: none; }
 .menuitem.back { margin-top: 18px; font-size: 13px; letter-spacing: 2px; }
 .menuitem[disabled] { opacity: 0.4; cursor: default; }
 .menuitem[disabled]:hover, .menuitem[disabled]:focus { color: var(--parchment-dim); border-color: var(--brass-dim); background: linear-gradient(160deg, rgba(74,58,32,0.55), rgba(28,21,12,0.55)); }
@@ -374,6 +378,7 @@ body.menuopen #hud, body.menuopen #message { display: none; }
   font-size: 12px; letter-spacing: 2px; color: var(--parchment-dim);
   cursor: pointer;
 }
+.setrow[hidden] { display: none; }   /* same as .menuitem[hidden]: display:flex would otherwise win */
 .setrow:focus-within { border-color: var(--gold); color: var(--gold-bright); }
 .setrow > span { flex: 1; text-align: left; white-space: nowrap; }
 .setrow > b { width: 46px; text-align: right; color: var(--gold-bright); font-size: 12px; }

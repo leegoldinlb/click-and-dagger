@@ -1242,13 +1242,11 @@ const Game = (() => {
     if (World.currentMission) { leavePauseInto(() => World.loadMissionByName(World.currentMission)); return; }
     location.reload();   // an editor level has no name to reload by — booting the page is its restart
   });
-  const quitBtn = document.getElementById('quitHubBtn');
-  quitBtn.addEventListener('click', () => leavePauseInto(() => World.loadMissionByName('hub')));
-
-  // Back out of the mission entirely, to the title screen. Distinct from QUIT
-  // TO THE AIRPORT, which is still *playing* — the hub is a level. This is the
-  // way out of the game itself, and the only route back to MISSION SELECT and
-  // the rest of the main menu once a mission is under way.
+  // Back out of the mission entirely, to the title screen — the only route
+  // back to MISSION SELECT and the rest of the main menu once a mission is
+  // under way. (There was a QUIT TO THE AIRPORT here too, but the hub is
+  // reachable enough already: a gate in every level, the debrief, and mission
+  // select all lead there.)
   function quitToTitle() {
     // Ordering matters: G.started goes false BEFORE releasing the pointer,
     // because exitPointerLock fires pointerlockchange -> syncMode, and syncMode
@@ -1268,6 +1266,17 @@ const Game = (() => {
     showScreen('title');
   }
   document.getElementById('quitTitleBtn').addEventListener('click', quitToTitle);
+
+  // ---- quit the app (desktop only) ----
+  // In a browser tab there's nothing to quit — the page can't close itself,
+  // and the tab's own close button is right there — so these rows stay hidden
+  // unless the preload bridge is present.
+  if (window.CLICKDAGGER_DESKTOP && typeof window.CLICKDAGGER_QUIT === 'function') {
+    for (const b of document.querySelectorAll('.quitapp')) {
+      b.hidden = false;
+      b.addEventListener('click', () => window.CLICKDAGGER_QUIT());
+    }
+  }
 
   // ---- mission select ----
   const MISSION_LABELS = {
@@ -1403,8 +1412,6 @@ const Game = (() => {
   });
 
   updateModeTags();
-  // Quitting to the airport only makes sense if this build actually ships one.
-  quitBtn.disabled = !World.hasMission('hub');
   showScreen('title');            // normalizes the body class and puts focus on BEGIN MISSION
   Adventure.setWinTrigger(win);   // lets a puzzle payoff (e.g. the sports car + keys) end the mission directly
   Adventure.setLoseTrigger(dieBomb);   // cutting the wrong wire on the bomb ends it too
