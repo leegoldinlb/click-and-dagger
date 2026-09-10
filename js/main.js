@@ -1245,6 +1245,30 @@ const Game = (() => {
   const quitBtn = document.getElementById('quitHubBtn');
   quitBtn.addEventListener('click', () => leavePauseInto(() => World.loadMissionByName('hub')));
 
+  // Back out of the mission entirely, to the title screen. Distinct from QUIT
+  // TO THE AIRPORT, which is still *playing* — the hub is a level. This is the
+  // way out of the game itself, and the only route back to MISSION SELECT and
+  // the rest of the main menu once a mission is under way.
+  function quitToTitle() {
+    // Ordering matters: G.started goes false BEFORE releasing the pointer,
+    // because exitPointerLock fires pointerlockchange -> syncMode, and syncMode
+    // opens the pause menu on a lock it sees as lost mid-mission.
+    G.started = false;
+    G.paused = false;
+    clearHeldInput();
+    if (document.exitPointerLock) document.exitPointerLock();
+    // Re-load from scratch so BEGIN MISSION starts a clean run rather than
+    // dropping back into the half-played one that was just abandoned — bodies
+    // still down, doors still open, kit still in hand.
+    if (World.isEpisode) World.loadEpisodeSlot(World.episodeSlot);
+    else if (World.currentMission) World.loadMissionByName(World.currentMission);
+    else World.load(World.bootLevel);
+    applyNewMissionState();
+    Music.stop();          // applyNewMissionState re-tracks the music; the title screen is silent, as on a cold boot
+    showScreen('title');
+  }
+  document.getElementById('quitTitleBtn').addEventListener('click', quitToTitle);
+
   // ---- mission select ----
   const MISSION_LABELS = {
     hub: 'THE AIRPORT', cuba: 'HAVANA', hongkong: 'HONG KONG', paris: 'PARIS',

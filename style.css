@@ -360,10 +360,10 @@ body.adventure #modeline { color: #b09048; }
    d-pad/kit/action buttons have nothing to do while a menu is up. */
 body.menuopen #touchlook, body.menuopen #touchdpad,
 body.menuopen #touchkit, body.menuopen #touchactions { display: none; }
-/* The panel backdrops stop just short of opaque, so the HUD read as ghost text
-   through the title screen rather than being covered by it. Ordering it behind
-   isn't enough on its own — it has to be gone. */
-body.menuopen #hud { display: none; }
+/* The panel backdrops stop just short of opaque, so these read as ghost text
+   through the title screen rather than being covered by it. Ordering them
+   behind isn't enough on its own — they have to be gone. */
+body.menuopen #hud, body.menuopen #message { display: none; }
 
 .settings { display: flex; flex-direction: column; gap: 10px; min-width: 380px; max-width: 480px; }
 .setrow {
