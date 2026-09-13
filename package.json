@@ -1,6 +1,6 @@
 {
   "name": "click-and-dagger",
-  "version": "1.14.0",
+  "version": "1.14.1",
   "private": true,
   "main": "electron/main.js",
   "scripts": {
@@ -15,6 +15,7 @@
   "build": {
     "appId": "com.clickanddagger.app",
     "productName": "Click and Dagger",
+    "afterPack": "electron/afterPack.js",
     "files": [
       "index.html",
       "editor.html",
